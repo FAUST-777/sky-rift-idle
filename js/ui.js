@@ -46,7 +46,7 @@
       $('revivePay').disabled = S.crystal < cost;
     }
     // 有技能點未使用 → 技能分頁亮紅點；可以轉職 → 角色分頁亮紅點
-    setDot('skills', S.skillPoints > 0);
+    setDot('skills', G.partyMembers().concat(Object.keys(S.partners)).some(w => G.spOf(w) > 0 && G.charOf(w).cls !== 'villager'));
     setDot('hero', h.cls === 'villager' && h.level >= G.CONFIG.classUnlockLevel);
   }
   // ── Buff 圖示（戰鬥畫面左上角，點一下看說明）─────────────────────────────
@@ -153,7 +153,8 @@
       clsHtml = `<p class="muted" style="margin:0">${t('hero.classLocked', { lv: G.CONFIG.classUnlockLevel, cur: h.level })}</p>`;
     } else {
       clsHtml = `<div class="classes">${G.CLASS_ORDER.map(c => `<button class="cls ${h.cls === c ? 'cur' : ''}" data-act="class" data-cls="${c}">
-          <b style="color:${G.CLASSES[c].color}">${G.clsName(c)}${h.cls === c ? t('hero.current') : ''}</b><p>${t(`class.${c}.desc`)}</p></button>`).join('')}</div>
+          <b style="color:${G.CLASSES[c].color === '#5b3d7a' ? '#b48be0' : G.CLASSES[c].color}">${G.clsName(c)}${h.cls === c ? t('hero.current') : ''}</b>
+          <div class="tags">${classTags(c)}</div><p>${t(`class.${c}.desc`)}</p></button>`).join('')}</div>
       ${h.cls !== 'villager' ? `<p class="muted" style="font-size:12px;margin:8px 0 0">${t('hero.classChangeNote', { cost: G.CONFIG.classChangeCost })}</p>` : ''}`;
     }
 
@@ -217,56 +218,87 @@
   }
 
   // ── 分頁：技能 ───────────────────────────────────────────────────────────
-  function renderSkills() {
-    const S = G.S, cls = S.hero.cls, list = G.SKILLS[cls] || [];
-    const spent = G.skillPointsInClass();
-    const aslots = S.activeSkills.map((id, i) => {
+  // 角色切換列（角色、技能分頁共用；顯示各角色剩餘技能點）
+  function whoBarHtml(withSp) {
+    const S = G.S;
+    const ids = Object.keys(S.partners).sort((a, b) => S.party.includes(b) - S.party.includes(a));
+    if (!ids.length) return '';
+    return `<div class="who">${['hero', ...ids].map(id => {
+      const sp = withSp ? G.spOf(id) : 0;
+      return `<button class="chip ${UI.who === id ? 'on' : ''}" data-act="who" data-v="${id}">${id === 'hero' ? '🧍 ' : S.party.includes(id) ? '⚔️ ' : ''}${esc(whoName(id))}${sp ? ` <b class="gold">+${sp}</b>` : ''}</button>`;
+    }).join('')}</div>`;
+  }
+
+  // 職業標籤：定位・範圍・系別
+  function classTags(c) {
+    const C = G.CLASSES[c];
+    return `<span class="ctag">${G.CORE_ICON[C.core]} ${t(`core.${C.core}`)}</span><span class="ctag">${t(`range.${C.range}`)}</span><span class="ctag" style="color:${G.DMG_TYPES[C.dmgType]}">${t(`dtype.${C.dmgType}`)}</span>`;
+  }
+  UI.classTags = classTags;
+
+  function slotGrid(kind, ch, list) {
+    const slots = kind === 'active' ? ch.active : ch.passive;
+    return `<div class="aslots">${slots.map((id, i) => {
       const sk = id && list.find(s => s.id === id);
-      return `<button class="aslot ${sk ? 'filled' : ''}" data-act="aslot" data-i="${i}">${sk
-        ? `<b>${G.skillName(id)}</b><br><small class="muted">Lv ${S.skills[id]}</small>`
+      return `<button class="aslot ${sk ? 'filled ' + kind : ''}" data-act="slot" data-kind="${kind}" data-i="${i}">${sk
+        ? `<b>${G.skillName(id)}</b><br><small class="muted">Lv ${ch.skills[id] || 0}</small>`
         : `<span class="muted">${t('skills.empty')}<br><small>${t('skills.emptyHint')}</small></span>`}</button>`;
-    }).join('');
+    }).join('')}</div>`;
+  }
+
+  function renderSkills() {
+    const S = G.S;
+    if (UI.who !== 'hero' && !S.partners[UI.who]) UI.who = 'hero';
+    const who = UI.who, ch = G.charOf(who), cls = ch.cls, list = G.SKILLS[cls] || [];
+    const spent = G.spentPoints(who), sp = G.spOf(who);
     const tiers = [0, 1, 2].map(tier => {
       const sks = list.filter(s => s.tier === tier);
       if (!sks.length) return '';
       const locked = spent < G.TIER_REQ[tier];
       return `<div class="tier-title ${locked ? 'locked' : ''}">${t('skills.tier', { n: tier + 1 })}${tier ? t('skills.tierReq', { req: G.TIER_REQ[tier], cur: spent }) : ''}</div>` +
         sks.map(s => {
-          const r = S.skills[s.id];
+          const r = ch.skills[s.id] || 0;
+          const equipped = (s.type === 'active' ? ch.active : ch.passive).includes(s.id);
           const now = r ? G.skillDesc(s, r) : t('skills.notLearned');
           const next = r < s.max ? t('skills.next', { desc: G.skillDesc(s, r + 1) }) : t('skills.maxed');
           return `<div class="skill ${locked ? 'locked' : ''}">
             <div class="info">
-              <div class="name">${G.skillName(s.id)}<span class="tag ${s.type}">${s.type === 'active' ? t('skills.active', { cd: s.cd }) : t('skills.passive')}</span></div>
+              <div class="name">${G.skillName(s.id)}<span class="tag ${s.type}">${s.type === 'active' ? t('skills.active', { cd: s.cd }) : t('skills.passive')}</span>${equipped ? `<span class="tag eq">${t('skills.equipped')}</span>` : ''}</div>
               <div class="desc">${now}</div><div class="desc">${next}</div>
               <div class="pips">${Array.from({ length: s.max }, (_, i) => `<i class="${i < r ? 'on' : ''}"></i>`).join('')}</div>
             </div>
-            <button class="btn small primary" data-act="learn" data-id="${s.id}" ${locked || r >= s.max || S.skillPoints <= 0 ? 'disabled' : ''}>＋</button>
+            <button class="btn small primary" data-act="learn" data-id="${s.id}" ${locked || r >= s.max || sp <= 0 ? 'disabled' : ''}>＋</button>
           </div>`;
         }).join('');
     }).join('');
 
     return `
       <div class="card">
-        <h3>${t('skills.points')} <span class="gold">${S.skillPoints}</span></h3>
-        <p class="muted" style="margin:0 0 10px;font-size:12px">${t('skills.help')}</p>
-        <div class="aslots">${aslots}</div>
+        ${whoBarHtml(true)}
+        <h3>${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span></h3>
+        <p class="muted" style="margin:0 0 10px;font-size:12px">${t('skills.help', { a: G.ACTIVE_SLOTS, p: G.PASSIVE_SLOTS })}</p>
+        <div class="slot-label">${t('skills.activeSlots')}</div>
+        ${slotGrid('active', ch, list)}
+        <div class="slot-label">${t('skills.passiveSlots')}</div>
+        ${slotGrid('passive', ch, list)}
       </div>
       <div class="card">
         <h3>${t('skills.tree', { cls: G.clsName(cls) })}</h3>
-        ${cls === 'villager' ? `<p class="muted" style="margin:0 0 8px">${t('skills.villager', { lv: G.CONFIG.classUnlockLevel })}</p>` : ''}
+        ${cls === 'villager' ? `<p class="muted" style="margin:0 0 8px">${t('skills.villager', { lv: G.CONFIG.classUnlockLevel })}</p>` : `<div class="tags">${classTags(cls)}</div>`}
         ${tiers}
       </div>`;
   }
 
-  function slotPicker(i) {
-    const S = G.S, list = (G.SKILLS[S.hero.cls] || []).filter(s => s.type === 'active' && S.skills[s.id] > 0);
+  function slotPicker(kind, i) {
+    const who = UI.who, ch = G.charOf(who);
+    const list = (G.SKILLS[ch.cls] || []).filter(s => s.type === kind && ch.skills[s.id] > 0);
+    const slots = kind === 'active' ? ch.active : ch.passive;
     UI.modal(`
-      <h2>${t('skills.pickTitle', { n: i + 1 })}</h2>
-      ${list.map(s => `<button class="btn" style="width:100%;margin-bottom:8px;text-align:left;white-space:normal" data-act="setaslot" data-i="${i}" data-id="${s.id}">
-        <b>${G.skillName(s.id)}</b> Lv ${S.skills[s.id]}　<span class="muted">${G.skillDesc(s, S.skills[s.id])}</span></button>`).join('') || `<p class="muted">${t('skills.noActive')}</p>`}
+      <h2>${t(kind === 'active' ? 'skills.pickActive' : 'skills.pickPassive', { n: i + 1 })}</h2>
+      ${list.map(s => `<button class="btn ${slots.includes(s.id) ? 'on' : ''}" style="width:100%;margin-bottom:8px;text-align:left;white-space:normal" data-act="setslot" data-kind="${kind}" data-i="${i}" data-id="${s.id}">
+        <b>${G.skillName(s.id)}</b> Lv ${ch.skills[s.id]}　<span class="muted">${G.skillDesc(s, ch.skills[s.id])}</span></button>`).join('') || `<p class="muted">${t(kind === 'active' ? 'skills.noActive' : 'skills.noPassive')}</p>`}
       <div class="modal-actions">
-        ${S.activeSkills[i] ? `<button class="btn" data-act="setaslot" data-i="${i}" data-id="">${t('skills.clear')}</button>` : ''}
+        ${slots[i] ? `<button class="btn" data-act="setslot" data-kind="${kind}" data-i="${i}" data-id="">${t('skills.clear')}</button>` : ''}
         <button class="btn" data-act="close">${t('common.close')}</button>
       </div>`);
   }
@@ -286,18 +318,21 @@
             ${open ? `<button class="btn small primary" data-act="recruit" data-id="${p.id}">${t('partners.recruit', { cost: G.fmt(G.partnerRecruitCost(p)) })}</button>` : ''}
           </div></div>`;
       }
-      const st = G.partnerStats(p.id), inParty = S.party.includes(p.id), sk = G.partnerSkill(p.id);
+      const st = G.partnerStats(p.id), inParty = S.party.includes(p.id), sp = G.spOf(p.id);
+      const nSk = own.active.filter(Boolean).length + own.passive.filter(Boolean).length;
       return `<div class="card partner">
         <canvas data-doll="${p.id}" width="64" height="80"></canvas>
         <div class="grow">
           <div class="row between"><b>${G.partnerName(p.id)} <span class="muted">Lv ${own.level}</span></b>
             <button class="btn small ${inParty ? 'on' : ''}" data-act="party" data-id="${p.id}">${inParty ? t('partners.inParty') : t('partners.resting')}</button></div>
-          <div class="muted" style="font-size:12px;margin:4px 0">${t('partners.stats', { hp: G.fmt(st.maxHp), atk: st.atk, def: st.def })}${sk ? t('partners.skill', { name: G.skillName(sk.def.id), lv: sk.rank }) : ''}</div>
+          <div class="tags" style="margin:4px 0">${classTags(own.cls)}</div>
+          <div class="muted" style="font-size:12px;margin:4px 0">${t('partners.stats', { hp: G.fmt(st.maxHp), atk: st.atk, def: st.def })}</div>
           <div class="row wrap" style="margin-top:6px">
             <select data-act="pclass" data-id="${p.id}">
               ${G.CLASS_ORDER.map(c => `<option value="${c}" ${own.cls === c ? 'selected' : ''}>${G.clsName(c)}</option>`).join('')}
             </select>
             <button class="btn small good" data-act="plevel" data-id="${p.id}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(own.level)) })}</button>
+            <button class="btn small" data-act="pskills" data-id="${p.id}">📜 ${t('partners.skills', { n: nSk })}${sp ? ` <b class="gold">+${sp}</b>` : ''}</button>
           </div>
         </div></div>`;
     }).join('');
@@ -514,9 +549,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         break;
       }
       case 'class2': G.changeClass(d.cls); UI.close(); UI.refresh(); break;
-      case 'learn': G.learnSkill(d.id); break;
-      case 'aslot': slotPicker(+d.i); break;
-      case 'setaslot': G.setActiveSkill(+d.i, d.id || null); UI.close(); break;
+      case 'learn': G.learnSkill(d.id, UI.who); break;
+      case 'slot': slotPicker(d.kind, +d.i); break;
+      case 'setslot': G.setSkillSlot(UI.who, d.kind, +d.i, d.id || null); UI.close(); break;
+      case 'pskills': UI.who = d.id; switchTab('skills'); break;
       case 'recruit': G.recruit(d.id); break;
       case 'party': G.toggleParty(d.id); break;
       case 'plevel': G.partnerLevelUp(d.id); break;
@@ -532,6 +568,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         break;
       case 'nets': G.buyNets(+d.v); break;
     }
+  }
+
+  function switchTab(tab) {
+    UI.tab = tab;
+    UI.placing = null;
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
+    $('panel').scrollTop = 0;
+    UI.render();
   }
 
   // 戰鬥畫面折疊（記在設定裡，重開也保持）
@@ -560,12 +604,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     applyStatic();
     document.getElementById('tabs').addEventListener('click', e => {
       const b = e.target.closest('[data-tab]');
-      if (!b) return;
-      UI.tab = b.dataset.tab;
-      UI.placing = null;
-      document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-      $('panel').scrollTop = 0;
-      UI.render();
+      if (b) switchTab(b.dataset.tab);
     });
     document.addEventListener('click', e => {
       const el = e.target.closest('[data-act]');

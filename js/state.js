@@ -17,24 +17,33 @@
   G.pick = arr => arr[Math.floor(Math.random() * arr.length)];
   G.fmt = n => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e4 ? (n / 1e3).toFixed(1) + 'K' : String(Math.floor(n));
 
+  const emptyGear = () => ({ weapon: null, helmet: null, armor: null, boots: null, accessory: null });
+  const emptySlots = n => Array(n).fill(null);
+
+  // 角色（主角或夥伴）的技能都長一樣：skills {id: 等級}、active[4]、passive[4]
+  // 技能點 = 等級 − 已投入點數（每個職業第一招送 1 級）
+  function resetSkills(ch) {
+    const first = (G.SKILLS[ch.cls] || []).find(s => s.type === 'active');
+    ch.skills = first ? { [first.id]: 1 } : {};
+    ch.active = emptySlots(G.ACTIVE_SLOTS);
+    ch.passive = emptySlots(G.PASSIVE_SLOTS);
+    if (first) ch.active[0] = first.id;
+  }
+
   function newState() {
-    const skills = {};
-    Object.keys(G.SKILLS).forEach(c => G.SKILLS[c].forEach(s => skills[s.id] = 0));
-    skills.smash = 1;
+    const hero = { level: 1, xp: 0, cls: 'villager', hair: '#5a3a22', skin: '#f1c9a0' };
+    resetSkills(hero);
     return {
-      v: 1,
+      v: 1, skillVer: 2,
       seenPrologue: false,
       gold: 0, crystal: 0, nets: 0,
-      hero: { level: 1, xp: 0, cls: 'villager', hair: '#5a3a22', skin: '#f1c9a0' },
-      skills,
-      skillPoints: 0,
-      activeSkills: ['smash', null, null],
-      equipped: { weapon: null, helmet: null, armor: null, boots: null, accessory: null },
+      hero,
+      equipped: emptyGear(),
       inventory: [],
       bagExpands: 0,         // 背包擴充次數
       floor: 1, maxFloor: 1, kills: 0, autoAdvance: true,
-      morale: 0,             // 士氣層數（每層 +1% 全隊最終防禦，貓鎧者在場才累積/生效）
-      partners: {},          // id -> { level, cls, equipped }
+      morale: 0,             // 士氣層數（每層 +1% 全隊最終防禦；有人裝「士氣」被動才累積/生效）
+      partners: {},          // id -> { level, cls, equipped, skills, active, passive }
       party: [],             // 出戰中的夥伴 id
       ship: { balloon: 1, engine: 1, hull: 1, cannon: 0, paint: 0, figurehead: 0 },
       furniture: {},         // id -> 持有數量（未擺放）
@@ -55,9 +64,8 @@
       // 補上新版本新增的欄位，舊存檔也能讀
       G.S = Object.assign(base, s);
       G.S.ship = Object.assign(newState().ship, s.ship);
-      G.S.skills = Object.assign(newState().skills, s.skills);
       migrateToI18n(G.S);
-      migrateClasses(G.S);
+      migrateSkills(G.S);
     } else {
       G.S = base;
     }
@@ -82,29 +90,23 @@
     S.log = S.log.filter(l => l.k);   // 舊的純文字日誌無法翻譯，直接清掉
   }
 
-  const emptyGear = () => ({ weapon: null, helmet: null, armor: null, boots: null, accessory: null });
-
-  // 死靈術師已移除 → 改成貓鎧者，技能點全部退還；夥伴補上裝備欄
-  function migrateClasses(S) {
-    const gone = id => !G.CLASSES[id];
-    if (gone(S.hero.cls)) {
-      let refund = 0;
-      Object.keys(S.skills).forEach(id => { refund += S.skills[id]; S.skills[id] = 0; });
-      S.hero.cls = 'catknight';
-      const first = G.SKILLS.catknight[0];
-      S.skills[first.id] = 1;
-      S.skillPoints += Math.max(0, refund - 1);
-      S.activeSkills = [first.id, null, null];
-    }
-    // 移除不存在的技能 id
-    const valid = new Set(Object.values(G.SKILLS).flat().map(s => s.id));
-    Object.keys(S.skills).forEach(id => { if (!valid.has(id)) delete S.skills[id]; });
-    valid.forEach(id => { if (S.skills[id] === undefined) S.skills[id] = 0; });
-    S.activeSkills = S.activeSkills.map(id => (id && valid.has(id) ? id : null));
-    Object.values(S.partners).forEach(p => {
-      if (gone(p.cls)) p.cls = 'catknight';
-      p.equipped = Object.assign(emptyGear(), p.equipped);
+  // 職業重新設計（第 5 輪）：舊職業對應到同定位的新職業，所有人技能點全部退還重配
+  const CLASS_MAP = { necro: 'catknight', priest: 'druid', crusader: 'wallbringer' };
+  function migrateSkills(S) {
+    const fixCls = c => (G.CLASSES[c] ? c : CLASS_MAP[c] || 'bloodknight');
+    const chars = [S.hero, ...Object.values(S.partners)];
+    chars.forEach(ch => {
+      const old = ch.cls;
+      ch.cls = fixCls(ch.cls);
+      // 舊版沒有技能欄位，或技能 id 已不存在 → 重置
+      const valid = new Set((G.SKILLS[ch.cls] || []).map(s => s.id));
+      const ok = ch.skills && ch.active && ch.passive && ch.active.length === G.ACTIVE_SLOTS && ch.cls === old &&
+        Object.keys(ch.skills).every(id => valid.has(id));
+      if (!ok || S.skillVer !== 2) resetSkills(ch);
     });
+    Object.values(S.partners).forEach(p => { p.equipped = Object.assign(emptyGear(), p.equipped); });
+    delete S.skills; delete S.skillPoints; delete S.activeSkills;
+    S.skillVer = 2;
   }
 
   G.save = function () {
@@ -125,93 +127,80 @@
   };
   G.logText = l => l.k ? t(l.k, l.p) : (l.text || '');   // 舊存檔的日誌是純文字
 
-  // ── 屬性計算 ─────────────────────────────────────────────────────────────
-  function passiveSum(kind) {
-    const list = G.SKILLS[G.S.hero.cls] || [];
-    let sum = 0;
-    list.forEach(sk => { if (sk.type === 'passive' && sk.kind === kind && G.S.skills[sk.id] > 0) sum += sk.v(G.S.skills[sk.id]); });
-    return sum;
-  }
-  G.passive = passiveSum;
+  // ── 角色 / 技能 ─────────────────────────────────────────────────────────
+  // who = 'hero' 或夥伴 id
+  G.charOf = who => (who === 'hero' || !who ? G.S.hero : G.S.partners[who]);
+  G.partyMembers = () => ['hero', ...G.S.party.filter(id => G.S.partners[id])];
+  G.skillDef = (cls, id) => (G.SKILLS[cls] || []).find(s => s.id === id);
+  G.spentPoints = who => Object.values(G.charOf(who).skills).reduce((a, b) => a + b, 0);
+  G.spOf = who => Math.max(0, G.charOf(who).level - G.spentPoints(who));
 
-  G.heroStats = function () {
-    const h = G.S.hero, cls = G.CLASSES[h.cls], B = G.HERO_BASE, L = G.LEVEL_GAIN;
-    const st = {
-      maxHp: (B.hp + L.hp * (h.level - 1)) * cls.mult.hp,
-      atk:   (B.atk + L.atk * (h.level - 1)) * cls.mult.atk,
-      def:   (B.def + L.def * (h.level - 1)) * cls.mult.def,
-      spd: B.spd, crit: B.crit, critDmg: B.critDmg,
-    };
-    G.SLOTS.forEach(slot => {
-      const it = G.S.equipped[slot];
-      if (!it) return;
-      st.maxHp += it.stats.hp || 0;
-      st.atk   += it.stats.atk || 0;
-      st.def   += it.stats.def || 0;
-      st.crit  += it.stats.crit || 0;
-      st.spd   += it.stats.spd || 0;
+  // 已裝備的被動 → 依類型加總：self / party（光環）/ proc（普攻附加）/ special（特殊機制）
+  G.passivesOf = function (who) {
+    const ch = G.charOf(who), out = { self: {}, party: {}, proc: [], special: {} };
+    ch.passive.forEach(id => {
+      const sk = id && G.skillDef(ch.cls, id), r = id && ch.skills[id];
+      if (!sk || !r) return;
+      const v = sk.v(r);
+      if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t });
+      else if (sk.p === 'special') out.special[sk.key] = { v, v2: sk.v2 ? sk.v2(r) : 0 };
+      else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
     });
-    st.atk   *= 1 + passiveSum('atkPct');
-    st.def   *= 1 + passiveSum('defPct');
-    st.maxHp *= 1 + passiveSum('hpPct');
-    st.crit  += passiveSum('critUp');
-    st.lifesteal   = passiveSum('lifesteal');
-    st.healPower   = 1 + passiveSum('healPower');
-    st.summonPower = 1 + passiveSum('summonPower');
-    st.armorBreak  = cls.missile === 'cat' ? G.CONFIG.catBreakBase + passiveSum('armorBreak') : 0;
-    st.missile     = cls.missile || null;
-    st.maxHp = Math.round(st.maxHp);
-    st.atk = +st.atk.toFixed(1);
-    st.def = +st.def.toFixed(1);
-    st.spd = +Math.min(3, st.spd).toFixed(2);
-    st.crit = +Math.min(75, st.crit).toFixed(1);
-    st.ranged = G.CLASSES[h.cls].ranged;
-    return st;
+    return out;
   };
+  // 全隊光環（出戰中所有人的 party 被動加總）
+  G.partyAura = function () {
+    const aura = {};
+    G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => aura[k] = (aura[k] || 0) + v));
+    return aura;
+  };
+  // 隊伍裡某個特殊被動的最大值（例如士氣上限、吸貓狂熱上限）
+  G.partySpecial = key => Math.max(0, ...G.partyMembers().map(w => (G.passivesOf(w).special[key] || {}).v || 0));
+  G.moraleCap = () => G.partySpecial('morale');
+  G.frenzyCap = () => G.partySpecial('frenzy');
 
-  G.partnerStats = function (id) {
-    const p = G.S.partners[id], cls = G.CLASSES[p.cls];
-    // 夥伴成長比主角略低，靠升級和裝備追上
+  // ── 屬性計算（主角與夥伴共用）─────────────────────────────────────────
+  G.charStats = function (who) {
+    const ch = G.charOf(who), cls = G.CLASSES[ch.cls], isHero = who === 'hero' || !who;
+    const B = G.HERO_BASE, L = G.LEVEL_GAIN, lv = ch.level;
+    // 夥伴底子比主角略低，靠升級、裝備追上
+    const base = isHero
+      ? { hp: B.hp + L.hp * (lv - 1), atk: B.atk + L.atk * (lv - 1), def: B.def + L.def * (lv - 1), spd: B.spd }
+      : { hp: 80 + 14 * (lv - 1), atk: 8 + 2.4 * (lv - 1), def: 2 + 0.9 * (lv - 1), spd: 0.9 };
     const st = {
-      maxHp: (80 + 14 * (p.level - 1)) * cls.mult.hp,
-      atk:   (8 + 2.4 * (p.level - 1)) * cls.mult.atk,
-      def:   (2 + 0.9 * (p.level - 1)) * cls.mult.def,
-      spd: 0.9, crit: 5, critDmg: 1.5,
-      lifesteal: 0, healPower: 1, summonPower: 1,
-      ranged: cls.ranged,
-      armorBreak: cls.missile === 'cat' ? G.CONFIG.catBreakBase : 0,
-      missile: cls.missile || null,
+      maxHp: base.hp * cls.mult.hp, atk: base.atk * cls.mult.atk, def: base.def * cls.mult.def,
+      spd: base.spd, crit: B.crit, critDmg: B.critDmg,
     };
+    const gear = G.gearOf(who);
     G.SLOTS.forEach(slot => {
-      const it = p.equipped && p.equipped[slot];
+      const it = gear[slot];
       if (!it) return;
-      st.maxHp += it.stats.hp || 0;
-      st.atk   += it.stats.atk || 0;
-      st.def   += it.stats.def || 0;
-      st.crit  += it.stats.crit || 0;
-      st.spd   += it.stats.spd || 0;
+      st.maxHp += it.stats.hp || 0; st.atk += it.stats.atk || 0; st.def += it.stats.def || 0;
+      st.crit += it.stats.crit || 0; st.spd += it.stats.spd || 0;
+    });
+    const ps = G.passivesOf(who).self, g = k => ps[k] || 0;
+    st.atk   *= 1 + g('atkPct');
+    st.def   *= 1 + g('defPct');
+    st.maxHp *= 1 + g('hpPct');
+    st.spd   *= 1 + g('spdPct');
+    st.crit  += g('crit');
+    st.critDmg += g('critDmg');
+    Object.assign(st, {
+      evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
+      summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),
     });
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);
     st.def = +st.def.toFixed(1);
     st.spd = +Math.min(3, st.spd).toFixed(2);
     st.crit = +Math.min(75, st.crit).toFixed(1);
+    Object.assign(st, { ranged: cls.ranged, range: cls.range, dmgType: cls.dmgType, missile: cls.missile || null, shots: cls.shots || 1 });
     return st;
   };
+  G.heroStats = () => G.charStats('hero');
+  G.partnerStats = id => G.charStats(id);
 
-  // 隊伍裡有沒有貓鎧者（主角或出戰中的夥伴）
-  G.catKnightInParty = function () {
-    return G.S.hero.cls === 'catknight' || G.S.party.some(id => G.S.partners[id] && G.S.partners[id].cls === 'catknight');
-  };
-  // 夥伴使用該職業的第一個主動技能（等級跟著夥伴等級成長）
-  G.partnerSkill = function (id) {
-    const p = G.S.partners[id];
-    if (p.cls === 'villager') return null;
-    const sk = G.SKILLS[p.cls].find(s => s.type === 'active');
-    return { def: sk, rank: Math.min(sk.max, 1 + Math.floor(p.level / 5)) };
-  };
-
-  G.power = st => Math.round(st.atk * st.spd * (1 + st.crit / 100 * (st.critDmg - 1)) * 4 + st.maxHp * 0.3 + st.def * 3);
+  G.power = st => Math.round(st.atk * st.spd * (1 + st.crit / 100 * (st.critDmg - 1)) * (st.range === 'all' ? 5 : 4) + st.maxHp * 0.3 + st.def * 3);
 
   // ── 等級與經驗 ───────────────────────────────────────────────────────────
   G.gainXp = function (xp) {
@@ -221,7 +210,6 @@
     while (h.xp >= G.xpToLevel(h.level)) {
       h.xp -= G.xpToLevel(h.level);
       h.level++;
-      G.S.skillPoints++;
       up = true;
       G.addLog('log.levelUp', { lv: h.level }, '#ffd76a');
       if (h.level === G.CONFIG.classUnlockLevel && h.cls === 'villager') {
@@ -232,7 +220,8 @@
     if (up) G.emit('levelup');
   };
 
-  G.goldMult = () => 1 + (G.S.ship.engine - 1) * 0.1 + G.S.pets.length * 0.01;
+  // 金幣倍率：引擎、捕獲的怪物、學者「獎學金」等全隊光環
+  G.goldMult = () => 1 + (G.S.ship.engine - 1) * 0.1 + G.S.pets.length * 0.01 + (G.partyAura().goldPct || 0);
 
   // ── 裝備產生 ─────────────────────────────────────────────────────────────
   G.rollRarity = function (boss) {
@@ -365,46 +354,42 @@
       if (G.S.gold < G.CONFIG.classChangeCost) return toast('toast.classCost', { cost: G.CONFIG.classChangeCost });
       G.S.gold -= G.CONFIG.classChangeCost;
     }
-    // 退還所有技能點
-    let refund = 0;
-    Object.keys(G.S.skills).forEach(id => { refund += G.S.skills[id]; G.S.skills[id] = 0; });
-    G.S.skillPoints += refund - 1;   // 每個職業第一招的 1 點是送的，不退
-    if (G.S.skillPoints < 0) G.S.skillPoints = 0;
     h.cls = cls;
-    const first = G.SKILLS[cls][0];
-    G.S.skills[first.id] = 1;
-    G.S.activeSkills = [first.id, null, null];
+    resetSkills(h);   // 技能點全部退還（技能點 = 等級 − 已投入）
     G.addLog('log.classChanged', { cls: { k: `class.${cls}.name` } }, '#ffd76a');
     G.emit('look'); G.emit('skills'); G.emit('stats');
   };
 
-  G.skillPointsInClass = function () {
-    return (G.SKILLS[G.S.hero.cls] || []).reduce((a, s) => a + G.S.skills[s.id], 0);
-  };
-
-  G.learnSkill = function (id) {
-    const sk = (G.SKILLS[G.S.hero.cls] || []).find(s => s.id === id);
+  G.learnSkill = function (id, who = 'hero') {
+    const ch = G.charOf(who), sk = G.skillDef(ch.cls, id);
     if (!sk) return;
-    if (G.S.skillPoints <= 0) return toast('toast.noSP');
-    if (G.S.skills[id] >= sk.max) return;
-    if (G.skillPointsInClass() < G.TIER_REQ[sk.tier]) return toast('toast.tierReq', { n: G.TIER_REQ[sk.tier] });
-    G.S.skills[id]++;
-    G.S.skillPoints--;
-    // 第一次學會主動技能時，有空格就自動放進去
-    if (sk.type === 'active' && G.S.skills[id] === 1 && !G.S.activeSkills.includes(id)) {
-      const empty = G.S.activeSkills.indexOf(null);
-      if (empty >= 0) G.S.activeSkills[empty] = id;
+    if (G.spOf(who) <= 0) return toast('toast.noSP');
+    const r = ch.skills[id] || 0;
+    if (r >= sk.max) return;
+    if (G.spentPoints(who) < G.TIER_REQ[sk.tier]) return toast('toast.tierReq', { n: G.TIER_REQ[sk.tier] });
+    ch.skills[id] = r + 1;
+    // 第一次學會就自動放進空格
+    if (r === 0) {
+      const slots = sk.type === 'active' ? ch.active : ch.passive;
+      const empty = slots.indexOf(null);
+      if (empty >= 0 && !slots.includes(id)) slots[empty] = id;
     }
-    G.emit('skills'); G.emit('stats');
+    skillsChanged(who);
   };
 
-  G.setActiveSkill = function (slotIdx, id) {
-    const a = G.S.activeSkills;
-    const existing = a.indexOf(id);
-    if (existing >= 0) a[existing] = a[slotIdx];
-    a[slotIdx] = id;
-    G.emit('skills');
+  // 把技能放進第 idx 格（id = null 清空）；同一招已在別格就互換
+  G.setSkillSlot = function (who, kind, idx, id) {
+    const ch = G.charOf(who), slots = kind === 'active' ? ch.active : ch.passive;
+    const existing = id ? slots.indexOf(id) : -1;
+    if (existing >= 0) slots[existing] = slots[idx];
+    slots[idx] = id;
+    skillsChanged(who);
   };
+
+  function skillsChanged(who) {
+    G.emit('skills');
+    G.emit(who === 'hero' ? 'stats' : 'party');
+  }
 
   G.recruit = function (id) {
     const p = G.PARTNERS.find(x => x.id === id);
@@ -413,7 +398,9 @@
     const cost = G.partnerRecruitCost(p);
     if (G.S.gold < cost) return toast('toast.needGold', { n: G.fmt(cost) });
     G.S.gold -= cost;
-    G.S.partners[id] = { level: 1, cls: 'bloodknight', equipped: emptyGear() };
+    const np = { level: 1, cls: 'bloodknight', equipped: emptyGear() };
+    resetSkills(np);
+    G.S.partners[id] = np;
     if (G.S.party.length < G.CONFIG.maxParty) G.S.party.push(id);
     G.addLog('log.recruited', { name: { k: `partner.${id}.name` } }, '#7fd1ff');
     G.emit('party');
@@ -426,12 +413,16 @@
     if (p.level >= G.S.hero.level + 5) return toast('toast.partnerCap');
     G.S.gold -= cost;
     p.level++;
-    G.emit('party');
+    G.emit('party'); G.emit('skills');
   };
 
+  // 夥伴換職業免費，技能點全部退還
   G.partnerClass = function (id, cls) {
-    G.S.partners[id].cls = cls;
-    G.emit('party');
+    const p = G.S.partners[id];
+    if (p.cls === cls) return;
+    p.cls = cls;
+    resetSkills(p);
+    G.emit('party'); G.emit('skills');
   };
 
   G.toggleParty = function (id) {

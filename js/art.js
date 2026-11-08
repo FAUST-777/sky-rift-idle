@@ -45,24 +45,31 @@
     return look;
   }
 
+  // 職業招牌外觀：沒裝武器時拿職業武器；沒戴頭盔時戴職業頭飾
+  // 頭飾 v：1 鐵盔 2 兜帽 3 貓耳全罩 4 三角海盜帽 5 學士帽 6 貝雷帽 7 頭帶
+  const CLASS_HEAD = {
+    pirate: { v: 4, color: '#2b2b2b' }, scholar: { v: 5, color: '#24304a' }, darkpainter: { v: 6, color: '#3a2450' },
+    druid: { v: 2, color: '#3f6b3a' }, wallbringer: { v: 1, color: '#8a8f99' }, gymgoer: { v: 7, color: '#e04040' },
+  };
+  function classLook(look, tier) {
+    const C = G.CLASSES[look.cls] || {};
+    if (look.cls === 'catknight') return catKnightLook(look);
+    if (!look.weapon && C.weapon) look.weapon = { type: C.weapon, color: GEAR_COLORS[tier || 0] };
+    if (!look.helmet && CLASS_HEAD[look.cls]) look.helmet = CLASS_HEAD[look.cls];
+    if (!look.armor && look.cls !== 'villager') look.armor = { v: look.cls === 'wallbringer' ? 2 : 0, color: C.color };
+    return look;
+  }
+
   A.lookFromHero = function () {
     const S = G.S;
-    const look = Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls }, gearLook(S.equipped));
-    return S.hero.cls === 'catknight' ? catKnightLook(look) : look;
+    return classLook(Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls }, gearLook(S.equipped)), 0);
   };
   // 夥伴：穿上的裝備優先，沒穿的部位用職業預設裝扮
   A.lookFromPartner = function (id) {
     const def = G.PARTNERS.find(p => p.id === id), p = G.S.partners[id];
-    const w = { bloodknight: 'axe', priest: 'mace', crusader: 'sword', villager: null, catknight: null }[p.cls];
     const tier = Math.min(4, Math.floor(p.level / 8));
-    const fb = {
-      weapon: w ? { type: w, color: GEAR_COLORS[tier] } : null,
-      helmet: p.cls === 'crusader' ? { v: 1, color: GEAR_COLORS[tier] } : null,
-      armor: { v: p.cls === 'crusader' ? 2 : p.cls === 'bloodknight' ? 1 : 0, color: G.CLASSES[p.cls].color },
-      boots: { v: 0, color: '#5b4632' },
-    };
-    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls }, gearLook(p.equipped || {}, fb));
-    return p.cls === 'catknight' ? catKnightLook(look) : look;
+    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
+    return classLook(look, tier);
   };
 
   // ── 紙娃娃：64×80 一格，面向右，分層畫 ───────────────────────────────────
@@ -127,7 +134,7 @@
 
     // 頭髮 / 頭盔
     const hm = look.helmet;
-    if (!hm || hm.v === 0) {
+    if (!hm || [0, 4, 6, 7].includes(hm.v)) {   // 帽子類露出頭髮；鐵盔/兜帽/全罩/學士帽蓋住
       ctx.fillStyle = look.hair;
       ctx.beginPath(); ctx.arc(32, 18, 10, Math.PI * 0.95, Math.PI * 2.05); ctx.fill();
       ctx.fillRect(22, 17, 5, 9);
@@ -154,6 +161,22 @@
         ctx.fillRect(34, 20, 2.5, 2); ctx.fillRect(39, 20, 2.5, 2); ctx.shadowBlur = 0;
         ctx.fillStyle = shade(hm.color, 35);   // 胸口的發射艙門
         ctx.fillRect(27, 36, 4, 3); ctx.fillRect(35, 36, 4, 3); ctx.fillRect(31, 44, 4, 3);
+      } else if (hm.v === 4) {   // 海盜三角帽
+        ctx.beginPath(); ctx.moveTo(17, 15); ctx.quadraticCurveTo(33, 4, 49, 15); ctx.quadraticCurveTo(33, 11, 17, 15); ctx.fill();
+        ctx.beginPath(); ctx.arc(33, 13, 9, Math.PI, 0); ctx.fill();
+        ctx.fillStyle = '#d4a017'; ctx.fillRect(29, 9, 6, 2);
+        ctx.fillStyle = '#eee'; ctx.beginPath(); ctx.arc(32, 9, 1.8, 0, Math.PI * 2); ctx.fill();
+      } else if (hm.v === 5) {   // 學士帽
+        ctx.beginPath(); ctx.arc(33, 15, 9.5, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(19, 9); ctx.lineTo(33, 4); ctx.lineTo(47, 9); ctx.lineTo(33, 13); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#ffd76a'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(33, 8); ctx.lineTo(44, 10); ctx.lineTo(44, 17); ctx.stroke();
+      } else if (hm.v === 6) {   // 貝雷帽
+        ctx.beginPath(); ctx.ellipse(30, 12, 13, 6, -0.2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(31, 4, 2, 4);
+      } else if (hm.v === 7) {   // 運動頭帶
+        ctx.fillRect(23, 15, 21, 4);
+        ctx.fillRect(21, 16, 3, 8);
       } else {                   // 兜帽：包住頭，臉露出
         ctx.beginPath(); ctx.arc(32, 21, 13, Math.PI * 0.55, Math.PI * 2.1); ctx.lineTo(28, 33); ctx.closePath(); ctx.fill();
         ctx.fillStyle = look.skin;
@@ -173,6 +196,31 @@
     ctx.lineCap = 'round';
     if (wp && wp.type === 'none') {
       // 空手（貓鎧者：小貓就是武器）
+    } else if (wp && wp.type === 'pistol') {      // 海盜：燧發槍（前手一把、腰間一把）
+      const gun = (x, y) => {
+        ctx.fillStyle = '#5a3a1e'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.lineTo(x + 1, y + 7); ctx.lineTo(x + 4, y + 1); ctx.fill();
+        ctx.fillStyle = shade(wp.color, 30); ctx.fillRect(x, y - 2, 13, 3.5);
+      };
+      gun(43, 47); gun(25, 52);
+    } else if (wp && wp.type === 'book') {        // 學者：厚書
+      ctx.fillStyle = shade(wp.color, -10); ctx.fillRect(41, 42, 13, 16);
+      ctx.fillStyle = '#f3ead2'; ctx.fillRect(43, 43, 10, 14);
+      ctx.fillStyle = '#7a2f2f'; ctx.fillRect(41, 42, 3, 16);
+    } else if (wp && wp.type === 'brush') {       // 暗黑畫家：大畫筆
+      ctx.strokeStyle = '#6b4a26'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(43, 58); ctx.lineTo(53, 20); ctx.stroke();
+      ctx.fillStyle = '#c0c0c0'; ctx.fillRect(51, 17, 5, 5);
+      ctx.fillStyle = '#7a3dbf'; ctx.beginPath(); ctx.moveTo(51, 17); ctx.quadraticCurveTo(54, 5, 57, 17); ctx.fill();
+    } else if (wp && wp.type === 'tower') {       // 城牆者：大塔盾
+      ctx.fillStyle = shade(wp.color, 10); rr(ctx, 40, 28, 18, 36, 4); ctx.fill();
+      ctx.strokeStyle = shade(wp.color, -40); ctx.lineWidth = 2; rr(ctx, 40, 28, 18, 36, 4); ctx.stroke();
+      ctx.fillStyle = shade(wp.color, 50); ctx.fillRect(47, 32, 4, 28); ctx.fillRect(42, 42, 14, 4);
+    } else if (wp && wp.type === 'leash') {       // 遛狗者：牽繩
+      ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(43, 50); ctx.quadraticCurveTo(52, 66, 62, 70); ctx.stroke();
+    } else if (wp && wp.type === 'dumbbell') {    // 健身者：啞鈴
+      ctx.fillStyle = '#555'; ctx.fillRect(39, 49, 10, 3);
+      ctx.fillStyle = '#2b2b2b'; ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
     } else if (!wp) {              // 村民：草叉
       ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.moveTo(43, 62); ctx.lineTo(49, 14); ctx.stroke();
@@ -296,6 +344,84 @@
     ctx.beginPath(); ctx.moveTo(24, 14); ctx.lineTo(27, 13); ctx.moveTo(24, 16); ctx.lineTo(27, 16.5); ctx.stroke();
   };
   A.KITTEN_COLORS = ['#f0a04b', '#f4f1ea', '#8c8c8c', '#3b3b3b', '#e8c39e'];
+
+  // ── 其他職業的投射物（都畫在 28×22，面向右）──────────────────────────────
+  A.MISSILES = {
+    book(ctx) {        // 學者：翻開的書
+      const c = G.pick(['#7a2f2f', '#2f5a7a', '#3f6b3a', '#6b4a8a']);
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(2, 8); ctx.lineTo(14, 4); ctx.lineTo(26, 8); ctx.lineTo(26, 18); ctx.lineTo(14, 14); ctx.lineTo(2, 18); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#f3ead2'; ctx.beginPath(); ctx.moveTo(4, 9); ctx.lineTo(14, 6); ctx.lineTo(24, 9); ctx.lineTo(24, 16); ctx.lineTo(14, 13); ctx.lineTo(4, 16); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#999'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(14, 6); ctx.lineTo(14, 13); ctx.stroke();
+    },
+    paint(ctx) {       // 暗黑畫家：墨水團
+      ctx.fillStyle = G.pick(['#7a3dbf', '#2a1a3d', '#b04be0']);
+      ctx.beginPath(); ctx.ellipse(16, 11, 9, 7, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(6, 11, 3, 0, Math.PI * 2); ctx.arc(3, 8, 1.8, 0, Math.PI * 2); ctx.arc(2, 14, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.arc(19, 8, 2.5, 0, Math.PI * 2); ctx.fill();
+    },
+    bullet(ctx) {      // 海盜：鉛彈＋火光尾
+      ctx.fillStyle = 'rgba(255,190,80,.6)'; ctx.beginPath(); ctx.ellipse(10, 11, 9, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#3a3a3a'; ctx.beginPath(); ctx.arc(20, 11, 3.5, 0, Math.PI * 2); ctx.fill();
+    },
+    leaf(ctx) {        // 德魯伊：葉刃
+      ctx.fillStyle = '#5fae4f'; ctx.beginPath(); ctx.moveTo(2, 11); ctx.quadraticCurveTo(14, 1, 26, 11); ctx.quadraticCurveTo(14, 21, 2, 11); ctx.fill();
+      ctx.strokeStyle = '#2f6a2a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(3, 11); ctx.lineTo(25, 11); ctx.stroke();
+    },
+    dog(ctx) {         // 遛狗者：衝出去咬的小狗
+      const c = G.pick(['#c8925a', '#f2e6d0', '#3b3b3b', '#a0522d']);
+      ctx.fillStyle = c;
+      ctx.beginPath(); ctx.ellipse(12, 13, 8, 5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(21, 10, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(23, 10, 5, 4);
+      ctx.fillStyle = shade(c, -45); ctx.beginPath(); ctx.ellipse(18, 7, 2.5, 4.5, 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1b1b2a'; ctx.fillRect(27, 10, 1.5, 1.5); ctx.fillRect(22, 8, 1.6, 1.6);
+      ctx.strokeStyle = c; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(5, 11); ctx.lineTo(1, 6); ctx.moveTo(8, 17); ctx.lineTo(6, 21); ctx.moveTo(16, 17); ctx.lineTo(18, 21); ctx.stroke();
+    },
+  };
+
+  // ── 德魯伊的動物（64×64，面向右）─────────────────────────────────────────
+  A.drawAnimal = function (ctx, kind) {
+    const a = G.ANIMALS[kind], c = a.color, dark = shade(c, -45), light = shade(c, 40);
+    ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(32, 60, 18, 4, 0, 0, Math.PI * 2); ctx.fill();
+    const eye = (x, y) => { ctx.fillStyle = '#1b1b2a'; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill(); };
+    ctx.fillStyle = c;
+    if (kind === 'bear') {
+      ctx.beginPath(); ctx.ellipse(28, 42, 20, 15, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(46, 30, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(40, 21, 4, 0, Math.PI * 2); ctx.arc(52, 21, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(14, 50, 7, 10); ctx.fillRect(33, 50, 7, 10);
+      ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(52, 33, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
+      eye(48, 27); ctx.fillStyle = '#1b1b2a'; ctx.fillRect(54, 31, 3, 2);
+    } else if (kind === 'wolf') {
+      ctx.beginPath(); ctx.ellipse(28, 40, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(42, 26); ctx.lineTo(58, 34); ctx.lineTo(44, 40); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(43, 32, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(38, 26); ctx.lineTo(40, 15); ctx.lineTo(45, 25); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(10, 36); ctx.quadraticCurveTo(2, 30, 4, 22); ctx.lineTo(12, 33); ctx.fill();
+      ctx.fillRect(16, 46, 5, 13); ctx.fillRect(34, 46, 5, 13);
+      ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(30, 44, 10, 4, 0, 0, Math.PI * 2); ctx.fill();
+      eye(46, 30);
+    } else if (kind === 'owl') {
+      ctx.beginPath(); ctx.ellipse(32, 38, 15, 19, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(20, 24); ctx.lineTo(22, 14); ctx.lineTo(28, 22); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(44, 24); ctx.lineTo(42, 14); ctx.lineTo(36, 22); ctx.fill();
+      ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(32, 44, 9, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(26, 30, 6, 0, Math.PI * 2); ctx.arc(38, 30, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f0a030'; ctx.beginPath(); ctx.arc(26, 30, 3.5, 0, Math.PI * 2); ctx.arc(38, 30, 3.5, 0, Math.PI * 2); ctx.fill();
+      eye(26, 30); eye(38, 30);
+      ctx.fillStyle = '#f0a030'; ctx.beginPath(); ctx.moveTo(30, 35); ctx.lineTo(34, 35); ctx.lineTo(32, 39); ctx.fill();
+    } else {   // deer
+      ctx.beginPath(); ctx.ellipse(28, 38, 17, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(40, 18, 6, 18);
+      ctx.beginPath(); ctx.ellipse(48, 18, 8, 6, 0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(15, 44, 4, 16); ctx.fillRect(36, 44, 4, 16);
+      ctx.strokeStyle = '#d9c4a0'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(44, 13); ctx.lineTo(40, 3); ctx.moveTo(42, 8); ctx.lineTo(36, 6); ctx.moveTo(48, 12); ctx.lineTo(52, 2); ctx.moveTo(50, 7); ctx.lineTo(56, 5); ctx.stroke();
+      ctx.fillStyle = light; ctx.beginPath(); ctx.arc(22, 34, 2, 0, Math.PI * 2); ctx.arc(28, 32, 2, 0, Math.PI * 2); ctx.arc(32, 36, 2, 0, Math.PI * 2); ctx.fill();
+      eye(50, 17);
+    }
+  };
 
   // ── 飛行船：依零件等級改變外觀 ───────────────────────────────────────────
   A.drawShip = function (ctx, ship, W, H) {

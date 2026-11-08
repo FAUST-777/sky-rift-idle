@@ -17,13 +17,11 @@ G.CONFIG = {
   reviveSeconds: 30,        // 戰敗後免費復活要等幾秒（復活後退回上一層）
   reviveCost: 50,           // 花多少雲晶原地復活
 
-  // 貓鎧者
-  catBreakBase: 0.10,       // 貓爪普攻的破甲（敵人防禦 -10%），被動「貓爪印記」再往上加
-  catBreakDur: 5,           // 破甲持續秒數
+  // 貓鎧者被動（上限由技能等級決定，見 ck_morale / ck_frenzy）
   moralePerFloor: 1,        // 士氣：每打過一層（沒戰敗）全隊最終防禦 +1%
-  moraleMax: 15,            // 士氣上限 +15%
   frenzyPerHit: 1,          // 吸貓狂熱：每次打中敵人自身傷害 +1%
-  frenzyMax: 10,            // 吸貓狂熱上限 +10%
+  crisisHp: 0.6,            // 學者「危機意識」：任一隊友生命低於 60% 觸發
+  evadeCap: 0.6,            // 閃避率上限
 
   // 背包擴充
   bagExpandSlots: 5,        // 每次擴充幾格
@@ -73,62 +71,197 @@ G.SLOT_MAIN = {
 G.AFFIXES = [{ atk: 2 }, { hp: 12 }, { def: 1.5 }, { crit: 1.5 }, { spd: 0.03 }];
 
 // ── 職業（名稱/說明：class.<id>.name / .desc）──────────────────────────────
-// mult = 屬性倍率；ranged = 遠程（站後面放投射物）
-// missile = 普攻的投射物造型（貓鎧者：從鎧甲開口射出小貓）
+// core  = 定位：atk 攻擊 / buff 輔助 / spc 特殊 / def 防禦（決定屬性倍率的大方向）
+// range = 普攻範圍：all 打全部敵人但每下較弱 / one 只打一隻但較痛
+// dmgType = 傷害系別：physical 物理 / animal 動物 / arcane 奧術 / dark 黑暗（之後做組合特效用）
+// ranged = 站後排；missile = 普攻投射物造型；shots = 普攻一次打幾發
+// look = 沒裝武器時的職業招牌外觀
 G.CLASSES = {
-  villager:    { color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1, atk: 1, def: 1 } },
-  bloodknight: { color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.1, atk: 1.35, def: 1.0 } },
-  catknight:   { color: '#9aa3ad', cape: '#d98a3a', ranged: false, missile: 'cat', mult: { hp: 1.25, atk: 1.05, def: 1.3 } },
-  priest:      { color: '#f1e3a6', cape: '#e8e2c8', ranged: true,  mult: { hp: 1.0, atk: 0.9, def: 1.0 } },
-  crusader:    { color: '#d4a017', cape: '#c9a227', ranged: false, mult: { hp: 1.45, atk: 0.85, def: 1.6 } },
+  villager:    { core: 'atk',  range: 'one', dmgType: 'physical', color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1,    atk: 1,    def: 1 } },
+  bloodknight: { core: 'atk',  range: 'one', dmgType: 'physical', color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.15, atk: 1.35, def: 0.95 }, weapon: 'sword' },
+  catknight:   { core: 'buff', range: 'all', dmgType: 'animal',   color: '#9aa3ad', cape: '#d98a3a', ranged: false, mult: { hp: 1.25, atk: 1.0,  def: 1.25 }, missile: 'cat' },
+  scholar:     { core: 'atk',  range: 'all', dmgType: 'arcane',   color: '#3f6fb5', cape: '#24477a', ranged: true,  mult: { hp: 0.9,  atk: 1.3,  def: 0.85 }, missile: 'book', weapon: 'book' },
+  darkpainter: { core: 'spc',  range: 'all', dmgType: 'dark',     color: '#5b3d7a', cape: '#2a1a3d', ranged: true,  mult: { hp: 0.95, atk: 1.1,  def: 0.9 },  missile: 'paint', weapon: 'brush' },
+  pirate:      { core: 'atk',  range: 'one', dmgType: 'physical', color: '#7a2f2f', cape: '#2b2b2b', ranged: true,  mult: { hp: 1.0,  atk: 1.4,  def: 0.85 }, missile: 'bullet', shots: 2, weapon: 'pistol' },
+  wallbringer: { core: 'def',  range: 'one', dmgType: 'physical', color: '#8a8f99', cape: '#4a5560', ranged: false, mult: { hp: 1.5,  atk: 0.8,  def: 1.7 },  weapon: 'tower' },
+  druid:       { core: 'buff', range: 'all', dmgType: 'animal',   color: '#4f8a4a', cape: '#2f5a2c', ranged: true,  mult: { hp: 1.05, atk: 1.0,  def: 1.0 },  missile: 'leaf', weapon: 'staff' },
+  dogwalker:   { core: 'spc',  range: 'one', dmgType: 'animal',   color: '#b07a3e', cape: '#6b4a24', ranged: false, mult: { hp: 1.1,  atk: 1.15, def: 1.05 }, missile: 'dog', weapon: 'leash' },
+  gymgoer:     { core: 'def',  range: 'one', dmgType: 'physical', color: '#e0703a', cape: null,      ranged: false, mult: { hp: 1.6,  atk: 0.95, def: 1.35 }, weapon: 'dumbbell' },
 };
-G.CLASS_ORDER = ['bloodknight', 'catknight', 'priest', 'crusader'];
+G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer'];
+G.CORE_ICON  = { atk: '⚔️', buff: '✨', spc: '🔮', def: '🛡️' };
+G.DMG_TYPES  = { physical: '#ffffff', animal: '#ffd27a', arcane: '#8fd3ff', dark: '#c99bff' };   // 傷害數字顏色
+G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 
-// ── 技能（名稱/說明：skill.<id>.name / .desc，說明裡的 {v} 會代入數值）─────
-// kind（主動）：strike 單體倍率傷害 / aoe 全體傷害 / buffAtk 攻擊強化 / healParty 群補
-//               shieldParty 群體護盾 / summon 召喚 / taunt 挑釁減傷
-//               aoeBreak 全體傷害＋破甲
-// kind（被動）：lifesteal / critUp / atkPct / defPct / hpPct / healPower / summonPower / armorBreak
-// v(rank) = 該等級的效果數值；raw: true 表示 {v} 直接顯示，不換成百分比
+// 組合特效（之後設計）：例如 { types: ['physical', 'animal'], id: 'xxx' }
+// 戰鬥場景每次造成傷害都會記錄系別，之後在 battle.js 的 hit() 加判斷即可
+G.COMBOS = [];
+
+// ── 技能（名稱/說明：skill.<id>.name / .desc；{v} 代入數值）────────────────
+// 主動：fx(v) 回傳這招的效果，戰鬥場景會依欄位執行：
+//   target 'one'|'all'|'none'  mult 傷害倍率  hits 段數  critBonus 額外暴擊率
+//   debuffs [{id,v,t}] 對命中目標上狀態    self / party [{id,v,t}] 給自己/全隊上 buff
+//   heal 全隊回復最大生命比例  shield 全隊護盾比例  taunt {v,t} 挑釁並減傷
+//   drain 傷害轉生命比例  vsBleed 對流血目標額外倍率  summon 動物 id  cdCut 全隊主動技能冷卻減少秒數
+// 被動：p = 'self' 自身屬性 / 'party' 全隊光環 / 'proc' 普攻附加 / 'special' 特殊機制
+//   key = 影響的屬性或機制；proc 另有 fx（狀態）、chance（'v' = 機率吃 v）、val、t
+// buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen ｜ defDown slow blind bleed poison
+// v(rank) = 該等級數值；raw: true → {v} 直接顯示不換百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
-const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(3);
+const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(4);
 G.TIER_REQ = [0, 3, 8];
+G.ACTIVE_SLOTS = 4;
+G.PASSIVE_SLOTS = 4;
+G.DOT = { bleed: 0.3, poison: 0.22 };   // 每秒傷害 = 施放者攻擊 × 倍率
+
+const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
+const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
 
 G.SKILLS = {
   villager: [
-    { id: 'smash', type: 'active', kind: 'strike', tier: 0, max: 5, cd: 6, v: lin(1.8, 0.2) },
+    A('smash', 0, 6, lin(1.8, 0.2), v => ({ target: 'one', mult: v })),
   ],
+
+  // 血騎士：吸血續戰、流血
   bloodknight: [
-    { id: 'bloodslash', type: 'active',  kind: 'strike',    tier: 0, max: 5, cd: 5,  v: lin(2.2, 0.25) },
-    { id: 'drain',      type: 'passive', kind: 'lifesteal', tier: 0, max: 5,         v: lin(0.05, 0.03) },
-    { id: 'whirl',      type: 'active',  kind: 'aoe',       tier: 1, max: 5, cd: 8,  v: lin(1.4, 0.2) },
-    { id: 'frenzy',     type: 'passive', kind: 'critUp',    tier: 1, max: 5,         v: lin(5, 3), raw: true },
-    { id: 'bloodlust',  type: 'active',  kind: 'buffAtk',   tier: 2, max: 5, cd: 15, v: lin(0.4, 0.1), dur: 8 },
+    A('bk_slash',     0, 5,  lin(2.2, 0.25), v => ({ target: 'one', mult: v, debuffs: [{ id: 'bleed', v: 1, t: 5 }] })),
+    A('bk_rend',      0, 8,  lin(0.9, 0.12), v => ({ target: 'one', mult: v, hits: 3, debuffs: [{ id: 'bleed', v: 1, t: 6 }] })),
+    A('bk_feast',     1, 10, lin(1.8, 0.25), v => ({ target: 'one', mult: v, drain: 1 })),
+    A('bk_bloodlust', 1, 15, lin(0.4, 0.1),  v => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }] })),
+    A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1 })),
+    P('bk_drain',      0, lin(0.05, 0.03), 'self', 'lifesteal'),
+    P('bk_hemorrhage', 0, lin(0.25, 0.1),  'proc', 'bleed', { fx: 'bleed', chance: 'v', val: 1, t: 4 }),
+    P('bk_frenzy',     1, lin(5, 3),       'self', 'crit', { raw: true }),
+    P('bk_thirst',     1, lin(0.1, 0.05),  'special', 'vsBleed'),
+    P('bk_vitality',   2, lin(0.1, 0.06),  'self', 'hpPct'),
   ],
-  // 貓鎧者：職業特性 = 普攻破甲、士氣、吸貓狂熱（數值見 G.CONFIG）
+
+  // 貓鎧者：士氣 / 吸貓狂熱、貓抓降攻速、中毒
   catknight: [
-    { id: 'kittenvolley', type: 'active',  kind: 'aoe',        tier: 0, max: 5, cd: 6,  v: lin(1.2, 0.2) },
-    { id: 'clawmark',     type: 'passive', kind: 'armorBreak', tier: 0, max: 5,         v: lin(0.05, 0.03) },
-    { id: 'fullburst',    type: 'active',  kind: 'aoeBreak',   tier: 1, max: 5, cd: 10, v: lin(1.6, 0.25), breakV: 0.3, dur: 6 },
-    { id: 'heavyplate',   type: 'passive', kind: 'defPct',     tier: 1, max: 5,         v: lin(0.08, 0.06) },
-    { id: 'catstorm',     type: 'active',  kind: 'buffAtk',    tier: 2, max: 5, cd: 15, v: lin(0.2, 0.06), dur: 10, party: true },
+    A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }] })),
+    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
+    A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
+    A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
+    A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v })),
+    P('ck_morale',  0, lin(5, 2.5),    'special', 'morale', { raw: true }),   // 士氣上限（5 級 = 15%）
+    P('ck_frenzy',  0, lin(4, 1.5),    'special', 'frenzy', { raw: true }),   // 吸貓狂熱上限（5 級 = 10%）
+    P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4 }),
+    P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
+    P('ck_plate',   2, lin(0.08, 0.06), 'self', 'defPct'),
   ],
-  priest: [
-    { id: 'holylight',  type: 'active',  kind: 'healParty',   tier: 0, max: 5, cd: 7,  v: lin(0.2, 0.05) },
-    { id: 'smite',      type: 'passive', kind: 'atkPct',      tier: 0, max: 5,         v: lin(0.05, 0.04) },
-    { id: 'aegis',      type: 'active',  kind: 'shieldParty', tier: 1, max: 5, cd: 12, v: lin(0.15, 0.05), dur: 8 },
-    { id: 'devotion',   type: 'passive', kind: 'healPower',   tier: 1, max: 5,         v: lin(0.15, 0.1) },
-    { id: 'blessing',   type: 'active',  kind: 'buffAtk',     tier: 2, max: 5, cd: 15, v: lin(0.25, 0.07), dur: 10, party: true },
+
+  // 學者：書海全體攻擊、危機意識、多賺金幣
+  scholar: [
+    A('sc_barrage', 0, 6,  lin(0.45, 0.08), v => ({ target: 'all', mult: v, hits: 3 })),
+    A('sc_tome',    0, 8,  lin(1.4, 0.22),  v => ({ target: 'all', mult: v })),
+    A('sc_lecture', 1, 10, lin(0.8, 0.12),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.15, t: 5 }] })),
+    A('sc_cram',    1, 15, lin(0.35, 0.08), v => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }, { id: 'spdUp', v: 0.2, t: 8 }] })),
+    A('sc_exam',    2, 12, lin(1.1, 0.18),  v => ({ target: 'all', mult: v, critBonus: 100 })),
+    P('sc_crisis',  0, lin(0.1, 0.03),  'special', 'crisis', { v2: lin(0.2, 0.05) }),
+    P('sc_grant',   0, lin(0.08, 0.05), 'party', 'goldPct'),
+    P('sc_wisdom',  1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('sc_speed',   1, lin(0.06, 0.04), 'self', 'spdPct'),
+    P('sc_thesis',  2, lin(0.08, 0.05), 'self', 'skillDmg'),
   ],
-  crusader: [
-    { id: 'shieldbash', type: 'active',  kind: 'strike', tier: 0, max: 5, cd: 5,  v: lin(1.6, 0.2) },
-    { id: 'bulwark',    type: 'passive', kind: 'defPct', tier: 0, max: 5,         v: lin(0.1, 0.08) },
-    { id: 'provoke',    type: 'active',  kind: 'taunt',  tier: 1, max: 5, cd: 12, v: lin(0.3, 0.06), dur: 6 },
-    { id: 'fortitude',  type: 'passive', kind: 'hpPct',  tier: 1, max: 5,         v: lin(0.1, 0.08) },
-    { id: 'judgement',  type: 'active',  kind: 'aoe',    tier: 2, max: 5, cd: 10, v: lin(1.3, 0.2) },
+
+  // 暗黑畫家：降命中、降防、全隊加攻速
+  darkpainter: [
+    A('dp_splash',      0, 6,  lin(0.8, 0.14), v => ({ target: 'all', mult: v, debuffs: [{ id: 'blind', v: 0.2, t: 4 }] })),
+    A('dp_erase',       0, 8,  lin(0.7, 0.12), v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.25, t: 6 }] })),
+    A('dp_sketch',      1, 14, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
+    A('dp_nightmare',   1, 12, lin(1.3, 0.2),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'blind', v: 0.3, t: 5 }, { id: 'slow', v: 0.2, t: 5 }] })),
+    A('dp_masterpiece', 2, 18, lin(0.15, 0.05), v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }, { id: 'spdUp', v: 0.15, t: 10 }] })),
+    P('dp_ink',     0, lin(0.08, 0.04), 'proc', 'blind',   { fx: 'blind', val: 'v', t: 3 }),
+    P('dp_corrode', 0, lin(0.06, 0.03), 'proc', 'defDown', { fx: 'defDown', val: 'v', t: 4 }),
+    P('dp_tempo',   1, lin(0.04, 0.02), 'party', 'spdPct'),
+    P('dp_darkart', 1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('dp_gallery', 2, lin(0.15, 0.1),  'self', 'debuffDur'),
+  ],
+
+  // 海盜：雙槍高單體、閃避
+  pirate: [
+    A('pi_doubletap', 0, 5,  lin(1.2, 0.15), v => ({ target: 'one', mult: v, hits: 2 })),
+    A('pi_headshot',  0, 9,  lin(3.0, 0.35), v => ({ target: 'one', mult: v, critBonus: 50 })),
+    A('pi_broadside', 1, 12, lin(0.5, 0.08), v => ({ target: 'one', mult: v, hits: 5 })),
+    A('pi_smoke',     1, 14, lin(0.3, 0.06), v => ({ target: 'none', self: [{ id: 'evade', v, t: 6 }] })),
+    A('pi_plunder',   2, 10, lin(2.0, 0.25), v => ({ target: 'one', mult: v, self: [{ id: 'atkUp', v: 0.2, t: 6 }] })),
+    P('pi_nimble',   0, lin(0.06, 0.03), 'self', 'evade'),
+    P('pi_sharp',    0, lin(5, 3),       'self', 'crit', { raw: true }),
+    P('pi_quick',    1, lin(0.08, 0.04), 'self', 'spdPct'),
+    P('pi_ruthless', 1, lin(0.15, 0.1),  'self', 'critDmg'),
+    P('pi_riposte',  2, lin(0.6, 0.15),  'special', 'riposte'),
+  ],
+
+  // 城牆者：幫隊友扛傷、降隊友受傷、全隊防禦
+  wallbringer: [
+    A('wb_bash',    0, 6,  lin(1.5, 0.2),   v => ({ target: 'one', mult: v })),
+    A('wb_provoke', 0, 12, lin(0.3, 0.06),  v => ({ target: 'none', taunt: { v, t: 6 } })),
+    A('wb_bulwark', 1, 14, lin(0.15, 0.04), v => ({ target: 'none', party: [{ id: 'dmgReduce', v, t: 6 }] })),
+    A('wb_fortify', 1, 15, lin(0.25, 0.07), v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }] })),
+    A('wb_aegis',   2, 16, lin(0.12, 0.04), v => ({ target: 'none', shield: v })),
+    P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover'),
+    P('wb_stone',    0, lin(0.1, 0.08),  'self', 'defPct'),
+    P('wb_guardian', 1, lin(0.04, 0.02), 'party', 'dmgReduce'),
+    P('wb_rampart',  1, lin(0.1, 0.07),  'self', 'hpPct'),
+    P('wb_thorns',   2, lin(0.1, 0.06),  'special', 'thorns'),
+  ],
+
+  // 德魯伊：召喚一隻動物（同時只能一隻），各給不同全隊 buff
+  druid: [
+    A('dr_bear',   0, 20, lin(0.15, 0.04),  v => ({ target: 'none', summon: 'bear', aura: v })),
+    A('dr_wolf',   0, 20, lin(0.12, 0.03),  v => ({ target: 'none', summon: 'wolf', aura: v })),
+    A('dr_owl',    1, 20, lin(6, 2),        v => ({ target: 'none', summon: 'owl', aura: v }), { raw: true }),
+    A('dr_deer',   1, 20, lin(0.01, 0.004), v => ({ target: 'none', summon: 'deer', aura: v })),
+    A('dr_thorns', 2, 9,  lin(0.9, 0.15),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
+    P('dr_bond',   0, lin(0.2, 0.1),     'self', 'summonPower'),
+    P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
+    P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen'),
+    P('dr_wild',   1, lin(0.06, 0.04),   'self', 'atkPct'),
+    P('dr_herd',   2, lin(0.15, 0.1),    'self', 'animalAura'),
+  ],
+
+  // 遛狗者：全隊減冷卻、加攻速、加技能傷害
+  dogwalker: [
+    A('dw_fetch',   0, 6,  lin(1.8, 0.25), v => ({ target: 'one', mult: v })),
+    A('dw_walkies', 0, 14, lin(2, 0.5),    v => ({ target: 'none', cdCut: v }), { raw: true }),
+    A('dw_zoomies', 1, 14, lin(0.25, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
+    A('dw_pack',    1, 10, lin(0.55, 0.08), v => ({ target: 'one', mult: v, hits: 4 })),
+    A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }] })),
+    P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr'),
+    P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
+    P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('dw_stride',  1, lin(0.03, 0.02), 'party', 'spdPct'),
+    P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3 }),
+  ],
+
+  // 健身者：幫隊友平均分攤傷害、自己緩緩回血
+  gymgoer: [
+    A('gy_punch',    0, 6,  lin(1.6, 0.2),   v => ({ target: 'one', mult: v })),
+    A('gy_squat',    0, 12, lin(0.2, 0.05),  v => ({ target: 'none', selfHeal: v })),
+    A('gy_flex',     1, 12, lin(0.3, 0.08),  v => ({ target: 'none', taunt: { v: 0.2, t: 6 }, self: [{ id: 'defUp', v, t: 6 }] })),
+    A('gy_protein',  1, 14, lin(0.1, 0.03),  v => ({ target: 'none', heal: v })),
+    A('gy_superset', 2, 10, lin(0.7, 0.1),   v => ({ target: 'one', mult: v, hits: 3 })),
+    P('gy_buddy',     0, lin(0.3, 0.05),  'special', 'share'),
+    P('gy_recovery',  0, lin(0.01, 0.005), 'self', 'regen'),
+    P('gy_bulk',      1, lin(0.12, 0.08), 'self', 'hpPct'),
+    P('gy_core',      1, lin(0.08, 0.06), 'self', 'defPct'),
+    P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce'),
   ],
 };
-G.ACTIVE_SLOTS = 3;
+
+// 德魯伊的動物：aura = 在場時給全隊的加成種類；stats = 以施放者屬性為基準的倍率
+G.ANIMALS = {
+  bear: { icon: '🐻', aura: 'defPct', stats: { hp: 1.4, atk: 0.4, def: 1.2 }, color: '#7a5230' },
+  wolf: { icon: '🐺', aura: 'atkPct', stats: { hp: 0.6, atk: 0.8, def: 0.6 }, color: '#8a8f99' },
+  owl:  { icon: '🦉', aura: 'crit',   stats: { hp: 0.4, atk: 0.5, def: 0.4 }, color: '#a07a50' },
+  deer: { icon: '🦌', aura: 'regen',  stats: { hp: 0.7, atk: 0.3, def: 0.7 }, color: '#c08a50' },
+};
+// 狀態圖示
+G.FX_ICON = {
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚',
+  shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
+  defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
+};
 
 // ── 怪物（名稱：monster.<id>）──────────────────────────────────────────────
 // 每 5 層換一組怪；shape 決定程式畫的造型

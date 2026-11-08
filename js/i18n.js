@@ -64,9 +64,13 @@
   G.rarityName  = r  => G.t(`rarity.${r}`);
 
   // 技能說明：{v} 依技能設定換成百分比或原始數值
+  // 百分比：小於 10% 時留一位小數（例如每秒回 0.3%）
+  const pct = x => { const n = x * 100; return +(n < 10 ? n.toFixed(1) : Math.round(n)); };
   G.skillDesc = function (sk, rank) {
     const v = sk.v(rank);
-    return G.t(`skill.${sk.id}.desc`, { v: sk.raw ? v : Math.round(v * 100) });
+    const p = { v: sk.raw ? +v.toFixed(1) : pct(v) };
+    if (sk.v2) p.v2 = pct(sk.v2(rank));
+    return G.t(`skill.${sk.id}.desc`, p);
   };
 
   // 裝備名稱：前綴（依稀有度）+ 底材。舊存檔沒有 base 欄位時用存好的 name
