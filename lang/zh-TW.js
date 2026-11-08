@@ -28,6 +28,9 @@ G.I18N['zh-TW'] = {
   'hero.classChangeNote': '換職業要 {cost} 金幣，技能點會全部退還。',
   'hero.bag': '背包', 'hero.autoEquip': '一鍵穿最好的', 'hero.sellCommon': '賣掉普通', 'hero.sellUncommon': '賣掉優良以下',
   'hero.bagEmpty': '打怪會掉裝備，掉到的會出現在這裡。',
+  'hero.who.hero': '主角', 'hero.partnerNote': '夥伴的職業與升級在「夥伴」分頁。', 'hero.notRecruited': '還沒有夥伴，往上爬就會遇到。',
+  'hero.expand': '擴充 +{n} 格', 'hero.bagMax': '已達上限', 'item.equipTo': '給 {name} 裝備',
+  'hero.autoEquipHint': '主角先挑，剩下的再分給夥伴',
   'item.named': '{prefix}・{base}', 'item.meta': '{rarity}・{slot}・第 {floor} 層掉落',
   'item.compare': '括號內是跟目前穿著「{name}」的差異', 'item.unequip': '卸下', 'item.sell': '賣掉 +{v}💰', 'item.equip': '裝備',
   'classModal.title': '轉職為「{name}」？', 'classModal.free': '第一次轉職免費。', 'classModal.cost': '需要 {cost} 金幣。',
@@ -45,7 +48,7 @@ G.I18N['zh-TW'] = {
   // ── 職業 ──
   'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 級可以轉職。',
   'class.bloodknight.name': '血騎士', 'class.bloodknight.desc': '近戰物理輸出，靠吸血續戰。',
-  'class.necro.name': '死靈術師', 'class.necro.desc': '遠程魔法與召喚骷髏，擅長群體傷害。',
+  'class.catknight.name': '貓鎧者', 'class.catknight.desc': '全身包覆鎧甲的神祕騎士。打開鎧甲開口射出小貓抓傷敵人，削弱敵人防禦、擅長全體傷害，並讓全隊累積「士氣」與「吸貓狂熱」。',
   'class.priest.name': '牧師', 'class.priest.desc': '治療、護盾、強化隊友。',
   'class.crusader.name': '聖十字軍', 'class.crusader.desc': '坦克，挑釁敵人、承受傷害。',
 
@@ -64,11 +67,11 @@ G.I18N['zh-TW'] = {
   'skill.whirl.name': '旋風血刃', 'skill.whirl.desc': '全體 {v}% 傷害',
   'skill.frenzy.name': '狂怒', 'skill.frenzy.desc': '暴擊率 +{v}%',
   'skill.bloodlust.name': '嗜血', 'skill.bloodlust.desc': '自身攻擊 +{v}%，8 秒',
-  'skill.bonespear.name': '骨矛', 'skill.bonespear.desc': '單體 {v}% 傷害',
-  'skill.soulsiphon.name': '靈魂汲取', 'skill.soulsiphon.desc': '攻擊 +{v}%',
-  'skill.skeleton.name': '召喚骷髏', 'skill.skeleton.desc': '召喚骷髏 12 秒，攻擊力為你的 {v}%',
-  'skill.legion.name': '亡者大軍', 'skill.legion.desc': '召喚物攻擊 +{v}%',
-  'skill.corpse.name': '屍爆', 'skill.corpse.desc': '全體 {v}% 傷害',
+  'skill.kittenvolley.name': '貓咪齊射', 'skill.kittenvolley.desc': '打開艙門射出一群小貓，全體 {v}% 傷害',
+  'skill.clawmark.name': '貓爪印記', 'skill.clawmark.desc': '普攻破甲效果再 +{v}%（基本 10%）',
+  'skill.fullburst.name': '全彈發射', 'skill.fullburst.desc': '全身艙門打開，全體 {v}% 傷害，並使敵人防禦 -30%，6 秒',
+  'skill.heavyplate.name': '重裝鎧甲', 'skill.heavyplate.desc': '防禦 +{v}%',
+  'skill.catstorm.name': '萬貓奔騰', 'skill.catstorm.desc': '全隊攻擊 +{v}%，10 秒',
   'skill.holylight.name': '聖光術', 'skill.holylight.desc': '全隊回復 {v}% 生命',
   'skill.smite.name': '聖光懲擊', 'skill.smite.desc': '攻擊 +{v}%',
   'skill.aegis.name': '神聖護盾', 'skill.aegis.desc': '全隊獲得 {v}% 生命的護盾',
@@ -126,6 +129,17 @@ G.I18N['zh-TW'] = {
   'battle.toFloor': '↑ 前往第 {n} 層', 'battle.defeat': '戰敗……', 'battle.revived': '復活！',
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
+  'battle.morale': '🎖️ 士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
+  'battle.deadShort': '💀 {s}秒',
+
+  // ── Buff ──
+  'buff.morale.name': '士氣', 'buff.morale.desc': '貓鎧者在場時，每打過一層（沒有戰敗）全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%。戰敗會歸零。',
+  'buff.frenzy.name': '吸貓狂熱', 'buff.frenzy.desc': '貓鎧者在場時，隊員每次打中敵人，自身傷害 +1%（最多 +{max}%），倒下才重新計算。目前：{list}',
+  'buff.atk.name': '攻擊強化', 'buff.atk.desc': '攻擊 +{v}%，還剩 {s} 秒',
+  'buff.shield.name': '護盾', 'buff.shield.desc': '可再吸收 {v} 點傷害',
+  'buff.taunt.name': '挑釁', 'buff.taunt.desc': '{name} 正在吸引所有敵人',
+  'buff.break.name': '敵人破甲', 'buff.break.desc': '敵人防禦 -{v}%',
+
   // ── 日誌 ──
   'log.start': '🎈 你搭著熱氣球飛進了天空裂洞……',
   'log.levelUp': '⬆️ 升到 {lv} 級！獲得 1 技能點', 'log.canClass': '✨ 可以轉職了！到「角色」分頁選擇職業',
@@ -134,11 +148,12 @@ G.I18N['zh-TW'] = {
   'log.capture': '🕸️ 捕獲了「{name}」！牠住進了飛行船', 'log.bossDown': '🏆 擊敗第 {f} 層層主！第 {n} 層已開放',
   'log.partnerAvail': '🤝 {name} 可以招募了（夥伴分頁）', 'log.capReached': '🎈 氣囊高度只到第 {n} 層，升級氣囊才能往上',
   'log.defeat': '💀 在第 {n} 層倒下', 'log.reviveFree': '🕊️ 復活了，退回第 {n} 層修練（已暫停自動推進）',
-  'log.revivePaid': '💎 花了 {n} 雲晶原地復活',
+  'log.revivePaid': '💎 花了 {n} 雲晶原地復活', 'log.moraleLost': '🎖️ 戰敗，士氣歸零',
 
   // ── 提示 ──
   'toast.canClass': '可以轉職了！到「角色」分頁選擇職業', 'toast.bagFull': '背包滿了',
-  'toast.sold': '賣出 {n} 件，獲得 {g} 金幣', 'toast.equipped': '換上 {n} 件更好的裝備', 'toast.bestAlready': '已經是最好的裝備了',
+  'toast.sold': '賣出 {n} 件，獲得 {g} 金幣', 'toast.equipped': '換上 {n} 件更好的裝備（主角優先，其次夥伴）',
+  'toast.bagExpanded': '背包擴充到 {n} 格', 'toast.bestAlready': '已經是最好的裝備了',
   'toast.classLevel': '{lv} 級才能轉職', 'toast.classCost': '換職業需要 {cost} 金幣',
   'toast.noSP': '沒有技能點了，升級可以獲得', 'toast.tierReq': '需要先在此職業投入 {n} 點',
   'toast.reachFloor': '要先到達第 {n} 層', 'toast.needGold': '需要 {n} 金幣',

@@ -6,7 +6,7 @@
 (function () {
   const $ = id => document.getElementById(id);
   const t = (k, p) => G.t(k, p);
-  const UI = G.UI = { tab: 'adventure', placing: null };
+  const UI = G.UI = { tab: 'adventure', placing: null, who: 'hero' };   // who = 角色分頁目前看的是主角還是哪個夥伴
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ── 固定在 HTML 裡的文字（data-i18n="key"）───────────────────────────────
@@ -31,6 +31,12 @@
     $('floorKills').classList.toggle('boss', boss);
     // 戰敗復活倒數
     const sc = G.battleScene();
+    if (sc && sc.reviveAt && G.settings.battleCollapsed) {
+      // 戰鬥畫面收起來時，倒數改顯示在進度條旁邊
+      $('floorKills').textContent = t('battle.deadShort', { s: Math.max(0, Math.ceil((sc.reviveAt - Date.now()) / 1000)) });
+      $('floorKills').classList.add('boss');
+    }
+    renderBuffs(sc);
     if (sc && sc.reviveAt) {
       const left = Math.max(0, Math.ceil((sc.reviveAt - Date.now()) / 1000));
       $('reviveTitle').textContent = t('revive.title');
@@ -43,6 +49,19 @@
     setDot('skills', S.skillPoints > 0);
     setDot('hero', h.cls === 'villager' && h.level >= G.CONFIG.classUnlockLevel);
   }
+  // ── Buff 圖示（戰鬥畫面左上角，點一下看說明）─────────────────────────────
+  let lastBuffSig = '';
+  UI.buffs = [];
+  function renderBuffs(sc) {
+    const list = sc && sc.getBuffs ? sc.getBuffs() : [];
+    UI.buffs = list;
+    const sig = list.map(b => b.id + b.val).join('|');
+    if (sig === lastBuffSig) return;     // 沒變就不重畫，點擊才不會被打斷
+    lastBuffSig = sig;
+    $('buffBar').innerHTML = list.map(b =>
+      `<button class="buff ${b.id}" data-act="buff" data-id="${b.id}" title="${esc(t(`buff.${b.id}.name`))}">${b.icon}<b>${esc(b.val)}</b></button>`).join('');
+  }
+
   function setDot(tab, on) {
     const b = document.querySelector(`#tabs [data-tab="${tab}"]`);
     let d = b.querySelector('.dot');
@@ -95,22 +114,42 @@
   }
 
   // ── 分頁：角色（紙娃娃 + 裝備 + 轉職）──────────────────────────────────
+  const whoName = who => (who === 'hero' ? t('hero.who.hero') : G.partnerName(who));
+
   function renderHero() {
-    const S = G.S, st = G.heroStats(), h = S.hero;
+    const S = G.S, h = S.hero;
+    if (UI.who !== 'hero' && !S.partners[UI.who]) UI.who = 'hero';
+    const who = UI.who, isHero = who === 'hero';
+    const gear = G.gearOf(who);
+    const st = isHero ? G.heroStats() : G.partnerStats(who);
+    const cls = isHero ? h.cls : S.partners[who].cls;
+    const lv = isHero ? h.level : S.partners[who].level;
+
+    // 角色切換：主角＋已招募的夥伴（出戰中的排前面）
+    const ids = Object.keys(S.partners).sort((a, b) => S.party.includes(b) - S.party.includes(a));
+    const whoBar = `<div class="who">${['hero', ...ids].map(id =>
+      `<button class="chip ${who === id ? 'on' : ''}" data-act="who" data-v="${id}">${id === 'hero' ? '🧍 ' : S.party.includes(id) ? '⚔️ ' : ''}${esc(whoName(id))}</button>`).join('')}</div>`;
+
     const slots = G.SLOTS.map(slot => {
-      const it = S.equipped[slot];
+      const it = gear[slot];
       return it
         ? `<button class="slot" style="border-color:${G.RARITY[it.rarity].color}" data-act="item" data-slot="${slot}">${itemIcon(it)}<small>${G.slotName(slot)}</small></button>`
         : `<button class="slot empty">${G.SLOT_ICON[slot]}<small>${G.slotName(slot)}</small></button>`;
     }).join('');
+    // ▲ = 比「目前選的角色」身上的更好
     const inv = [...S.inventory].sort((a, b) => b.rarity - a.rarity || G.itemScore(b) - G.itemScore(a)).map(it => {
-      const better = G.itemScore(it) > G.itemScore(S.equipped[it.slot]);
+      const better = G.itemScore(it) > G.itemScore(gear[it.slot]);
       return `<button class="item" style="border-color:${G.RARITY[it.rarity].color}" data-act="item" data-id="${it.uid}">
         ${better ? '<span class="up">▲</span>' : ''}${itemIcon(it)}<small>${esc(G.itemName(it))}</small></button>`;
     }).join('');
 
+    const cap = G.invCap(), canExp = G.canExpandBag(), ec = G.bagExpandCost(S.bagExpands || 0);
+    const expCost = [ec.gold ? `${G.fmt(ec.gold)}💰` : '', ec.crystal ? `${ec.crystal}💎` : ''].filter(Boolean).join(' ');
+
     let clsHtml;
-    if (h.level < G.CONFIG.classUnlockLevel) {
+    if (!isHero) {
+      clsHtml = `<p class="muted" style="margin:0;font-size:12px">${t('hero.partnerNote')}</p>`;
+    } else if (h.level < G.CONFIG.classUnlockLevel) {
       clsHtml = `<p class="muted" style="margin:0">${t('hero.classLocked', { lv: G.CONFIG.classUnlockLevel, cur: h.level })}</p>`;
     } else {
       clsHtml = `<div class="classes">${G.CLASS_ORDER.map(c => `<button class="cls ${h.cls === c ? 'cur' : ''}" data-act="class" data-cls="${c}">
@@ -120,10 +159,12 @@
 
     return `
       <div class="card">
+        ${ids.length ? whoBar : ''}
         <div class="doll-wrap">
           <canvas class="doll" id="dollSlot"></canvas>
           <div class="grow">
-            <div style="font-size:18px;font-weight:700">Lv ${h.level} <span style="color:${G.CLASSES[h.cls].color}">${G.clsName(h.cls)}</span></div>
+            ${isHero ? '' : `<div style="font-weight:700;margin-bottom:2px">${esc(whoName(who))}</div>`}
+            <div style="font-size:18px;font-weight:700">Lv ${lv} <span style="color:${G.CLASSES[cls].color}">${G.clsName(cls)}</span></div>
             <div class="muted" style="font-size:12px;margin-bottom:8px">${t('stat.power')} <span class="gold">${G.fmt(G.power(st))}</span></div>
             <div class="stats" style="grid-template-columns:1fr">
               <div>${t('stat.hp')} <b>${G.fmt(st.maxHp)}</b></div><div>${t('stat.atk')} <b>${st.atk}</b></div><div>${t('stat.def')} <b>${st.def}</b></div>
@@ -134,13 +175,16 @@
         <div class="slots">${slots}</div>
       </div>
       <div class="card">
-        <h3>${t('hero.class')} <small>${G.clsName(h.cls)}</small></h3>
+        <h3>${t('hero.class')} <small>${G.clsName(cls)}</small></h3>
         ${clsHtml}
       </div>
       <div class="card">
-        <h3>${t('hero.bag')} <small>${S.inventory.length}/${G.CONFIG.inventorySize}</small></h3>
+        <div class="bag-head" style="margin-bottom:10px">
+          <b style="font-size:15px">${t('hero.bag')}</b><small class="muted">${S.inventory.length}/${cap}</small>
+          <button class="btn small" data-act="expand" ${canExp ? '' : 'disabled'}>${canExp ? `${t('hero.expand', { n: G.CONFIG.bagExpandSlots })}　${expCost}` : t('hero.bagMax')}</button>
+        </div>
         <div class="row wrap" style="margin-bottom:10px">
-          <button class="btn small good" data-act="autoequip">${t('hero.autoEquip')}</button>
+          <button class="btn small good" data-act="autoequip" title="${esc(t('hero.autoEquipHint'))}">${t('hero.autoEquip')}</button>
           <button class="btn small" data-act="sellbelow" data-v="0">${t('hero.sellCommon')}</button>
           <button class="btn small" data-act="sellbelow" data-v="1">${t('hero.sellUncommon')}</button>
         </div>
@@ -148,8 +192,10 @@
       </div>`;
   }
 
+  // 裝備彈窗：對象 = 角色分頁目前選的人（主角或夥伴）
   function itemModal(it, equippedSlot) {
-    const cur = equippedSlot ? null : G.S.equipped[it.slot];
+    const who = UI.who;
+    const cur = equippedSlot ? null : G.gearOf(who)[it.slot];
     const keys = [...new Set([...Object.keys(it.stats), ...(cur ? Object.keys(cur.stats) : [])])];
     const rows = keys.map(k => {
       const a = it.stats[k] || 0, b = cur ? cur.stats[k] || 0 : 0, d = +(a - b).toFixed(2);
@@ -166,7 +212,7 @@
         ${equippedSlot
           ? `<button class="btn" data-act="unequip" data-slot="${equippedSlot}">${t('item.unequip')}</button>`
           : `<button class="btn danger" data-act="sell" data-id="${it.uid}">${t('item.sell', { v: G.fmt(G.itemValue(it)) })}</button>
-             <button class="btn primary" data-act="equip" data-id="${it.uid}">${t('item.equip')}</button>`}
+             <button class="btn primary" data-act="equip" data-id="${it.uid}">${who === 'hero' ? t('item.equip') : t('item.equipTo', { name: esc(whoName(who)) })}</button>`}
       </div>`);
   }
 
@@ -388,7 +434,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   const RENDER = { adventure: renderAdventure, hero: renderHero, skills: renderSkills, partners: renderPartners, ship: renderShip, home: renderHome };
   UI.render = function () {
     $('panel').innerHTML = RENDER[UI.tab]();
-    if (UI.tab === 'hero') mount('#dollSlot', dollCanvas(G.ART.lookFromHero(), 128, 160, 1.8));
+    if (UI.tab === 'hero') mount('#dollSlot', dollCanvas(UI.who === 'hero' ? G.ART.lookFromHero() : G.ART.lookFromPartner(UI.who), 128, 160, 1.8));
     if (UI.tab === 'partners') mountPartnerDolls();
     if (UI.tab === 'home') mountPets();
     if (UI.tab === 'ship') {
@@ -444,11 +490,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'credits': UI.modalKind = 'credits'; creditsModal(); break;
       case 'revivePay': G.battleScene().revivePaid(); break;
       case 'item':
-        if (d.slot) itemModal(S.equipped[d.slot], d.slot);
+        if (d.slot) itemModal(G.gearOf(UI.who)[d.slot], d.slot);
         else itemModal(S.inventory.find(i => i.uid === +d.id));
         break;
-      case 'equip': G.equip(+d.id); UI.close(); break;
-      case 'unequip': G.unequip(d.slot); UI.close(); break;
+      case 'equip': G.equip(+d.id, UI.who); UI.close(); UI.refresh(); break;
+      case 'unequip': G.unequip(d.slot, UI.who); UI.close(); UI.refresh(); break;
+      case 'who': UI.who = d.v; UI.render(); break;
+      case 'expand': G.expandBag(); break;
+      case 'collapse': setCollapsed(!G.settings.battleCollapsed); break;
+      case 'buff': {
+        const b = UI.buffs.find(x => x.id === d.id);
+        if (b) UI.toast(`${b.icon} ${t(`buff.${b.id}.name`)}：${t(`buff.${b.id}.desc`, b.p)}`);
+        break;
+      }
       case 'sell': G.sell(+d.id); UI.close(); break;
       case 'autoequip': G.autoEquip(); break;
       case 'sellbelow': G.sellAllBelow(+d.v); break;
@@ -480,9 +534,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     }
   }
 
+  // 戰鬥畫面折疊（記在設定裡，重開也保持）
+  function setCollapsed(on) {
+    G.settings.battleCollapsed = !!on;
+    G.saveSettings();
+    $('battleWrap').classList.toggle('collapsed', !!on);
+    $('collapseBtn').textContent = on ? '▼' : '▲';
+    $('collapseBtn').title = t(on ? 'battle.expand' : 'battle.collapse');
+    hud();
+  }
+
   // 切換語言：固定文字、HUD、目前分頁、開著的設定/序章視窗全部重畫
   function onLang() {
     applyStatic();
+    lastBuffSig = '';
+    setCollapsed(G.settings.battleCollapsed);
     hud();
     UI.render();
     if (UI.showPrologue) UI.showPrologue();
@@ -525,10 +591,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     G.on('levelup', () => UI.refresh(['hero', 'skills', 'adventure']));
     G.on('skills', () => UI.refresh(['skills', 'hero', 'adventure']));
     G.on('stats', () => UI.refresh(['hero', 'adventure']));
-    G.on('party', () => UI.refresh(['partners', 'adventure']));
+    G.on('party', () => UI.refresh(['partners', 'hero', 'adventure']));
     G.on('ship', () => UI.refresh(['ship', 'home', 'adventure']));
     G.on('home', () => UI.refresh(['home']));
 
+    setCollapsed(G.settings.battleCollapsed);
     setInterval(hud, 400);
     hud();
     UI.render();

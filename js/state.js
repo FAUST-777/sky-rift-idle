@@ -31,8 +31,10 @@
       activeSkills: ['smash', null, null],
       equipped: { weapon: null, helmet: null, armor: null, boots: null, accessory: null },
       inventory: [],
+      bagExpands: 0,         // 背包擴充次數
       floor: 1, maxFloor: 1, kills: 0, autoAdvance: true,
-      partners: {},          // id -> { level, cls }
+      morale: 0,             // 士氣層數（每層 +1% 全隊最終防禦，貓鎧者在場才累積/生效）
+      partners: {},          // id -> { level, cls, equipped }
       party: [],             // 出戰中的夥伴 id
       ship: { balloon: 1, engine: 1, hull: 1, cannon: 0, paint: 0, figurehead: 0 },
       furniture: {},         // id -> 持有數量（未擺放）
@@ -55,6 +57,7 @@
       G.S.ship = Object.assign(newState().ship, s.ship);
       G.S.skills = Object.assign(newState().skills, s.skills);
       migrateToI18n(G.S);
+      migrateClasses(G.S);
     } else {
       G.S = base;
     }
@@ -77,6 +80,31 @@
       if (m) { p.id = m.id; delete p.name; }
     });
     S.log = S.log.filter(l => l.k);   // 舊的純文字日誌無法翻譯，直接清掉
+  }
+
+  const emptyGear = () => ({ weapon: null, helmet: null, armor: null, boots: null, accessory: null });
+
+  // 死靈術師已移除 → 改成貓鎧者，技能點全部退還；夥伴補上裝備欄
+  function migrateClasses(S) {
+    const gone = id => !G.CLASSES[id];
+    if (gone(S.hero.cls)) {
+      let refund = 0;
+      Object.keys(S.skills).forEach(id => { refund += S.skills[id]; S.skills[id] = 0; });
+      S.hero.cls = 'catknight';
+      const first = G.SKILLS.catknight[0];
+      S.skills[first.id] = 1;
+      S.skillPoints += Math.max(0, refund - 1);
+      S.activeSkills = [first.id, null, null];
+    }
+    // 移除不存在的技能 id
+    const valid = new Set(Object.values(G.SKILLS).flat().map(s => s.id));
+    Object.keys(S.skills).forEach(id => { if (!valid.has(id)) delete S.skills[id]; });
+    valid.forEach(id => { if (S.skills[id] === undefined) S.skills[id] = 0; });
+    S.activeSkills = S.activeSkills.map(id => (id && valid.has(id) ? id : null));
+    Object.values(S.partners).forEach(p => {
+      if (gone(p.cls)) p.cls = 'catknight';
+      p.equipped = Object.assign(emptyGear(), p.equipped);
+    });
   }
 
   G.save = function () {
@@ -130,6 +158,8 @@
     st.lifesteal   = passiveSum('lifesteal');
     st.healPower   = 1 + passiveSum('healPower');
     st.summonPower = 1 + passiveSum('summonPower');
+    st.armorBreak  = cls.missile === 'cat' ? G.CONFIG.catBreakBase + passiveSum('armorBreak') : 0;
+    st.missile     = cls.missile || null;
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);
     st.def = +st.def.toFixed(1);
@@ -141,15 +171,37 @@
 
   G.partnerStats = function (id) {
     const p = G.S.partners[id], cls = G.CLASSES[p.cls];
-    // 夥伴成長比主角略低，靠升級追上
-    return {
-      maxHp: Math.round((80 + 14 * (p.level - 1)) * cls.mult.hp),
-      atk:   +((8 + 2.4 * (p.level - 1)) * cls.mult.atk).toFixed(1),
-      def:   +((2 + 0.9 * (p.level - 1)) * cls.mult.def).toFixed(1),
+    // 夥伴成長比主角略低，靠升級和裝備追上
+    const st = {
+      maxHp: (80 + 14 * (p.level - 1)) * cls.mult.hp,
+      atk:   (8 + 2.4 * (p.level - 1)) * cls.mult.atk,
+      def:   (2 + 0.9 * (p.level - 1)) * cls.mult.def,
       spd: 0.9, crit: 5, critDmg: 1.5,
       lifesteal: 0, healPower: 1, summonPower: 1,
       ranged: cls.ranged,
+      armorBreak: cls.missile === 'cat' ? G.CONFIG.catBreakBase : 0,
+      missile: cls.missile || null,
     };
+    G.SLOTS.forEach(slot => {
+      const it = p.equipped && p.equipped[slot];
+      if (!it) return;
+      st.maxHp += it.stats.hp || 0;
+      st.atk   += it.stats.atk || 0;
+      st.def   += it.stats.def || 0;
+      st.crit  += it.stats.crit || 0;
+      st.spd   += it.stats.spd || 0;
+    });
+    st.maxHp = Math.round(st.maxHp);
+    st.atk = +st.atk.toFixed(1);
+    st.def = +st.def.toFixed(1);
+    st.spd = +Math.min(3, st.spd).toFixed(2);
+    st.crit = +Math.min(75, st.crit).toFixed(1);
+    return st;
+  };
+
+  // 隊伍裡有沒有貓鎧者（主角或出戰中的夥伴）
+  G.catKnightInParty = function () {
+    return G.S.hero.cls === 'catknight' || G.S.party.some(id => G.S.partners[id] && G.S.partners[id].cls === 'catknight');
   };
   // 夥伴使用該職業的第一個主動技能（等級跟著夥伴等級成長）
   G.partnerSkill = function (id) {
@@ -213,12 +265,26 @@
   G.itemScore = it => it ? (it.stats.atk || 0) * 4 + (it.stats.hp || 0) * 0.3 + (it.stats.def || 0) * 3 + (it.stats.crit || 0) * 2 + (it.stats.spd || 0) * 60 : 0;
   G.itemValue = it => Math.round(5 * it.floor * Math.pow(it.rarity + 1, 2));
 
+  // ── 背包容量與擴充 ───────────────────────────────────────────────────────
+  G.invCap = () => Math.min(G.CONFIG.bagMax, G.CONFIG.inventorySize + (G.S.bagExpands || 0) * G.CONFIG.bagExpandSlots);
+  G.canExpandBag = () => G.invCap() < G.CONFIG.bagMax;
+  G.expandBag = function () {
+    if (!G.canExpandBag()) return;
+    const c = G.bagExpandCost(G.S.bagExpands || 0);
+    if (G.S.gold < c.gold) return toast('toast.notEnoughGold');
+    if (G.S.crystal < c.crystal) return toast('toast.notEnoughCrystal');
+    G.S.gold -= c.gold; G.S.crystal -= c.crystal;
+    G.S.bagExpands = (G.S.bagExpands || 0) + 1;
+    toast('toast.bagExpanded', { n: G.invCap() });
+    G.emit('inventory');
+  };
+
   G.addItem = function (it) {
     if (G.S.autoSellCommon && it.rarity === 0) {
       G.S.gold += G.itemValue(it);
       return 'sold';
     }
-    if (G.S.inventory.length >= G.CONFIG.inventorySize) {
+    if (G.S.inventory.length >= G.invCap()) {
       G.S.gold += G.itemValue(it);
       return 'full';
     }
@@ -228,24 +294,33 @@
   };
 
   // ── 玩家操作 ─────────────────────────────────────────────────────────────
-  G.equip = function (uid) {
+  // who = 'hero' 或夥伴 id；夥伴和主角共用同一個背包
+  G.gearOf = who => (who === 'hero' || !who ? G.S.equipped : G.S.partners[who].equipped);
+  function gearChanged(who) {
+    G.emit('inventory');
+    G.emit(who === 'hero' || !who ? 'look' : 'party');
+  }
+
+  G.equip = function (uid, who = 'hero') {
     const idx = G.S.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return;
+    const gear = G.gearOf(who);
     const it = G.S.inventory[idx];
-    const old = G.S.equipped[it.slot];
+    const old = gear[it.slot];
     G.S.inventory.splice(idx, 1);
     if (old) G.S.inventory.push(old);
-    G.S.equipped[it.slot] = it;
-    G.emit('inventory'); G.emit('look');
+    gear[it.slot] = it;
+    gearChanged(who);
   };
 
-  G.unequip = function (slot) {
-    const it = G.S.equipped[slot];
+  G.unequip = function (slot, who = 'hero') {
+    const gear = G.gearOf(who);
+    const it = gear[slot];
     if (!it) return;
-    if (G.S.inventory.length >= G.CONFIG.inventorySize) return toast('toast.bagFull');
-    G.S.equipped[slot] = null;
+    if (G.S.inventory.length >= G.invCap()) return toast('toast.bagFull');
+    gear[slot] = null;
     G.S.inventory.push(it);
-    G.emit('inventory'); G.emit('look');
+    gearChanged(who);
   };
 
   G.sell = function (uid) {
@@ -267,12 +342,17 @@
     toast('toast.sold', { n, g: G.fmt(g) });
   };
 
-  // 自動穿上分數較高的裝備
+  // 一鍵穿最好的：主角先挑，剩下的再依序給出戰中的夥伴、其他夥伴
+  // 主角換下來的舊裝備會回到背包，夥伴也可能撿去穿
   G.autoEquip = function () {
     let n = 0;
-    G.SLOTS.forEach(slot => {
-      const best = G.S.inventory.filter(i => i.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a))[0];
-      if (best && G.itemScore(best) > G.itemScore(G.S.equipped[slot])) { G.equip(best.uid); n++; }
+    const order = ['hero', ...G.S.party, ...Object.keys(G.S.partners).filter(id => !G.S.party.includes(id))];
+    order.forEach(who => {
+      const gear = G.gearOf(who);
+      G.SLOTS.forEach(slot => {
+        const best = G.S.inventory.filter(i => i.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a))[0];
+        if (best && G.itemScore(best) > G.itemScore(gear[slot])) { G.equip(best.uid, who); n++; }
+      });
     });
     n ? toast('toast.equipped', { n }) : toast('toast.bestAlready');
   };
@@ -333,7 +413,7 @@
     const cost = G.partnerRecruitCost(p);
     if (G.S.gold < cost) return toast('toast.needGold', { n: G.fmt(cost) });
     G.S.gold -= cost;
-    G.S.partners[id] = { level: 1, cls: 'bloodknight' };
+    G.S.partners[id] = { level: 1, cls: 'bloodknight', equipped: emptyGear() };
     if (G.S.party.length < G.CONFIG.maxParty) G.S.party.push(id);
     G.addLog('log.recruited', { name: { k: `partner.${id}.name` } }, '#7fd1ff');
     G.emit('party');

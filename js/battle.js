@@ -32,12 +32,17 @@
       this.walkT = 1;
       this.cannonT = 6;
       this.needRebuild = false;
+      this.frenzyMem = {};   // 吸貓狂熱層數（重建隊伍時保留，倒下才歸零）
+
+      // 小貓貼圖
+      G.ART.KITTEN_COLORS.forEach((c, i) => this.tex('kitten' + i, 28, 22, ctx => G.ART.drawKitten(ctx, c)));
 
       // 背景
       this.sky = this.add.graphics();
       ['clouds', 'clouds2'].forEach((k, i) => this.tex(k, 256, 128, (ctx, w, h) => G.ART.drawClouds(ctx, w, h, i ? 0.85 : 0.45)));
       this.islandsLayer = null;
-      this.shipImg = this.add.image(78, 62, '__DEFAULT').setScale(0.5);
+      // 飛行船放右上（左上角留給 buff 圖示）
+      this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.5);
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
       this.ground = this.add.tileSprite(0, GROUND - 6, W, H - GROUND + 6, '__DEFAULT').setOrigin(0);
@@ -47,7 +52,7 @@
       this.bars = this.add.graphics().setDepth(50);
       this.fx = this.add.layer().setDepth(60);
 
-      this.tweens.add({ targets: this.shipImg, y: 70, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      this.tweens.add({ targets: this.shipImg, y: 66, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
 
       this.buildParty();
 
@@ -109,7 +114,8 @@
       if (o.texture.startsWith('ov_')) img.setScale((o.scale || 1.1) * 64 / img.width);
       const u = Object.assign({
         alive: true, shield: 0, shieldT: 0, atkCd: G.rand(0.2, 0.8),
-        buffs: { atk: { v: 0, t: 0 } }, taunt: { v: 0, t: 0 }, skills: [], img, homeX: o.x,
+        buffs: { atk: { v: 0, t: 0 } }, taunt: { v: 0, t: 0 }, defBreak: { v: 0, t: 0 }, frenzy: 0,
+        skills: [], img, homeX: o.x,
       }, o);
       u.hp = u.st.maxHp;
       return u;
@@ -126,19 +132,20 @@
       this.units.forEach(u => u.img.destroy());
       this.units = [];
       const hero = this.makeUnit({
-        side: 'party', kind: 'hero', st: G.heroStats(),
+        side: 'party', kind: 'hero', key: 'hero', st: G.heroStats(),
         texture: this.humanTex('hero', G.ART.lookFromHero()), x: 0,
       });
       hero.skills = this.heroSkills();
+      hero.frenzy = this.frenzyMem.hero || 0;
       this.hero = hero;
       const members = [hero];
       G.S.party.forEach(id => {
         if (!G.S.partners[id]) return;
-        const def = G.PARTNERS.find(p => p.id === id);
         const u = this.makeUnit({
-          side: 'party', kind: 'partner', name: def.name, partnerId: id, st: G.partnerStats(id),
+          side: 'party', kind: 'partner', key: id, partnerId: id, st: G.partnerStats(id),
           texture: this.humanTex('p_' + id, G.ART.lookFromPartner(id)), x: 0, scale: 1.0,
         });
+        u.frenzy = this.frenzyMem[id] || 0;
         const sk = G.partnerSkill(id);
         if (sk) u.skills = [{ def: sk.def, rank: sk.rank, cd: sk.def.cd * 0.7 }];
         members.push(u);
@@ -211,14 +218,30 @@
     }
 
     // ── 傷害 ─────────────────────────────────────────────────────────────
+    // 士氣：貓鎧者在場時，全隊最終防禦 +morale%
+    moraleMult() { return G.catKnightInParty() ? 1 + G.S.morale / 100 : 1; }
+    frenzyOn() { return G.catKnightInParty(); }
+
     hit(src, target, mult, opts = {}) {
       if (!target || !target.alive) return;
       let dmg = src.st.atk * (1 + src.buffs.atk.v) * mult;
+      // 吸貓狂熱：攻擊者自身累積的傷害加成
+      if (src.side === 'party' && src.frenzy && this.frenzyOn()) dmg *= 1 + src.frenzy / 100;
       const crit = Math.random() * 100 < src.st.crit;
       if (crit) dmg *= src.st.critDmg;
-      dmg *= 50 / (50 + target.st.def);
+      // 最終防禦：敵人吃破甲；我方吃士氣
+      let def = target.st.def;
+      if (target.defBreak.t > 0) def *= 1 - target.defBreak.v;
+      if (target.side === 'party') def *= this.moraleMult();
+      dmg *= 50 / (50 + def);
       if (target.taunt.t > 0) dmg *= 1 - target.taunt.v;
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
+
+      // 隊員打中敵人 → 吸貓狂熱 +1%（召喚物、船砲不算）
+      if (target.side === 'enemy' && (src.kind === 'hero' || src.kind === 'partner') && this.frenzyOn() && src.frenzy < G.CONFIG.frenzyMax) {
+        src.frenzy = Math.min(G.CONFIG.frenzyMax, src.frenzy + G.CONFIG.frenzyPerHit);
+        this.frenzyMem[src.key] = src.frenzy;
+      }
 
       let left = dmg;
       if (target.shield > 0) {
@@ -249,14 +272,72 @@
     basicAttack(u) {
       const t = this.targetFor(u);
       if (!t) return;
+      if (u.st.missile === 'cat') {
+        // 貓鎧者：鎧甲開口射出小貓，飛過去抓傷 → 命中時傷害＋破甲
+        this.launchKittens(u, [t], 2, () => {
+          if (!this.enemies.includes(t) || !u.alive) return;   // 小貓飛行途中換層/戰敗就作廢
+          this.hit(u, t, 1);
+          this.breakArmor(t, u.st.armorBreak, G.CONFIG.catBreakDur);
+          this.checkWaveEnd();
+        });
+        return;
+      }
       this.attackAnim(u, t, u.kind === 'summon' ? '#5bf0a0' : null);
       this.hit(u, t, 1);
     }
 
+    // 從單位的胸口艙門射出 n 隻小貓，畫弧線飛向目標；第一隻抵達時呼叫 onHit
+    launchKittens(u, targets, n, onHit) {
+      this.glow(u, '#ffe066');
+      let hitDone = false;
+      for (let i = 0; i < n; i++) {
+        const target = targets[i % targets.length];
+        if (!target) continue;
+        const k = this.add.image(u.img.x + 6, u.img.y - 42 + i * 8, 'kitten' + G.randInt(0, G.ART.KITTEN_COLORS.length - 1)).setDepth(40).setScale(0.9);
+        const tx = target.img.x - 8, ty = target.img.y - 34 + G.rand(-8, 8);
+        const peak = Math.min(u.img.y, ty) - 40 - i * 10;
+        const startX = k.x, startY = k.y;
+        this.tweens.addCounter({
+          from: 0, to: 1, duration: 320 + i * 60, ease: 'Sine.in',
+          onUpdate: tw => {
+            const p = tw.getValue();
+            k.x = startX + (tx - startX) * p;
+            k.y = (1 - p) * (1 - p) * startY + 2 * (1 - p) * p * peak + p * p * ty;   // 二次貝茲弧線
+            k.rotation = (p - 0.5) * 0.8;
+          },
+          onComplete: () => {
+            this.scratch(tx, ty);
+            k.destroy();
+            if (!hitDone && onHit) { hitDone = true; onHit(target); }
+          },
+        });
+      }
+    }
+
+    // 抓痕特效
+    scratch(x, y) {
+      const g = this.add.graphics().setDepth(46);
+      g.lineStyle(2, 0xffffff, 1);
+      for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(x - 8 + i * 6, y - 9); g.lineTo(x - 2 + i * 6, y + 9); g.strokePath(); }
+      this.tweens.add({ targets: g, alpha: 0, duration: 260, onComplete: () => g.destroy() });
+    }
+
+    // 破甲：取較強、較久的那個
+    breakArmor(t, v, dur) {
+      if (!t || !t.alive || !v) return;
+      if (v >= t.defBreak.v || t.defBreak.t <= 0) t.defBreak = { v, t: dur };
+      else t.defBreak.t = Math.max(t.defBreak.t, dur);
+    }
+
     castSkill(u, s) {
       const d = s.def, v = d.v(s.rank);
-      const col = { strike: '#ffd27a', aoe: '#ff8a5c', buffAtk: '#ff5c8a', healParty: '#7dff9a', shieldParty: '#9fd8ff', summon: '#5bf0a0', taunt: '#ffd23f' }[d.kind];
-      this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, d.name, col, 15, 900);
+      const col = { strike: '#ffd27a', aoe: '#ff8a5c', aoeBreak: '#ffb347', buffAtk: '#ff5c8a', healParty: '#7dff9a', shieldParty: '#9fd8ff', summon: '#5bf0a0', taunt: '#ffd23f' }[d.kind];
+      this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, G.skillName(d.id), col, 15, 900);
+      // 貓鎧者的範圍技：每個敵人都飛一隻小貓過去
+      if ((d.kind === 'aoe' || d.kind === 'aoeBreak') && u.st.missile === 'cat') {
+        const es = this.enemiesAlive();
+        this.launchKittens(u, es, Math.max(3, es.length * 2));
+      }
       const party = this.partyAlive();
       switch (d.kind) {
         case 'strike': { const t = this.targetFor(u); this.attackAnim(u, t, col); this.hit(u, t, v); break; }
@@ -264,6 +345,14 @@
           this.enemiesAlive().forEach(e => {
             const ring = this.add.circle(e.img.x, e.img.y - 30, 10, Phaser.Display.Color.HexStringToColor(col).color, 0.6).setDepth(45);
             this.tweens.add({ targets: ring, scale: 4, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
+            this.hit(u, e, v, { noFlash: true });
+          });
+          break;
+        case 'aoeBreak':
+          this.enemiesAlive().forEach(e => {
+            const ring = this.add.circle(e.img.x, e.img.y - 30, 10, Phaser.Display.Color.HexStringToColor(col).color, 0.6).setDepth(45);
+            this.tweens.add({ targets: ring, scale: 4, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
+            this.breakArmor(e, d.breakV, d.dur);
             this.hit(u, e, v, { noFlash: true });
           });
           break;
@@ -305,6 +394,8 @@
     kill(u) {
       u.alive = false;
       u.hp = 0;
+      // 倒下 → 吸貓狂熱歸零
+      if (u.key) { u.frenzy = 0; this.frenzyMem[u.key] = 0; }
       if (u.side === 'enemy') {
         this.tweens.add({ targets: u.img, alpha: 0, y: u.img.y + 10, duration: 350, onComplete: () => u.img.setVisible(false) });
         this.reward(u);
@@ -352,6 +443,11 @@
     bossCleared() {
       const S = G.S, f = S.floor;
       S.kills = 0;
+      // 士氣：貓鎧者在場、這層沒戰敗 → +1%
+      if (G.catKnightInParty() && S.morale < G.CONFIG.moraleMax) {
+        S.morale = Math.min(G.CONFIG.moraleMax, S.morale + G.CONFIG.moralePerFloor);
+        this.floatText(W / 2, 108, G.t('battle.morale', { n: S.morale }), '#9fd8ff', 17, 1500);
+      }
       if (f + 1 > S.maxFloor) {
         S.maxFloor = f + 1;
         G.addLog('log.bossDown', { f, n: f + 1 }, '#ffd76a');
@@ -381,6 +477,8 @@
       // 用真實時間計時：分頁切到背景時 Phaser 會暫停，但復活倒數要照算
       this.reviveAt = Date.now() + G.CONFIG.reviveSeconds * 1000;
       G.addLog('log.defeat', { n: G.S.floor }, '#ff8a8a');
+      // 戰敗 → 士氣歸零
+      if (G.S.morale > 0) { G.S.morale = 0; G.addLog('log.moraleLost', null, '#ff8a8a'); }
       G.emit('dead', true);
     }
 
@@ -482,6 +580,7 @@
         if (!u.alive) return;
         if (u.buffs.atk.t > 0 && (u.buffs.atk.t -= dt) <= 0) u.buffs.atk.v = 0;
         if (u.taunt.t > 0) u.taunt.t -= dt;
+        if (u.defBreak.t > 0 && (u.defBreak.t -= dt) <= 0) u.defBreak.v = 0;
         if (u.shieldT > 0 && (u.shieldT -= dt) <= 0) u.shield = 0;
         if (u.kind === 'summon' && (u.life -= dt) <= 0) { this.kill(u); return; }
 
@@ -519,6 +618,32 @@
       }
     }
 
+    // ── 目前生效中的 buff（給介面左上角的圖示用）───────────────────────────
+    getBuffs() {
+      const out = [], S = G.S, h = this.hero;
+      if (!h) return out;
+      const cat = G.catKnightInParty();
+      if (cat && S.morale > 0) out.push({ id: 'morale', icon: '🎖️', val: `+${S.morale}%`, p: { n: S.morale, max: G.CONFIG.moraleMax } });
+      if (cat) {
+        const members = this.units.filter(u => u.key);
+        const top = Math.max(0, ...members.map(u => u.frenzy || 0));
+        if (top > 0) {
+          const list = members.map(u => `${u.kind === 'hero' ? G.t('hero.who.hero') : G.partnerName(u.partnerId)} +${u.frenzy}%`).join('、');
+          out.push({ id: 'frenzy', icon: '🐾', val: `+${top}%`, p: { max: G.CONFIG.frenzyMax, list } });
+        }
+      }
+      if (h.buffs.atk.t > 0) out.push({ id: 'atk', icon: '⚔️', val: `${Math.ceil(h.buffs.atk.t)}s`, p: { v: Math.round(h.buffs.atk.v * 100), s: Math.ceil(h.buffs.atk.t) } });
+      if (h.shield > 0) out.push({ id: 'shield', icon: '🔰', val: G.fmt(h.shield), p: { v: G.fmt(h.shield) } });
+      const taunter = this.units.find(u => u.alive && u.taunt.t > 0);
+      if (taunter) out.push({ id: 'taunt', icon: '😤', val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: taunter.kind === 'hero' ? G.t('hero.who.hero') : G.partnerName(taunter.partnerId) } });
+      const broken = this.enemies.filter(e => e.alive && e.defBreak.t > 0);
+      if (broken.length) {
+        const v = Math.round(Math.max(...broken.map(e => e.defBreak.v)) * 100);
+        out.push({ id: 'break', icon: '💔', val: `-${v}%`, p: { v } });
+      }
+      return out;
+    }
+
     drawBars() {
       const g = this.bars;
       g.clear();
@@ -530,6 +655,7 @@
         g.fillStyle(u.side === 'party' ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, w * p, 4);
         if (u.shield > 0) g.fillStyle(0x9fd8ff, 0.9).fillRect(x, y - 3, w * Math.min(1, u.shield / u.st.maxHp), 2);
         if (u.taunt.t > 0) g.lineStyle(1, 0xffd23f, 1).strokeRect(x - 1, y - 1, w + 2, 6);
+        if (u.defBreak.t > 0) g.fillStyle(0xffb347, 1).fillRect(x, y + 5, w * Math.min(1, u.defBreak.t / G.CONFIG.catBreakDur), 2);  // 破甲剩餘時間
       });
     }
   }

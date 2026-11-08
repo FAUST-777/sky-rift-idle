@@ -24,18 +24,23 @@
   </header>
 
   <section id="battleWrap">
-    <div id="battle"></div>
-    <div id="revive" hidden>
-      <div class="revive-card">
-        <div class="revive-title" id="reviveTitle"></div>
-        <div id="reviveText"></div>
-        <button class="btn primary" id="revivePay" data-act="revivePay"></button>
+    <!-- 可折疊的戰鬥區：收起時 Phaser 仍在背景跑，只是把高度收成 0 -->
+    <div id="battleBox">
+      <div id="battle"></div>
+      <div id="buffBar"></div>
+      <div id="revive" hidden>
+        <div class="revive-card">
+          <div class="revive-title" id="reviveTitle"></div>
+          <div id="reviveText"></div>
+          <button class="btn primary" id="revivePay" data-act="revivePay"></button>
+        </div>
       </div>
     </div>
     <div id="floorBar">
       <span id="floorName"></span>
       <div class="prog"><i id="floorProg"></i></div>
       <span id="floorKills">0/10</span>
+      <button id="collapseBtn" data-act="collapse" aria-label="toggle battle view">▲</button>
     </div>
   </section>
 

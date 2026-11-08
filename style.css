@@ -42,7 +42,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ── 戰鬥區 ───────────────────────────────────────── */
 #battleWrap { position: relative; flex: none; }
 #battle { width: 100%; aspect-ratio: 480 / 300; background: #9fd8ff; }
+#battleWrap.collapsed #battle { position: absolute; top: 0; left: 0; }
 #battle canvas { display: block; }
+/* 戰鬥區折疊：只收外框高度，#battle 本身尺寸不變（Phaser 才不會被縮成 0） */
+#battleBox { position: relative; overflow: hidden; aspect-ratio: 480 / 300; transition: aspect-ratio .25s, height .25s; }
+#battleWrap.collapsed #battleBox { height: 0; aspect-ratio: auto; }
+#collapseBtn { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; width: 30px; height: 26px; padding: 0; font-size: 12px; color: var(--muted); flex: none; }
+#battleWrap.collapsed #collapseBtn { color: var(--gold); border-color: var(--gold); }
+
+/* Buff 圖示列（戰鬥畫面左上角） */
+#buffBar { position: absolute; top: 6px; left: 6px; display: flex; flex-wrap: wrap; gap: 4px; max-width: 70%; z-index: 4; }
+.buff { display: flex; align-items: center; gap: 2px; background: rgba(15,10,30,.72); border: 1px solid rgba(255,255,255,.18); border-radius: 8px;
+  padding: 2px 5px 2px 3px; font-size: 14px; line-height: 1; color: #fff; }
+.buff b { font-size: 10px; font-weight: 700; }
+.buff.morale { border-color: #9fd8ff; } .buff.frenzy { border-color: #ffb36b; } .buff.break { border-color: #ff8a8a; }
+
 #revive { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 480 / 300; background: rgba(10,6,20,.62);
   display: flex; align-items: center; justify-content: center; z-index: 5; }
 #revive[hidden] { display: none; }
@@ -99,6 +113,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .slot { aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--line); background: #1a1530; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; position: relative; padding: 0; }
 .slot small { font-size: 10px; color: var(--muted); }
 .slot.empty { opacity: .45; }
+.who { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 2px; }
+.who .chip { flex: none; }
+.bag-head { display: flex; align-items: center; gap: 8px; }
+.bag-head .btn { margin-left: auto; }
 
 .inv { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .item { aspect-ratio: 1; border-radius: 10px; border: 2px solid; background: #1a1530; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; position: relative; padding: 2px; }

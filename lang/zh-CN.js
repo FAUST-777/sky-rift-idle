@@ -28,6 +28,9 @@ G.I18N['zh-CN'] = {
   'hero.classChangeNote': '更换职业需要 {cost} 金币，技能点会全部返还。',
   'hero.bag': '背包', 'hero.autoEquip': '一键穿最好的', 'hero.sellCommon': '卖掉普通', 'hero.sellUncommon': '卖掉优良以下',
   'hero.bagEmpty': '打怪会掉装备，掉到的会出现在这里。',
+  'hero.who.hero': '主角', 'hero.partnerNote': '伙伴的职业与升级在「伙伴」分页。', 'hero.notRecruited': '还没有伙伴，往上爬就会遇到。',
+  'hero.expand': '扩充 +{n} 格', 'hero.bagMax': '已达上限', 'item.equipTo': '给 {name} 装备',
+  'hero.autoEquipHint': '主角先挑，剩下的再分给伙伴',
   'item.named': '{prefix}・{base}', 'item.meta': '{rarity}・{slot}・第 {floor} 层掉落',
   'item.compare': '括号内是与当前穿着「{name}」的差异', 'item.unequip': '卸下', 'item.sell': '卖掉 +{v}💰', 'item.equip': '装备',
   'classModal.title': '转职为「{name}」？', 'classModal.free': '第一次转职免费。', 'classModal.cost': '需要 {cost} 金币。',
@@ -45,7 +48,7 @@ G.I18N['zh-CN'] = {
   // ── 职业 ──
   'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 级可以转职。',
   'class.bloodknight.name': '血骑士', 'class.bloodknight.desc': '近战物理输出，靠吸血续战。',
-  'class.necro.name': '死灵术士', 'class.necro.desc': '远程魔法与召唤骷髅，擅长群体伤害。',
+  'class.catknight.name': '猫铠者', 'class.catknight.desc': '全身包覆铠甲的神秘骑士。打开铠甲开口射出小猫抓伤敌人，削弱敌人防御、擅长全体伤害，并让全队累积「士气」与「吸猫狂热」。',
   'class.priest.name': '牧师', 'class.priest.desc': '治疗、护盾、强化队友。',
   'class.crusader.name': '圣十字军', 'class.crusader.desc': '坦克，嘲讽敌人、承受伤害。',
 
@@ -64,11 +67,11 @@ G.I18N['zh-CN'] = {
   'skill.whirl.name': '旋风血刃', 'skill.whirl.desc': '全体 {v}% 伤害',
   'skill.frenzy.name': '狂怒', 'skill.frenzy.desc': '暴击率 +{v}%',
   'skill.bloodlust.name': '嗜血', 'skill.bloodlust.desc': '自身攻击 +{v}%，8 秒',
-  'skill.bonespear.name': '骨矛', 'skill.bonespear.desc': '单体 {v}% 伤害',
-  'skill.soulsiphon.name': '灵魂汲取', 'skill.soulsiphon.desc': '攻击 +{v}%',
-  'skill.skeleton.name': '召唤骷髅', 'skill.skeleton.desc': '召唤骷髅 12 秒，攻击力为你的 {v}%',
-  'skill.legion.name': '亡者大军', 'skill.legion.desc': '召唤物攻击 +{v}%',
-  'skill.corpse.name': '尸爆', 'skill.corpse.desc': '全体 {v}% 伤害',
+  'skill.kittenvolley.name': '猫咪齐射', 'skill.kittenvolley.desc': '打开舱门射出一群小猫，全体 {v}% 伤害',
+  'skill.clawmark.name': '猫爪印记', 'skill.clawmark.desc': '普攻破甲效果再 +{v}%（基本 10%）',
+  'skill.fullburst.name': '全弹发射', 'skill.fullburst.desc': '全身舱门打开，全体 {v}% 伤害，并使敌人防御 -30%，6 秒',
+  'skill.heavyplate.name': '重装铠甲', 'skill.heavyplate.desc': '防御 +{v}%',
+  'skill.catstorm.name': '万猫奔腾', 'skill.catstorm.desc': '全队攻击 +{v}%，10 秒',
   'skill.holylight.name': '圣光术', 'skill.holylight.desc': '全队恢复 {v}% 生命',
   'skill.smite.name': '圣光惩击', 'skill.smite.desc': '攻击 +{v}%',
   'skill.aegis.name': '神圣护盾', 'skill.aegis.desc': '全队获得 {v}% 生命的护盾',
@@ -126,6 +129,17 @@ G.I18N['zh-CN'] = {
   'battle.toFloor': '↑ 前往第 {n} 层', 'battle.defeat': '战败……', 'battle.revived': '复活！',
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
+  'battle.morale': '🎖️ 士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
+  'battle.deadShort': '💀 {s}秒',
+
+  // ── Buff ──
+  'buff.morale.name': '士气', 'buff.morale.desc': '猫铠者在场时，每打过一层（没有战败）全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
+  'buff.frenzy.name': '吸猫狂热', 'buff.frenzy.desc': '猫铠者在场时，队员每次击中敌人，自身伤害 +1%（最多 +{max}%），倒下才重新计算。当前：{list}',
+  'buff.atk.name': '攻击强化', 'buff.atk.desc': '攻击 +{v}%，还剩 {s} 秒',
+  'buff.shield.name': '护盾', 'buff.shield.desc': '可再吸收 {v} 点伤害',
+  'buff.taunt.name': '嘲讽', 'buff.taunt.desc': '{name} 正在吸引所有敌人',
+  'buff.break.name': '敌人破甲', 'buff.break.desc': '敌人防御 -{v}%',
+
   // ── 日志 ──
   'log.start': '🎈 你乘着热气球飞进了天空裂洞……',
   'log.levelUp': '⬆️ 升到 {lv} 级！获得 1 技能点', 'log.canClass': '✨ 可以转职了！到「角色」分页选择职业',
@@ -134,11 +148,12 @@ G.I18N['zh-CN'] = {
   'log.capture': '🕸️ 捕获了「{name}」！它住进了飞行船', 'log.bossDown': '🏆 击败第 {f} 层层主！第 {n} 层已开放',
   'log.partnerAvail': '🤝 {name} 可以招募了（伙伴分页）', 'log.capReached': '🎈 气囊高度只到第 {n} 层，升级气囊才能往上',
   'log.defeat': '💀 在第 {n} 层倒下', 'log.reviveFree': '🕊️ 复活了，退回第 {n} 层修炼（已暂停自动推进）',
-  'log.revivePaid': '💎 花了 {n} 云晶原地复活',
+  'log.revivePaid': '💎 花了 {n} 云晶原地复活', 'log.moraleLost': '🎖️ 战败，士气归零',
 
   // ── 提示 ──
   'toast.canClass': '可以转职了！到「角色」分页选择职业', 'toast.bagFull': '背包满了',
-  'toast.sold': '卖出 {n} 件，获得 {g} 金币', 'toast.equipped': '换上 {n} 件更好的装备', 'toast.bestAlready': '已经是最好的装备了',
+  'toast.sold': '卖出 {n} 件，获得 {g} 金币', 'toast.equipped': '换上 {n} 件更好的装备（主角优先，其次伙伴）',
+  'toast.bagExpanded': '背包扩充到 {n} 格', 'toast.bestAlready': '已经是最好的装备了',
   'toast.classLevel': '{lv} 级才能转职', 'toast.classCost': '更换职业需要 {cost} 金币',
   'toast.noSP': '没有技能点了，升级可以获得', 'toast.tierReq': '需要先在此职业投入 {n} 点',
   'toast.reachFloor': '要先到达第 {n} 层', 'toast.needGold': '需要 {n} 金币',

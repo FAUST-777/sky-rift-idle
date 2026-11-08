@@ -25,29 +25,44 @@
   const GEAR_COLORS = ['#8d8478', '#4f9d57', '#3f7fd0', '#8a4fd0', '#e0a030'];
 
   // ── 人物外觀資料：由職業 + 裝備組成 ──────────────────────────────────────
-  A.lookFromHero = function () {
-    const S = G.S, e = S.equipped;
+  // 把裝備欄轉成外觀；沒穿的部位用 fallback（夥伴的職業預設裝扮）
+  function gearLook(e, fb = {}) {
     return {
-      skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls,
-      weapon: e.weapon ? { type: e.weapon.look, color: GEAR_COLORS[e.weapon.rarity] } : null,
-      helmet: e.helmet ? { v: e.helmet.look, color: GEAR_COLORS[e.helmet.rarity] } : null,
-      armor:  e.armor  ? { v: e.armor.look,  color: GEAR_COLORS[e.armor.rarity] } : null,
-      boots:  e.boots  ? { v: e.boots.look,  color: GEAR_COLORS[e.boots.rarity] } : null,
+      weapon: e.weapon ? { type: e.weapon.look, color: GEAR_COLORS[e.weapon.rarity] } : fb.weapon || null,
+      helmet: e.helmet ? { v: e.helmet.look, color: GEAR_COLORS[e.helmet.rarity] } : fb.helmet || null,
+      armor:  e.armor  ? { v: e.armor.look,  color: GEAR_COLORS[e.armor.rarity] } : fb.armor || null,
+      boots:  e.boots  ? { v: e.boots.look,  color: GEAR_COLORS[e.boots.rarity] } : fb.boots || null,
       accessory: e.accessory ? { color: GEAR_COLORS[e.accessory.rarity] } : null,
     };
+  }
+  // 貓鎧者：永遠是全身鎧甲＋貓耳全罩頭盔（顏色跟著裝備稀有度），沒武器就空手（小貓是武器）
+  function catKnightLook(look) {
+    const steel = '#9aa3ad';
+    look.helmet = { v: 3, color: look.helmet ? look.helmet.color : steel };
+    look.armor  = { v: 2, color: look.armor ? look.armor.color : steel };
+    look.boots  = { v: 1, color: look.boots ? look.boots.color : steel };
+    if (!look.weapon) look.weapon = { type: 'none' };
+    return look;
+  }
+
+  A.lookFromHero = function () {
+    const S = G.S;
+    const look = Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls }, gearLook(S.equipped));
+    return S.hero.cls === 'catknight' ? catKnightLook(look) : look;
   };
-  // 夥伴：依職業給一套預設裝扮
+  // 夥伴：穿上的裝備優先，沒穿的部位用職業預設裝扮
   A.lookFromPartner = function (id) {
     const def = G.PARTNERS.find(p => p.id === id), p = G.S.partners[id];
-    const w = { bloodknight: 'axe', necro: 'staff', priest: 'mace', crusader: 'sword', villager: null }[p.cls];
+    const w = { bloodknight: 'axe', priest: 'mace', crusader: 'sword', villager: null, catknight: null }[p.cls];
     const tier = Math.min(4, Math.floor(p.level / 8));
-    return {
-      skin: def.skin, hair: def.hair, cls: p.cls,
+    const fb = {
       weapon: w ? { type: w, color: GEAR_COLORS[tier] } : null,
-      helmet: p.cls === 'crusader' ? { v: 1, color: GEAR_COLORS[tier] } : p.cls === 'necro' ? { v: 2, color: '#2e2440' } : null,
+      helmet: p.cls === 'crusader' ? { v: 1, color: GEAR_COLORS[tier] } : null,
       armor: { v: p.cls === 'crusader' ? 2 : p.cls === 'bloodknight' ? 1 : 0, color: G.CLASSES[p.cls].color },
       boots: { v: 0, color: '#5b4632' },
     };
+    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls }, gearLook(p.equipped || {}, fb));
+    return p.cls === 'catknight' ? catKnightLook(look) : look;
   };
 
   // ── 紙娃娃：64×80 一格，面向右，分層畫 ───────────────────────────────────
@@ -127,6 +142,18 @@
         ctx.fillRect(21, 18, 5, 10);
         ctx.fillStyle = shade(hm.color, 50); ctx.fillRect(36, 18, 2.5, 8);
         ctx.fillStyle = shade(hm.color, -30); ctx.fillRect(22, 19, 23, 2);
+      } else if (hm.v === 3) {   // 貓鎧者：全罩頭盔＋貓耳，只露出發光的眼縫
+        ctx.beginPath(); ctx.arc(33, 21, 11.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(24, 14); ctx.lineTo(25, 3); ctx.lineTo(31, 11); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(35, 11); ctx.lineTo(41, 3); ctx.lineTo(42, 14); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#f2a7b8';
+        ctx.beginPath(); ctx.moveTo(26, 12); ctx.lineTo(26.5, 6.5); ctx.lineTo(29.5, 11); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(37, 11); ctx.lineTo(40, 6.5); ctx.lineTo(40.5, 12); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = shade(hm.color, -55); ctx.fillRect(28, 19, 15, 4);
+        ctx.fillStyle = '#ffe066'; ctx.shadowColor = '#ffe066'; ctx.shadowBlur = 5;
+        ctx.fillRect(34, 20, 2.5, 2); ctx.fillRect(39, 20, 2.5, 2); ctx.shadowBlur = 0;
+        ctx.fillStyle = shade(hm.color, 35);   // 胸口的發射艙門
+        ctx.fillRect(27, 36, 4, 3); ctx.fillRect(35, 36, 4, 3); ctx.fillRect(31, 44, 4, 3);
       } else {                   // 兜帽：包住頭，臉露出
         ctx.beginPath(); ctx.arc(32, 21, 13, Math.PI * 0.55, Math.PI * 2.1); ctx.lineTo(28, 33); ctx.closePath(); ctx.fill();
         ctx.fillStyle = look.skin;
@@ -144,7 +171,9 @@
     // 武器（握在前手）
     const wp = look.weapon;
     ctx.lineCap = 'round';
-    if (!wp) {                     // 村民：草叉
+    if (wp && wp.type === 'none') {
+      // 空手（貓鎧者：小貓就是武器）
+    } else if (!wp) {              // 村民：草叉
       ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.moveTo(43, 62); ctx.lineTo(49, 14); ctx.stroke();
       ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
@@ -248,6 +277,25 @@
     }
     ctx.restore();
   };
+
+  // ── 小貓（貓鎧者的投射物）：28×22，面向右、飛撲姿勢 ────────────────────
+  A.drawKitten = function (ctx, color) {
+    const dark = shade(color, -50);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.ellipse(12, 13, 8, 5, -0.15, 0, Math.PI * 2); ctx.fill();          // 身體
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(5, 12); ctx.quadraticCurveTo(0, 8, 2, 3); ctx.stroke();       // 尾巴
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(16, 16); ctx.lineTo(21, 19); ctx.moveTo(8, 16); ctx.lineTo(5, 20); ctx.stroke(); // 腳
+    ctx.beginPath(); ctx.arc(20, 10, 5.5, 0, Math.PI * 2); ctx.fill();                        // 頭
+    ctx.beginPath(); ctx.moveTo(16, 7); ctx.lineTo(16.5, 1); ctx.lineTo(20, 5); ctx.fill();   // 耳
+    ctx.beginPath(); ctx.moveTo(21, 5); ctx.lineTo(25, 1); ctx.lineTo(25, 8); ctx.fill();
+    ctx.fillStyle = dark; ctx.fillRect(9, 10, 1.5, 4); ctx.fillRect(13, 9, 1.5, 4);         // 花紋
+    ctx.fillStyle = '#1b1b2a'; ctx.fillRect(21, 8.5, 1.6, 2); ctx.fillRect(24, 8.5, 1.4, 2); // 眼
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;                                            // 伸出的爪子
+    ctx.beginPath(); ctx.moveTo(24, 14); ctx.lineTo(27, 13); ctx.moveTo(24, 16); ctx.lineTo(27, 16.5); ctx.stroke();
+  };
+  A.KITTEN_COLORS = ['#f0a04b', '#f4f1ea', '#8c8c8c', '#3b3b3b', '#e8c39e'];
 
   // ── 飛行船：依零件等級改變外觀 ───────────────────────────────────────────
   A.drawShip = function (ctx, ship, W, H) {

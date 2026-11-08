@@ -16,6 +16,29 @@ G.CONFIG = {
   captureChance: 0.05,
   reviveSeconds: 30,        // 戰敗後免費復活要等幾秒（復活後退回上一層）
   reviveCost: 50,           // 花多少雲晶原地復活
+
+  // 貓鎧者
+  catBreakBase: 0.10,       // 貓爪普攻的破甲（敵人防禦 -10%），被動「貓爪印記」再往上加
+  catBreakDur: 5,           // 破甲持續秒數
+  moralePerFloor: 1,        // 士氣：每打過一層（沒戰敗）全隊最終防禦 +1%
+  moraleMax: 15,            // 士氣上限 +15%
+  frenzyPerHit: 1,          // 吸貓狂熱：每次打中敵人自身傷害 +1%
+  frenzyMax: 10,            // 吸貓狂熱上限 +10%
+
+  // 背包擴充
+  bagExpandSlots: 5,        // 每次擴充幾格
+  bagMax: 100,              // 背包最多幾格
+};
+
+// 背包第 n 次擴充（n 從 0 開始）的費用：前面用金幣，越後面越要雲晶，最後只收雲晶
+G.bagExpandCost = n => {
+  const table = [
+    { gold: 500,   crystal: 0 },
+    { gold: 1500,  crystal: 0 },
+    { gold: 4000,  crystal: 10 },
+    { gold: 10000, crystal: 30 },
+  ];
+  return table[n] || { gold: 0, crystal: 60 + (n - 4) * 40 };
 };
 
 // ── 稀有度（名稱：rarity.<index>，裝備前綴：prefix.<index>）────────────────
@@ -51,19 +74,21 @@ G.AFFIXES = [{ atk: 2 }, { hp: 12 }, { def: 1.5 }, { crit: 1.5 }, { spd: 0.03 }]
 
 // ── 職業（名稱/說明：class.<id>.name / .desc）──────────────────────────────
 // mult = 屬性倍率；ranged = 遠程（站後面放投射物）
+// missile = 普攻的投射物造型（貓鎧者：從鎧甲開口射出小貓）
 G.CLASSES = {
   villager:    { color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1, atk: 1, def: 1 } },
   bloodknight: { color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.1, atk: 1.35, def: 1.0 } },
-  necro:       { color: '#7d5ba6', cape: '#3d2b56', ranged: true,  mult: { hp: 0.9, atk: 1.2, def: 0.85 } },
+  catknight:   { color: '#9aa3ad', cape: '#d98a3a', ranged: false, missile: 'cat', mult: { hp: 1.25, atk: 1.05, def: 1.3 } },
   priest:      { color: '#f1e3a6', cape: '#e8e2c8', ranged: true,  mult: { hp: 1.0, atk: 0.9, def: 1.0 } },
   crusader:    { color: '#d4a017', cape: '#c9a227', ranged: false, mult: { hp: 1.45, atk: 0.85, def: 1.6 } },
 };
-G.CLASS_ORDER = ['bloodknight', 'necro', 'priest', 'crusader'];
+G.CLASS_ORDER = ['bloodknight', 'catknight', 'priest', 'crusader'];
 
 // ── 技能（名稱/說明：skill.<id>.name / .desc，說明裡的 {v} 會代入數值）─────
 // kind（主動）：strike 單體倍率傷害 / aoe 全體傷害 / buffAtk 攻擊強化 / healParty 群補
 //               shieldParty 群體護盾 / summon 召喚 / taunt 挑釁減傷
-// kind（被動）：lifesteal / critUp / atkPct / defPct / hpPct / healPower / summonPower
+//               aoeBreak 全體傷害＋破甲
+// kind（被動）：lifesteal / critUp / atkPct / defPct / hpPct / healPower / summonPower / armorBreak
 // v(rank) = 該等級的效果數值；raw: true 表示 {v} 直接顯示，不換成百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
 const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(3);
@@ -80,12 +105,13 @@ G.SKILLS = {
     { id: 'frenzy',     type: 'passive', kind: 'critUp',    tier: 1, max: 5,         v: lin(5, 3), raw: true },
     { id: 'bloodlust',  type: 'active',  kind: 'buffAtk',   tier: 2, max: 5, cd: 15, v: lin(0.4, 0.1), dur: 8 },
   ],
-  necro: [
-    { id: 'bonespear',  type: 'active',  kind: 'strike',      tier: 0, max: 5, cd: 4,  v: lin(2.0, 0.25) },
-    { id: 'soulsiphon', type: 'passive', kind: 'atkPct',      tier: 0, max: 5,         v: lin(0.06, 0.04) },
-    { id: 'skeleton',   type: 'active',  kind: 'summon',      tier: 1, max: 5, cd: 14, v: lin(0.5, 0.12), dur: 12 },
-    { id: 'legion',     type: 'passive', kind: 'summonPower', tier: 1, max: 5,         v: lin(0.15, 0.1) },
-    { id: 'corpse',     type: 'active',  kind: 'aoe',         tier: 2, max: 5, cd: 9,  v: lin(1.8, 0.25) },
+  // 貓鎧者：職業特性 = 普攻破甲、士氣、吸貓狂熱（數值見 G.CONFIG）
+  catknight: [
+    { id: 'kittenvolley', type: 'active',  kind: 'aoe',        tier: 0, max: 5, cd: 6,  v: lin(1.2, 0.2) },
+    { id: 'clawmark',     type: 'passive', kind: 'armorBreak', tier: 0, max: 5,         v: lin(0.05, 0.03) },
+    { id: 'fullburst',    type: 'active',  kind: 'aoeBreak',   tier: 1, max: 5, cd: 10, v: lin(1.6, 0.25), breakV: 0.3, dur: 6 },
+    { id: 'heavyplate',   type: 'passive', kind: 'defPct',     tier: 1, max: 5,         v: lin(0.08, 0.06) },
+    { id: 'catstorm',     type: 'active',  kind: 'buffAtk',    tier: 2, max: 5, cd: 15, v: lin(0.2, 0.06), dur: 10, party: true },
   ],
   priest: [
     { id: 'holylight',  type: 'active',  kind: 'healParty',   tier: 0, max: 5, cd: 7,  v: lin(0.2, 0.05) },

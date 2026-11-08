@@ -28,6 +28,9 @@ G.I18N['en'] = {
   'hero.classChangeNote': 'Changing class costs {cost} gold. All skill points are refunded.',
   'hero.bag': 'Inventory', 'hero.autoEquip': 'Equip best', 'hero.sellCommon': 'Sell Common', 'hero.sellUncommon': 'Sell Uncommon & below',
   'hero.bagEmpty': 'Monsters drop gear. Anything you find shows up here.',
+  'hero.who.hero': 'You', 'hero.partnerNote': 'Change companion classes and levels in the Party tab.', 'hero.notRecruited': 'No companions yet. You will meet them as you climb.',
+  'hero.expand': 'Expand +{n}', 'hero.bagMax': 'Maxed', 'item.equipTo': 'Equip on {name}',
+  'hero.autoEquipHint': 'You pick first, companions get the rest',
   'item.named': '{prefix} {base}', 'item.meta': '{rarity} · {slot} · Dropped on Floor {floor}',
   'item.compare': 'Numbers in brackets compare with your equipped {name}', 'item.unequip': 'Unequip', 'item.sell': 'Sell +{v}💰', 'item.equip': 'Equip',
   'classModal.title': 'Become a {name}?', 'classModal.free': 'Your first class change is free.', 'classModal.cost': 'Costs {cost} gold.',
@@ -45,7 +48,7 @@ G.I18N['en'] = {
   // ── Classes ──
   'class.villager.name': 'Villager', 'class.villager.desc': 'An ordinary villager. Choose a class at Lv 5.',
   'class.bloodknight.name': 'Blood Knight', 'class.bloodknight.desc': 'Melee physical damage that heals by draining blood.',
-  'class.necro.name': 'Necromancer', 'class.necro.desc': 'Ranged magic and summoned skeletons. Strong area damage.',
+  'class.catknight.name': 'Cat Knight', 'class.catknight.desc': 'A mysterious knight sealed in full armor. Hatches across the armor open to launch kittens that claw enemies. Weakens enemy defense, excels at area damage, and builds Morale and Cat Frenzy for the party.',
   'class.priest.name': 'Priest', 'class.priest.desc': 'Heals, shields and empowers the party.',
   'class.crusader.name': 'Crusader', 'class.crusader.desc': 'A tank who taunts enemies and soaks up damage.',
 
@@ -64,11 +67,11 @@ G.I18N['en'] = {
   'skill.whirl.name': 'Crimson Whirl', 'skill.whirl.desc': 'Deals {v}% damage to all enemies',
   'skill.frenzy.name': 'Frenzy', 'skill.frenzy.desc': 'Crit chance +{v}%',
   'skill.bloodlust.name': 'Bloodlust', 'skill.bloodlust.desc': 'Own ATK +{v}% for 8s',
-  'skill.bonespear.name': 'Bone Spear', 'skill.bonespear.desc': 'Deals {v}% damage to one enemy',
-  'skill.soulsiphon.name': 'Soul Siphon', 'skill.soulsiphon.desc': 'ATK +{v}%',
-  'skill.skeleton.name': 'Raise Skeleton', 'skill.skeleton.desc': 'Summons a skeleton for 12s with {v}% of your ATK',
-  'skill.legion.name': 'Army of the Dead', 'skill.legion.desc': 'Summon ATK +{v}%',
-  'skill.corpse.name': 'Corpse Explosion', 'skill.corpse.desc': 'Deals {v}% damage to all enemies',
+  'skill.kittenvolley.name': 'Kitten Volley', 'skill.kittenvolley.desc': 'Opens the hatches and launches a swarm of kittens: {v}% damage to all enemies',
+  'skill.clawmark.name': 'Claw Mark', 'skill.clawmark.desc': 'Basic attack armor break +{v}% (base 10%)',
+  'skill.fullburst.name': 'Full Burst', 'skill.fullburst.desc': 'Every hatch opens at once: {v}% damage to all enemies and enemy DEF -30% for 6s',
+  'skill.heavyplate.name': 'Heavy Plate', 'skill.heavyplate.desc': 'DEF +{v}%',
+  'skill.catstorm.name': 'Cat Stampede', 'skill.catstorm.desc': 'Party ATK +{v}% for 10s',
   'skill.holylight.name': 'Holy Light', 'skill.holylight.desc': 'Heals the party for {v}% HP',
   'skill.smite.name': 'Smite', 'skill.smite.desc': 'ATK +{v}%',
   'skill.aegis.name': 'Divine Aegis', 'skill.aegis.desc': 'Shields the party for {v}% of their HP',
@@ -126,6 +129,17 @@ G.I18N['en'] = {
   'battle.toFloor': '↑ To Floor {n}', 'battle.defeat': 'Defeated...', 'battle.revived': 'Revived!',
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
+  'battle.morale': '🎖️ Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
+  'battle.deadShort': '💀 {s}s',
+
+  // ── Buffs ──
+  'buff.morale.name': 'Morale', 'buff.morale.desc': 'While a Cat Knight is in the party, every floor cleared without a defeat gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',
+  'buff.frenzy.name': 'Cat Frenzy', 'buff.frenzy.desc': 'While a Cat Knight is in the party, each hit on an enemy gives that member +1% damage (up to +{max}%). Resets when they fall. Now: {list}',
+  'buff.atk.name': 'ATK Up', 'buff.atk.desc': 'ATK +{v}%, {s}s left',
+  'buff.shield.name': 'Shield', 'buff.shield.desc': 'Absorbs {v} more damage',
+  'buff.taunt.name': 'Taunt', 'buff.taunt.desc': '{name} is drawing all enemies',
+  'buff.break.name': 'Armor Break', 'buff.break.desc': 'Enemy DEF -{v}%',
+
   // ── Log ──
   'log.start': '🎈 You drifted into the Sky Rift on a hot-air balloon...',
   'log.levelUp': '⬆️ Reached Lv {lv}! +1 skill point', 'log.canClass': '✨ You can choose a class! Go to the Hero tab',
@@ -134,11 +148,12 @@ G.I18N['en'] = {
   'log.capture': '🕸️ Captured: {name}! It now lives on your airship', 'log.bossDown': '🏆 Defeated the Floor {f} boss! Floor {n} unlocked',
   'log.partnerAvail': '🤝 {name} can be recruited (Party tab)', 'log.capReached': '🎈 Your balloon only reaches Floor {n}. Upgrade it to climb higher',
   'log.defeat': '💀 Fell on Floor {n}', 'log.reviveFree': '🕊️ Revived and pulled back to Floor {n} to train (auto-climb paused)',
-  'log.revivePaid': '💎 Spent {n} Cloud Crystals to revive on the spot',
+  'log.revivePaid': '💎 Spent {n} Cloud Crystals to revive on the spot', 'log.moraleLost': '🎖️ Defeated. Morale reset',
 
   // ── Toasts ──
   'toast.canClass': 'You can choose a class! Go to the Hero tab', 'toast.bagFull': 'Inventory full',
-  'toast.sold': 'Sold {n} items for {g} gold', 'toast.equipped': 'Equipped {n} better items', 'toast.bestAlready': 'You already have the best gear on',
+  'toast.sold': 'Sold {n} items for {g} gold', 'toast.equipped': 'Equipped {n} better items (you first, then companions)',
+  'toast.bagExpanded': 'Inventory expanded to {n} slots', 'toast.bestAlready': 'You already have the best gear on',
   'toast.classLevel': 'Class change unlocks at Lv {lv}', 'toast.classCost': 'Changing class costs {cost} gold',
   'toast.noSP': 'No skill points left. Level up to earn more', 'toast.tierReq': 'Spend {n} points in this class first',
   'toast.reachFloor': 'Reach Floor {n} first', 'toast.needGold': 'Need {n} gold',
