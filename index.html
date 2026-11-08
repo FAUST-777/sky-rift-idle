@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1b1530">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>天空裂洞物語</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="hud-left">
+      <div class="lv">Lv <b id="hudLv">1</b> <span id="hudCls">村民</span></div>
+      <div class="xpbar"><i id="hudXp"></i></div>
+    </div>
+    <div class="hud-right">
+      <span title="金幣">💰 <b id="hudGold">0</b></span>
+      <span title="雲晶">💎 <b id="hudCrystal">0</b></span>
+    </div>
+  </header>
+
+  <section id="battleWrap">
+    <div id="battle"></div>
+    <div id="floorBar">
+      <span id="floorName">第 1 層</span>
+      <div class="prog"><i id="floorProg"></i></div>
+      <span id="floorKills">0/10</span>
+    </div>
+  </section>
+
+  <main id="panel"></main>
+
+  <nav id="tabs">
+    <button data-tab="adventure" class="on"><span>🗺️</span>冒險</button>
+    <button data-tab="hero"><span>🧍</span>角色</button>
+    <button data-tab="skills"><span>📜</span>技能</button>
+    <button data-tab="partners"><span>🤝</span>夥伴</button>
+    <button data-tab="ship"><span>🎈</span>飛行船</button>
+    <button data-tab="home"><span>🏠</span>家園</button>
+  </nav>
+
+  <div id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+  <div id="toast"></div>
+</div>
+
+<script src="vendor/phaser.min.js"></script>
+<script src="assets/manifest.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/art.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
