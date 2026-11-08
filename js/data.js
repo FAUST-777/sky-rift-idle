@@ -108,7 +108,7 @@ G.TEAM_SYNERGIES = [
 G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 
 // ── 技能（名稱/說明：skill.<id>.name / .desc；{v} 代入數值）────────────────
-// 主動：fx(v) 回傳這招的效果，戰鬥場景會依欄位執行：
+// 主動：fx(v, rank) 回傳這招的效果，戰鬥場景會依欄位執行：
 //   target 'one'|'all'|'none'  mult 傷害倍率  hits 段數  critBonus 額外暴擊率
 //   debuffs [{id,v,t}] 對命中目標上狀態    self / party [{id,v,t}] 給自己/全隊上 buff
 //   heal 全隊回復最大生命比例  shield 全隊護盾比例  taunt {v,t} 挑釁並減傷
@@ -116,7 +116,8 @@ G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 // 被動：p = 'self' 自身屬性 / 'party' 全隊光環 / 'proc' 普攻附加 / 'special' 特殊機制
 //   key = 影響的屬性或機制；proc 另有 fx（狀態）、chance（'v' = 機率吃 v）、val、t
 // buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen ｜ defDown slow blind bleed poison
-// v(rank) = 該等級數值；raw: true → {v} 直接顯示不換百分比
+// v(rank) = 該等級數值；v2(rank) = 第二個數值（說明 {v2}）；被動有 key2 時 v2 加到 key2 屬性
+// raw: true → {v} 直接顯示不換百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
 const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(4);
 G.TIER_REQ = [0, 3, 8];
@@ -235,13 +236,13 @@ G.SKILLS = {
   // 遛狗者：全隊減冷卻、加攻速、加技能傷害
   dogwalker: [
     A('dw_fetch',   0, 6,  lin(1.8, 0.25), v => ({ target: 'one', mult: v })),
-    A('dw_walkies', 0, 14, lin(2, 0.5),    v => ({ target: 'none', cdCut: v }), { raw: true }),
+    A('dw_walkies', 0, 14, lin(2, 0.5),    (v, r) => ({ target: 'none', cdCut: v, heal: lin(0.1, 0.0125)(r) }), { raw: true, v2: lin(0.1, 0.0125) }),   // 回血 10%→15%
     A('dw_zoomies', 1, 14, lin(0.25, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
     A('dw_pack',    1, 10, lin(0.55, 0.08), v => ({ target: 'one', mult: v, hits: 4 })),
     A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }] })),
     P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr'),
     P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
-    P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct', { key2: 'lifesteal', v2: lin(0.2, 0.025) }),   // 另外吸血 20%→30%
     P('dw_stride',  1, lin(0.03, 0.02), 'party', 'spdPct'),
     P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3 }),
   ],

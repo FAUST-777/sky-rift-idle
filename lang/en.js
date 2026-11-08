@@ -151,13 +151,13 @@ G.I18N['en'] = {
   'skill.dr_herd.name': 'Heart of the Herd', 'skill.dr_herd.desc': 'Buffs you cast are {v}% stronger',
 
   'skill.dw_fetch.name': 'Fetch!', 'skill.dw_fetch.desc': 'A dog charges in: {v}% damage to one enemy',
-  'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner',
+  'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner and the party heals {v2}% HP',
   'skill.dw_zoomies.name': 'Zoomies', 'skill.dw_zoomies.desc': 'Party attack speed +{v}% for 8s',
   'skill.dw_pack.name': 'Pack Attack', 'skill.dw_pack.desc': '4 bites of {v}% damage',
   'skill.dw_goodboy.name': 'Good Boy', 'skill.dw_goodboy.desc': 'Party skill damage +{v}% for 10s',
   'skill.dw_leash.name': 'Leash Rhythm', 'skill.dw_leash.desc': 'Party skill cooldowns -{v}%',
   'skill.dw_trainer.name': 'Dog Trainer', 'skill.dw_trainer.desc': 'Party skill damage +{v}%',
-  'skill.dw_loyal.name': 'Loyal Hound', 'skill.dw_loyal.desc': 'ATK +{v}%',
+  'skill.dw_loyal.name': 'Loyal Hound', 'skill.dw_loyal.desc': 'ATK +{v}%, heal for {v2}% of damage dealt',
   'skill.dw_stride.name': 'Power Walk', 'skill.dw_stride.desc': 'Party attack speed +{v}%',
   'skill.dw_bark.name': 'Bark', 'skill.dw_bark.desc': 'Basic attacks have a {v}% chance to slow enemy attacks by 20% for 3s',
 
@@ -174,6 +174,23 @@ G.I18N['en'] = {
 
   // ── Party ──
   'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
+  // 冒險頁即時數值
+  'live.title': 'Live Stats',
+  'live.hint': 'buffs included, updates in combat',
+  'live.waiting': 'Shown once combat starts',
+  'live.hp': 'HP',
+  'live.spd': 'Attack speed',
+  'live.crit': 'Crit chance',
+  'live.critDmg': 'Crit damage',
+  'live.cdr': 'Cooldown reduction',
+  'live.regen': 'Regen',
+  'live.lifesteal': 'Lifesteal',
+  'live.evade': 'Evasion',
+  'live.dmg': 'Damage',
+  'live.skillDmg': 'Skill damage',
+  'live.dmgReduce': 'Damage reduction',
+  'live.debuffDur': 'Debuff duration',
+  'live.shield': 'Shield',
   // 團隊特效
   'syn.title': 'Team Synergy',
   'syn.help': 'Triggered by the damage types of your deployed members (hero + partners): 2–3 of the same type, or one each of three specific types, grant party-wide bonuses. Change partner classes to change the mix.',

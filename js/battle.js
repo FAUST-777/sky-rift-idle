@@ -261,6 +261,25 @@
     }
     skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (this.party(u) ? this.aura.skillDmg || 0 : 0); }
 
+    // 即時能力值（冒險頁「即時數值」用）：吃 buff、光環、團隊特效、詛咒，隨戰鬥波動
+    liveStats(u) {
+      const a = this.aura, curse = this.curse || {};
+      return {
+        hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
+        atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
+        crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
+        cdr: Math.min(0.5, a.cdr || 0),
+        regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
+        lifesteal: u.st.lifesteal || 0,
+        evade: this.evadeOf(u),
+        dmg: (1 + (a.dmgPct || 0)) * (1 - (curse.dmg || 0)) - 1,
+        skillDmg: this.skillMult(u) - 1,
+        dmgReduce: 1 - this.takenMult(u),
+        debuffDur: (u.st.debuffDur || 1) + (a.debuffDur || 0) - 1,
+        shield: u.shield || 0,
+      };
+    }
+
     // 士氣：隊伍有人裝「士氣」被動時生效（上限依技能等級）
     moraleMult() { return G.moraleCap() > 0 ? 1 + Math.min(G.S.morale, G.moraleCap()) / 100 : 1; }
     crisisOn() { return this.partyAlive().some(p => p.hp / p.st.maxHp < G.CONFIG.crisisHp); }
@@ -476,14 +495,14 @@
     // ── 主動技能 ─────────────────────────────────────────────────────────
     // 治療類技能沒人受傷就先不放；召喚類已經有動物就不放
     shouldCast(u, e) {
-      if (e.heal) return this.partyAlive().some(p => p.hp / p.st.maxHp < 0.8);
+      if (e.heal && !e.cdCut) return this.partyAlive().some(p => p.hp / p.st.maxHp < 0.8);   // 散步時間：減冷卻為主，順便回血，不用等人受傷
       if (e.selfHeal) return u.hp / u.st.maxHp < 0.75;
       if (e.summon) return !(this.animal && this.animal.unit.alive);
       return true;
     }
 
     castSkill(u, s) {
-      const d = s.def, v = d.v(s.rank), e = d.fx(v);
+      const d = s.def, v = d.v(s.rank), e = d.fx(v, s.rank);
       if (!this.shouldCast(u, e)) return false;
       const col = e.mult ? '#ffd27a' : e.heal || e.selfHeal ? '#7dff9a' : '#9fd8ff';
       this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, G.skillName(d.id), col, 15, 900);

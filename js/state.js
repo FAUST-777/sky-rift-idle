@@ -198,6 +198,7 @@
       if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t });
       else if (sk.p === 'special') out.special[sk.key] = { v, v2: sk.v2 ? sk.v2(r) : 0 };
       else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
+      if (sk.key2 && (sk.p === 'self' || sk.p === 'party')) out[sk.p][sk.key2] = (out[sk.p][sk.key2] || 0) + sk.v2(r);   // 第二效果（例如忠犬的吸血）
     });
     return out;
   };

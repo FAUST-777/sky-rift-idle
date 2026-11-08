@@ -255,3 +255,8 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .syn-row { border-top: 1px solid var(--line); padding: 6px 0; line-height: 1.6; }
 .syn-row b { margin-right: 6px; }
 .syn-row.on b { color: var(--gold); }
+
+/* ── 冒險頁即時數值 ───────────────────────────────── */
+.live-who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.stats.live b.up { color: var(--good); }
+.stats.live b.down { color: #ff7070; }

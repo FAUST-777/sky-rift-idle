@@ -151,13 +151,13 @@ G.I18N['zh-TW'] = {
   'skill.dr_herd.name': '獸群之心', 'skill.dr_herd.desc': '自己施放的增益效果 +{v}%',
 
   'skill.dw_fetch.name': '去撿！', 'skill.dw_fetch.desc': '狗狗衝出去咬，單體 {v}% 傷害',
-  'skill.dw_walkies.name': '散步時間', 'skill.dw_walkies.desc': '全隊其他主動技能冷卻立刻減少 {v} 秒',
+  'skill.dw_walkies.name': '散步時間', 'skill.dw_walkies.desc': '全隊其他主動技能冷卻立刻減少 {v} 秒，並回復全隊 {v2}% 生命',
   'skill.dw_zoomies.name': '暴衝', 'skill.dw_zoomies.desc': '全隊攻速 +{v}%，8 秒',
   'skill.dw_pack.name': '狗群圍攻', 'skill.dw_pack.desc': '連咬 4 下，每下 {v}% 傷害',
   'skill.dw_goodboy.name': '乖狗狗', 'skill.dw_goodboy.desc': '全隊技能傷害 +{v}%，10 秒',
   'skill.dw_leash.name': '牽繩節奏', 'skill.dw_leash.desc': '全隊技能冷卻 -{v}%',
   'skill.dw_trainer.name': '訓犬師', 'skill.dw_trainer.desc': '全隊技能傷害 +{v}%',
-  'skill.dw_loyal.name': '忠犬', 'skill.dw_loyal.desc': '攻擊 +{v}%',
+  'skill.dw_loyal.name': '忠犬', 'skill.dw_loyal.desc': '攻擊 +{v}%，造成傷害的 {v2}% 轉為自己的生命',
   'skill.dw_stride.name': '健走', 'skill.dw_stride.desc': '全隊攻速 +{v}%',
   'skill.dw_bark.name': '吠叫', 'skill.dw_bark.desc': '普攻有 {v}% 機率讓敵人攻速 -20%，3 秒',
 
@@ -174,6 +174,23 @@ G.I18N['zh-TW'] = {
 
   // ── 夥伴 ──
   'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
+  // 冒險頁即時數值
+  'live.title': '即時數值',
+  'live.hint': '含 buff，隨戰鬥變動',
+  'live.waiting': '戰鬥開始後顯示',
+  'live.hp': '生命',
+  'live.spd': '攻速',
+  'live.crit': '暴擊率',
+  'live.critDmg': '暴擊傷害',
+  'live.cdr': '冷卻減免',
+  'live.regen': '回復',
+  'live.lifesteal': '吸血',
+  'live.evade': '閃避',
+  'live.dmg': '全體傷害',
+  'live.skillDmg': '技能傷害',
+  'live.dmgReduce': '減傷',
+  'live.debuffDur': '減益持續',
+  'live.shield': '護盾',
   // 團隊特效
   'syn.title': '團隊特效',
   'syn.help': '依出戰成員（主角＋夥伴）的攻擊系別觸發：同系別湊 2～3 位，或三種特定系別各 1 位，都有全隊加成。換夥伴職業就能改變組合。',

@@ -37,6 +37,7 @@
       $('floorKills').classList.add('boss');
     }
     renderBuffs(sc);
+    renderLive(sc);
     if (sc && sc.reviveAt) {
       const left = Math.max(0, Math.ceil((sc.reviveAt - Date.now()) / 1000));
       $('reviveTitle').textContent = t('revive.title');
@@ -61,6 +62,43 @@
     lastBuffSig = sig;
     $('buffBar').innerHTML = list.map(b =>
       `<button class="buff ${b.id}" data-act="buff" data-id="${b.id}" title="${esc(t(`buff.${b.id}.name`))}">${b.icon}<b>${esc(b.val)}</b></button>`).join('');
+  }
+
+  // ── 冒險頁「即時數值」：每 0.4 秒跟著 hud 更新，切換看哪個角色（UI.liveWho）──
+  let lastWhoSig = '';
+  function renderLive(sc) {
+    const grid = $('liveGrid'), whoBox = $('liveWho');
+    if (!grid || UI.tab !== 'adventure' || !sc || !sc.units) return;
+    const members = sc.units.filter(u => u.key);
+    if (!members.length) return;
+    if (!members.some(u => u.key === UI.liveWho)) UI.liveWho = members[0].key;
+    const whoSig = members.map(u => u.key).join('|') + '#' + UI.liveWho + G.settings.lang;
+    if (whoSig !== lastWhoSig || !whoBox.children.length) {   // 成員有變才重畫按鈕，避免點擊被打斷
+      lastWhoSig = whoSig;
+      whoBox.innerHTML = members.map(u => `<button class="btn small ${u.key === UI.liveWho ? 'on' : ''}" data-act="livewho" data-v="${esc(u.key)}">${esc(G.whoName(u.key))} <span class="muted">${G.clsName(G.charOf(u.key).cls)}</span></button>`).join('');
+    }
+    const u = members.find(x => x.key === UI.liveWho), L = sc.liveStats(u), base = u.st;
+    const pc = (v, d = 0) => (v * 100).toFixed(d) + '%';
+    // 比基礎（沒 buff）高 → 綠色、低 → 紅色
+    const cmp = (now, b) => now > b * 1.001 ? 'up' : now < b * 0.999 ? 'down' : '';
+    const cell = (k, v, cls = '') => `<div>${t(k)} <b class="${cls}">${v}</b></div>`;
+    grid.innerHTML = [
+      cell('live.hp', `${G.fmt(L.hp)} / ${G.fmt(L.maxHp)}`, u.alive ? '' : 'down'),
+      cell('stat.atk', L.atk.toFixed(1), cmp(L.atk, base.atk)),
+      cell('stat.def', L.def.toFixed(1), cmp(L.def, base.def)),
+      cell('live.spd', L.spd.toFixed(2) + '/s', cmp(L.spd, base.spd)),
+      cell('live.crit', L.crit.toFixed(1) + '%', cmp(L.crit, base.crit)),
+      cell('live.critDmg', pc(L.critDmg), cmp(L.critDmg, base.critDmg)),
+      cell('live.cdr', pc(L.cdr), L.cdr > 0 ? 'up' : ''),
+      cell('live.regen', pc(L.regen, 1) + '/s', L.regen > 0 ? 'up' : ''),
+      cell('live.lifesteal', pc(L.lifesteal)),
+      cell('live.evade', pc(L.evade)),
+      cell('live.dmg', (L.dmg >= 0 ? '+' : '') + pc(L.dmg), L.dmg > 0 ? 'up' : L.dmg < 0 ? 'down' : ''),
+      cell('live.skillDmg', '+' + pc(L.skillDmg)),
+      cell('live.dmgReduce', pc(L.dmgReduce)),
+      cell('live.debuffDur', '+' + pc(L.debuffDur)),
+      L.shield ? cell('live.shield', G.fmt(L.shield), 'up') : '',
+    ].join('');
   }
 
   function setDot(tab, on) {
@@ -108,6 +146,11 @@
           <div>${t('stat.def')} <b>${st.def}</b></div><div>${t('stat.spd')} <b>${st.spd}</b></div>
           <div>${t('stat.crit')} <b>${st.crit}%</b></div><div>${t('adv.partners')} <b>${S.party.length}/${G.CONFIG.maxParty}</b></div>
         </div>
+      </div>
+      <div class="card" id="liveCard">
+        <h3>📊 ${t('live.title')} <small>${t('live.hint')}</small></h3>
+        <div class="live-who" id="liveWho"></div>
+        <div class="stats live" id="liveGrid"><div class="muted">${t('live.waiting')}</div></div>
       </div>
       <div class="card">
         <h3>${t('adv.log')}</h3>
@@ -790,6 +833,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'equip': G.equip(+d.id, UI.who); UI.close(); UI.refresh(); break;
       case 'unequip': G.unequip(d.slot, UI.who); UI.close(); UI.refresh(); break;
       case 'who': UI.who = d.v; UI.render(); break;
+      case 'livewho': UI.liveWho = d.v; lastWhoSig = ''; renderLive(G.battleScene()); break;
       case 'expand': G.expandBag(); break;
       case 'collapse': setCollapsed(!G.settings.battleCollapsed); break;
       case 'buff': {
