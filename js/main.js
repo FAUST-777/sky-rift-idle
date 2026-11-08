@@ -24,11 +24,15 @@
       <div class="modal-actions"><button class="btn primary" data-act="close">${t('offline.ok')}</button></div>`);
   }
 
-  if (!G.S.seenPrologue) {
+  // 開場對話：新玩家一定看；開場內容改版（G.INTRO_VER）後老玩家也會再看一次
+  if ((G.S.introVer || 0) < G.INTRO_VER) {
+    const firstTime = !G.S.seenPrologue;
     G.UI.prologue(() => {
       G.S.seenPrologue = true;
-      G.addLog('log.start', null, '#7fd1ff');
+      G.S.introVer = G.INTRO_VER;
+      if (firstTime) G.addLog('log.start', null, '#7fd1ff');
       G.save();
+      if (!firstTime) showOffline(offline);
     });
   } else {
     showOffline(offline);

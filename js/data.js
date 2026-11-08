@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// 遊戲資料表：數值、職業、技能、怪物、裝備、夥伴、家具、飛行船
+// 遊戲資料表：數值、職業、技能、怪物、裝備、夥伴、家具、飛空艇
 // 想調平衡或加內容，大部分只要改這個檔案
 // 顯示文字（名稱、說明）不放這裡，放在 lang/*.js，用 id 對應
 // ════════════════════════════════════════════════════════════════════════════
@@ -310,21 +310,37 @@ G.PARTNERS = [
 G.partnerRecruitCost = p => 80 * p.floor;
 G.partnerLevelCost = lv => Math.round(50 * Math.pow(1.3, lv - 1));
 
-// ── 飛行船（名稱：part.<id>.name）──────────────────────────────────────────
+// ── 飛空艇（部位名稱：part.<id>.name；款式名稱：part.<id>.<0~4>）───────────
+// 每個部位 5 款，越後面越強、外觀也不同；買過的款式可以自由切換
+// v = 每款的效果數值；free = 第 0 款開局就有（熱氣球、船身）；costMult = 價格倍率
+//   balloon 全隊生命%  hull 全隊防禦%（也決定家園大小）  bow 全隊傷害%  charm 全隊冒險金幣%
+//   cannon 砲擊傷害（攻擊力倍率，每 6 秒）  wing / engine 可爬層數 +N
+G.SHIP_SLOTS = ['balloon', 'hull', 'bow', 'charm', 'cannon', 'wing', 'engine'];
 G.SHIP_PARTS = {
-  balloon: { icon: '🎈', max: 10 },
-  engine:  { icon: '⚙️', max: 10 },
-  hull:    { icon: '🚢', max: 4 },
-  cannon:  { icon: '💣', max: 10 },
+  balloon: { icon: '🎈', stat: 'hpPct',   v: [0, 0.08, 0.16, 0.26, 0.40], free: true, costMult: 1 },
+  hull:    { icon: '🚢', stat: 'defPct',  v: [0, 0.08, 0.16, 0.26, 0.40], free: true, costMult: 1.2 },
+  bow:     { icon: '🗿', stat: 'dmgPct',  v: [0.05, 0.10, 0.18, 0.28, 0.40], costMult: 1.3 },
+  charm:   { icon: '🔔', stat: 'goldPct', v: [0.10, 0.20, 0.35, 0.55, 0.80], costMult: 1 },
+  cannon:  { icon: '💣', stat: 'cannon',  v: [0.3, 0.6, 1.0, 1.6, 2.5], costMult: 1.1 },
+  wing:    { icon: '🕊️', stat: 'floors',  v: [5, 10, 15, 20, 25], costMult: 0.9 },
+  engine:  { icon: '⚙️', stat: 'floors',  v: [5, 10, 15, 20, 25], costMult: 1 },
 };
-G.shipMaxFloor = lv => 5 + (lv - 1) * 5;
-G.homeSize = lv => [{ w: 4, h: 3 }, { w: 5, h: 4 }, { w: 6, h: 5 }, { w: 6, h: 6 }][Math.max(0, lv - 1)];
-G.shipUpgradeCost = (part, lv) => {
-  const base = { balloon: 200, engine: 150, hull: 400, cannon: 250 }[part];
-  return { gold: Math.round(base * Math.pow(2.6, lv)), crystal: Math.round(3 * Math.pow(1.9, lv)) };
+G.SHIP_BASE_FLOORS = 5;   // 沒有穩定翼和引擎時只能到第 5 層
+G.SHIP_COST = [
+  { gold: 400,    crystal: 0 },
+  { gold: 2500,   crystal: 5 },
+  { gold: 10000,  crystal: 20 },
+  { gold: 40000,  crystal: 60 },
+  { gold: 140000, crystal: 160 },
+];
+G.shipPartCost = (slot, i) => {
+  const P = G.SHIP_PARTS[slot];
+  if (P.free && i === 0) return { gold: 0, crystal: 0 };
+  const c = G.SHIP_COST[i];
+  return { gold: Math.round(c.gold * P.costMult), crystal: Math.round(c.crystal * P.costMult) };
 };
+G.homeSize = tier => [{ w: 4, h: 3 }, { w: 5, h: 3 }, { w: 5, h: 4 }, { w: 6, h: 5 }, { w: 6, h: 6 }][Math.max(0, Math.min(4, tier))];
 G.SHIP_PAINTS = ['#b5523b', '#3b6fb5', '#3b8f5a', '#7a4bb5', '#d4a017', '#3a3a3a'];
-G.SHIP_FIGUREHEADS = 4;   // 名稱：figurehead.<index>
 
 // ── 家具與收藏品（名稱：furniture.<id>）────────────────────────────────────
 // comfort = 舒適度（每 1 點 = 離線收益 +1%）；cur = 用金幣(gold)或雲晶(crystal)買
@@ -342,5 +358,7 @@ G.FURNITURE = [
   { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 15, collect: true },
 ];
 
-// 開場劇情頁數（內容：prologue.1 ～ prologue.N）
-G.PROLOGUE_PAGES = 5;
+// 開場對話頁數（內容：prologue.1 ～ prologue.N）
+// INTRO_VER 改版時 +1，看過舊版開場的玩家會再看一次新的
+G.PROLOGUE_PAGES = 3;
+G.INTRO_VER = 2;

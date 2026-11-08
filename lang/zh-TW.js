@@ -3,7 +3,7 @@ G.I18N['zh-TW'] = {
   'game.title': '天空裂洞物語',
 
   // ── 分頁 / 共用 ──
-  'tab.adventure': '冒險', 'tab.hero': '角色', 'tab.skills': '技能', 'tab.partners': '夥伴', 'tab.ship': '飛行船', 'tab.home': '家園',
+  'tab.adventure': '冒險', 'tab.hero': '角色', 'tab.skills': '技能', 'tab.partners': '夥伴', 'tab.ship': '飛空艇', 'tab.home': '家園',
   'common.close': '關閉', 'common.cancel': '取消', 'common.gold': '金幣', 'common.crystal': '雲晶',
   'floor.name': '第 {n} 層', 'floor.boss': '層主戰',
 
@@ -19,7 +19,7 @@ G.I18N['zh-TW'] = {
   'credits.body': '本遊戲使用 <b>Phaser 3.80.1</b>（https://phaser.io），依 MIT 授權使用。',
 
   // ── 冒險 ──
-  'adv.title': '天空裂洞', 'adv.reach': '最高可到第 {top} 層（氣囊上限 {cap}）',
+  'adv.title': '天空裂洞', 'adv.reach': '最高可到第 {top} 層（飛空艇上限 {cap}）',
   'adv.down': '◀ 下降', 'adv.up': '上升 ▶', 'adv.auto': '打倒層主後自動往上', 'adv.challenge': '挑戰第 {n} 層',
   'adv.partners': '夥伴', 'adv.log': '冒險日誌', 'adv.logEmpty': '還沒有紀錄',
 
@@ -185,18 +185,33 @@ G.I18N['zh-TW'] = {
   'partner.kael.name': '浪人凱爾', 'partner.kael.bio': '比所有人都早上來的探險者，似乎知道些什麼。',
   'partner.mira.name': '占星師米菈', 'partner.mira.bio': '能讀懂裂洞星圖的少女。',
 
-  // ── 飛行船 ──
-  'ship.help': '飛行船決定你能飛多高：<b>氣囊等級</b>決定能進入的最高層。升級零件，外觀也會跟著改變。',
-  'ship.parts': '改裝零件', 'ship.partsHint': '雲晶：打層主必掉', 'ship.maxed': '滿級',
-  'ship.look': '外觀', 'ship.paint': '塗裝', 'ship.figurehead': '船首像',
-  'part.balloon.name': '氣囊', 'part.balloon.desc': '可到達第 {n} 層',
-  'part.engine.name': '引擎', 'part.engine.desc': '金幣 +{n}%、移動加快',
-  'part.hull.name': '船身', 'part.hull.desc': '家園空間 {w}×{h}',
-  'part.cannon.name': '船砲', 'part.cannon.desc': '每 6 秒砲擊，{n}% 攻擊力傷害', 'part.cannon.none': '尚未安裝',
-  'figurehead.0': '無', 'figurehead.1': '鷹首', 'figurehead.2': '龍首', 'figurehead.3': '女神像',
+  // ── 飛空艇 ──
+  'ship.help': '打造優秀強韌的飛空艇，才能往天空破洞的高層冒險。每個部位有 5 款，買過的款式可以隨時切換；<b>側面穩定翼和引擎</b>決定能爬到第幾層。', 'ship.paint': '塗裝', 'ship.free': '免費',
+  'ship.using': '使用中', 'ship.equip': '裝上', 'ship.none': '未安裝',
+  'ship.sum.hp': '全隊生命', 'ship.sum.def': '全隊防禦', 'ship.sum.dmg': '全隊傷害',
+  'ship.sum.gold': '冒險金幣', 'ship.sum.cannon': '砲擊傷害', 'ship.sum.floors': '可爬到',
+  'part.balloon.name': '熱氣球', 'part.balloon.what': '提升全隊生命', 'part.balloon.desc': '全隊生命 +{v}%',
+  'part.balloon.0': '拼布氣球', 'part.balloon.1': '條紋氣球', 'part.balloon.2': '雙囊氣球',
+  'part.balloon.3': '鋼骨氣囊', 'part.balloon.4': '星辰氣囊', 'part.hull.name': '船身',
+  'part.hull.what': '提升全隊防禦；船身越大，家園空間也越大', 'part.hull.desc': '全隊防禦 +{v}%・家園 {w}×{h}', 'part.hull.0': '小木舟',
+  'part.hull.1': '商船船身', 'part.hull.2': '加固船身', 'part.hull.3': '鐵甲船身',
+  'part.hull.4': '黃金王船', 'part.bow.name': '船首', 'part.bow.what': '提升全隊傷害',
+  'part.bow.desc': '全隊傷害 +{v}%', 'part.bow.0': '木製衝角', 'part.bow.1': '鷹首像',
+  'part.bow.2': '龍首像', 'part.bow.3': '女神像', 'part.bow.4': '水晶船首',
+  'part.charm.name': '船底掛飾', 'part.charm.what': '提升全隊冒險獲得的金幣', 'part.charm.desc': '冒險金幣 +{v}%',
+  'part.charm.0': '風燈', 'part.charm.1': '銅鈴', 'part.charm.2': '船錨',
+  'part.charm.3': '招財雲晶', 'part.charm.4': '海盜旗', 'part.cannon.name': '船砲',
+  'part.cannon.what': '飛空艇每 6 秒對敵人遠程砲擊', 'part.cannon.desc': '砲擊 {v}% 攻擊力傷害', 'part.cannon.0': '小鐵砲',
+  'part.cannon.1': '雙管砲', 'part.cannon.2': '長程加農砲', 'part.cannon.3': '魔導砲',
+  'part.cannon.4': '天穹巨砲', 'part.wing.name': '側面穩定翼', 'part.wing.what': '可以多往上爬幾層',
+  'part.wing.desc': '可爬層數 +{v}', 'part.wing.0': '帆布側翼', 'part.wing.1': '木製穩定翼',
+  'part.wing.2': '鐵骨穩定翼', 'part.wing.3': '飛鳥之翼', 'part.wing.4': '天使之翼',
+  'part.engine.name': '引擎', 'part.engine.what': '可以多往上爬幾層，前進速度也更快', 'part.engine.desc': '可爬層數 +{v}',
+  'part.engine.0': '手搖槳', 'part.engine.1': '風車引擎', 'part.engine.2': '蒸汽引擎',
+  'part.engine.3': '雙渦輪引擎', 'part.engine.4': '雲晶反應爐',
 
   // ── 家園 ──
-  'home.title': '飛行船船艙', 'home.comfort': '舒適度 {c}（離線收益 +{c}%）',
+  'home.title': '飛空艇船艙', 'home.comfort': '舒適度 {c}（離線收益 +{c}%）',
   'home.placingHint': '👉 點空格擺放，點已擺的家具收回倉庫。',
   'home.hint': '先在下面「倉庫」選一件家具，再點空格擺放。點已擺放的家具可收回。', 'home.hullHint': '升級「船身」可以擴大空間。',
   'home.storage': '倉庫', 'home.storageEmpty': '空的，去下面商店買家具吧', 'home.shop': '家具商店',
@@ -246,12 +261,12 @@ G.I18N['zh-TW'] = {
   'buff.poison.name': '中毒', 'buff.poison.desc': '{n} 個敵人中毒中，每秒最高 {v} 傷害',
 
   // ── 日誌 ──
-  'log.start': '🎈 你搭著熱氣球飛進了天空裂洞……',
+  'log.start': '🎈 你搭著飛空艇飛進了天空裂洞……',
   'log.levelUp': '⬆️ 升到 {lv} 級！獲得 1 技能點', 'log.canClass': '✨ 可以轉職了！到「角色」分頁選擇職業',
   'log.classChanged': '🎓 轉職為「{cls}」！技能點已重置', 'log.recruited': '🤝 {name} 加入了隊伍！',
-  'log.shipUp': '🛠️ {part} 升到 {lv} 級', 'log.drop': '🎁 掉落 {rarity}「{item}」', 'log.bagFull': '🎒 背包滿了，裝備自動賣掉',
-  'log.capture': '🕸️ 捕獲了「{name}」！牠住進了飛行船', 'log.bossDown': '🏆 擊敗第 {f} 層層主！第 {n} 層已開放',
-  'log.partnerAvail': '🤝 {name} 可以招募了（夥伴分頁）', 'log.capReached': '🎈 氣囊高度只到第 {n} 層，升級氣囊才能往上',
+  'log.drop': '🎁 掉落 {rarity}「{item}」', 'log.bagFull': '🎒 背包滿了，裝備自動賣掉',
+  'log.capture': '🕸️ 捕獲了「{name}」！牠住進了飛空艇', 'log.bossDown': '🏆 擊敗第 {f} 層層主！第 {n} 層已開放',
+  'log.partnerAvail': '🤝 {name} 可以招募了（夥伴分頁）', 'log.capReached': '🧭 飛空艇只能到第 {n} 層，升級「側面穩定翼」或「引擎」才能往上',
   'log.defeat': '💀 在第 {n} 層倒下', 'log.reviveFree': '🕊️ 復活了，退回第 {n} 層修練（已暫停自動推進）',
   'log.revivePaid': '💎 花了 {n} 雲晶原地復活', 'log.moraleLost': '🎖️ 戰敗，士氣歸零',
 
@@ -263,19 +278,20 @@ G.I18N['zh-TW'] = {
   'toast.noSP': '沒有技能點了，升級可以獲得', 'toast.tierReq': '需要先在此職業投入 {n} 點',
   'toast.reachFloor': '要先到達第 {n} 層', 'toast.needGold': '需要 {n} 金幣',
   'toast.partnerCap': '夥伴等級不能超過主角 5 級以上', 'toast.partyFull': '最多 {n} 位夥伴出戰',
-  'toast.shipMax': '已經升到最高級', 'toast.needShip': '需要 {gold} 金幣、{crystal} 雲晶',
+  'toast.needShip': '需要 {gold} 金幣、{crystal} 雲晶',
   'toast.notEnoughGold': '金幣不夠', 'toast.notEnoughCrystal': '雲晶不夠', 'toast.bought': '買了 {name}，到家園點空格擺放',
-  'toast.capReached': '飛行船只能到第 {n} 層，升級「氣囊」才能繼續往上', 'toast.reviveNeed': '雲晶不夠，需要 {n} 💎',
+  'toast.capReached': '飛空艇只能到第 {n} 層，升級「側面穩定翼」或「引擎」才能繼續往上', 'toast.reviveNeed': '雲晶不夠，需要 {n} 💎',
 
   // ── 離線收益 / 序章 ──
-  'offline.title': '歡迎回來！', 'offline.away': '你離開了 {time}，飛行船上的夥伴們持續在第 {floor} 層探索。',
+  'offline.title': '歡迎回來！', 'offline.away': '你離開了 {time}，飛空艇上的夥伴們持續在第 {floor} 層探索。',
   'time.hm': '{h} 小時 {m} 分鐘', 'time.m': '{m} 分鐘',
   'offline.gold': '金幣', 'offline.xp': '經驗', 'offline.bonus': '家園舒適度加成',
   'offline.cap': '離線收益最多累積 {h} 小時。布置家園可以提高收益。', 'offline.ok': '收下',
-  'prologue.title': '序章', 'prologue.next': '繼續', 'prologue.go': '出發！',
-  'prologue.1': '這是一個平凡的中世紀村莊。麥田、風車、石板路，日子一天天過去。',
-  'prologue.2': '直到某天清晨，村民們抬頭，看見天空破了一個大洞。',
-  'prologue.3': '洞裡傳來風聲，也落下閃閃發光的「雲晶」。',
-  'prologue.4': '大家紛紛搭上熱氣球，飛進洞裡探險……',
-  'prologue.5': '而你，只是一個普通的村民。',
+  'prologue.title': '歡迎，冒險者', 'prologue.next': '繼續', 'prologue.go': '出發！',
+  'prologue.1': '嗨～冒險者！這裡是中世紀世界，天空突然破了一個大洞。大家紛紛為了財富自由、躺平不上班，乘坐飛空艇上去冒險。上面充滿未知……',
+  'prologue.2': '你的目標是打造優秀強韌的飛空艇，持續往天空破洞的高層冒險。你的主角與夥伴會自動前進，只需要掛機、農裝備、配置技能就好。',
+  'prologue.3': '作者是個住在台灣、窮困潦倒的社畜，需要大家斗內吃滷肉飯＋滷蛋，感謝各位！🍚🥚',
+  
+  
+  'log.shipBuy': '🛠️ 買了新零件「{name}」',
 };

@@ -164,6 +164,10 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .part { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #2c2448; }
 .part:last-child { border-bottom: 0; }
 .part .ico { font-size: 26px; width: 36px; text-align: center; }
+.model { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-top: 1px solid #2c2448; }
+.model.using { background: rgba(127,209,255,.07); border-radius: 8px; }
+.model .tier { width: 22px; text-align: center; color: var(--gold); font-weight: 700; }
+.model .btn { min-width: 78px; }
 .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
 .swatch { width: 34px; height: 34px; border-radius: 50%; border: 3px solid transparent; padding: 0; }
 .swatch.on { border-color: #fff; }

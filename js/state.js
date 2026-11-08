@@ -30,6 +30,31 @@
     if (first) ch.active[0] = first.id;
   }
 
+  // 飛空艇：eq = 每個部位裝著第幾款（-1 = 沒裝），owned = 買過的款式
+  function newShip() {
+    const eq = {}, owned = {};
+    G.SHIP_SLOTS.forEach(s => { const free = G.SHIP_PARTS[s].free; eq[s] = free ? 0 : -1; owned[s] = free ? [0] : []; });
+    return { paint: 0, eq, owned };
+  }
+  // 舊版飛行船（每個零件是「等級」）→ 新版款式；照舊氣囊能到的層數送穩定翼/引擎，不會改版後爬不上去
+  function migrateShip(old) {
+    if (!old || old.eq) return Object.assign(newShip(), old || {});
+    const ship = newShip(), give = (slot, tier) => {
+      if (tier < 0) return;
+      tier = Math.min(4, tier);
+      for (let i = 0; i <= tier; i++) if (!ship.owned[slot].includes(i)) ship.owned[slot].push(i);
+      ship.eq[slot] = tier;
+    };
+    const steps = Math.max(0, (old.balloon || 1) - 1);          // 舊氣囊每級 +5 層
+    give('engine', Math.ceil(steps / 2) - 1);
+    give('wing', Math.floor(steps / 2) - 1);
+    give('hull', (old.hull || 1) - 1);
+    if (old.cannon > 0) give('cannon', Math.ceil(old.cannon / 2) - 1);
+    if (old.figurehead > 0) give('bow', old.figurehead - 1);
+    ship.paint = old.paint || 0;
+    return ship;
+  }
+
   function newState() {
     const hero = { level: 1, xp: 0, cls: 'villager', hair: '#5a3a22', skin: '#f1c9a0' };
     resetSkills(hero);
@@ -45,7 +70,8 @@
       morale: 0,             // 士氣層數（每層 +1% 全隊最終防禦；有人裝「士氣」被動才累積/生效）
       partners: {},          // id -> { level, cls, equipped, skills, active, passive }
       party: [],             // 出戰中的夥伴 id
-      ship: { balloon: 1, engine: 1, hull: 1, cannon: 0, paint: 0, figurehead: 0 },
+      ship: newShip(),
+      introVer: 0,           // 看過的開場對話版本（G.INTRO_VER 改版時會再看一次）
       furniture: {},         // id -> 持有數量（未擺放）
       home: {},              // "x,y" -> furniture id
       pets: [],              // { id(怪物), shape, color }
@@ -63,7 +89,8 @@
     if (s && s.v === 1) {
       // 補上新版本新增的欄位，舊存檔也能讀
       G.S = Object.assign(base, s);
-      G.S.ship = Object.assign(newState().ship, s.ship);
+      G.S.ship = migrateShip(s.ship);
+      if (s.seenPrologue && !s.introVer) G.S.introVer = 1;   // 看過舊版序章
       migrateToI18n(G.S);
       migrateSkills(G.S);
     } else {
@@ -148,10 +175,24 @@
     });
     return out;
   };
-  // 全隊光環（出戰中所有人的 party 被動加總）
+  // ── 飛空艇數值 ───────────────────────────────────────────────────────────
+  G.shipTier = slot => G.S.ship.eq[slot];
+  G.shipVal = slot => { const i = G.shipTier(slot); return i >= 0 ? G.SHIP_PARTS[slot].v[i] : 0; };
+  G.shipMaxFloor = () => G.SHIP_BASE_FLOORS + G.shipVal('wing') + G.shipVal('engine');
+  G.cannonMult = () => G.shipVal('cannon');
+  G.homeTier = () => Math.max(0, G.shipTier('hull'));
+  G.petCap = () => 6 + G.homeTier() * 2;
+  // 給全隊的加成：熱氣球生命、船身防禦、船首傷害、船底掛飾金幣
+  G.shipBonus = () => ({ hpPct: G.shipVal('balloon'), defPct: G.shipVal('hull'), dmgPct: G.shipVal('bow'), goldPct: G.shipVal('charm') });
+  // 飛空艇外觀（每個部位裝的款式，-1 = 沒裝）
+  G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
+
+  // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
   G.partyAura = function () {
     const aura = {};
-    G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => aura[k] = (aura[k] || 0) + v));
+    const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
+    G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => add(k, v)));
+    Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     return aura;
   };
   // 隊伍裡某個特殊被動的最大值（例如士氣上限、吸貓狂熱上限）
@@ -220,8 +261,8 @@
     if (up) G.emit('levelup');
   };
 
-  // 金幣倍率：引擎、捕獲的怪物、學者「獎學金」等全隊光環
-  G.goldMult = () => 1 + (G.S.ship.engine - 1) * 0.1 + G.S.pets.length * 0.01 + (G.partyAura().goldPct || 0);
+  // 金幣倍率：捕獲的怪物、飛空艇船底掛飾、學者「獎學金」等全隊光環
+  G.goldMult = () => 1 + G.S.pets.length * 0.01 + (G.partyAura().goldPct || 0);
 
   // ── 裝備產生 ─────────────────────────────────────────────────────────────
   G.rollRarity = function (boss) {
@@ -433,19 +474,27 @@
     G.emit('party');
   };
 
-  G.upgradeShip = function (part) {
-    const lv = G.S.ship[part], P = G.SHIP_PARTS[part];
-    if (lv >= P.max) return toast('toast.shipMax');
-    const c = G.shipUpgradeCost(part, lv);
+  // 買飛空艇零件（買完直接裝上）
+  G.buyShipPart = function (slot, i) {
+    const sh = G.S.ship;
+    if (sh.owned[slot].includes(i)) return G.equipShipPart(slot, i);
+    const c = G.shipPartCost(slot, i);
     if (G.S.gold < c.gold || G.S.crystal < c.crystal) return toast('toast.needShip', { gold: G.fmt(c.gold), crystal: c.crystal });
     G.S.gold -= c.gold; G.S.crystal -= c.crystal;
-    G.S.ship[part]++;
-    if (part === 'hull') trimHome();
-    G.addLog('log.shipUp', { part: { k: `part.${part}.name` }, lv: G.S.ship[part] }, '#9fe39f');
-    G.emit('ship');
+    sh.owned[slot].push(i);
+    G.addLog('log.shipBuy', { name: { k: `part.${slot}.${i}` } }, '#9fe39f');
+    G.equipShipPart(slot, i);
   };
 
-  G.setShipLook = function (key, val) { G.S.ship[key] = val; G.emit('ship'); };
+  G.equipShipPart = function (slot, i) {
+    const sh = G.S.ship;
+    if (!sh.owned[slot].includes(i)) return;
+    sh.eq[slot] = i;
+    if (slot === 'hull') trimHome();
+    G.emit('ship'); G.emit('stats'); G.emit('party');
+  };
+
+  G.setShipPaint = function (i) { G.S.ship.paint = i; G.emit('ship'); };
 
   G.buyFurniture = function (id) {
     const f = G.FURNITURE.find(x => x.id === id);
@@ -474,7 +523,7 @@
   };
 
   function trimHome() {
-    const { w, h } = G.homeSize(G.S.ship.hull);
+    const { w, h } = G.homeSize(G.homeTier());
     Object.keys(G.S.home).forEach(k => {
       const [x, y] = k.split(',').map(Number);
       if (x >= w || y >= h) G.removeFurniture(k);
@@ -496,7 +545,7 @@
   G.petName = p => p.id ? G.monsterName(p.id) : (p.name || '?');
 
   G.setFloor = function (f) {
-    const limit = Math.min(G.S.maxFloor, G.shipMaxFloor(G.S.ship.balloon));
+    const limit = Math.min(G.S.maxFloor, G.shipMaxFloor());
     G.S.floor = Math.max(1, Math.min(f, limit));
     G.S.kills = 0;
     G.emit('floor');

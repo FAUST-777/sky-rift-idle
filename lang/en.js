@@ -19,7 +19,7 @@ G.I18N['en'] = {
   'credits.body': 'This game uses <b>Phaser 3.80.1</b> (https://phaser.io) under the MIT License.',
 
   // ── Adventure ──
-  'adv.title': 'The Sky Rift', 'adv.reach': 'Highest reachable: Floor {top} (balloon limit {cap})',
+  'adv.title': 'The Sky Rift', 'adv.reach': 'Highest reachable: Floor {top} (airship limit {cap})',
   'adv.down': '◀ Down', 'adv.up': 'Up ▶', 'adv.auto': 'Climb automatically after beating the boss', 'adv.challenge': 'Challenge Floor {n}',
   'adv.partners': 'Party', 'adv.log': 'Adventure Log', 'adv.logEmpty': 'Nothing yet',
 
@@ -186,14 +186,29 @@ G.I18N['en'] = {
   'partner.mira.name': 'Mira the Astrologer', 'partner.mira.bio': 'A girl who can read the rift\'s star charts.',
 
   // ── Airship ──
-  'ship.help': 'Your airship decides how high you can go: <b>balloon level</b> sets the highest floor you can enter. Upgrading parts also changes how it looks.',
-  'ship.parts': 'Upgrades', 'ship.partsHint': 'Bosses always drop Cloud Crystals', 'ship.maxed': 'Max',
-  'ship.look': 'Appearance', 'ship.paint': 'Paint', 'ship.figurehead': 'Figurehead',
-  'part.balloon.name': 'Balloon', 'part.balloon.desc': 'Reach Floor {n}',
-  'part.engine.name': 'Engine', 'part.engine.desc': 'Gold +{n}%, faster travel',
-  'part.hull.name': 'Hull', 'part.hull.desc': 'Home space {w}×{h}',
-  'part.cannon.name': 'Cannon', 'part.cannon.desc': 'Fires every 6s for {n}% ATK damage', 'part.cannon.none': 'Not installed',
-  'figurehead.0': 'None', 'figurehead.1': 'Eagle', 'figurehead.2': 'Dragon', 'figurehead.3': 'Goddess',
+  'ship.help': 'Build a strong, sturdy airship to climb ever higher into the rift. Each part comes in 5 models, and you can switch between owned models anytime. <b>Side Stabilizers and the Engine</b> decide how high you can climb.', 'ship.paint': 'Paint', 'ship.free': 'Free',
+  'ship.using': 'In use', 'ship.equip': 'Equip', 'ship.none': 'None',
+  'ship.sum.hp': 'Party HP', 'ship.sum.def': 'Party DEF', 'ship.sum.dmg': 'Party damage',
+  'ship.sum.gold': 'Adventure gold', 'ship.sum.cannon': 'Cannon damage', 'ship.sum.floors': 'Can reach',
+  'part.balloon.name': 'Balloon', 'part.balloon.what': 'Boosts party HP', 'part.balloon.desc': 'Party HP +{v}%',
+  'part.balloon.0': 'Patchwork Balloon', 'part.balloon.1': 'Striped Balloon', 'part.balloon.2': 'Twin Envelope',
+  'part.balloon.3': 'Steel-Ribbed Envelope', 'part.balloon.4': 'Starlight Envelope', 'part.hull.name': 'Hull',
+  'part.hull.what': 'Boosts party DEF. A bigger hull also means a bigger Home.', 'part.hull.desc': 'Party DEF +{v}% · Home {w}×{h}', 'part.hull.0': 'Little Skiff',
+  'part.hull.1': 'Merchant Hull', 'part.hull.2': 'Reinforced Hull', 'part.hull.3': 'Ironclad Hull',
+  'part.hull.4': 'Golden Royal Hull', 'part.bow.name': 'Figurehead', 'part.bow.what': 'Boosts party damage',
+  'part.bow.desc': 'Party damage +{v}%', 'part.bow.0': 'Wooden Ram', 'part.bow.1': 'Eagle Figurehead',
+  'part.bow.2': 'Dragon Figurehead', 'part.bow.3': 'Goddess Figurehead', 'part.bow.4': 'Crystal Prow',
+  'part.charm.name': 'Hull Charm', 'part.charm.what': 'Boosts gold earned while adventuring', 'part.charm.desc': 'Adventure gold +{v}%',
+  'part.charm.0': 'Lantern', 'part.charm.1': 'Brass Bell', 'part.charm.2': 'Anchor',
+  'part.charm.3': 'Lucky Cloud Crystal', 'part.charm.4': 'Jolly Roger', 'part.cannon.name': 'Cannon',
+  'part.cannon.what': 'The airship bombards enemies every 6s', 'part.cannon.desc': 'Fires for {v}% ATK damage', 'part.cannon.0': 'Small Iron Cannon',
+  'part.cannon.1': 'Double-Barrel Cannon', 'part.cannon.2': 'Long Cannon', 'part.cannon.3': 'Arcane Cannon',
+  'part.cannon.4': 'Sky Breaker', 'part.wing.name': 'Side Stabilizers', 'part.wing.what': 'Lets you climb more floors',
+  'part.wing.desc': 'Floors +{v}', 'part.wing.0': 'Canvas Fins', 'part.wing.1': 'Wooden Stabilizers',
+  'part.wing.2': 'Iron-Frame Stabilizers', 'part.wing.3': 'Bird Wings', 'part.wing.4': 'Angel Wings',
+  'part.engine.name': 'Engine', 'part.engine.what': 'Lets you climb more floors and travel faster', 'part.engine.desc': 'Floors +{v}',
+  'part.engine.0': 'Hand-Crank Paddles', 'part.engine.1': 'Windmill Engine', 'part.engine.2': 'Steam Engine',
+  'part.engine.3': 'Twin Turbines', 'part.engine.4': 'Cloud Crystal Reactor',
 
   // ── Home ──
   'home.title': 'Airship Cabin', 'home.comfort': 'Comfort {c} (offline earnings +{c}%)',
@@ -246,12 +261,12 @@ G.I18N['en'] = {
   'buff.poison.name': 'Poison', 'buff.poison.desc': '{n} enemies poisoned, up to {v} damage per second',
 
   // ── Log ──
-  'log.start': '🎈 You drifted into the Sky Rift on a hot-air balloon...',
+  'log.start': '🎈 You flew into the Sky Rift on your airship...',
   'log.levelUp': '⬆️ Reached Lv {lv}! +1 skill point', 'log.canClass': '✨ You can choose a class! Go to the Hero tab',
   'log.classChanged': '🎓 You became a {cls}! Skill points reset', 'log.recruited': '🤝 {name} joined the party!',
-  'log.shipUp': '🛠️ {part} upgraded to Lv {lv}', 'log.drop': '🎁 Found {rarity} {item}', 'log.bagFull': '🎒 Inventory full, gear sold automatically',
+  'log.drop': '🎁 Found {rarity} {item}', 'log.bagFull': '🎒 Inventory full, gear sold automatically',
   'log.capture': '🕸️ Captured: {name}! It now lives on your airship', 'log.bossDown': '🏆 Defeated the Floor {f} boss! Floor {n} unlocked',
-  'log.partnerAvail': '🤝 {name} can be recruited (Party tab)', 'log.capReached': '🎈 Your balloon only reaches Floor {n}. Upgrade it to climb higher',
+  'log.partnerAvail': '🤝 {name} can be recruited (Party tab)', 'log.capReached': '🧭 Your airship only reaches Floor {n}. Upgrade the Side Stabilizers or Engine to climb higher',
   'log.defeat': '💀 Fell on Floor {n}', 'log.reviveFree': '🕊️ Revived and pulled back to Floor {n} to train (auto-climb paused)',
   'log.revivePaid': '💎 Spent {n} Cloud Crystals to revive on the spot', 'log.moraleLost': '🎖️ Defeated. Morale reset',
 
@@ -263,19 +278,20 @@ G.I18N['en'] = {
   'toast.noSP': 'No skill points left. Level up to earn more', 'toast.tierReq': 'Spend {n} points in this class first',
   'toast.reachFloor': 'Reach Floor {n} first', 'toast.needGold': 'Need {n} gold',
   'toast.partnerCap': 'Companions can\'t be more than 5 levels above you', 'toast.partyFull': 'Up to {n} companions can be deployed',
-  'toast.shipMax': 'Already at max level', 'toast.needShip': 'Need {gold} gold and {crystal} Cloud Crystals',
+  'toast.needShip': 'Need {gold} gold and {crystal} Cloud Crystals',
   'toast.notEnoughGold': 'Not enough gold', 'toast.notEnoughCrystal': 'Not enough Cloud Crystals', 'toast.bought': 'Bought {name}. Place it in your Home',
-  'toast.capReached': 'Your airship only reaches Floor {n}. Upgrade the Balloon to go higher', 'toast.reviveNeed': 'Not enough Cloud Crystals. Need {n} 💎',
+  'toast.capReached': 'Your airship only reaches Floor {n}. Upgrade the Side Stabilizers or Engine to go higher', 'toast.reviveNeed': 'Not enough Cloud Crystals. Need {n} 💎',
 
   // ── Offline / prologue ──
   'offline.title': 'Welcome back!', 'offline.away': 'You were away for {time}. Your companions kept exploring Floor {floor}.',
   'time.hm': '{h}h {m}m', 'time.m': '{m} min',
   'offline.gold': 'Gold', 'offline.xp': 'XP', 'offline.bonus': 'Home comfort bonus',
   'offline.cap': 'Offline earnings build up for at most {h} hours. Decorate your Home to earn more.', 'offline.ok': 'Collect',
-  'prologue.title': 'Prologue', 'prologue.next': 'Next', 'prologue.go': 'Set off!',
-  'prologue.1': 'An ordinary medieval village. Wheat fields, windmills, cobbled streets. One day much like the next.',
-  'prologue.2': 'Until one morning, the villagers looked up and saw a great hole torn in the sky.',
-  'prologue.3': 'Wind howled from inside it, and glittering Cloud Crystals rained down.',
-  'prologue.4': 'One after another, people climbed into hot-air balloons and flew in to explore...',
-  'prologue.5': 'And you? You are just an ordinary villager.',
+  'prologue.title': 'Welcome, Adventurer', 'prologue.next': 'Next', 'prologue.go': 'Set off!',
+  'prologue.1': 'Hi, adventurer! This is a medieval world, and a huge hole has just torn open in the sky. Everyone is chasing financial freedom: quitting their jobs, lying flat, and flying up in airships to explore. Up there, everything is unknown...',
+  'prologue.2': 'Your goal is to build a strong, sturdy airship and keep climbing to the higher floors of the sky rift. Your hero and companions move forward on their own. Just let it idle, farm gear and set up your skills.',
+  'prologue.3': 'The developer is a broke, overworked office worker in Taiwan who needs your donations for braised pork rice and a marinated egg. Thank you all! 🍚🥚',
+  
+  
+  'log.shipBuy': '🛠️ Bought a new part: {name}',
 };

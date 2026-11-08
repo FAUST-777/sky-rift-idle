@@ -55,7 +55,7 @@
       this.sky = this.add.graphics();
       ['clouds', 'clouds2'].forEach((k, i) => this.tex(k, 256, 128, (ctx, w, h) => G.ART.drawClouds(ctx, w, h, i ? 0.85 : 0.45)));
       this.islandsLayer = null;
-      // 飛行船放右上（左上角留給 buff 圖示）
+      // 飛空艇放右上（左上角留給 buff 圖示）
       this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.5);
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
@@ -99,7 +99,7 @@
 
     drawShip() {
       const key = 'ship_' + (++this.texVer);
-      this.tex(key, 240, 180, (ctx, w, h) => G.ART.drawShip(ctx, G.S.ship, w, h));
+      this.tex(key, 240, 180, (ctx, w, h) => G.ART.drawShip(ctx, G.shipLook(), w, h));
       const old = this.shipImg.texture.key;
       this.shipImg.setTexture(key);
       if (old.startsWith('ship_')) this.textures.remove(old);
@@ -328,6 +328,7 @@
 
       let dmg = this.atkOf(src) * mult;
       if (opts.skill) dmg *= this.skillMult(src);
+      if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
       if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
@@ -554,7 +555,7 @@
       const crystal = u.boss ? 1 + Math.floor(f / 5) : Math.random() < 0.04 ? 1 : 0;
       if (crystal) { S.crystal += crystal; this.floatText(u.img.x, u.img.y - 30, `+${crystal}💎`, '#9fe8ff', 13, 900); }
       // 捕獲
-      const petCap = 4 + S.ship.hull * 2;
+      const petCap = G.petCap();
       if (!u.boss && S.nets > 0 && S.pets.length < petCap && Math.random() < G.CONFIG.captureChance) {
         S.nets--;
         S.pets.push({ id: u.monsterId, shape: u.shape, color: u.color });
@@ -580,7 +581,7 @@
         const unlocked = G.PARTNERS.find(p => p.floor === f + 1 || p.floor === f);
         if (unlocked && !S.partners[unlocked.id] && S.maxFloor >= unlocked.floor) G.addLog('log.partnerAvail', { name: { k: `partner.${unlocked.id}.name` } }, '#7fd1ff');
       }
-      const shipCap = G.shipMaxFloor(S.ship.balloon);
+      const shipCap = G.shipMaxFloor();
       if (S.autoAdvance) {
         if (f + 1 <= shipCap) {
           S.floor = f + 1;
@@ -656,7 +657,7 @@
         this.hero.hp = this.hero.st.maxHp * ratio;
       }
       this.mode = 'walk';
-      this.walkT = 1.2 / (1 + (G.S.ship.engine - 1) * 0.08);
+      this.walkT = 1.2 / this.travelSpeed();
     }
 
     // ── 文字特效 ─────────────────────────────────────────────────────────
@@ -668,11 +669,14 @@
       this.tweens.add({ targets: t, y: y - 26, alpha: 0, duration: dur, ease: 'Quad.out', onComplete: () => t.destroy() });
     }
 
+    // 引擎越好，在空中前進越快
+    travelSpeed() { return 1 + (G.shipTier('engine') + 1) * 0.08; }
+
     // ── 每幀更新 ─────────────────────────────────────────────────────────
     update(_, dtMs) {
       const dt = Math.min(0.1, dtMs / 1000);
       const walking = this.mode === 'walk' || this.mode === 'enter';
-      const speed = 70 * (1 + (G.S.ship.engine - 1) * 0.08);
+      const speed = 70 * this.travelSpeed();
       if (walking) {
         this.ground.tilePositionX += speed * dt;
         this.cloudNear.tilePositionX += speed * 0.5 * dt;
@@ -745,7 +749,7 @@
       this.regenTick(dt);
 
       // 船砲支援
-      if (this.mode === 'fight' && G.S.ship.cannon > 0 && this.enemiesAlive().length) {
+      if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {
         this.cannonT -= dt;
         if (this.cannonT <= 0) {
           this.cannonT = 6;
@@ -754,7 +758,7 @@
           const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);
           this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
             ball.destroy();
-            if (this.valid(t)) { this.hit(src, t, 0.3 * G.S.ship.cannon); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13); this.checkWaveEnd(); }
+            if (this.valid(t)) { this.hit(src, t, G.cannonMult()); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13); this.checkWaveEnd(); }
           } });
         }
       }

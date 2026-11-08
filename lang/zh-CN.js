@@ -3,7 +3,7 @@ G.I18N['zh-CN'] = {
   'game.title': '天空裂洞物语',
 
   // ── 分页 / 通用 ──
-  'tab.adventure': '冒险', 'tab.hero': '角色', 'tab.skills': '技能', 'tab.partners': '伙伴', 'tab.ship': '飞行船', 'tab.home': '家园',
+  'tab.adventure': '冒险', 'tab.hero': '角色', 'tab.skills': '技能', 'tab.partners': '伙伴', 'tab.ship': '飞空艇', 'tab.home': '家园',
   'common.close': '关闭', 'common.cancel': '取消', 'common.gold': '金币', 'common.crystal': '云晶',
   'floor.name': '第 {n} 层', 'floor.boss': '层主战',
 
@@ -19,7 +19,7 @@ G.I18N['zh-CN'] = {
   'credits.body': '本游戏使用 <b>Phaser 3.80.1</b>（https://phaser.io），依 MIT 许可使用。',
 
   // ── 冒险 ──
-  'adv.title': '天空裂洞', 'adv.reach': '最高可到第 {top} 层（气囊上限 {cap}）',
+  'adv.title': '天空裂洞', 'adv.reach': '最高可到第 {top} 层（飞空艇上限 {cap}）',
   'adv.down': '◀ 下降', 'adv.up': '上升 ▶', 'adv.auto': '击败层主后自动往上', 'adv.challenge': '挑战第 {n} 层',
   'adv.partners': '伙伴', 'adv.log': '冒险日志', 'adv.logEmpty': '还没有记录',
 
@@ -185,18 +185,33 @@ G.I18N['zh-CN'] = {
   'partner.kael.name': '浪人凯尔', 'partner.kael.bio': '比所有人都早上来的探险者，似乎知道些什么。',
   'partner.mira.name': '占星师米菈', 'partner.mira.bio': '能读懂裂洞星图的少女。',
 
-  // ── 飞行船 ──
-  'ship.help': '飞行船决定你能飞多高：<b>气囊等级</b>决定能进入的最高层。升级零件，外观也会跟着改变。',
-  'ship.parts': '改装零件', 'ship.partsHint': '云晶：打层主必掉', 'ship.maxed': '满级',
-  'ship.look': '外观', 'ship.paint': '涂装', 'ship.figurehead': '船首像',
-  'part.balloon.name': '气囊', 'part.balloon.desc': '可到达第 {n} 层',
-  'part.engine.name': '引擎', 'part.engine.desc': '金币 +{n}%、移动加快',
-  'part.hull.name': '船身', 'part.hull.desc': '家园空间 {w}×{h}',
-  'part.cannon.name': '船炮', 'part.cannon.desc': '每 6 秒炮击，{n}% 攻击力伤害', 'part.cannon.none': '尚未安装',
-  'figurehead.0': '无', 'figurehead.1': '鹰首', 'figurehead.2': '龙首', 'figurehead.3': '女神像',
+  // ── 飞空艇 ──
+  'ship.help': '打造优秀强韧的飞空艇，才能往天空破洞的高层冒险。每个部位有 5 款，买过的款式可以随时切换；<b>侧面稳定翼和引擎</b>决定能爬到第几层。', 'ship.paint': '涂装', 'ship.free': '免费',
+  'ship.using': '使用中', 'ship.equip': '装上', 'ship.none': '未安装',
+  'ship.sum.hp': '全队生命', 'ship.sum.def': '全队防御', 'ship.sum.dmg': '全队伤害',
+  'ship.sum.gold': '冒险金币', 'ship.sum.cannon': '炮击伤害', 'ship.sum.floors': '可爬到',
+  'part.balloon.name': '热气球', 'part.balloon.what': '提升全队生命', 'part.balloon.desc': '全队生命 +{v}%',
+  'part.balloon.0': '拼布气球', 'part.balloon.1': '条纹气球', 'part.balloon.2': '双囊气球',
+  'part.balloon.3': '钢骨气囊', 'part.balloon.4': '星辰气囊', 'part.hull.name': '船身',
+  'part.hull.what': '提升全队防御；船身越大，家园空间也越大', 'part.hull.desc': '全队防御 +{v}%・家园 {w}×{h}', 'part.hull.0': '小木舟',
+  'part.hull.1': '商船船身', 'part.hull.2': '加固船身', 'part.hull.3': '铁甲船身',
+  'part.hull.4': '黄金王船', 'part.bow.name': '船首', 'part.bow.what': '提升全队伤害',
+  'part.bow.desc': '全队伤害 +{v}%', 'part.bow.0': '木制冲角', 'part.bow.1': '鹰首像',
+  'part.bow.2': '龙首像', 'part.bow.3': '女神像', 'part.bow.4': '水晶船首',
+  'part.charm.name': '船底挂饰', 'part.charm.what': '提升全队冒险获得的金币', 'part.charm.desc': '冒险金币 +{v}%',
+  'part.charm.0': '风灯', 'part.charm.1': '铜铃', 'part.charm.2': '船锚',
+  'part.charm.3': '招财云晶', 'part.charm.4': '海盗旗', 'part.cannon.name': '船炮',
+  'part.cannon.what': '飞空艇每 6 秒对敌人远程炮击', 'part.cannon.desc': '炮击 {v}% 攻击力伤害', 'part.cannon.0': '小铁炮',
+  'part.cannon.1': '双管炮', 'part.cannon.2': '长程加农炮', 'part.cannon.3': '魔导炮',
+  'part.cannon.4': '天穹巨炮', 'part.wing.name': '侧面稳定翼', 'part.wing.what': '可以多往上爬几层',
+  'part.wing.desc': '可爬层数 +{v}', 'part.wing.0': '帆布侧翼', 'part.wing.1': '木制稳定翼',
+  'part.wing.2': '铁骨稳定翼', 'part.wing.3': '飞鸟之翼', 'part.wing.4': '天使之翼',
+  'part.engine.name': '引擎', 'part.engine.what': '可以多往上爬几层，前进速度也更快', 'part.engine.desc': '可爬层数 +{v}',
+  'part.engine.0': '手摇桨', 'part.engine.1': '风车引擎', 'part.engine.2': '蒸汽引擎',
+  'part.engine.3': '双涡轮引擎', 'part.engine.4': '云晶反应炉',
 
   // ── 家园 ──
-  'home.title': '飞行船船舱', 'home.comfort': '舒适度 {c}（离线收益 +{c}%）',
+  'home.title': '飞空艇船舱', 'home.comfort': '舒适度 {c}（离线收益 +{c}%）',
   'home.placingHint': '👉 点空格摆放，点已摆的家具收回仓库。',
   'home.hint': '先在下面「仓库」选一件家具，再点空格摆放。点已摆放的家具可收回。', 'home.hullHint': '升级「船身」可以扩大空间。',
   'home.storage': '仓库', 'home.storageEmpty': '空的，去下面商店买家具吧', 'home.shop': '家具商店',
@@ -246,12 +261,12 @@ G.I18N['zh-CN'] = {
   'buff.poison.name': '中毒', 'buff.poison.desc': '{n} 个敌人中毒中，每秒最高 {v} 伤害',
 
   // ── 日志 ──
-  'log.start': '🎈 你乘着热气球飞进了天空裂洞……',
+  'log.start': '🎈 你乘着飞空艇飞进了天空裂洞……',
   'log.levelUp': '⬆️ 升到 {lv} 级！获得 1 技能点', 'log.canClass': '✨ 可以转职了！到「角色」分页选择职业',
   'log.classChanged': '🎓 转职为「{cls}」！技能点已重置', 'log.recruited': '🤝 {name} 加入了队伍！',
-  'log.shipUp': '🛠️ {part} 升到 {lv} 级', 'log.drop': '🎁 掉落 {rarity}「{item}」', 'log.bagFull': '🎒 背包满了，装备自动卖掉',
-  'log.capture': '🕸️ 捕获了「{name}」！它住进了飞行船', 'log.bossDown': '🏆 击败第 {f} 层层主！第 {n} 层已开放',
-  'log.partnerAvail': '🤝 {name} 可以招募了（伙伴分页）', 'log.capReached': '🎈 气囊高度只到第 {n} 层，升级气囊才能往上',
+  'log.drop': '🎁 掉落 {rarity}「{item}」', 'log.bagFull': '🎒 背包满了，装备自动卖掉',
+  'log.capture': '🕸️ 捕获了「{name}」！它住进了飞空艇', 'log.bossDown': '🏆 击败第 {f} 层层主！第 {n} 层已开放',
+  'log.partnerAvail': '🤝 {name} 可以招募了（伙伴分页）', 'log.capReached': '🧭 飞空艇只能到第 {n} 层，升级「侧面稳定翼」或「引擎」才能往上',
   'log.defeat': '💀 在第 {n} 层倒下', 'log.reviveFree': '🕊️ 复活了，退回第 {n} 层修炼（已暂停自动推进）',
   'log.revivePaid': '💎 花了 {n} 云晶原地复活', 'log.moraleLost': '🎖️ 战败，士气归零',
 
@@ -263,19 +278,20 @@ G.I18N['zh-CN'] = {
   'toast.noSP': '没有技能点了，升级可以获得', 'toast.tierReq': '需要先在此职业投入 {n} 点',
   'toast.reachFloor': '要先到达第 {n} 层', 'toast.needGold': '需要 {n} 金币',
   'toast.partnerCap': '伙伴等级不能超过主角 5 级以上', 'toast.partyFull': '最多 {n} 位伙伴出战',
-  'toast.shipMax': '已经升到最高级', 'toast.needShip': '需要 {gold} 金币、{crystal} 云晶',
+  'toast.needShip': '需要 {gold} 金币、{crystal} 云晶',
   'toast.notEnoughGold': '金币不够', 'toast.notEnoughCrystal': '云晶不够', 'toast.bought': '买了 {name}，到家园点空格摆放',
-  'toast.capReached': '飞行船只能到第 {n} 层，升级「气囊」才能继续往上', 'toast.reviveNeed': '云晶不够，需要 {n} 💎',
+  'toast.capReached': '飞空艇只能到第 {n} 层，升级「侧面稳定翼」或「引擎」才能继续往上', 'toast.reviveNeed': '云晶不够，需要 {n} 💎',
 
   // ── 离线收益 / 序章 ──
-  'offline.title': '欢迎回来！', 'offline.away': '你离开了 {time}，飞行船上的伙伴们持续在第 {floor} 层探索。',
+  'offline.title': '欢迎回来！', 'offline.away': '你离开了 {time}，飞空艇上的伙伴们持续在第 {floor} 层探索。',
   'time.hm': '{h} 小时 {m} 分钟', 'time.m': '{m} 分钟',
   'offline.gold': '金币', 'offline.xp': '经验', 'offline.bonus': '家园舒适度加成',
   'offline.cap': '离线收益最多累积 {h} 小时。布置家园可以提高收益。', 'offline.ok': '收下',
-  'prologue.title': '序章', 'prologue.next': '继续', 'prologue.go': '出发！',
-  'prologue.1': '这是一个平凡的中世纪村庄。麦田、风车、石板路，日子一天天过去。',
-  'prologue.2': '直到某天清晨，村民们抬头，看见天空破了一个大洞。',
-  'prologue.3': '洞里传来风声，也落下闪闪发光的「云晶」。',
-  'prologue.4': '大家纷纷乘上热气球，飞进洞里探险……',
-  'prologue.5': '而你，只是一个普通的村民。',
+  'prologue.title': '欢迎，冒险者', 'prologue.next': '继续', 'prologue.go': '出发！',
+  'prologue.1': '嗨～冒险者！这里是中世纪世界，天空突然破了一个大洞。大家纷纷为了财富自由、躺平不上班，乘坐飞空艇上去冒险。上面充满未知……',
+  'prologue.2': '你的目标是打造优秀强韧的飞空艇，持续往天空破洞的高层冒险。你的主角与伙伴会自动前进，只需要挂机、刷装备、配置技能就好。',
+  'prologue.3': '作者是个住在台湾、穷困潦倒的社畜，需要大家打赏吃卤肉饭＋卤蛋，感谢各位！🍚🥚',
+  
+  
+  'log.shipBuy': '🛠️ 买了新零件「{name}」',
 };

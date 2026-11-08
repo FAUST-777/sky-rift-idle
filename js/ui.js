@@ -83,7 +83,7 @@
   // ── 分頁：冒險 ───────────────────────────────────────────────────────────
   function renderAdventure() {
     const S = G.S, st = G.heroStats();
-    const cap = G.shipMaxFloor(S.ship.balloon);
+    const cap = G.shipMaxFloor();
     const top = Math.min(S.maxFloor, cap);
     return `
       <div class="card">
@@ -351,42 +351,56 @@
     });
   }
 
-  // ── 分頁：飛行船 ─────────────────────────────────────────────────────────
-  function partDesc(k, lv) {
-    if (k === 'balloon') return t('part.balloon.desc', { n: G.shipMaxFloor(lv) });
-    if (k === 'engine') return t('part.engine.desc', { n: (lv - 1) * 10 });
-    if (k === 'hull') { const s = G.homeSize(lv); return t('part.hull.desc', { w: s.w, h: s.h }); }
-    return lv === 0 ? t('part.cannon.none') : t('part.cannon.desc', { n: lv * 30 });
+  // ── 分頁：飛空艇（零件商店：7 個部位 × 5 款）───────────────────────────
+  // 每款的效果文字
+  function partEffect(slot, i) {
+    const v = G.SHIP_PARTS[slot].v[i], pct = Math.round(v * 100);
+    if (slot === 'hull') { const s = G.homeSize(i); return t('part.hull.desc', { v: pct, w: s.w, h: s.h }); }
+    if (slot === 'wing' || slot === 'engine') return t(`part.${slot}.desc`, { v });
+    return t(`part.${slot}.desc`, { v: pct });
   }
 
   function renderShip() {
-    const S = G.S, sh = S.ship;
-    const parts = Object.entries(G.SHIP_PARTS).map(([k, P]) => {
-      const lv = sh[k], maxed = lv >= P.max, c = G.shipUpgradeCost(k, lv);
-      return `<div class="part">
-        <div class="ico">${P.icon}</div>
-        <div class="grow"><b>${t(`part.${k}.name`)}</b> <span class="muted">Lv ${lv}/${P.max}</span>
-          <div class="muted" style="font-size:12px">${partDesc(k, lv)}${maxed ? '' : `　→　<span style="color:var(--good)">${partDesc(k, lv + 1)}</span>`}</div></div>
-        <button class="btn small primary" data-act="ship" data-part="${k}" ${maxed ? 'disabled' : ''}>${maxed ? t('ship.maxed') : `${G.fmt(c.gold)}💰<br>${c.crystal}💎`}</button>
-      </div>`;
+    const S = G.S, sh = S.ship, b = G.shipBonus();
+    const pct = v => `+${Math.round(v * 100)}%`;
+    // 目前加成總覽
+    const summary = [
+      ['🎈', t('ship.sum.hp'), pct(b.hpPct)], ['🚢', t('ship.sum.def'), pct(b.defPct)], ['🗿', t('ship.sum.dmg'), pct(b.dmgPct)],
+      ['🔔', t('ship.sum.gold'), pct(b.goldPct)], ['💣', t('ship.sum.cannon'), G.cannonMult() ? `${Math.round(G.cannonMult() * 100)}%` : '—'],
+      ['🧭', t('ship.sum.floors'), t('floor.name', { n: G.shipMaxFloor() })],
+    ].map(([i, k, v]) => `<div>${i} ${k} <b>${v}</b></div>`).join('');
+
+    const slots = G.SHIP_SLOTS.map(slot => {
+      const P = G.SHIP_PARTS[slot], cur = sh.eq[slot];
+      const rows = P.v.map((_, i) => {
+        const own = sh.owned[slot].includes(i), using = cur === i, c = G.shipPartCost(slot, i);
+        const price = [c.gold ? `${G.fmt(c.gold)}💰` : '', c.crystal ? `${c.crystal}💎` : ''].filter(Boolean).join(' ') || t('ship.free');
+        const btn = using ? `<button class="btn small on" disabled>${t('ship.using')}</button>`
+          : own ? `<button class="btn small good" data-act="shipeq" data-slot="${slot}" data-i="${i}">${t('ship.equip')}</button>`
+          : `<button class="btn small primary" data-act="shipbuy" data-slot="${slot}" data-i="${i}">${price}</button>`;
+        return `<div class="model ${using ? 'using' : ''}">
+          <span class="tier">${['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'][i]}</span>
+          <div class="grow"><b>${t(`part.${slot}.${i}`)}</b><div class="muted" style="font-size:11px">${partEffect(slot, i)}</div></div>${btn}</div>`;
+      }).join('');
+      return `<div class="card">
+        <h3>${P.icon} ${t(`part.${slot}.name`)} <small>${cur >= 0 ? t(`part.${slot}.${cur}`) : t('ship.none')}</small></h3>
+        <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t(`part.${slot}.what`)}</p>
+        ${rows}</div>`;
     }).join('');
-    const figures = Array.from({ length: G.SHIP_FIGUREHEADS }, (_, i) =>
-      `<button class="chip ${sh.figurehead === i ? 'on' : ''}" data-act="figure" data-v="${i}">${t(`figurehead.${i}`)}</button>`).join('');
+
     return `
       <div class="card"><canvas class="ship-view" id="shipSlot"></canvas>
-        <p class="muted" style="font-size:12px;margin:8px 0 0">${t('ship.help')}</p></div>
-      <div class="card"><h3>${t('ship.parts')} <small>${t('ship.partsHint')}</small></h3>${parts}</div>
-      <div class="card"><h3>${t('ship.look')}</h3>
-        <div class="muted" style="font-size:12px;margin-bottom:6px">${t('ship.paint')}</div>
+        <p class="muted" style="font-size:12px;margin:8px 0 10px">${t('ship.help')}</p>
+        <div class="stats">${summary}</div></div>
+      ${slots}
+      <div class="card"><h3>${t('ship.paint')}</h3>
         <div class="swatches">${G.SHIP_PAINTS.map((c, i) => `<button class="swatch ${sh.paint === i ? 'on' : ''}" style="background:${c}" data-act="paint" data-v="${i}"></button>`).join('')}</div>
-        <div class="muted" style="font-size:12px;margin:12px 0 6px">${t('ship.figurehead')}</div>
-        <div class="chips">${figures}</div>
       </div>`;
   }
 
-  // ── 分頁：家園（飛行船內部）─────────────────────────────────────────────
+  // ── 分頁：家園（飛空艇內部）─────────────────────────────────────────────
   function renderHome() {
-    const S = G.S, { w, h } = G.homeSize(S.ship.hull), petCap = 4 + S.ship.hull * 2;
+    const S = G.S, { w, h } = G.homeSize(G.homeTier()), petCap = G.petCap();
     let cells = '';
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const key = `${x},${y}`, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
@@ -474,7 +488,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     if (UI.tab === 'home') mountPets();
     if (UI.tab === 'ship') {
       const c = G.ART.canvas(640, 480);
-      G.ART.drawShip(c.getContext('2d'), G.S.ship, 640, 480);
+      G.ART.drawShip(c.getContext('2d'), G.shipLook(), 640, 480);
       mount('#shipSlot', c);
     }
   };
@@ -556,9 +570,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'recruit': G.recruit(d.id); break;
       case 'party': G.toggleParty(d.id); break;
       case 'plevel': G.partnerLevelUp(d.id); break;
-      case 'ship': G.upgradeShip(d.part); break;
-      case 'paint': G.setShipLook('paint', +d.v); break;
-      case 'figure': G.setShipLook('figurehead', +d.v); break;
+      case 'shipbuy': G.buyShipPart(d.slot, +d.i); break;
+      case 'shipeq': G.equipShipPart(d.slot, +d.i); break;
+      case 'paint': G.setShipPaint(+d.v); break;
       case 'buy': G.buyFurniture(d.id); break;
       case 'pick': UI.placing = UI.placing === d.id ? null : d.id; UI.refresh(); break;
       case 'cell':

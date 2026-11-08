@@ -423,81 +423,163 @@
     }
   };
 
-  // ── 飛行船：依零件等級改變外觀 ───────────────────────────────────────────
-  A.drawShip = function (ctx, ship, W, H) {
-    const paint = G.SHIP_PAINTS[ship.paint] || G.SHIP_PAINTS[0];
+  // ── 飛空艇：每個部位裝的款式（0~4，-1 = 沒裝）決定外觀 ───────────────────
+  // look = { paint, balloon, hull, bow, charm, cannon, wing, engine }
+  A.drawShip = function (ctx, look, W, H) {
+    const paint = G.SHIP_PAINTS[look.paint] || G.SHIP_PAINTS[0];
+    const lw = Math.max(1, W / 220);
     const cx = W / 2;
-    const bRx = W * (0.26 + ship.balloon * 0.012), bRy = H * (0.22 + ship.balloon * 0.01);
-    const bCy = H * 0.3;
-    const hullW = W * (0.42 + ship.hull * 0.06), hullTop = H * 0.66, hullH = H * 0.16;
+    const bt = Math.max(0, look.balloon), ht = Math.max(0, look.hull);
+    const bRx = W * (0.24 + bt * 0.025), bRy = H * (0.2 + bt * 0.018), bCy = H * 0.3;
+    const hullW = W * (0.42 + ht * 0.05), hullTop = H * 0.66, hullH = H * (0.15 + ht * 0.01);
+    const hx = cx - hullW / 2;
 
     // 繩索
-    ctx.strokeStyle = '#6b5a45'; ctx.lineWidth = Math.max(1, W / 200);
+    ctx.strokeStyle = '#6b5a45'; ctx.lineWidth = lw;
     [-0.7, -0.25, 0.25, 0.7].forEach(t => {
       ctx.beginPath(); ctx.moveTo(cx + t * bRx * 0.8, bCy + bRy * 0.8); ctx.lineTo(cx + t * hullW * 0.4, hullTop); ctx.stroke();
     });
 
-    // 氣囊（條紋）
-    ctx.save();
-    ctx.beginPath(); ctx.ellipse(cx, bCy, bRx, bRy, 0, 0, Math.PI * 2); ctx.clip();
-    const stripes = 6 + ship.balloon;
-    for (let i = 0; i < stripes; i++) {
-      ctx.fillStyle = i % 2 ? '#f3ead2' : paint;
-      ctx.fillRect(cx - bRx + (i * 2 * bRx) / stripes, bCy - bRy, (2 * bRx) / stripes + 1, bRy * 2);
-    }
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    ctx.beginPath(); ctx.ellipse(cx - bRx * 0.3, bCy - bRy * 0.35, bRx * 0.4, bRy * 0.3, -0.3, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-    ctx.strokeStyle = shade(paint, -50); ctx.lineWidth = Math.max(1.5, W / 120);
-    ctx.beginPath(); ctx.ellipse(cx, bCy, bRx, bRy, 0, 0, Math.PI * 2); ctx.stroke();
+    // 熱氣球：0 拼布 1 條紋 2 雙囊 3 鋼骨 4 星辰
+    const envelope = (ex, ey, rx, ry) => {
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(ex, ey, rx, ry, 0, 0, Math.PI * 2); ctx.clip();
+      if (bt === 0) {
+        const patch = ['#c9a27a', '#a7c4a0', '#d9c27a', '#b98a8a'];
+        for (let x = 0; x < 6; x++) for (let y = 0; y < 4; y++) { ctx.fillStyle = patch[(x + y) % 4]; ctx.fillRect(ex - rx + x * rx / 3, ey - ry + y * ry / 2, rx / 3 + 1, ry / 2 + 1); }
+      } else if (bt === 4) {
+        ctx.fillStyle = '#1d2050'; ctx.fillRect(ex - rx, ey - ry, rx * 2, ry * 2);
+        ctx.fillStyle = '#ffe9a0';
+        for (let i = 0; i < 14; i++) { const sx = ex - rx + ((i * 37) % 100) / 100 * rx * 2, sy = ey - ry + ((i * 53) % 100) / 100 * ry * 2; ctx.beginPath(); ctx.arc(sx, sy, W * 0.005 + (i % 3), 0, Math.PI * 2); ctx.fill(); }
+      } else {
+        const stripes = 8 + bt * 2;
+        for (let i = 0; i < stripes; i++) {
+          ctx.fillStyle = i % 2 ? '#f3ead2' : paint;
+          ctx.fillRect(ex - rx + (i * 2 * rx) / stripes, ey - ry, (2 * rx) / stripes + 1, ry * 2);
+        }
+      }
+      ctx.fillStyle = 'rgba(255,255,255,.18)';
+      ctx.beginPath(); ctx.ellipse(ex - rx * 0.3, ey - ry * 0.35, rx * 0.4, ry * 0.3, -0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = bt === 3 ? '#4a4f57' : shade(paint, -50); ctx.lineWidth = bt === 3 ? lw * 3 : lw * 2;
+      ctx.beginPath(); ctx.ellipse(ex, ey, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+      if (bt === 3) {   // 鋼骨
+        for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.ellipse(ex, ey, Math.abs(i) * rx * 0.3 + 1, ry, 0, 0, Math.PI * 2); ctx.stroke(); }
+      }
+    };
+    if (bt === 2) { envelope(cx - bRx * 0.45, bCy, bRx * 0.62, bRy); envelope(cx + bRx * 0.45, bCy, bRx * 0.62, bRy); }
+    else envelope(cx, bCy, bRx, bRy);
 
-    // 船身
-    const hx = cx - hullW / 2;
-    ctx.fillStyle = '#7a4e2c';
+    // 船身：0 小木舟 1 商船 2 加固 3 鐵甲 4 黃金王船
+    const wood = ['#8a5a32', '#7a4e2c', '#6b4226', '#5d636b', '#7a4e2c'][ht];
+    ctx.fillStyle = wood;
     ctx.beginPath();
     ctx.moveTo(hx, hullTop); ctx.lineTo(hx + hullW, hullTop);
     ctx.quadraticCurveTo(hx + hullW * 0.97, hullTop + hullH, hx + hullW * 0.8, hullTop + hullH);
     ctx.lineTo(hx + hullW * 0.15, hullTop + hullH);
     ctx.quadraticCurveTo(hx, hullTop + hullH * 0.9, hx, hullTop);
     ctx.fill();
-    ctx.fillStyle = paint; ctx.fillRect(hx + 2, hullTop + hullH * 0.18, hullW - 4, hullH * 0.18);
-    ctx.fillStyle = '#5b3a1e';
-    for (let i = 1; i < 4 + ship.hull; i++) ctx.fillRect(hx + (hullW * i) / (4 + ship.hull), hullTop + hullH * 0.45, 1.5, hullH * 0.45);
+    ctx.fillStyle = ht === 4 ? '#e0b030' : paint;
+    ctx.fillRect(hx + 2, hullTop + hullH * 0.18, hullW - 4, hullH * 0.18);
+    ctx.fillStyle = shade(wood, -30);
+    const planks = 4 + ht * 2;
+    for (let i = 1; i < planks; i++) ctx.fillRect(hx + (hullW * i) / planks, hullTop + hullH * 0.45, 1.5, hullH * 0.45);
+    if (ht >= 2) {   // 鉚釘/鐵板
+      ctx.fillStyle = ht === 3 ? '#9aa3ad' : '#b08a50';
+      for (let i = 1; i < 10; i++) ctx.beginPath(), ctx.arc(hx + hullW * i / 10, hullTop + hullH * 0.42, W * 0.004, 0, Math.PI * 2), ctx.fill();
+    }
+    if (ht === 4) { ctx.strokeStyle = '#ffd76a'; ctx.lineWidth = lw * 2; ctx.beginPath(); ctx.moveTo(hx + 4, hullTop + 2); ctx.lineTo(hx + hullW - 4, hullTop + 2); ctx.stroke(); }
     // 欄杆
-    ctx.strokeStyle = '#5b3a1e'; ctx.lineWidth = Math.max(1, W / 220);
+    ctx.strokeStyle = shade(wood, -35); ctx.lineWidth = lw;
     ctx.beginPath(); ctx.moveTo(hx, hullTop - hullH * 0.25); ctx.lineTo(hx + hullW, hullTop - hullH * 0.25); ctx.stroke();
     for (let i = 0; i <= 8; i++) { ctx.beginPath(); ctx.moveTo(hx + (hullW * i) / 8, hullTop - hullH * 0.25); ctx.lineTo(hx + (hullW * i) / 8, hullTop); ctx.stroke(); }
 
-    // 船砲
-    const cannons = Math.min(3, ship.cannon);
-    ctx.fillStyle = '#2b2b2b';
-    for (let i = 0; i < cannons; i++) {
-      const x = hx + hullW * (0.3 + i * 0.18);
-      ctx.beginPath(); ctx.arc(x, hullTop + hullH * 0.62, hullH * 0.14, 0, Math.PI * 2); ctx.fill();
+    // 側面穩定翼：從船身側面往後上方伸出（畫在船身前面才看得到）
+    // 0 帆布 1 木製 2 鐵骨 → 鰭狀；3 飛鳥 4 天使 → 羽毛翅膀
+    if (look.wing >= 0) {
+      const wt = look.wing, L = W * (0.16 + wt * 0.035);
+      const ax = hx + hullW * 0.32, ay = hullTop + hullH * 0.35;
+      const wc = ['#e8dcc0', '#9a6b3e', '#7d848c', '#f4f4f4', '#fff3c4'][wt];
+      ctx.lineWidth = lw; ctx.strokeStyle = shade(wc, -60);
+      if (wt <= 2) {
+        ctx.fillStyle = wc;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax - L, ay - L * 0.55); ctx.lineTo(ax - L * 0.8, ay + hullH * 0.2); ctx.lineTo(ax, ay + hullH * 0.35); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        if (wt === 2) { ctx.beginPath(); ctx.moveTo(ax, ay + hullH * 0.1); ctx.lineTo(ax - L * 0.9, ay - L * 0.4); ctx.stroke(); }
+      } else {
+        if (wt === 4) { ctx.shadowColor = '#ffe066'; ctx.shadowBlur = 12; }
+        for (let k = 3; k >= 0; k--) {
+          ctx.fillStyle = k % 2 ? wc : shade(wc, -12);
+          ctx.beginPath();
+          ctx.ellipse(ax - L * (0.25 + k * 0.2), ay - L * (0.18 + k * 0.1), L * (0.32 - k * 0.03), L * 0.09, -0.45, 0, Math.PI * 2);
+          ctx.fill(); ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+      }
     }
 
-    // 螺旋槳（引擎）
-    const props = 1 + Math.floor((ship.engine - 1) / 3);
-    for (let i = 0; i < props; i++) {
-      const py = hullTop + hullH * 0.2 + i * hullH * 0.35 - (props - 1) * hullH * 0.15;
-      ctx.fillStyle = '#555'; ctx.fillRect(hx - W * 0.04, py - 1, W * 0.04, 3);
-      ctx.fillStyle = '#c9b48a';
-      ctx.beginPath(); ctx.ellipse(hx - W * 0.045, py, W * 0.01, hullH * 0.28, 0, 0, Math.PI * 2); ctx.fill();
+    // 船砲：款式越高砲越多越大
+    if (look.cannon >= 0) {
+      const n = Math.min(3, look.cannon + 1), r = hullH * (0.12 + look.cannon * 0.02);
+      ctx.fillStyle = look.cannon === 3 ? '#5a3a8a' : look.cannon === 4 ? '#c9a227' : '#2b2b2b';
+      for (let i = 0; i < n; i++) {
+        const x = hx + hullW * (0.3 + i * 0.18);
+        ctx.beginPath(); ctx.arc(x, hullTop + hullH * 0.62, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(x, hullTop + hullH * 0.62, r * 0.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = look.cannon === 3 ? '#5a3a8a' : look.cannon === 4 ? '#c9a227' : '#2b2b2b';
+      }
     }
 
-    // 船首像
+    // 引擎：0 手搖槳 1 風車 2 蒸汽 3 雙渦輪 4 雲晶反應爐
+    if (look.engine >= 0) {
+      const et = look.engine, props = et >= 3 ? 2 : 1;
+      for (let i = 0; i < props; i++) {
+        const py = hullTop + hullH * (props === 1 ? 0.4 : 0.15 + i * 0.5);
+        ctx.fillStyle = '#555'; ctx.fillRect(hx - W * 0.04, py - 1, W * 0.04, 3);
+        ctx.fillStyle = et === 4 ? '#7ff3ff' : '#c9b48a';
+        if (et === 4) { ctx.shadowColor = '#7ff3ff'; ctx.shadowBlur = 8; }
+        ctx.beginPath(); ctx.ellipse(hx - W * 0.045, py, W * 0.01 + et * 1.5, hullH * (0.22 + et * 0.04), 0, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      if (et === 2) {   // 蒸汽煙囪
+        ctx.fillStyle = '#444'; ctx.fillRect(hx + hullW * 0.12, hullTop - hullH * 0.9, W * 0.025, hullH * 0.7);
+        ctx.fillStyle = 'rgba(230,230,230,.7)'; ctx.beginPath(); ctx.arc(hx + hullW * 0.13, hullTop - hullH * 1.1, W * 0.02, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // 船首：0 木製衝角 1 鷹首 2 龍首 3 女神像 4 水晶
     const fx = hx + hullW, fy = hullTop + hullH * 0.2;
-    ctx.fillStyle = '#d4a017';
-    if (ship.figurehead === 1) {        // 鷹首
+    if (look.bow === 0) {
+      ctx.fillStyle = '#6b4226';
+      ctx.beginPath(); ctx.moveTo(fx - 2, fy - 2); ctx.lineTo(fx + W * 0.05, fy + hullH * 0.3); ctx.lineTo(fx - 2, fy + hullH * 0.6); ctx.fill();
+    } else if (look.bow === 1) {
+      ctx.fillStyle = '#d4a017';
       ctx.beginPath(); ctx.moveTo(fx - 2, fy - 6); ctx.lineTo(fx + W * 0.06, fy); ctx.lineTo(fx - 2, fy + 8); ctx.fill();
-    } else if (ship.figurehead === 2) { // 龍首
+    } else if (look.bow === 2) {
       ctx.fillStyle = '#3b8f5a';
       ctx.beginPath(); ctx.moveTo(fx - 2, fy + 8); ctx.quadraticCurveTo(fx + W * 0.03, fy - 14, fx + W * 0.08, fy - 8);
       ctx.lineTo(fx + W * 0.04, fy); ctx.lineTo(fx - 2, fy + 12); ctx.fill();
-    } else if (ship.figurehead === 3) { // 女神像
+    } else if (look.bow === 3) {
       ctx.fillStyle = '#e8e2c8';
       ctx.beginPath(); ctx.arc(fx + W * 0.03, fy - 6, W * 0.015, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.moveTo(fx - 2, fy + 10); ctx.lineTo(fx + W * 0.04, fy - 2); ctx.lineTo(fx + W * 0.02, fy + 10); ctx.fill();
+    } else if (look.bow === 4) {
+      ctx.fillStyle = '#7ff3ff'; ctx.shadowColor = '#7ff3ff'; ctx.shadowBlur = 10;
+      ctx.beginPath(); ctx.moveTo(fx - 2, fy); ctx.lineTo(fx + W * 0.04, fy - H * 0.04); ctx.lineTo(fx + W * 0.08, fy + 2); ctx.lineTo(fx + W * 0.04, fy + H * 0.05); ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // 船底掛飾：0 風燈 1 銅鈴 2 船錨 3 雲晶 4 海盜旗
+    if (look.charm >= 0) {
+      const ax = cx, ay = hullTop + hullH, ch = H * 0.08;
+      ctx.strokeStyle = '#5b3a1e'; ctx.lineWidth = lw;
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax, ay + ch); ctx.stroke();
+      const y = ay + ch, s = W * 0.025;
+      if (look.charm === 0) { ctx.fillStyle = '#ff9a4d'; ctx.shadowColor = '#ffb36b'; ctx.shadowBlur = 8; ctx.fillRect(ax - s * 0.6, y, s * 1.2, s * 1.4); ctx.shadowBlur = 0; }
+      else if (look.charm === 1) { ctx.fillStyle = '#c9a227'; ctx.beginPath(); ctx.moveTo(ax - s, y + s * 1.3); ctx.quadraticCurveTo(ax, y - s * 0.6, ax + s, y + s * 1.3); ctx.fill(); }
+      else if (look.charm === 2) { ctx.strokeStyle = '#555'; ctx.lineWidth = lw * 2.5; ctx.beginPath(); ctx.moveTo(ax, y); ctx.lineTo(ax, y + s * 1.8); ctx.moveTo(ax - s, y + s); ctx.quadraticCurveTo(ax, y + s * 2.4, ax + s, y + s); ctx.stroke(); }
+      else if (look.charm === 3) { ctx.fillStyle = '#7ff3ff'; ctx.shadowColor = '#7ff3ff'; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(ax, y); ctx.lineTo(ax + s, y + s); ctx.lineTo(ax, y + s * 2.2); ctx.lineTo(ax - s, y + s); ctx.fill(); ctx.shadowBlur = 0; }
+      else { ctx.fillStyle = '#222'; ctx.fillRect(ax, y - s * 0.2, s * 2.2, s * 1.4); ctx.fillStyle = '#eee'; ctx.beginPath(); ctx.arc(ax + s * 1.1, y + s * 0.4, s * 0.35, 0, Math.PI * 2); ctx.fill(); }
     }
   };
 
