@@ -80,7 +80,7 @@
       furniture: {},         // id -> 持有數量（未擺放）
       home: {},              // "x,y" -> furniture id
       pets: [],              // { id(怪物), shape, color, bonus: { stat, v } }
-      autoSellCommon: false,
+      autoSell: [false, false, false, false],   // 撿到就賣：普通／優良／稀有／史詩（傳說不賣）
       log: [],               // { k, p, color }
       uid: 1,
       lastSeen: Date.now(),
@@ -99,6 +99,8 @@
       migrateToI18n(G.S);
       migrateSkills(G.S);
       migrateCapture(G.S, s);
+      if (!Array.isArray(s.autoSell)) G.S.autoSell = [!!s.autoSellCommon, false, false, false];   // 舊版只有「自動賣普通」
+      delete G.S.autoSellCommon;
     } else {
       G.S = base;
     }
@@ -218,6 +220,7 @@
     G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => add(k, v)));
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
+    G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) add(p.perk.stat, p.perk.v); });   // 出戰夥伴的專屬 buff
     return aura;
   };
   // 隊伍裡某個特殊被動的最大值（例如士氣上限、吸貓狂熱上限）
@@ -336,7 +339,7 @@
   };
 
   G.addItem = function (it) {
-    if (G.S.autoSellCommon && it.rarity === 0) {
+    if (G.S.autoSell[it.rarity]) {
       G.S.gold += G.itemValue(it);
       return 'sold';
     }

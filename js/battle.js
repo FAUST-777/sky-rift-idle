@@ -239,7 +239,8 @@
     party(u) { return u.side === 'party'; }
     atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0)); }
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? this.aura.spdPct || 0 : 0) - this.fxv(u, 'slow'))); }
-    critOf(u) { return u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0); }
+    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0)) * this.procMult(u); }
+    procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（占星師米菈的專屬 buff）
     evadeOf(u) { return Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade')); }
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
@@ -469,7 +470,7 @@
 
     // 普攻附加效果（被動 proc）
     applyProcs(u, t) {
-      u.procs.forEach(p => { if (this.valid(t) && Math.random() < p.chance) this.debuff(u, t, p.fx, p.val, p.t); });
+      u.procs.forEach(p => { if (this.valid(t) && Math.random() < p.chance * this.procMult(u)) this.debuff(u, t, p.fx, p.val, p.t); });
     }
 
     // ── 主動技能 ─────────────────────────────────────────────────────────

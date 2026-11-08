@@ -12,7 +12,7 @@ G.I18N['zh-TW'] = {
 
   // ── 設定 ──
   'settings.title': '設定', 'settings.language': '語言',
-  'settings.game': '遊戲', 'settings.autosell': '撿到普通裝備自動賣掉',
+  'settings.game': '遊戲', 'settings.autosell': '撿到就自動賣掉（可複選）：',
   'settings.data': '存檔', 'settings.saveNote': '進度自動存在這個瀏覽器。',
   'settings.reset': '全部重置', 'settings.credits': '授權說明',
   'reset.title': '全部重置？', 'reset.body': '遊戲進度和設定（語言、畫面）都會清除，回到第一次開啟的狀態，無法復原。', 'reset.confirm': '確定全部重置',
@@ -26,7 +26,7 @@ G.I18N['zh-TW'] = {
   // ── 角色 / 裝備 ──
   'hero.class': '職業', 'hero.classLocked': '到 {lv} 級可以轉職（目前 {cur} 級）。', 'hero.current': '（目前）',
   'hero.classChangeNote': '換職業要 {cost} 金幣，技能點會全部退還。',
-  'hero.bag': '背包', 'hero.sellCommon': '賣掉普通', 'hero.sellUncommon': '賣掉優良以下',
+  'hero.bag': '背包', 'hero.sellBelow.0': '賣掉白色', 'hero.sellBelow.1': '賣掉綠色以下', 'hero.sellBelow.2': '賣掉藍色以下',
   'hero.bagEmpty': '打怪會掉裝備，掉到的會出現在這裡。',
   'hero.who.hero': '主角', 'hero.partnerNote': '夥伴的職業與升級在「夥伴」分頁。', 'hero.notRecruited': '還沒有夥伴，往上爬就會遇到。',
   'hero.expand': '擴充 +{n} 格', 'hero.bagMax': '已達上限', 'item.equipTo': '給 {name} 裝備',
@@ -173,6 +173,7 @@ G.I18N['zh-TW'] = {
   'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到傷害 -{v}%',
 
   // ── 夥伴 ──
+  'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
   'partners.skills': '技能 {n}',
   'partners.levelUp': '升級 {cost}💰',
   'partners.title': '夥伴', 'partners.deployed': '出戰 {n}/{max}',

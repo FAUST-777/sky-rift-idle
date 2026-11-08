@@ -12,7 +12,7 @@ G.I18N['en'] = {
 
   // ── Settings ──
   'settings.title': 'Settings', 'settings.language': 'Language',
-  'settings.game': 'Game', 'settings.autosell': 'Auto-sell Common gear',
+  'settings.game': 'Game', 'settings.autosell': 'Auto-sell on pickup (pick any):',
   'settings.data': 'Save data', 'settings.saveNote': 'Progress is saved automatically in this browser.',
   'settings.reset': 'Reset everything', 'settings.credits': 'Licenses',
   'reset.title': 'Reset everything?', 'reset.body': 'All progress and settings (language, layout) will be wiped, as if opening the game for the first time. This cannot be undone.', 'reset.confirm': 'Reset everything',
@@ -26,7 +26,7 @@ G.I18N['en'] = {
   // ── Hero / gear ──
   'hero.class': 'Class', 'hero.classLocked': 'Choose a class at Lv {lv} (currently Lv {cur}).', 'hero.current': ' (current)',
   'hero.classChangeNote': 'Changing class costs {cost} gold. All skill points are refunded.',
-  'hero.bag': 'Inventory', 'hero.sellCommon': 'Sell Common', 'hero.sellUncommon': 'Sell Uncommon & below',
+  'hero.bag': 'Inventory', 'hero.sellBelow.0': 'Sell white', 'hero.sellBelow.1': 'Sell green & below', 'hero.sellBelow.2': 'Sell blue & below',
   'hero.bagEmpty': 'Monsters drop gear. Anything you find shows up here.',
   'hero.who.hero': 'You', 'hero.partnerNote': 'Change companion classes and levels in the Party tab.', 'hero.notRecruited': 'No companions yet. You will meet them as you climb.',
   'hero.expand': 'Expand +{n}', 'hero.bagMax': 'Maxed', 'item.equipTo': 'Equip on {name}',
@@ -173,6 +173,7 @@ G.I18N['en'] = {
   'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%',
 
   // ── Party ──
+  'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
   'partners.skills': 'Skills {n}',
   'partners.levelUp': 'Level up {cost}💰',
   'partners.title': 'Companions', 'partners.deployed': 'Deployed {n}/{max}',

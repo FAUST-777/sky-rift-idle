@@ -160,6 +160,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 6px; }
 .ctag { font-size: 10px; padding: 1px 6px; border-radius: 6px; background: #120e20; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .tag.eq { background: #2f4a2f; color: #9fe39f; }
+.tag.perk { background: #3d2f5c; color: #e3c9ff; font-weight: 400; white-space: nowrap; }
 .classes { grid-template-columns: 1fr 1fr; }
 .aslot { border: 2px dashed var(--line); border-radius: 10px; padding: 10px 6px; text-align: center; background: #1a1530; font-size: 13px; }
 .aslot.filled { border-style: solid; border-color: var(--accent); }

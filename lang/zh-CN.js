@@ -12,7 +12,7 @@ G.I18N['zh-CN'] = {
 
   // ── 设置 ──
   'settings.title': '设置', 'settings.language': '语言',
-  'settings.game': '游戏', 'settings.autosell': '捡到普通装备自动卖掉',
+  'settings.game': '游戏', 'settings.autosell': '捡到就自动卖掉（可复选）：',
   'settings.data': '存档', 'settings.saveNote': '进度自动保存在这个浏览器。',
   'settings.reset': '全部重置', 'settings.credits': '授权说明',
   'reset.title': '全部重置？', 'reset.body': '游戏进度和设置（语言、画面）都会清除，回到第一次打开的状态，无法恢复。', 'reset.confirm': '确定全部重置',
@@ -26,7 +26,7 @@ G.I18N['zh-CN'] = {
   // ── 角色 / 装备 ──
   'hero.class': '职业', 'hero.classLocked': '到 {lv} 级可以转职（当前 {cur} 级）。', 'hero.current': '（当前）',
   'hero.classChangeNote': '更换职业需要 {cost} 金币，技能点会全部返还。',
-  'hero.bag': '背包', 'hero.sellCommon': '卖掉普通', 'hero.sellUncommon': '卖掉优良以下',
+  'hero.bag': '背包', 'hero.sellBelow.0': '卖掉白色', 'hero.sellBelow.1': '卖掉绿色以下', 'hero.sellBelow.2': '卖掉蓝色以下',
   'hero.bagEmpty': '打怪会掉装备，掉到的会出现在这里。',
   'hero.who.hero': '主角', 'hero.partnerNote': '伙伴的职业与升级在「伙伴」分页。', 'hero.notRecruited': '还没有伙伴，往上爬就会遇到。',
   'hero.expand': '扩充 +{n} 格', 'hero.bagMax': '已达上限', 'item.equipTo': '给 {name} 装备',
@@ -173,6 +173,7 @@ G.I18N['zh-CN'] = {
   'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到伤害 -{v}%',
 
   // ── 伙伴 ──
+  'perk.cdr': '全队技能冷却 -{v}%', 'perk.defPct': '全队防御 +{v}%', 'perk.hpPct': '全队生命 +{v}%', 'perk.atkPct': '全队攻击 +{v}%', 'perk.procRate': '全队触发率 +{v}%', 'partners.perkHint': '专属能力：永久、不能升级，这位伙伴出战时全队生效。触发率影响暴击、流血、中毒、减速等几率。',
   'partners.skills': '技能 {n}',
   'partners.levelUp': '升级 {cost}💰',
   'partners.title': '伙伴', 'partners.deployed': '出战 {n}/{max}',

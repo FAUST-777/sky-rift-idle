@@ -203,8 +203,7 @@
         <div class="row wrap" style="margin-bottom:10px">
           <button class="btn small good" data-act="autoequip" data-scope="one">${t('hero.autoEquipOne', { name: esc(whoName(who)) })}</button>
           <button class="btn small good" data-act="autoequip" data-scope="all" title="${esc(t('hero.autoEquipHint'))}">${t('hero.autoEquipAll')}</button>
-          <button class="btn small" data-act="sellbelow" data-v="0">${t('hero.sellCommon')}</button>
-          <button class="btn small" data-act="sellbelow" data-v="1">${t('hero.sellUncommon')}</button>
+          ${[0, 1, 2].map(r => `<button class="btn small" data-act="sellbelow" data-v="${r}" style="color:${G.RARITY[r].color}">${t('hero.sellBelow.' + r)}</button>`).join('')}
         </div>
         <div class="inv">${inv || `<p class="muted" style="grid-column:1/-1;margin:0">${t('hero.bagEmpty')}</p>`}</div>
       </div>`;
@@ -295,7 +294,7 @@
     return `
       <div class="card">
         ${whoBarHtml(true)}
-        <h3>${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span></h3>
+        <h3 class="row" style="gap:6px">${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span>${G.S.partners[who] ? `<span class="grow"></span><span class="muted" style="font-size:12px;font-weight:400">Lv ${G.S.partners[who].level}</span><button class="btn small good" data-act="plevel" data-id="${who}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(G.S.partners[who].level)) })}</button>` : ''}</h3>
         <p class="muted" style="margin:0 0 10px;font-size:12px">${t('skills.help', { a: G.ACTIVE_SLOTS, p: G.PASSIVE_SLOTS })}</p>
         <div class="slot-label">${t('skills.activeSlots')}</div>
         ${slotGrid('active', ch, list)}
@@ -324,6 +323,10 @@
   }
 
   // ── 分頁：夥伴 ───────────────────────────────────────────────────────────
+  // 夥伴專屬 buff 標籤（永久、不能升級，出戰時給全隊）
+  function perkTag(p) {
+    return p.perk ? `<span class="tag perk" title="${esc(t('partners.perkHint'))}">★ ${t('perk.' + p.perk.stat, { v: Math.round(p.perk.v * 100) })}</span>` : '';
+  }
   function renderPartners() {
     const S = G.S;
     const cards = G.PARTNERS.map(p => {
@@ -334,7 +337,7 @@
           <canvas data-doll="${p.id}" width="64" height="80"></canvas>
           <div class="grow">
             <b>${open ? G.partnerName(p.id) : t('partners.unknown')}</b>
-            <div class="muted" style="font-size:12px;margin:4px 0 8px">${open ? t(`partner.${p.id}.bio`) : t('partners.meetAt', { n: p.floor })}</div>
+            <div class="muted" style="font-size:12px;margin:4px 0 8px">${open ? t(`partner.${p.id}.bio`) + '<br>' + perkTag(p) : t('partners.meetAt', { n: p.floor })}</div>
             ${open ? `<button class="btn small primary" data-act="recruit" data-id="${p.id}">${t('partners.recruit', { cost: G.fmt(G.partnerRecruitCost(p)) })}</button>` : ''}
           </div></div>`;
       }
@@ -343,7 +346,7 @@
       return `<div class="card partner">
         <canvas data-doll="${p.id}" width="64" height="80"></canvas>
         <div class="grow">
-          <div class="row between"><b>${G.partnerName(p.id)} <span class="muted">Lv ${own.level}</span></b>
+          <div class="row between"><b>${G.partnerName(p.id)} <span class="muted">Lv ${own.level}</span>${perkTag(p)}</b>
             <button class="btn small ${inParty ? 'on' : ''}" data-act="party" data-id="${p.id}">${inParty ? t('partners.inParty') : t('partners.resting')}</button></div>
           <div class="tags" style="margin:4px 0">${classTags(own.cls)}</div>
           <div class="muted" style="font-size:12px;margin:4px 0">${t('partners.stats', { hp: G.fmt(st.maxHp), atk: st.atk, def: st.def })}</div>
@@ -654,7 +657,8 @@
       </div>
       <div class="set-group">
         <div class="set-label">🎮 ${t('settings.game')}</div>
-        <label class="switch"><input type="checkbox" data-act="autosell" ${S.autoSellCommon ? 'checked' : ''}><i></i>${t('settings.autosell')}</label>
+        <div class="muted" style="font-size:12px;margin:0 0 6px">${t('settings.autosell')}</div>
+        <div class="row wrap" style="gap:10px 16px">${[0, 1, 2, 3].map(r => `<label class="switch"><input type="checkbox" data-act="autosell" data-v="${r}" ${S.autoSell[r] ? 'checked' : ''}><i></i><span style="color:${G.RARITY[r].color}">${t('rarity.' + r)}</span></label>`).join('')}</div>
       </div>
       <div class="set-group">
         <div class="set-label">💾 ${t('settings.data')}</div>
@@ -735,7 +739,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'lang': G.setLang(d.v); break;
       case 'floor': S.autoAdvance = +d.v > S.floor ? true : S.autoAdvance; G.setFloor(+d.v); UI.refresh(); break;
       case 'auto': S.autoAdvance = el.checked; break;
-      case 'autosell': S.autoSellCommon = el.checked; break;
+      case 'autosell': S.autoSell[+d.v] = el.checked; break;
       case 'reset': UI.modalKind = 'reset'; UI.modal(`<h2>${t('reset.title')}</h2><p>${t('reset.body')}</p>
         <div class="modal-actions"><button class="btn" data-act="settings">${t('common.cancel')}</button><button class="btn danger" data-act="reset2">${t('reset.confirm')}</button></div>`); break;
       case 'reset2': G.resetSave(); break;
