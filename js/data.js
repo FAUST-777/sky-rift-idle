@@ -12,8 +12,6 @@ G.CONFIG = {
   maxParty: 2,              // 同時出戰的夥伴數
   inventorySize: 40,
   offlineCapHours: 8,
-  netPrice: 50,             // 捕獸網價格
-  captureChance: 0.05,
   reviveSeconds: 30,        // 戰敗後免費復活要等幾秒（復活後退回上一層）
   reviveCost: 50,           // 花多少雲晶原地復活
 
@@ -356,6 +354,38 @@ G.FURNITURE = [
   { id: 'compass', icon: '🧭', price: 10,  cur: 'crystal', comfort: 6, collect: true },
   { id: 'egg',     icon: '🥚', price: 25,  cur: 'crystal', comfort: 10, collect: true },
   { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 15, collect: true },
+];
+
+// ── 上升詛咒：越往上越常出現，降低全隊傷害或防禦 ─────────────────────────
+// 每一層的詛咒是固定的（用層數算出來），不會每次進去都不同
+G.CURSE_START = 10;
+G.curseFor = f => {
+  if (f < G.CURSE_START) return null;
+  const h = (Math.imul(f, 2654435761) >>> 0) % 1000;
+  const chance = Math.min(850, 400 + (f - G.CURSE_START) * 15);   // 第 10 層 40% → 第 40 層 85%
+  if (h >= chance) return null;
+  const v = +Math.min(0.35, 0.06 + (f - G.CURSE_START) * 0.008).toFixed(3);
+  if (f >= 25 && h % 3 === 0) return { dmg: +(v * 0.75).toFixed(3), def: +(v * 0.75).toFixed(3) };   // 雙重詛咒
+  return h % 2 ? { dmg: v, def: 0 } : { dmg: 0, def: v };
+};
+
+// ── 捕獸網（裝備型，名稱：net.<id>）：裝一張就永久生效 ────────────────────
+G.NETS = [
+  { id: 'spider',  icon: '🕸️', rate: 0.01, gold: 300,    crystal: 0 },
+  { id: 'fishing', icon: '🎣', rate: 0.02, gold: 2000,   crystal: 0 },
+  { id: 'wire',    icon: '⛓️', rate: 0.03, gold: 8000,   crystal: 10 },
+  { id: 'money',   icon: '💰', rate: 0.04, gold: 30000,  crystal: 40 },
+  { id: 'mystery', icon: '🔮', rate: 0.05, gold: 100000, crystal: 120 },
+];
+
+// ── 怪物圖鑑：打倒層主登錄該層怪物、捕獲再點亮一次，各領一次雲晶 ─────────
+G.dexReward = (tier, kind) => (kind === 'caught' ? 10 + tier * 5 : 3 + tier * 2);
+G.monsterTierOf = id => G.MONSTER_TIERS.findIndex(t => t.some(m => m.id === id));
+
+// 捕獲的怪物：隨機一個小增益（全隊），主要是收集用
+G.PET_BONUSES = [
+  { stat: 'atkPct', v: 0.01 }, { stat: 'defPct', v: 0.01 }, { stat: 'hpPct', v: 0.01 },
+  { stat: 'spdPct', v: 0.01 }, { stat: 'goldPct', v: 0.02 }, { stat: 'crit', v: 0.5 },
 ];
 
 // 開場對話頁數（內容：prologue.1 ～ prologue.N）

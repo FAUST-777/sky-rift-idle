@@ -114,7 +114,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .slot small { font-size: 10px; color: var(--muted); }
 .slot.empty { opacity: .45; }
 .who { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 2px; }
-.who .chip { flex: none; }
+.who .chip { flex: none; display: flex; align-items: center; gap: 4px; }
+.who .who-hero { border-color: #8a7330; }
+.who .who-deployed { border-color: #3f9a5c; background: #1e3a2a; }
+.who .who-resting { opacity: .7; }
+.who .chip.on { border-color: var(--gold); background: #4a3d1a; opacity: 1; }
+.wtag { font-size: 10px; padding: 0 5px; border-radius: 6px; background: #3f9a5c; color: #eaffef; }
+.wtag.rest { background: #4a4560; color: #c9c3e0; }
+
+/* 轉職：左邊列表、右邊說明 */
+.cls-picker { display: grid; grid-template-columns: 112px 1fr; gap: 10px; }
+.cls-list { display: flex; flex-direction: column; gap: 4px; }
+.cls-item { text-align: left; background: #1f1936; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 12px; display: flex; gap: 6px; align-items: center; }
+.cls-item.on { border-color: var(--gold); background: #4a3d1a; }
+.cls-item.cur { color: var(--good); }
+.cls-detail { background: #1a1530; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.cls-detail .cls-name { font-size: 16px; display: block; margin-bottom: 4px; }
+.cls-detail p { font-size: 12px; color: var(--muted); margin: 6px 0 8px; line-height: 1.5; }
 .bag-head { display: flex; align-items: center; gap: 8px; }
 .bag-head .btn { margin-left: auto; }
 
@@ -183,8 +199,18 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .shop { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .shop button { text-align: left; background: #1f1936; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
 .shop button b { font-size: 20px; margin-right: 4px; }
-.pets { display: flex; flex-wrap: wrap; gap: 6px; }
-.pets canvas { width: 48px; height: 48px; background: #1a1530; border-radius: 10px; }
+.pets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.pet { display: flex; flex-direction: column; align-items: center; background: #1a1530; border-radius: 10px; padding: 4px; }
+.pet canvas { width: 48px; height: 48px; }
+.pet small { font-size: 10px; text-align: center; line-height: 1.3; }
+.dex-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.dex { position: relative; display: flex; flex-direction: column; align-items: center; background: #1a1530; border: 1px solid var(--line); border-radius: 10px; padding: 4px 2px; }
+.dex canvas { width: 48px; height: 48px; }
+.dex small { font-size: 10px; text-align: center; }
+.dex .stars { font-size: 10px; letter-spacing: 2px; }
+.dex.claim { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.dex-badge { position: absolute; top: 2px; right: 2px; font-size: 9px; background: #4a3d1a; color: var(--gold); border-radius: 6px; padding: 0 4px; }
+.curse { font-size: 12px; color: #c99bff; margin-top: 4px; }
 
 /* ── 分頁列 ───────────────────────────────────────── */
 #tabs { display: grid; grid-template-columns: repeat(6, 1fr); background: #17122a; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }

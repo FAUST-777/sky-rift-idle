@@ -61,7 +61,9 @@
     return {
       v: 1, skillVer: 2,
       seenPrologue: false,
-      gold: 0, crystal: 0, nets: 0,
+      gold: 0, crystal: 0,
+      net: { owned: [], eq: -1 },   // 捕獸網：買過的款式、裝著第幾款（-1 = 沒裝）
+      dex: {},                      // 怪物圖鑑：id -> { seen, caught, seenClaimed, caughtClaimed }
       hero,
       equipped: emptyGear(),
       inventory: [],
@@ -74,7 +76,7 @@
       introVer: 0,           // 看過的開場對話版本（G.INTRO_VER 改版時會再看一次）
       furniture: {},         // id -> 持有數量（未擺放）
       home: {},              // "x,y" -> furniture id
-      pets: [],              // { id(怪物), shape, color }
+      pets: [],              // { id(怪物), shape, color, bonus: { stat, v } }
       autoSellCommon: false,
       log: [],               // { k, p, color }
       uid: 1,
@@ -93,6 +95,7 @@
       if (s.seenPrologue && !s.introVer) G.S.introVer = 1;   // 看過舊版序章
       migrateToI18n(G.S);
       migrateSkills(G.S);
+      migrateCapture(G.S, s);
     } else {
       G.S = base;
     }
@@ -136,13 +139,29 @@
     S.skillVer = 2;
   }
 
+  // 捕獸網改成裝備（第 7 輪）：有舊網子的送蜘蛛網；舊寵物補上隨機增益；圖鑑補登
+  function migrateCapture(S, old) {
+    if (!S.net || !Array.isArray(S.net.owned)) S.net = { owned: [], eq: -1 };
+    if (old.nets > 0 && !S.net.owned.length) { S.net.owned = [0]; S.net.eq = 0; }
+    delete S.nets;
+    S.dex = S.dex || {};
+    S.pets.forEach(p => { if (!p.bonus) p.bonus = G.pick(G.PET_BONUSES); if (p.id) G.dexMark(p.id, 'caught', S); });
+    // 已經打過的層：該層怪物算「已發現」
+    for (let f = 1; f < S.maxFloor; f++) G.monsterTier(f).forEach(m => G.dexMark(m.id, 'seen', S));
+  }
+
+  // 重置中就不要再存檔（不然頁面重新整理前的自動存檔會把剛刪掉的存檔寫回去）
+  let resetting = false;
   G.save = function () {
+    if (resetting) return;
     G.S.lastSeen = Date.now();
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(G.S)); } catch {}
   };
 
+  // 全部重置：遊戲存檔＋設定（語言、戰鬥畫面收合）都清掉
   G.resetSave = function () {
-    try { localStorage.removeItem(SAVE_KEY); } catch {}
+    resetting = true;
+    try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem('skyrift_settings'); } catch {}
     location.reload();
   };
 
@@ -193,6 +212,7 @@
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
     G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => add(k, v)));
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
+    G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     return aura;
   };
   // 隊伍裡某個特殊被動的最大值（例如士氣上限、吸貓狂熱上限）
@@ -262,7 +282,7 @@
   };
 
   // 金幣倍率：捕獲的怪物、飛空艇船底掛飾、學者「獎學金」等全隊光環
-  G.goldMult = () => 1 + G.S.pets.length * 0.01 + (G.partyAura().goldPct || 0);
+  G.goldMult = () => 1 + (G.partyAura().goldPct || 0);
 
   // ── 裝備產生 ─────────────────────────────────────────────────────────────
   G.rollRarity = function (boss) {
@@ -374,16 +394,29 @@
 
   // 一鍵穿最好的：主角先挑，剩下的再依序給出戰中的夥伴、其他夥伴
   // 主角換下來的舊裝備會回到背包，夥伴也可能撿去穿
-  G.autoEquip = function () {
+  // who 有值 = 只幫那一個角色穿；沒值 = 全隊（主角優先）
+  G.autoEquip = function (who) {
     let n = 0;
-    const order = ['hero', ...G.S.party, ...Object.keys(G.S.partners).filter(id => !G.S.party.includes(id))];
-    order.forEach(who => {
-      const gear = G.gearOf(who);
+    const order = who ? [who] : ['hero', ...G.S.party, ...Object.keys(G.S.partners).filter(id => !G.S.party.includes(id))];
+    // 全隊模式：先把夥伴身上的裝備收回背包一起排，主角才能拿到全隊最好的
+    // （每個欄位最後一定會被填回去，所以背包數量不會比原本多）
+    const uidOf = (w, slot) => { const it = G.gearOf(w)[slot]; return it ? it.uid : null; };
+    const before = {};
+    order.forEach(w => { before[w] = {}; G.SLOTS.forEach(slot => { before[w][slot] = uidOf(w, slot); }); });
+    if (!who) Object.keys(G.S.partners).forEach(id => {
+      const gear = G.gearOf(id);
+      G.SLOTS.forEach(slot => { if (gear[slot]) { G.S.inventory.push(gear[slot]); gear[slot] = null; } });
+    });
+    order.forEach(w => {
+      const gear = G.gearOf(w);
       G.SLOTS.forEach(slot => {
         const best = G.S.inventory.filter(i => i.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a))[0];
-        if (best && G.itemScore(best) > G.itemScore(gear[slot])) { G.equip(best.uid, who); n++; }
+        if (best && G.itemScore(best) > G.itemScore(gear[slot])) G.equip(best.uid, w);
       });
     });
+    // 只算真的有換的欄位
+    order.forEach(w => G.SLOTS.forEach(slot => { if (uidOf(w, slot) !== before[w][slot]) n++; }));
+    G.emit('party');
     n ? toast('toast.equipped', { n }) : toast('toast.bestAlready');
   };
 
@@ -534,11 +567,51 @@
     return Object.values(G.S.home).reduce((a, id) => a + (G.FURNITURE.find(f => f.id === id)?.comfort || 0), 0);
   };
 
-  G.buyNets = function (n) {
-    const cost = G.CONFIG.netPrice * n;
-    if (G.S.gold < cost) return toast('toast.notEnoughGold');
-    G.S.gold -= cost; G.S.nets += n;
-    G.emit('home');
+  // ── 捕獸網（裝備型）─────────────────────────────────────────────────────
+  G.captureChance = () => (G.S.net.eq >= 0 ? G.NETS[G.S.net.eq].rate : 0);
+  G.buyNet = function (i) {
+    const n = G.NETS[i], net = G.S.net;
+    if (net.owned.includes(i)) return G.equipNet(i);
+    if (G.S.gold < n.gold || G.S.crystal < n.crystal) return toast('toast.needShip', { gold: G.fmt(n.gold), crystal: n.crystal });
+    G.S.gold -= n.gold; G.S.crystal -= n.crystal;
+    net.owned.push(i);
+    G.equipNet(i);
+    toast('toast.netBought', { name: t(`net.${n.id}`) });
+  };
+  G.equipNet = function (i) { if (G.S.net.owned.includes(i)) { G.S.net.eq = i; G.emit('home'); } };
+
+  // 捕獲：成功就登錄圖鑑；家園有空位才帶回來養（帶一個隨機小增益）
+  G.capture = function (m) {
+    G.dexMark(m.monsterId, 'caught');
+    if (G.S.pets.length >= G.petCap()) { G.addLog('log.captureFull', { name: { k: `monster.${m.monsterId}` } }, '#ffb3f0'); return; }
+    G.S.pets.push({ id: m.monsterId, shape: m.shape, color: m.color, bonus: G.pick(G.PET_BONUSES) });
+    G.addLog('log.capture', { name: { k: `monster.${m.monsterId}` } }, '#ffb3f0');
+    G.emit('home'); G.emit('party');
+  };
+
+  // ── 怪物圖鑑 ─────────────────────────────────────────────────────────────
+  G.dexMark = function (id, kind, S = G.S) {
+    const e = S.dex[id] = S.dex[id] || { seen: false, caught: false, seenClaimed: false, caughtClaimed: false };
+    const isNew = !e[kind];
+    e[kind] = true;
+    if (kind === 'caught') e.seen = true;
+    if (isNew && S === G.S) { G.addLog(kind === 'caught' ? 'log.dexCaught' : 'log.dexSeen', { name: { k: `monster.${id}` } }, '#ffd76a'); G.emit('home'); }
+    return isNew;
+  };
+  G.dexClaimable = id => { const e = G.S.dex[id]; return !!e && ((e.seen && !e.seenClaimed) || (e.caught && !e.caughtClaimed)); };
+  function claimOne(id) {
+    const e = G.S.dex[id], tier = G.monsterTierOf(id);
+    if (!e) return 0;
+    let got = 0;
+    if (e.seen && !e.seenClaimed) { e.seenClaimed = true; got += G.dexReward(tier, 'seen'); }
+    if (e.caught && !e.caughtClaimed) { e.caughtClaimed = true; got += G.dexReward(tier, 'caught'); }
+    G.S.crystal += got;
+    return got;
+  }
+  // id 有值 = 領一隻；沒值 = 全部領
+  G.dexClaim = function (id) {
+    const got = id ? claimOne(id) : Object.keys(G.S.dex).reduce((a, k) => a + claimOne(k), 0);
+    if (got) { toast('toast.dexClaim', { n: got }); G.emit('home'); }
   };
 
   // 寵物名稱：新存檔存怪物 id，舊存檔存的是文字

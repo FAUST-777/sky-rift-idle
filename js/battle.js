@@ -95,6 +95,12 @@
       else this.islandsLayer.setTexture('islands');
       this.sky.setDepth(-2);
       this.shipImg.setDepth(-1);
+      // 上升詛咒：進到有詛咒的樓層時提示
+      this.curse = G.curseFor(f);
+      if (this.curse && this.cursedFloor !== f) {
+        this.cursedFloor = f;
+        this.floatText(W / 2, 135, G.t('curse.enter', { text: G.curseText(this.curse) }), '#c99bff', 15, 2200);
+      }
     }
 
     drawShip() {
@@ -236,6 +242,7 @@
       }
       let d = u.st.def * Math.max(0.1, m);
       if (this.party(u)) d *= this.moraleMult();
+      if (this.party(u) && this.curse && this.curse.def) d *= 1 - this.curse.def;                 // 上升詛咒：防禦下降
       return d;
     }
     takenMult(u) {
@@ -328,7 +335,8 @@
 
       let dmg = this.atkOf(src) * mult;
       if (opts.skill) dmg *= this.skillMult(src);
-      if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;                    // 飛空艇船首：全隊傷害
+      if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
+      if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
       if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
@@ -555,12 +563,10 @@
       const crystal = u.boss ? 1 + Math.floor(f / 5) : Math.random() < 0.04 ? 1 : 0;
       if (crystal) { S.crystal += crystal; this.floatText(u.img.x, u.img.y - 30, `+${crystal}💎`, '#9fe8ff', 13, 900); }
       // 捕獲
-      const petCap = G.petCap();
-      if (!u.boss && S.nets > 0 && S.pets.length < petCap && Math.random() < G.CONFIG.captureChance) {
-        S.nets--;
-        S.pets.push({ id: u.monsterId, shape: u.shape, color: u.color });
-        G.addLog('log.capture', { name: { k: `monster.${u.monsterId}` } }, '#ffb3f0');
-        G.emit('home');
+      // 捕獲（裝著捕獸網才有機率）
+      if (!u.boss && Math.random() < G.captureChance()) {
+        G.capture(u);
+        this.floatText(u.img.x, u.img.y - 50, '🕸️', '#ffffff', 20, 900);
       }
       if (!u.boss) S.kills++;
       else this.bossCleared();
@@ -569,6 +575,8 @@
     bossCleared() {
       const S = G.S, f = S.floor;
       S.kills = 0;
+      // 圖鑑：打倒層主 → 這一層的怪物都登錄為「已發現」
+      G.monsterTier(f).forEach(m => G.dexMark(m.id, 'seen'));
       // 士氣：隊伍有人裝「士氣」、這層沒戰敗 → +1%（上限依技能等級）
       const cap = G.moraleCap();
       if (cap && S.morale < cap) {
@@ -777,6 +785,7 @@
       const out = [], S = G.S;
       if (!this.hero) return out;
       const pct = v => Math.round(v * 100);
+      if (this.curse) out.push({ id: 'curse', icon: '🌪️', val: G.curseShort(this.curse), p: { text: G.curseText(this.curse), n: G.S.floor } });
       const mc = G.moraleCap();
       if (mc && S.morale > 0) out.push({ id: 'morale', icon: G.FX_ICON.morale, val: `+${Math.min(S.morale, mc)}%`, p: { n: Math.min(S.morale, mc), max: mc } });
       const fc = G.frenzyCap();

@@ -64,6 +64,10 @@
   G.rarityName  = r  => G.t(`rarity.${r}`);
 
   // 技能說明：{v} 依技能設定換成百分比或原始數值
+  // 上升詛咒文字：「傷害 -12%」「防禦 -12%」或兩個都有
+  G.curseText = c => [c.dmg ? G.t('curse.dmg', { v: Math.round(c.dmg * 100) }) : '', c.def ? G.t('curse.def', { v: Math.round(c.def * 100) }) : ''].filter(Boolean).join('、');
+  G.curseShort = c => `-${Math.round(Math.max(c.dmg, c.def) * 100)}%`;
+
   // 百分比：小於 10% 時留一位小數（例如每秒回 0.3%）
   const pct = x => { const n = x * 100; return +(n < 10 ? n.toFixed(1) : Math.round(n)); };
   G.skillDesc = function (sk, rank) {

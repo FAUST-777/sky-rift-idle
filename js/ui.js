@@ -24,7 +24,7 @@
     $('hudXp').style.width = Math.min(100, h.xp / G.xpToLevel(h.level) * 100) + '%';
     $('hudGold').textContent = G.fmt(S.gold);
     $('hudCrystal').textContent = G.fmt(S.crystal);
-    $('floorName').textContent = t('floor.name', { n: S.floor });
+    $('floorName').textContent = t('floor.name', { n: S.floor }) + (G.curseFor(S.floor) ? ' 🌪️' : '');
     const boss = S.kills >= G.CONFIG.killsPerFloor;
     $('floorProg').style.width = Math.min(100, S.kills / G.CONFIG.killsPerFloor * 100) + '%';
     $('floorKills').textContent = boss ? t('floor.boss') : `${S.kills}/${G.CONFIG.killsPerFloor}`;
@@ -91,7 +91,8 @@
         <div class="row between">
           <button class="btn" data-act="floor" data-v="${S.floor - 1}" ${S.floor <= 1 ? 'disabled' : ''}>${t('adv.down')}</button>
           <div style="text-align:center"><div style="font-size:24px;font-weight:700">${t('floor.name', { n: S.floor })}</div>
-            <div class="muted" style="font-size:12px">${G.monsterTier(S.floor).map(m => G.monsterName(m.id)).join('・')}</div></div>
+            <div class="muted" style="font-size:12px">${G.monsterTier(S.floor).map(m => G.monsterName(m.id)).join('・')}</div>
+            ${G.curseFor(S.floor) ? `<div class="curse">🌪️ ${t('curse.name')}：${G.curseText(G.curseFor(S.floor))}</div>` : ''}</div>
           <button class="btn" data-act="floor" data-v="${S.floor + 1}" ${S.floor >= top ? 'disabled' : ''}>${t('adv.up')}</button>
         </div>
         <div class="row between wrap" style="margin-top:12px">
@@ -125,10 +126,6 @@
     const cls = isHero ? h.cls : S.partners[who].cls;
     const lv = isHero ? h.level : S.partners[who].level;
 
-    // 角色切換：主角＋已招募的夥伴（出戰中的排前面）
-    const ids = Object.keys(S.partners).sort((a, b) => S.party.includes(b) - S.party.includes(a));
-    const whoBar = `<div class="who">${['hero', ...ids].map(id =>
-      `<button class="chip ${who === id ? 'on' : ''}" data-act="who" data-v="${id}">${id === 'hero' ? '🧍 ' : S.party.includes(id) ? '⚔️ ' : ''}${esc(whoName(id))}</button>`).join('')}</div>`;
 
     const slots = G.SLOTS.map(slot => {
       const it = gear[slot];
@@ -152,15 +149,33 @@
     } else if (h.level < G.CONFIG.classUnlockLevel) {
       clsHtml = `<p class="muted" style="margin:0">${t('hero.classLocked', { lv: G.CONFIG.classUnlockLevel, cur: h.level })}</p>`;
     } else {
-      clsHtml = `<div class="classes">${G.CLASS_ORDER.map(c => `<button class="cls ${h.cls === c ? 'cur' : ''}" data-act="class" data-cls="${c}">
-          <b style="color:${G.CLASSES[c].color === '#5b3d7a' ? '#b48be0' : G.CLASSES[c].color}">${G.clsName(c)}${h.cls === c ? t('hero.current') : ''}</b>
-          <div class="tags">${classTags(c)}</div><p>${t(`class.${c}.desc`)}</p></button>`).join('')}</div>
-      ${h.cls !== 'villager' ? `<p class="muted" style="font-size:12px;margin:8px 0 0">${t('hero.classChangeNote', { cost: G.CONFIG.classChangeCost })}</p>` : ''}`;
+      // 轉職：左邊職業列表，右邊詳細說明，按確認才轉職
+      if (!G.CLASSES[UI.clsPick] || UI.clsPick === 'villager') UI.clsPick = h.cls === 'villager' ? G.CLASS_ORDER[0] : h.cls;
+      const pick = UI.clsPick, C = G.CLASSES[pick];
+      const list = G.CLASS_ORDER.map(c => `<button class="cls-item ${pick === c ? 'on' : ''} ${h.cls === c ? 'cur' : ''}" data-act="clspick" data-cls="${c}">
+          <span>${G.CORE_ICON[G.CLASSES[c].core]}</span>${G.clsName(c)}${h.cls === c ? ' ✓' : ''}</button>`).join('');
+      const sk = (G.SKILLS[pick] || []);
+      const names = type => sk.filter(s => s.type === type).map(s => G.skillName(s.id)).join('・');
+      const cost = h.cls === 'villager' ? t('classModal.free') : t('classModal.cost', { cost: G.CONFIG.classChangeCost });
+      clsHtml = `<div class="cls-picker">
+          <div class="cls-list">${list}</div>
+          <div class="cls-detail">
+            <b class="cls-name">${G.clsName(pick)}</b>
+            <div class="tags">${classTags(pick)}</div>
+            <p>${t(`class.${pick}.desc`)}</p>
+            <div class="muted" style="font-size:11px;margin-bottom:4px"><b>${t('skills.activeSlots')}</b>：${names('active')}</div>
+            <div class="muted" style="font-size:11px"><b>${t('skills.passiveSlots')}</b>：${names('passive')}</div>
+            ${h.cls === pick
+              ? `<button class="btn small" disabled style="margin-top:10px;width:100%">${t('hero.current').replace(/[（）() ]/g, '')}</button>`
+              : `<button class="btn small primary" data-act="class2" data-cls="${pick}" style="margin-top:10px;width:100%">${t('hero.changeTo', { name: G.clsName(pick) })}</button>
+                 <div class="muted" style="font-size:11px;margin-top:4px">${cost}${t('classModal.refund')}</div>`}
+          </div>
+        </div>`;
     }
 
     return `
       <div class="card">
-        ${ids.length ? whoBar : ''}
+        ${whoBarHtml(false)}
         <div class="doll-wrap">
           <canvas class="doll" id="dollSlot"></canvas>
           <div class="grow">
@@ -185,7 +200,8 @@
           <button class="btn small" data-act="expand" ${canExp ? '' : 'disabled'}>${canExp ? `${t('hero.expand', { n: G.CONFIG.bagExpandSlots })}　${expCost}` : t('hero.bagMax')}</button>
         </div>
         <div class="row wrap" style="margin-bottom:10px">
-          <button class="btn small good" data-act="autoequip" title="${esc(t('hero.autoEquipHint'))}">${t('hero.autoEquip')}</button>
+          <button class="btn small good" data-act="autoequip" data-scope="one">${t('hero.autoEquipOne', { name: esc(whoName(who)) })}</button>
+          <button class="btn small good" data-act="autoequip" data-scope="all" title="${esc(t('hero.autoEquipHint'))}">${t('hero.autoEquipAll')}</button>
           <button class="btn small" data-act="sellbelow" data-v="0">${t('hero.sellCommon')}</button>
           <button class="btn small" data-act="sellbelow" data-v="1">${t('hero.sellUncommon')}</button>
         </div>
@@ -223,9 +239,12 @@
     const S = G.S;
     const ids = Object.keys(S.partners).sort((a, b) => S.party.includes(b) - S.party.includes(a));
     if (!ids.length) return '';
+    // 主角金色、出戰中綠色＋「出戰」標籤、休息中灰色
     return `<div class="who">${['hero', ...ids].map(id => {
       const sp = withSp ? G.spOf(id) : 0;
-      return `<button class="chip ${UI.who === id ? 'on' : ''}" data-act="who" data-v="${id}">${id === 'hero' ? '🧍 ' : S.party.includes(id) ? '⚔️ ' : ''}${esc(whoName(id))}${sp ? ` <b class="gold">+${sp}</b>` : ''}</button>`;
+      const state = id === 'hero' ? 'hero' : S.party.includes(id) ? 'deployed' : 'resting';
+      const tag = state === 'deployed' ? `<span class="wtag">${t('hero.deployedTag')}</span>` : state === 'resting' ? `<span class="wtag rest">${t('partners.resting')}</span>` : '';
+      return `<button class="chip who-${state} ${UI.who === id ? 'on' : ''}" data-act="who" data-v="${id}">${id === 'hero' ? '🧍 ' : ''}${esc(whoName(id))}${tag}${sp ? ` <b class="gold">+${sp}</b>` : ''}</button>`;
     }).join('')}</div>`;
   }
 
@@ -421,15 +440,57 @@
       </div>
       <div class="card"><h3>${t('home.storage')}</h3><div class="chips">${stock || `<span class="muted">${t('home.storageEmpty')}</span>`}</div></div>
       <div class="card"><h3>${t('home.shop')}</h3><div class="shop">${shop}</div></div>
+      ${renderNets()}
       <div class="card">
         <h3>${t('home.pets')} <small>${t('home.petsInfo', { n: S.pets.length, cap: petCap })}</small></h3>
-        <div class="row" style="margin-bottom:10px">
-          <span class="grow">${t('home.nets', { n: S.nets })}<br><small class="muted">${t('home.netsHint', { p: G.CONFIG.captureChance * 100 })}</small></span>
-          <button class="btn small" data-act="nets" data-v="1">${t('home.buy1', { price: G.CONFIG.netPrice })}</button>
-          <button class="btn small" data-act="nets" data-v="10">${t('home.buy10')}</button>
-        </div>
-        <div class="pets">${S.pets.map((p, i) => `<canvas data-pet="${i}" title="${esc(G.petName(p))}"></canvas>`).join('') || `<span class="muted">${t('home.noPets')}</span>`}</div>
-      </div>`;
+        <div class="pets">${S.pets.map((p, i) => `<div class="pet"><canvas data-pet="${i}"></canvas><small>${esc(G.petName(p))}</small><small class="gold">${petBonusText(p)}</small></div>`).join('') || `<span class="muted">${t('home.noPets')}</span>`}</div>
+      </div>
+      ${renderDex()}`;
+  }
+
+  const petBonusText = p => {
+    if (!p.bonus) return '';
+    const v = p.bonus.stat === 'crit' ? p.bonus.v : Math.round(p.bonus.v * 100);
+    return t(`petBonus.${p.bonus.stat}`, { v });
+  };
+
+  // 捕獸網：五款，買了直接裝上，永久生效
+  function renderNets() {
+    const net = G.S.net;
+    const rows = G.NETS.map((n, i) => {
+      const own = net.owned.includes(i), using = net.eq === i;
+      const price = [n.gold ? `${G.fmt(n.gold)}💰` : '', n.crystal ? `${n.crystal}💎` : ''].filter(Boolean).join(' ');
+      const btn = using ? `<button class="btn small on" disabled>${t('ship.using')}</button>`
+        : own ? `<button class="btn small good" data-act="neteq" data-i="${i}">${t('ship.equip')}</button>`
+        : `<button class="btn small primary" data-act="netbuy" data-i="${i}">${price}</button>`;
+      return `<div class="model ${using ? 'using' : ''}"><span class="tier">${n.icon}</span>
+        <div class="grow"><b>${t(`net.${n.id}`)}</b><div class="muted" style="font-size:11px">${t('net.rate', { p: Math.round(n.rate * 100) })}</div></div>${btn}</div>`;
+    }).join('');
+    return `<div class="card">
+      <h3>🕸️ ${t('net.title')} <small>${net.eq >= 0 ? t('net.rate', { p: Math.round(G.captureChance() * 100) }) : t('net.none')}</small></h3>
+      <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t('net.help')}</p>${rows}</div>`;
+  }
+
+  // 怪物圖鑑：打倒層主登錄（已發現）、捕獲再點亮（★），各領一次雲晶
+  function renderDex() {
+    const all = G.MONSTER_TIERS.flat(), dex = G.S.dex;
+    const seen = all.filter(m => dex[m.id] && dex[m.id].seen).length, caught = all.filter(m => dex[m.id] && dex[m.id].caught).length;
+    const anyClaim = all.some(m => G.dexClaimable(m.id));
+    const cells = all.map(m => {
+      const e = dex[m.id] || {}, tier = G.monsterTierOf(m.id);
+      const claim = G.dexClaimable(m.id);
+      return `<button class="dex ${e.seen ? '' : 'unknown'} ${claim ? 'claim' : ''}" data-act="dexclaim" data-id="${m.id}">
+        <canvas data-dex="${m.id}"></canvas>
+        <small>${e.seen ? G.monsterName(m.id) : '？？？'}</small>
+        <span class="stars">${e.seen ? '👁' : '·'}${e.caught ? '⭐' : '·'}</span>
+        ${claim ? `<span class="dex-badge">+${(e.seen && !e.seenClaimed ? G.dexReward(tier, 'seen') : 0) + (e.caught && !e.caughtClaimed ? G.dexReward(tier, 'caught') : 0)}💎</span>` : ''}
+      </button>`;
+    }).join('');
+    return `<div class="card">
+      <h3>📖 ${t('dex.title')} <small>${t('dex.progress', { s: seen, c: caught, n: all.length })}</small></h3>
+      <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t('dex.help')}</p>
+      ${anyClaim ? `<button class="btn small primary" data-act="dexclaim" data-id="" style="margin-bottom:8px">${t('dex.claimAll')}</button>` : ''}
+      <div class="dex-grid">${cells}</div></div>`;
   }
 
   function mountPets() {
@@ -437,6 +498,13 @@
       const p = G.S.pets[+c.dataset.pet];
       c.width = 96; c.height = 96;
       G.ART.drawMonster(c.getContext('2d'), p.shape, p.color, 0, 0, 1.5);
+    });
+    $('panel').querySelectorAll('canvas[data-dex]').forEach(c => {
+      const m = G.MONSTER_TIERS.flat().find(x => x.id === c.dataset.dex), e = G.S.dex[m.id];
+      c.width = 96; c.height = 96;
+      const ctx = c.getContext('2d');
+      if (!e || !e.seen) ctx.filter = 'brightness(0) opacity(.5)';   // 還沒發現：剪影
+      G.ART.drawMonster(ctx, m.shape, m.color, 0, 0, 1.5);
     });
   }
 
@@ -553,7 +621,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         break;
       }
       case 'sell': G.sell(+d.id); UI.close(); break;
-      case 'autoequip': G.autoEquip(); break;
+      case 'autoequip': G.autoEquip(d.scope === 'one' ? UI.who : null); break;
+      case 'clspick': UI.clsPick = d.cls; UI.render(); break;
       case 'sellbelow': G.sellAllBelow(+d.v); break;
       case 'class': {
         if (S.hero.cls === d.cls) break;
@@ -580,7 +649,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         else if (UI.placing) { G.placeFurniture(d.k, UI.placing); if (!S.furniture[UI.placing]) UI.placing = null; UI.refresh(); }
         else UI.toast(t('home.pickFirst'));
         break;
-      case 'nets': G.buyNets(+d.v); break;
+      case 'netbuy': G.buyNet(+d.i); break;
+      case 'neteq': G.equipNet(+d.i); break;
+      case 'dexclaim': if (!d.id || G.dexClaimable(d.id)) G.dexClaim(d.id || null); break;
     }
   }
 
