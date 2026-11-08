@@ -1,8 +1,11 @@
 // ════════════════════════════════════════════════════════════════════════════
 // 遊戲狀態、存檔、屬性計算、所有玩家操作
+// 顯示給玩家的文字一律用 G.t()；日誌存「key + 參數」，切換語言時舊日誌也會跟著換
 // ════════════════════════════════════════════════════════════════════════════
 (function () {
   const SAVE_KEY = 'skyrift_save_v1';
+  const t = (k, p) => G.t(k, p);
+  const toast = (k, p) => G.emit('toast', t(k, p));
 
   // ── 簡單事件匯流排（UI 與戰鬥場景互相通知）─────────────────────────────────
   const listeners = {};
@@ -34,9 +37,9 @@
       ship: { balloon: 1, engine: 1, hull: 1, cannon: 0, paint: 0, figurehead: 0 },
       furniture: {},         // id -> 持有數量（未擺放）
       home: {},              // "x,y" -> furniture id
-      pets: [],              // { name, shape, color }
+      pets: [],              // { id(怪物), shape, color }
       autoSellCommon: false,
-      log: [],
+      log: [],               // { k, p, color }
       uid: 1,
       lastSeen: Date.now(),
     };
@@ -51,10 +54,30 @@
       G.S = Object.assign(base, s);
       G.S.ship = Object.assign(newState().ship, s.ship);
       G.S.skills = Object.assign(newState().skills, s.skills);
+      migrateToI18n(G.S);
     } else {
       G.S = base;
     }
   };
+
+  // 多語系之前的存檔：裝備/寵物存的是中文名稱、日誌是純文字 → 轉成 id，切換語言才會跟著換
+  function migrateToI18n(S) {
+    const zh = G.I18N['zh-TW'];
+    const fixItem = it => {
+      if (!it || it.base !== undefined || !it.name) return;
+      const baseName = it.name.split('・').pop();
+      const idx = G.ITEM_BASES[it.slot].findIndex((_, i) => zh[`base.${it.slot}.${i}`] === baseName);
+      if (idx >= 0) { it.base = idx; delete it.name; }
+    };
+    S.inventory.forEach(fixItem);
+    Object.values(S.equipped).forEach(fixItem);
+    S.pets.forEach(p => {
+      if (p.id || !p.name) return;
+      const m = G.MONSTER_TIERS.flat().find(x => zh[`monster.${x.id}`] === p.name);
+      if (m) { p.id = m.id; delete p.name; }
+    });
+    S.log = S.log.filter(l => l.k);   // 舊的純文字日誌無法翻譯，直接清掉
+  }
 
   G.save = function () {
     G.S.lastSeen = Date.now();
@@ -66,11 +89,13 @@
     location.reload();
   };
 
-  G.addLog = function (text, color) {
-    G.S.log.unshift({ text, color: color || '' });
+  // 日誌：存 key + 參數，畫面上才翻譯
+  G.addLog = function (k, p, color) {
+    G.S.log.unshift({ k, p: p || null, color: color || '' });
     if (G.S.log.length > 30) G.S.log.length = 30;
     G.emit('log');
   };
+  G.logText = l => l.k ? t(l.k, l.p) : (l.text || '');   // 舊存檔的日誌是純文字
 
   // ── 屬性計算 ─────────────────────────────────────────────────────────────
   function passiveSum(kind) {
@@ -146,10 +171,10 @@
       h.level++;
       G.S.skillPoints++;
       up = true;
-      G.addLog(`⬆️ 升到 ${h.level} 級！獲得 1 技能點`, '#ffd76a');
+      G.addLog('log.levelUp', { lv: h.level }, '#ffd76a');
       if (h.level === G.CONFIG.classUnlockLevel && h.cls === 'villager') {
-        G.addLog('✨ 可以轉職了！到「角色」分頁選擇職業', '#ffd76a');
-        G.emit('toast', '可以轉職了！到「角色」分頁選擇職業');
+        G.addLog('log.canClass', null, '#ffd76a');
+        toast('toast.canClass');
       }
     }
     if (up) G.emit('levelup');
@@ -169,7 +194,8 @@
 
   G.makeItem = function (floor, boss) {
     const slot = G.pick(G.SLOTS);
-    const base = G.pick(G.ITEM_BASES[slot]);
+    const bases = G.ITEM_BASES[slot];
+    const baseIdx = G.randInt(0, bases.length - 1);
     const rarity = G.rollRarity(boss);
     const R = G.RARITY[rarity];
     const scale = (1 + (floor - 1) * 0.22) * R.mult;
@@ -180,11 +206,8 @@
       stats[k] = (stats[k] || 0) + v * scale * G.rand(0.4, 0.7);
     }
     Object.keys(stats).forEach(k => stats[k] = k === 'spd' ? +stats[k].toFixed(2) : +stats[k].toFixed(1));
-    return {
-      uid: G.S.uid++, slot, rarity, floor, look: base.look,
-      name: (G.RARITY_PREFIX[rarity] ? G.RARITY_PREFIX[rarity] + '・' : '') + base.n,
-      stats,
-    };
+    // 名稱不存文字，存底材編號，顯示時依語言組出來
+    return { uid: G.S.uid++, slot, base: baseIdx, rarity, floor, look: bases[baseIdx].look, stats };
   };
 
   G.itemScore = it => it ? (it.stats.atk || 0) * 4 + (it.stats.hp || 0) * 0.3 + (it.stats.def || 0) * 3 + (it.stats.crit || 0) * 2 + (it.stats.spd || 0) * 60 : 0;
@@ -219,7 +242,7 @@
   G.unequip = function (slot) {
     const it = G.S.equipped[slot];
     if (!it) return;
-    if (G.S.inventory.length >= G.CONFIG.inventorySize) return G.emit('toast', '背包滿了');
+    if (G.S.inventory.length >= G.CONFIG.inventorySize) return toast('toast.bagFull');
     G.S.equipped[slot] = null;
     G.S.inventory.push(it);
     G.emit('inventory'); G.emit('look');
@@ -241,7 +264,7 @@
     });
     G.S.gold += g;
     G.emit('inventory');
-    G.emit('toast', `賣出 ${n} 件，獲得 ${G.fmt(g)} 金幣`);
+    toast('toast.sold', { n, g: G.fmt(g) });
   };
 
   // 自動穿上分數較高的裝備
@@ -251,27 +274,27 @@
       const best = G.S.inventory.filter(i => i.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a))[0];
       if (best && G.itemScore(best) > G.itemScore(G.S.equipped[slot])) { G.equip(best.uid); n++; }
     });
-    G.emit('toast', n ? `換上 ${n} 件更好的裝備` : '已經是最好的裝備了');
+    n ? toast('toast.equipped', { n }) : toast('toast.bestAlready');
   };
 
   G.changeClass = function (cls) {
     const h = G.S.hero;
-    if (h.level < G.CONFIG.classUnlockLevel) return G.emit('toast', `${G.CONFIG.classUnlockLevel} 級才能轉職`);
+    if (h.level < G.CONFIG.classUnlockLevel) return toast('toast.classLevel', { lv: G.CONFIG.classUnlockLevel });
     if (h.cls === cls) return;
     if (h.cls !== 'villager') {
-      if (G.S.gold < G.CONFIG.classChangeCost) return G.emit('toast', `換職業需要 ${G.CONFIG.classChangeCost} 金幣`);
+      if (G.S.gold < G.CONFIG.classChangeCost) return toast('toast.classCost', { cost: G.CONFIG.classChangeCost });
       G.S.gold -= G.CONFIG.classChangeCost;
     }
     // 退還所有技能點
     let refund = 0;
     Object.keys(G.S.skills).forEach(id => { refund += G.S.skills[id]; G.S.skills[id] = 0; });
-    G.S.skillPoints += refund - 1;   // 猛擊的 1 點是送的，不退
+    G.S.skillPoints += refund - 1;   // 每個職業第一招的 1 點是送的，不退
     if (G.S.skillPoints < 0) G.S.skillPoints = 0;
     h.cls = cls;
     const first = G.SKILLS[cls][0];
     G.S.skills[first.id] = 1;
     G.S.activeSkills = [first.id, null, null];
-    G.addLog(`🎓 轉職為「${G.CLASSES[cls].name}」！技能點已重置`, '#ffd76a');
+    G.addLog('log.classChanged', { cls: { k: `class.${cls}.name` } }, '#ffd76a');
     G.emit('look'); G.emit('skills'); G.emit('stats');
   };
 
@@ -282,9 +305,9 @@
   G.learnSkill = function (id) {
     const sk = (G.SKILLS[G.S.hero.cls] || []).find(s => s.id === id);
     if (!sk) return;
-    if (G.S.skillPoints <= 0) return G.emit('toast', '沒有技能點了，升級可以獲得');
+    if (G.S.skillPoints <= 0) return toast('toast.noSP');
     if (G.S.skills[id] >= sk.max) return;
-    if (G.skillPointsInClass() < G.TIER_REQ[sk.tier]) return G.emit('toast', `需要先在此職業投入 ${G.TIER_REQ[sk.tier]} 點`);
+    if (G.skillPointsInClass() < G.TIER_REQ[sk.tier]) return toast('toast.tierReq', { n: G.TIER_REQ[sk.tier] });
     G.S.skills[id]++;
     G.S.skillPoints--;
     // 第一次學會主動技能時，有空格就自動放進去
@@ -306,21 +329,21 @@
   G.recruit = function (id) {
     const p = G.PARTNERS.find(x => x.id === id);
     if (G.S.partners[id]) return;
-    if (G.S.maxFloor < p.floor) return G.emit('toast', `要先到達第 ${p.floor} 層`);
+    if (G.S.maxFloor < p.floor) return toast('toast.reachFloor', { n: p.floor });
     const cost = G.partnerRecruitCost(p);
-    if (G.S.gold < cost) return G.emit('toast', `需要 ${G.fmt(cost)} 金幣`);
+    if (G.S.gold < cost) return toast('toast.needGold', { n: G.fmt(cost) });
     G.S.gold -= cost;
     G.S.partners[id] = { level: 1, cls: 'bloodknight' };
     if (G.S.party.length < G.CONFIG.maxParty) G.S.party.push(id);
-    G.addLog(`🤝 ${p.name} 加入了隊伍！`, '#7fd1ff');
+    G.addLog('log.recruited', { name: { k: `partner.${id}.name` } }, '#7fd1ff');
     G.emit('party');
   };
 
   G.partnerLevelUp = function (id) {
     const p = G.S.partners[id];
     const cost = G.partnerLevelCost(p.level);
-    if (G.S.gold < cost) return G.emit('toast', `需要 ${G.fmt(cost)} 金幣`);
-    if (p.level >= G.S.hero.level + 5) return G.emit('toast', '夥伴等級不能超過主角 5 級以上');
+    if (G.S.gold < cost) return toast('toast.needGold', { n: G.fmt(cost) });
+    if (p.level >= G.S.hero.level + 5) return toast('toast.partnerCap');
     G.S.gold -= cost;
     p.level++;
     G.emit('party');
@@ -334,20 +357,20 @@
   G.toggleParty = function (id) {
     const i = G.S.party.indexOf(id);
     if (i >= 0) G.S.party.splice(i, 1);
-    else if (G.S.party.length >= G.CONFIG.maxParty) return G.emit('toast', `最多 ${G.CONFIG.maxParty} 位夥伴出戰`);
+    else if (G.S.party.length >= G.CONFIG.maxParty) return toast('toast.partyFull', { n: G.CONFIG.maxParty });
     else G.S.party.push(id);
     G.emit('party');
   };
 
   G.upgradeShip = function (part) {
     const lv = G.S.ship[part], P = G.SHIP_PARTS[part];
-    if (lv >= P.max) return G.emit('toast', '已經升到最高級');
+    if (lv >= P.max) return toast('toast.shipMax');
     const c = G.shipUpgradeCost(part, lv);
-    if (G.S.gold < c.gold || G.S.crystal < c.crystal) return G.emit('toast', `需要 ${G.fmt(c.gold)} 金幣、${c.crystal} 雲晶`);
+    if (G.S.gold < c.gold || G.S.crystal < c.crystal) return toast('toast.needShip', { gold: G.fmt(c.gold), crystal: c.crystal });
     G.S.gold -= c.gold; G.S.crystal -= c.crystal;
     G.S.ship[part]++;
     if (part === 'hull') trimHome();
-    G.addLog(`🛠️ ${P.name} 升到 ${G.S.ship[part]} 級`, '#9fe39f');
+    G.addLog('log.shipUp', { part: { k: `part.${part}.name` }, lv: G.S.ship[part] }, '#9fe39f');
     G.emit('ship');
   };
 
@@ -356,11 +379,11 @@
   G.buyFurniture = function (id) {
     const f = G.FURNITURE.find(x => x.id === id);
     const have = f.cur === 'gold' ? G.S.gold : G.S.crystal;
-    if (have < f.price) return G.emit('toast', `${f.cur === 'gold' ? '金幣' : '雲晶'}不夠`);
+    if (have < f.price) return toast(f.cur === 'gold' ? 'toast.notEnoughGold' : 'toast.notEnoughCrystal');
     if (f.cur === 'gold') G.S.gold -= f.price; else G.S.crystal -= f.price;
     G.S.furniture[id] = (G.S.furniture[id] || 0) + 1;
     G.emit('home');
-    G.emit('toast', `買了 ${f.n}，到家園點空格擺放`);
+    toast('toast.bought', { name: t(`furniture.${id}`) });
   };
 
   G.placeFurniture = function (key, id) {
@@ -393,10 +416,13 @@
 
   G.buyNets = function (n) {
     const cost = G.CONFIG.netPrice * n;
-    if (G.S.gold < cost) return G.emit('toast', '金幣不夠');
+    if (G.S.gold < cost) return toast('toast.notEnoughGold');
     G.S.gold -= cost; G.S.nets += n;
     G.emit('home');
   };
+
+  // 寵物名稱：新存檔存怪物 id，舊存檔存的是文字
+  G.petName = p => p.id ? G.monsterName(p.id) : (p.name || '?');
 
   G.setFloor = function (f) {
     const limit = Math.min(G.S.maxFloor, G.shipMaxFloor(G.S.ship.balloon));

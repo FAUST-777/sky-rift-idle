@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -13,26 +13,27 @@
 <div id="app">
   <header id="hud">
     <div class="hud-left">
-      <div class="lv">Lv <b id="hudLv">1</b> <span id="hudCls">村民</span></div>
+      <div class="lv">Lv <b id="hudLv">1</b> <span id="hudCls"></span></div>
       <div class="xpbar"><i id="hudXp"></i></div>
     </div>
     <div class="hud-right">
-      <span title="金幣">💰 <b id="hudGold">0</b></span>
-      <span title="雲晶">💎 <b id="hudCrystal">0</b></span>
+      <span>💰 <b id="hudGold">0</b></span>
+      <span>💎 <b id="hudCrystal">0</b></span>
     </div>
+    <button id="settingsBtn" data-act="settings" aria-label="Settings">⚙️</button>
   </header>
 
   <section id="battleWrap">
     <div id="battle"></div>
     <div id="revive" hidden>
       <div class="revive-card">
-        <div class="revive-title">💀 戰敗</div>
+        <div class="revive-title" id="reviveTitle"></div>
         <div id="reviveText"></div>
         <button class="btn primary" id="revivePay" data-act="revivePay"></button>
       </div>
     </div>
     <div id="floorBar">
-      <span id="floorName">第 1 層</span>
+      <span id="floorName"></span>
       <div class="prog"><i id="floorProg"></i></div>
       <span id="floorKills">0/10</span>
     </div>
@@ -41,12 +42,12 @@
   <main id="panel"></main>
 
   <nav id="tabs">
-    <button data-tab="adventure" class="on"><span>🗺️</span>冒險</button>
-    <button data-tab="hero"><span>🧍</span>角色</button>
-    <button data-tab="skills"><span>📜</span>技能</button>
-    <button data-tab="partners"><span>🤝</span>夥伴</button>
-    <button data-tab="ship"><span>🎈</span>飛行船</button>
-    <button data-tab="home"><span>🏠</span>家園</button>
+    <button data-tab="adventure" class="on"><span>🗺️</span><em data-i18n="tab.adventure"></em></button>
+    <button data-tab="hero"><span>🧍</span><em data-i18n="tab.hero"></em></button>
+    <button data-tab="skills"><span>📜</span><em data-i18n="tab.skills"></em></button>
+    <button data-tab="partners"><span>🤝</span><em data-i18n="tab.partners"></em></button>
+    <button data-tab="ship"><span>🎈</span><em data-i18n="tab.ship"></em></button>
+    <button data-tab="home"><span>🏠</span><em data-i18n="tab.home"></em></button>
   </nav>
 
   <div id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
@@ -56,6 +57,10 @@
 <script src="vendor/phaser.min.js"></script>
 <script src="assets/manifest.js"></script>
 <script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="lang/zh-TW.js"></script>
+<script src="lang/en.js"></script>
+<script src="lang/zh-CN.js"></script>
 <script src="js/state.js"></script>
 <script src="js/art.js"></script>
 <script src="js/battle.js"></script>

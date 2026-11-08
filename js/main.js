@@ -2,6 +2,7 @@
 // 啟動：讀檔 → 離線收益 → 戰鬥場景 → 介面 → 自動存檔
 // ════════════════════════════════════════════════════════════════════════════
 (function () {
+  const t = (k, p) => G.t(k, p);
   G.load();
   const offline = G.offlineGains();
 
@@ -11,21 +12,22 @@
   function showOffline(g) {
     if (!g) return;
     const h = Math.floor(g.mins / 60), m = g.mins % 60;
-    G.UI.modal(`<h2>歡迎回來！</h2>
-      <p>你離開了 ${h ? h + ' 小時 ' : ''}${m} 分鐘，飛行船上的夥伴們持續在第 ${G.S.floor} 層探索。</p>
+    const time = h ? t('time.hm', { h, m }) : t('time.m', { m });
+    G.UI.modal(`<h2>${t('offline.title')}</h2>
+      <p>${t('offline.away', { time, floor: G.S.floor })}</p>
       <div class="stats" style="grid-template-columns:1fr">
-        <div>金幣 <b class="gold">+${G.fmt(g.gold)}</b></div>
-        <div>經驗 <b>+${G.fmt(g.xp)}</b></div>
-        ${g.bonus ? `<div>家園舒適度加成 <b>+${g.bonus}%</b></div>` : ''}
+        <div>${t('offline.gold')} <b class="gold">+${G.fmt(g.gold)}</b></div>
+        <div>${t('offline.xp')} <b>+${G.fmt(g.xp)}</b></div>
+        ${g.bonus ? `<div>${t('offline.bonus')} <b>+${g.bonus}%</b></div>` : ''}
       </div>
-      <p class="muted" style="font-size:12px">離線收益最多累積 ${G.CONFIG.offlineCapHours} 小時。布置家園可以提高收益。</p>
-      <div class="modal-actions"><button class="btn primary" data-act="close">收下</button></div>`);
+      <p class="muted" style="font-size:12px">${t('offline.cap', { h: G.CONFIG.offlineCapHours })}</p>
+      <div class="modal-actions"><button class="btn primary" data-act="close">${t('offline.ok')}</button></div>`);
   }
 
   if (!G.S.seenPrologue) {
     G.UI.prologue(() => {
       G.S.seenPrologue = true;
-      G.addLog('🎈 你搭著熱氣球飛進了天空裂洞……', '#7fd1ff');
+      G.addLog('log.start', null, '#7fd1ff');
       G.save();
     });
   } else {

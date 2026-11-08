@@ -32,6 +32,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .xpbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7f6bff, #b98bff); transition: width .3s; }
 .hud-right { display: flex; gap: 12px; font-size: 14px; white-space: nowrap; }
 .hud-right b { color: var(--gold); }
+#settingsBtn { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; width: 36px; height: 36px; font-size: 18px;
+  display: flex; align-items: center; justify-content: center; padding: 0; flex: none; }
+#settingsBtn:active { transform: scale(.92); }
+.set-group { padding: 12px 0; border-top: 1px solid var(--line); }
+.set-group:first-of-type { border-top: 0; padding-top: 4px; }
+.set-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
 
 /* ── 戰鬥區 ───────────────────────────────────────── */
 #battleWrap { position: relative; flex: none; }
@@ -156,6 +162,7 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 #tabs { display: grid; grid-template-columns: repeat(6, 1fr); background: #17122a; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
 #tabs button { background: none; border: 0; padding: 7px 0 8px; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
 #tabs button span { font-size: 20px; filter: grayscale(.6); }
+#tabs button em { font-style: normal; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 #tabs button.on { color: var(--gold); }
 #tabs button.on span { filter: none; }
 #tabs button .dot { position: absolute; top: 5px; right: 22%; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); }

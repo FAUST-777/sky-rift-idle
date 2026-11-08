@@ -126,7 +126,7 @@
       this.units.forEach(u => u.img.destroy());
       this.units = [];
       const hero = this.makeUnit({
-        side: 'party', kind: 'hero', name: '你', st: G.heroStats(),
+        side: 'party', kind: 'hero', st: G.heroStats(),
         texture: this.humanTex('hero', G.ART.lookFromHero()), x: 0,
       });
       hero.skills = this.heroSkills();
@@ -177,7 +177,7 @@
       for (let i = 0; i < count; i++) {
         const m = boss ? pool[(f - 1) % pool.length] : G.pick(pool);
         const u = this.makeUnit({
-          side: 'enemy', kind: 'monster', boss, name: boss ? `層主・${m.n}` : m.n, shape: m.shape, color: m.color,
+          side: 'enemy', kind: 'monster', boss, monsterId: m.id, shape: m.shape, color: m.color,
           st: G.monsterStats(f, boss), texture: this.monsterTex(m.shape, m.color),
           x: ENEMY_X[boss ? 1 : i], scale: boss ? 1.75 : 1.1, originY: 0.94,
         });
@@ -185,7 +185,7 @@
         this.tweens.add({ targets: u.img, x: u.homeX, duration: 700, ease: 'Quad.out' });
         this.enemies.push(u);
       }
-      if (boss) this.floatText(W / 2, 70, `⚠ 第 ${f} 層 層主出現`, '#ff6b6b', 22, 1400);
+      if (boss) this.floatText(W / 2, 70, G.t('battle.bossAppear', { n: f }), '#ff6b6b', 22, 1400);
       this.mode = 'enter';
       this.time.delayedCall(720, () => { if (this.mode === 'enter') this.mode = 'fight'; });
     }
@@ -229,7 +229,7 @@
       if (src.st.lifesteal && src.alive) src.hp = Math.min(src.st.maxHp, src.hp + dmg * src.st.lifesteal);
 
       const color = target.side === 'enemy' ? (crit ? '#ffd23f' : '#ffffff') : '#ff7070';
-      this.floatText(target.img.x + G.rand(-10, 10), target.img.y - target.img.displayHeight * 0.9, (crit ? '暴擊 ' : '') + G.fmt(dmg), color, crit ? 18 : 14);
+      this.floatText(target.img.x + G.rand(-10, 10), target.img.y - target.img.displayHeight * 0.9, (crit ? G.t('battle.crit') + ' ' : '') + G.fmt(dmg), color, crit ? 18 : 14);
       if (!opts.noFlash) this.tweens.add({ targets: target.img, alpha: 0.4, duration: 60, yoyo: true });
 
       if (target.hp <= 0) this.kill(target);
@@ -290,7 +290,7 @@
       this.units.filter(x => x.kind === 'summon').forEach(x => { x.alive = false; x.img.destroy(); });
       this.units = this.units.filter(x => x.kind !== 'summon');
       const st = { maxHp: Math.round(owner.st.maxHp * 0.5), atk: owner.st.atk * v * (owner.st.summonPower || 1), def: owner.st.def * 0.5, spd: 1.1, crit: 5, critDmg: 1.5, ranged: false };
-      const sk = this.makeUnit({ side: 'party', kind: 'summon', name: '骷髏', st, x: 222, texture: this.monsterTex('skeleton', '#e8e4d8'), originY: 0.94, scale: 0.95 });
+      const sk = this.makeUnit({ side: 'party', kind: 'summon', st, x: 222, texture: this.monsterTex('skeleton', '#e8e4d8'), originY: 0.94, scale: 0.95 });
       sk.life = dur;
       sk.img.setAlpha(0);
       this.tweens.add({ targets: sk.img, alpha: 1, duration: 300 });
@@ -331,8 +331,8 @@
       for (let i = 0; i < drops; i++) {
         const it = G.makeItem(f, u.boss);
         const res = G.addItem(it);
-        if (it.rarity >= 2 && res === 'ok') G.addLog(`🎁 掉落 ${G.RARITY[it.rarity].name}「${it.name}」`, G.RARITY[it.rarity].color);
-        if (res === 'full') G.addLog('🎒 背包滿了，裝備自動賣掉', '#aaa');
+        if (it.rarity >= 2 && res === 'ok') G.addLog('log.drop', { rarity: { k: `rarity.${it.rarity}` }, item: { item: { slot: it.slot, base: it.base, rarity: it.rarity } } }, G.RARITY[it.rarity].color);
+        if (res === 'full') G.addLog('log.bagFull', null, '#aaa');
       }
       // 雲晶
       const crystal = u.boss ? 1 + Math.floor(f / 5) : Math.random() < 0.04 ? 1 : 0;
@@ -341,8 +341,8 @@
       const petCap = 4 + S.ship.hull * 2;
       if (!u.boss && S.nets > 0 && S.pets.length < petCap && Math.random() < G.CONFIG.captureChance) {
         S.nets--;
-        S.pets.push({ name: u.name, shape: u.shape, color: u.color });
-        G.addLog(`🕸️ 捕獲了「${u.name}」！牠住進了飛行船`, '#ffb3f0');
+        S.pets.push({ id: u.monsterId, shape: u.shape, color: u.color });
+        G.addLog('log.capture', { name: { k: `monster.${u.monsterId}` } }, '#ffb3f0');
         G.emit('home');
       }
       if (!u.boss) S.kills++;
@@ -354,20 +354,20 @@
       S.kills = 0;
       if (f + 1 > S.maxFloor) {
         S.maxFloor = f + 1;
-        G.addLog(`🏆 擊敗第 ${f} 層層主！第 ${f + 1} 層已開放`, '#ffd76a');
+        G.addLog('log.bossDown', { f, n: f + 1 }, '#ffd76a');
         const unlocked = G.PARTNERS.find(p => p.floor === f + 1 || p.floor === f);
-        if (unlocked && !S.partners[unlocked.id] && S.maxFloor >= unlocked.floor) G.addLog(`🤝 ${unlocked.name} 可以招募了（夥伴分頁）`, '#7fd1ff');
+        if (unlocked && !S.partners[unlocked.id] && S.maxFloor >= unlocked.floor) G.addLog('log.partnerAvail', { name: { k: `partner.${unlocked.id}.name` } }, '#7fd1ff');
       }
       const cap = G.shipMaxFloor(S.ship.balloon);
       if (S.autoAdvance) {
         if (f + 1 <= cap) {
           S.floor = f + 1;
           this.time.delayedCall(900, () => this.applyFloorTheme());
-          this.floatText(W / 2, 80, `↑ 前往第 ${S.floor} 層`, '#ffffff', 22, 1500);
+          this.floatText(W / 2, 80, G.t('battle.toFloor', { n: S.floor }), '#ffffff', 22, 1500);
         } else if (!this.capWarned) {
           this.capWarned = true;
-          G.addLog(`🎈 氣囊高度只到第 ${cap} 層，升級氣囊才能往上`, '#ffb36b');
-          G.emit('toast', `飛行船只能到第 ${cap} 層，升級「氣囊」才能繼續往上`);
+          G.addLog('log.capReached', { n: cap }, '#ffb36b');
+          G.emit('toast', G.t('toast.capReached', { n: cap }));
         }
       }
       G.emit('floorChange');
@@ -377,10 +377,10 @@
     defeat() {
       this.mode = 'dead';
       this.hero.img.setAlpha(0.35).setTint(0x777777);
-      this.floatText(W / 2, 110, '戰敗……', '#ff6b6b', 26, 1600);
+      this.floatText(W / 2, 110, G.t('battle.defeat'), '#ff6b6b', 26, 1600);
       // 用真實時間計時：分頁切到背景時 Phaser 會暫停，但復活倒數要照算
       this.reviveAt = Date.now() + G.CONFIG.reviveSeconds * 1000;
-      G.addLog(`💀 在第 ${G.S.floor} 層倒下`, '#ff8a8a');
+      G.addLog('log.defeat', { n: G.S.floor }, '#ff8a8a');
       G.emit('dead', true);
     }
 
@@ -391,7 +391,7 @@
       this.reviveAt = 0;
       S.autoAdvance = false;
       S.floor = back; S.kills = 0;
-      G.addLog(`🕊️ 復活了，退回第 ${back} 層修練（已暫停自動推進）`, '#ff8a8a');
+      G.addLog('log.reviveFree', { n: back }, '#ff8a8a');
       G.emit('dead', false);
       G.emit('floorChange');
       this.restartFloor();
@@ -401,7 +401,7 @@
     revivePaid() {
       const S = G.S, cost = G.CONFIG.reviveCost;
       if (this.mode !== 'dead') return;
-      if (S.crystal < cost) return G.emit('toast', `雲晶不夠，需要 ${cost} 💎`);
+      if (S.crystal < cost) return G.emit('toast', G.t('toast.reviveNeed', { n: cost }));
       S.crystal -= cost;
       this.reviveAt = 0;
       this.units.forEach(u => {
@@ -410,8 +410,8 @@
         u.img.setAlpha(1).clearTint();
         this.glow(u, '#ffd76a');
       });
-      this.floatText(W / 2, 110, '復活！', '#ffd76a', 26, 1200);
-      G.addLog(`💎 花了 ${cost} 雲晶原地復活`, '#9fe8ff');
+      this.floatText(W / 2, 110, G.t('battle.revived'), '#ffd76a', 26, 1200);
+      G.addLog('log.revivePaid', { n: cost }, '#9fe8ff');
       G.emit('dead', false);
       this.mode = 'fight';
       this.checkWaveEnd();
@@ -505,7 +505,7 @@
           const ball = this.add.circle(this.shipImg.x + 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);
           this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
             ball.destroy();
-            if (t.alive) { this.hit(src, t, 0.3 * G.S.ship.cannon); this.floatText(t.img.x, t.img.y - 70, '砲擊!', '#ffb36b', 13); this.checkWaveEnd(); }
+            if (t.alive) { this.hit(src, t, 0.3 * G.S.ship.cannon); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13); this.checkWaveEnd(); }
           } });
         }
       }
