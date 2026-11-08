@@ -30,6 +30,9 @@
       // 自己畫的圖（assets/manifest.js 有登記才會載入）
       const ov = window.ASSET_OVERRIDES || {};
       Object.entries(ov).forEach(([key, url]) => this.load.image('ov_' + key, url));
+      // 內嵌的美術（base64，file:// 也能用）
+      const data = window.ASSET_DATA || {};
+      Object.entries(data).forEach(([key, url]) => this.load.image(key, url));
     }
 
     create() {
@@ -60,6 +63,9 @@
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
       this.ground = this.add.tileSprite(0, GROUND - 6, W, H - GROUND + 6, '__DEFAULT').setOrigin(0);
+      // 主背景圖（紫暮裂空）：有圖就蓋掉程式畫的漸層天空、浮島、遠雲，只留近雲飄動
+      this.bgImg = this.textures.exists('bg_main') ? this.add.image(0, 0, 'bg_main').setOrigin(0).setDisplaySize(W, H).setDepth(-3) : null;
+      if (this.bgImg) { this.cloudFar.setVisible(false); this.cloudNear.setAlpha(0.3); }
       this.drawShip();
       this.applyFloorTheme();
 
@@ -93,6 +99,7 @@
       this.tex('islands', 512, 160, (ctx, w, h) => G.ART.drawIslands(ctx, w, h, islandColor));
       if (!this.islandsLayer) this.islandsLayer = this.add.tileSprite(0, 40, W, 160, 'islands').setOrigin(0).setDepth(-1);
       else this.islandsLayer.setTexture('islands');
+      if (this.bgImg) { this.sky.setVisible(false); this.islandsLayer.setVisible(false); }
       this.sky.setDepth(-2);
       this.shipImg.setDepth(-1);
       // 上升詛咒：進到有詛咒的樓層時提示
