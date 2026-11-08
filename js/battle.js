@@ -191,6 +191,7 @@
     }
 
     restartFloor() {
+      if (this.reviveAt) { this.reviveAt = 0; G.emit('dead', false); }  // 倒地時手動換層 = 直接復活
       this.enemies.forEach(e => e.img.destroy());
       this.enemies = [];
       this.applyFloorTheme();
@@ -372,19 +373,48 @@
       G.emit('floorChange');
     }
 
+    // 戰敗：等 30 秒免費復活（退回上一層），或花雲晶原地復活
     defeat() {
       this.mode = 'dead';
       this.hero.img.setAlpha(0.35).setTint(0x777777);
       this.floatText(W / 2, 110, '戰敗……', '#ff6b6b', 26, 1600);
+      // 用真實時間計時：分頁切到背景時 Phaser 會暫停，但復活倒數要照算
+      this.reviveAt = Date.now() + G.CONFIG.reviveSeconds * 1000;
+      G.addLog(`💀 在第 ${G.S.floor} 層倒下`, '#ff8a8a');
+      G.emit('dead', true);
+    }
+
+    // 倒數結束：免費復活，退回上一層修練
+    reviveFree() {
       const S = G.S;
       const back = Math.max(1, S.floor - 1);
-      G.addLog(`💀 在第 ${S.floor} 層倒下，退回第 ${back} 層修練（已暫停自動推進）`, '#ff8a8a');
+      this.reviveAt = 0;
       S.autoAdvance = false;
-      this.time.delayedCall(1800, () => {
-        S.floor = back; S.kills = 0;
-        G.emit('floorChange');
-        this.restartFloor();
+      S.floor = back; S.kills = 0;
+      G.addLog(`🕊️ 復活了，退回第 ${back} 層修練（已暫停自動推進）`, '#ff8a8a');
+      G.emit('dead', false);
+      G.emit('floorChange');
+      this.restartFloor();
+    }
+
+    // 花雲晶：全隊原地滿血復活，繼續這場戰鬥
+    revivePaid() {
+      const S = G.S, cost = G.CONFIG.reviveCost;
+      if (this.mode !== 'dead') return;
+      if (S.crystal < cost) return G.emit('toast', `雲晶不夠，需要 ${cost} 💎`);
+      S.crystal -= cost;
+      this.reviveAt = 0;
+      this.units.forEach(u => {
+        if (u.kind === 'summon') return;
+        u.alive = true; u.hp = u.st.maxHp;
+        u.img.setAlpha(1).clearTint();
+        this.glow(u, '#ffd76a');
       });
+      this.floatText(W / 2, 110, '復活！', '#ffd76a', 26, 1200);
+      G.addLog(`💎 花了 ${cost} 雲晶原地復活`, '#9fe8ff');
+      G.emit('dead', false);
+      this.mode = 'fight';
+      this.checkWaveEnd();
     }
 
     waveCleared() {
@@ -440,6 +470,8 @@
         }
       } else if (this.mode === 'fight') {
         this.fightTick(dt);
+      } else if (this.mode === 'dead' && this.reviveAt && Date.now() >= this.reviveAt) {
+        this.reviveFree();
       }
       this.drawBars();
     }

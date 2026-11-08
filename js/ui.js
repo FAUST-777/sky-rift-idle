@@ -20,6 +20,15 @@
     $('floorProg').style.width = Math.min(100, S.kills / G.CONFIG.killsPerFloor * 100) + '%';
     $('floorKills').textContent = boss ? '層主戰' : `${S.kills}/${G.CONFIG.killsPerFloor}`;
     $('floorKills').classList.toggle('boss', boss);
+    // 戰敗復活倒數
+    const sc = G.battleScene();
+    if (sc && sc.reviveAt) {
+      const left = Math.max(0, Math.ceil((sc.reviveAt - Date.now()) / 1000));
+      $('reviveText').innerHTML = `<b>${left}</b>秒後免費復活（退回第 ${Math.max(1, S.floor - 1)} 層）`;
+      const cost = G.CONFIG.reviveCost;
+      $('revivePay').textContent = `💎 ${cost} 立即原地復活（有 ${G.fmt(S.crystal)}）`;
+      $('revivePay').disabled = S.crystal < cost;
+    }
     // 有技能點未使用 → 技能分頁亮紅點
     setDot('skills', S.skillPoints > 0);
     setDot('hero', h.cls === 'villager' && h.level >= G.CONFIG.classUnlockLevel);
@@ -379,6 +388,7 @@
       case 'reset': UI.modal(`<h2>重置存檔？</h2><p>所有進度都會消失，無法復原。</p>
         <div class="modal-actions"><button class="btn" data-act="close">取消</button><button class="btn danger" data-act="reset2">確定重置</button></div>`); break;
       case 'reset2': G.resetSave(); break;
+      case 'revivePay': G.battleScene().revivePaid(); break;
       case 'credits': UI.modal(`<h2>授權說明</h2>
         <p>本遊戲使用 <b>Phaser 3.80.1</b>（https://phaser.io），依 MIT 授權使用。</p>
         <pre style="white-space:pre-wrap;font-size:10px;line-height:1.5;color:var(--muted);background:#120e20;padding:10px;border-radius:8px">The MIT License (MIT)
@@ -453,6 +463,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     // 狀態改變時，只重畫有關的分頁
     G.on('toast', UI.toast);
+    G.on('dead', on => { $('revive').hidden = !on; hud(); });
     G.on('log', () => UI.refresh(['adventure']));
     G.on('floorChange', () => UI.refresh(['adventure']));
     G.on('floor', () => UI.refresh(['adventure']));

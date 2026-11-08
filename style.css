@@ -37,6 +37,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #battleWrap { position: relative; flex: none; }
 #battle { width: 100%; aspect-ratio: 480 / 300; background: #9fd8ff; }
 #battle canvas { display: block; }
+#revive { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 480 / 300; background: rgba(10,6,20,.62);
+  display: flex; align-items: center; justify-content: center; z-index: 5; }
+#revive[hidden] { display: none; }
+.revive-card { text-align: center; padding: 14px 18px; }
+.revive-title { font-size: 22px; font-weight: 700; color: var(--bad); margin-bottom: 6px; }
+#reviveText { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+#reviveText b { font-size: 28px; color: var(--text); display: block; }
 #floorBar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #17122a; border-bottom: 1px solid var(--line); font-size: 13px; }
 #floorName { font-weight: 700; color: var(--sky); min-width: 64px; }
 .prog { flex: 1; height: 8px; background: #0d0a18; border-radius: 4px; overflow: hidden; }
