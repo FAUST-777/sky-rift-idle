@@ -150,10 +150,10 @@
 
     memberUnit(who) {
       const isHero = who === 'hero';
-      const look = isHero ? G.ART.lookFromHero() : G.ART.lookFromPartner(who);
+      const look = isHero ? G.ART.lookFromHero() : who === G.MERC ? G.S.merc.snap.look : G.ART.lookFromPartner(who);
       const u = this.makeUnit({
         side: 'party', kind: isHero ? 'hero' : 'partner', key: who, partnerId: isHero ? null : who,
-        st: G.charStats(who), texture: this.humanTex(isHero ? 'hero' : 'p_' + who, look), x: 0, scale: isHero ? 1.1 : 1.0,
+        st: G.charStats(who), texture: this.humanTex(isHero ? 'hero' : 'p_' + who.replace('@', ''), look), x: 0, scale: isHero ? 1.1 : 1.0,
       });
       this.applyBuild(u, who);
       u.frenzy = this.frenzyMem[who] || 0;
@@ -187,7 +187,7 @@
     // 換裝、學技能後即時更新數值（保留血量比例）；外觀改變時換貼圖
     refreshMembers(look) {
       this.units.forEach(u => {
-        if (!u.key) return;
+        if (!u.key || (u.key === G.MERC && !G.S.merc)) return;   // 傭兵剛被解雇，等重建隊伍
         const ratio = u.hp / u.st.maxHp;
         u.st = G.charStats(u.key);
         if (this.aura.hpPct) u.st.maxHp = Math.round(u.st.maxHp * (1 + this.aura.hpPct));
@@ -793,7 +793,7 @@
         const members = this.units.filter(u => u.key);
         const top = Math.max(0, ...members.map(u => u.frenzy || 0));
         if (top > 0) {
-          const list = members.map(u => `${u.kind === 'hero' ? G.t('hero.who.hero') : G.partnerName(u.partnerId)} +${u.frenzy}%`).join('、');
+          const list = members.map(u => `${G.whoName(u.key)} +${u.frenzy}%`).join('、');
           out.push({ id: 'frenzy', icon: G.FX_ICON.frenzy, val: `+${top}%`, p: { max: fc, list } });
         }
       }
@@ -813,7 +813,7 @@
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);
-      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: taunter.kind === 'hero' ? G.t('hero.who.hero') : G.partnerName(taunter.partnerId) } });
+      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: G.whoName(taunter.key) } });
       // 敵人 debuff
       const foes = this.enemiesAlive();
       DEBUFF_IDS.forEach(id => {

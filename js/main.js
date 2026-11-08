@@ -25,18 +25,26 @@
   }
 
   // 開場對話：新玩家一定看；開場內容改版（G.INTRO_VER）後老玩家也會再看一次
-  if ((G.S.introVer || 0) < G.INTRO_VER) {
-    const firstTime = !G.S.seenPrologue;
-    G.UI.prologue(() => {
-      G.S.seenPrologue = true;
-      G.S.introVer = G.INTRO_VER;
-      if (firstTime) G.addLog('log.start', null, '#7fd1ff');
-      G.save();
-      if (!firstTime) showOffline(offline);
-    });
-  } else {
-    showOffline(offline);
+  function intro() {
+    if ((G.S.introVer || 0) < G.INTRO_VER) {
+      const firstTime = !G.S.seenPrologue;
+      G.UI.prologue(() => {
+        G.S.seenPrologue = true;
+        G.S.introVer = G.INTRO_VER;
+        if (firstTime) G.addLog('log.start', null, '#7fd1ff');
+        G.save();
+        if (!firstTime) showOffline(offline);
+      });
+    } else {
+      showOffline(offline);
+    }
   }
+
+  // 第一步：還沒有冒險者名稱就先取名（老玩家也要補取名），取完才進開場
+  if (!G.S.account && G.S.pendingName) G.createAccount(G.S.pendingName);   // 舊版離線取名的資料
+  delete G.S.pendingName;
+  if (!G.S.account) G.UI.askName(intro);
+  else intro();
 
   // 每 10 秒自動存檔（分頁在背景時不存，才不會蓋掉離開時間）
   setInterval(() => { if (!document.hidden) G.save(); }, 10000);

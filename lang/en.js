@@ -330,4 +330,64 @@ G.I18N['en'] = {
   'hero.changeTo': 'Become a {name}',
   'hero.autoEquipOne': 'Equip best: {name}',
   'hero.autoEquipAll': 'Equip best: whole party',
+
+  // ── 第 8 輪：冒險者名稱・好友・雇用 ──
+  'name.title': 'Name your adventurer',
+  'name.help': 'Up to {max} Chinese characters (or {en} letters). Friends will see this name. It cannot be changed later.',
+  'name.placeholder': 'Adventurer name',
+  'name.ok': 'Start adventure',
+  'name.tooLong': 'Name is too long',
+  'name.empty': 'Please enter a name',
+  
+  
+  
+  
+  'name.done': 'Your game ID: {id}',
+  'friends.title': 'Friends',
+  
+  'friends.copy': 'Copy',
+  'friends.copied': 'ID copied',
+  
+  'friends.inputPh': 'Paste a friend code', 
+  
+  
+  'friends.self': 'That is your own code', 
+  
+  'friends.full': 'Up to {n} friends',
+  'friends.added': 'Added friend: {name}',
+  'friends.empty': 'No friends yet. Copy your code to a friend, or paste theirs and import it.', 
+  
+  
+  'friends.floor': 'Best: Floor {n}',
+  'friends.view': 'View',
+  'friends.hire': 'Hire {cost}💎',
+  'friends.hired': 'Hired',
+  'friends.remove': 'Remove friend',
+  'friends.updated': 'data from {t} ago', 
+  
+  
+  'friends.viewTitle': '{name}\'s adventure',
+  'friends.level': 'Hero level',
+  'friends.nowFloor': 'Current floor',
+  'friends.bestFloor': 'Best floor',
+  'ago.min': '{n} min',
+  'ago.hour': '{n} h',
+  'ago.day': '{n} d',
+  'merc.tag': 'Merc',
+  'merc.dismiss': 'Dismiss',
+  'merc.hired': 'Hired {name}. They joined your party!',
+  
+  'merc.help': 'Your friend\'s hero, using the stats and skills from their friend code (import a new code to update). Takes a party slot; hiring another friend replaces them.', 
+  'log.mercHired': '🤝 Hired your friend {name}\'s hero',
+  'log.mercReplaced': '🤝 Hired {name}, replacing {old}',
+  'settings.account': 'Adventurer',
+  'friends.export': 'Copy my friend code',
+  'friends.exported': 'Friend code copied. Paste it to a friend',
+  'friends.exportHelp': 'Send this code to a friend. When they tap Import, you appear on their friend list. To show them your latest progress, just send a new code.',
+  'friends.import': 'Import',
+  'friends.badCode': 'Could not read that code. Make sure you copied all of it (it starts with SKY)',
+  'friends.imported': 'Added friend: {name}',
+  'friends.refreshed': 'Updated {name}',
+  'friends.codeTitle': 'My friend code',
+  'friends.copyManual': 'Your browser blocked automatic copying. Select the text below and copy it.',
 };

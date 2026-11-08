@@ -330,4 +330,64 @@ G.I18N['zh-TW'] = {
   'hero.changeTo': '轉職為「{name}」',
   'hero.autoEquipOne': '{name}穿最好的',
   'hero.autoEquipAll': '全隊穿最好的',
+
+  // ── 第 8 輪：冒險者名稱・好友・雇用 ──
+  'name.title': '為你的冒險者取名',
+  'name.help': '最多 {max} 個中文字（或 {en} 個英文字）。好友會看到這個名稱，之後不能修改。',
+  'name.placeholder': '冒險者名稱',
+  'name.ok': '開始冒險',
+  'name.tooLong': '名稱太長了',
+  'name.empty': '請輸入名稱',
+  
+  
+  
+  
+  'name.done': '你的遊戲 ID：{id}',
+  'friends.title': '好友',
+  
+  'friends.copy': '複製',
+  'friends.copied': '已複製 ID',
+  
+  'friends.inputPh': '貼上朋友的好友代碼', 
+  
+  
+  'friends.self': '這是你自己的代碼', 
+  
+  'friends.full': '好友最多 {n} 位',
+  'friends.added': '加了好友：{name}',
+  'friends.empty': '還沒有好友。複製你的代碼給朋友，或貼上朋友的代碼匯入。', 
+  
+  
+  'friends.floor': '最高第 {n} 層',
+  'friends.view': '查看',
+  'friends.hire': '雇用 {cost}💎',
+  'friends.hired': '雇用中',
+  'friends.remove': '移除好友',
+  'friends.updated': '{t}前的資料', 
+  
+  
+  'friends.viewTitle': '{name} 的冒險',
+  'friends.level': '主角等級',
+  'friends.nowFloor': '目前層數',
+  'friends.bestFloor': '最高層數',
+  'ago.min': '{n} 分鐘',
+  'ago.hour': '{n} 小時',
+  'ago.day': '{n} 天',
+  'merc.tag': '傭兵',
+  'merc.dismiss': '解雇',
+  'merc.hired': '雇用了 {name}，加入隊伍！',
+  
+  'merc.help': '好友的主角，能力和技能照他好友代碼裡的資料（重新匯入就會更新）。佔一個出戰名額；雇用別的好友會取代他。', 
+  'log.mercHired': '🤝 雇用了好友 {name} 的主角',
+  'log.mercReplaced': '🤝 雇用 {name}，取代了 {old}',
+  'settings.account': '冒險者',
+  'friends.export': '複製我的好友代碼',
+  'friends.exported': '已複製好友代碼，貼給朋友就可以了',
+  'friends.exportHelp': '把代碼貼給朋友，對方按「匯入」就會出現在他的好友名單。想讓朋友看到你的最新進度，就再複製一次給他。',
+  'friends.import': '匯入',
+  'friends.badCode': '代碼讀不出來，請確認有完整複製（開頭是 SKY）',
+  'friends.imported': '加了好友：{name}',
+  'friends.refreshed': '更新了 {name} 的資料',
+  'friends.codeTitle': '我的好友代碼',
+  'friends.copyManual': '瀏覽器不允許自動複製，請全選下面的文字自己複製。',
 };
