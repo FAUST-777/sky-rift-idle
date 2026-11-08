@@ -36,6 +36,14 @@
 用 puppeteer-core + 本機 Chrome 無頭模式，手機 390×844 與桌機 1280×800：
 序章、六個分頁、轉職、學技能、招募夥伴/換職業/升級、飛行船改裝與塗裝、買家具擺放、捕獲寵物、離線收益，皆無 console 錯誤。
 
+### 上線方式變更：GitHub Pages → 私人 repo + Vercel
+- 一開始用公開 repo + GitHub Pages 上線。
+- 使用者目標是之後上 Steam 販售，想把 repo 改私人。確認過 **Steam 沒有要求公開原始碼**，
+  Phaser（MIT）只要求附上授權文字 → 新增 `THIRD_PARTY_NOTICES.md`，遊戲「設定」加「授權說明」按鈕。
+- 免費版 GitHub Pages 不支援私人 repo，改部署到 Vercel（使用者原本就在用）：https://sky-rift-idle.vercel.app
+- 順序：先部署 Vercel 並驗證能玩 → 才把 repo 改私人並關掉 Pages，避免中間兩個網址都打不開。
+- 注意：網頁遊戲的 JS 本來就會下載到玩家瀏覽器，私人 repo 擋不住看網頁版程式；要保護的 Steam 版內容不要放進網頁版。
+
 ### 已知待辦
 - 數值只粗調（離線 2 小時 1→16 級，偏多）
 - 紙娃娃、背景、飛行船的自製圖替換機制

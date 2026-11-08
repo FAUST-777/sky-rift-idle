@@ -78,6 +78,7 @@
         <h3>設定</h3>
         <label class="switch"><input type="checkbox" data-act="autosell" ${S.autoSellCommon ? 'checked' : ''}><i></i>撿到普通裝備自動賣掉</label>
         <div class="row" style="margin-top:12px"><button class="btn small danger" data-act="reset">重置存檔</button>
+          <button class="btn small" data-act="credits">授權說明</button>
           <span class="muted" style="font-size:12px">進度自動存在這個瀏覽器</span></div>
       </div>`;
   }
@@ -378,6 +379,18 @@
       case 'reset': UI.modal(`<h2>重置存檔？</h2><p>所有進度都會消失，無法復原。</p>
         <div class="modal-actions"><button class="btn" data-act="close">取消</button><button class="btn danger" data-act="reset2">確定重置</button></div>`); break;
       case 'reset2': G.resetSave(); break;
+      case 'credits': UI.modal(`<h2>授權說明</h2>
+        <p>本遊戲使用 <b>Phaser 3.80.1</b>（https://phaser.io），依 MIT 授權使用。</p>
+        <pre style="white-space:pre-wrap;font-size:10px;line-height:1.5;color:var(--muted);background:#120e20;padding:10px;border-radius:8px">The MIT License (MIT)
+
+Copyright (c) 2024 Richard Davey, Phaser Studio Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+        <div class="modal-actions"><button class="btn primary" data-act="close">關閉</button></div>`); break;
       case 'item':
         if (d.slot) itemModal(S.equipped[d.slot], d.slot);
         else itemModal(S.inventory.find(i => i.uid === +d.id));

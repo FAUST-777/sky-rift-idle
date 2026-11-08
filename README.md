@@ -3,7 +3,7 @@
 中世紀村莊的天空破了一個大洞，村民搭熱氣球飛上去，一層一層往上探險的掛機遊戲。
 手機直式設計，電腦瀏覽器打開會顯示成置中的手機寬度。
 
-**線上試玩：** https://faust-777.github.io/sky-rift-idle/
+**線上試玩：** https://sky-rift-idle.vercel.app
 
 ## 需求起因
 
@@ -58,6 +58,12 @@ vendor/phaser.min.js 遊戲引擎 Phaser 3.80.1
 主角、夥伴的紙娃娃、背景、飛行船之後再接上替換機制。紙娃娃的圖要分層畫：
 身體、頭髮、頭盔、鎧甲、靴子、武器各一張，同樣大小疊在一起。
 
-## 上線
+## 部署
 
-整個資料夾推到 GitHub，開啟 GitHub Pages 就有網址，手機和電腦都能玩，免費。
+repo 為私人，網頁版放在 Vercel（免費方案支援私人 repo）。**push 不會自動部署**，改完要手動：
+
+```
+npx vercel --prod --scope faust777s-projects
+```
+
+第三方授權見 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（遊戲內「設定 → 授權說明」也看得到）。
