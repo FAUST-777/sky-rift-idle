@@ -62,6 +62,9 @@
       v: 1, skillVer: 2,
       seenPrologue: false,
       gold: 0, crystal: 0,
+      account: null,                // 線上帳號 { id, token, name }（還沒註冊成功時名稱存在 pendingName）
+      friends: [],                  // 好友的遊戲 ID
+      merc: null,                   // 雇用中的好友主角 { id, name, snap, hiredAt }
       net: { owned: [], eq: -1 },   // 捕獸網：買過的款式、裝著第幾款（-1 = 沒裝）
       dex: {},                      // 怪物圖鑑：id -> { seen, caught, seenClaimed, caughtClaimed }
       hero,
@@ -175,8 +178,10 @@
 
   // ── 角色 / 技能 ─────────────────────────────────────────────────────────
   // who = 'hero' 或夥伴 id
-  G.charOf = who => (who === 'hero' || !who ? G.S.hero : G.S.partners[who]);
-  G.partyMembers = () => ['hero', ...G.S.party.filter(id => G.S.partners[id])];
+  // 雇用的好友主角用特殊 id G.MERC，資料是好友上傳的快照
+  G.charOf = who => (who === 'hero' || !who ? G.S.hero : who === G.MERC ? G.S.merc.snap.char : G.S.partners[who]);
+  G.partyMembers = () => ['hero', ...G.S.party.filter(id => (id === G.MERC ? !!G.S.merc : !!G.S.partners[id]))];
+  G.whoName = who => (who === 'hero' || !who ? G.t('hero.who.hero') : who === G.MERC ? (G.S.merc ? G.S.merc.name : '?') : G.partnerName(who));
   G.skillDef = (cls, id) => (G.SKILLS[cls] || []).find(s => s.id === id);
   G.spentPoints = who => Object.values(G.charOf(who).skills).reduce((a, b) => a + b, 0);
   G.spOf = who => Math.max(0, G.charOf(who).level - G.spentPoints(who));
@@ -222,6 +227,7 @@
 
   // ── 屬性計算（主角與夥伴共用）─────────────────────────────────────────
   G.charStats = function (who) {
+    if (who === G.MERC) return Object.assign({}, G.S.merc.snap.st);   // 好友的能力照他上傳的數值
     const ch = G.charOf(who), cls = G.CLASSES[ch.cls], isHero = who === 'hero' || !who;
     const B = G.HERO_BASE, L = G.LEVEL_GAIN, lv = ch.level;
     // 夥伴底子比主角略低，靠升級、裝備追上
@@ -345,7 +351,7 @@
 
   // ── 玩家操作 ─────────────────────────────────────────────────────────────
   // who = 'hero' 或夥伴 id；夥伴和主角共用同一個背包
-  G.gearOf = who => (who === 'hero' || !who ? G.S.equipped : G.S.partners[who].equipped);
+  G.gearOf = who => (who === 'hero' || !who ? G.S.equipped : who === G.MERC ? {} : G.S.partners[who].equipped);
   function gearChanged(who) {
     G.emit('inventory');
     G.emit(who === 'hero' || !who ? 'look' : 'party');
@@ -397,7 +403,7 @@
   // who 有值 = 只幫那一個角色穿；沒值 = 全隊（主角優先）
   G.autoEquip = function (who) {
     let n = 0;
-    const order = who ? [who] : ['hero', ...G.S.party, ...Object.keys(G.S.partners).filter(id => !G.S.party.includes(id))];
+    const order = who ? [who] : ['hero', ...G.S.party.filter(id => id !== G.MERC), ...Object.keys(G.S.partners).filter(id => !G.S.party.includes(id))];
     // 全隊模式：先把夥伴身上的裝備收回背包一起排，主角才能拿到全隊最好的
     // （每個欄位最後一定會被填回去，所以背包數量不會比原本多）
     const uidOf = (w, slot) => { const it = G.gearOf(w)[slot]; return it ? it.uid : null; };

@@ -46,7 +46,8 @@
       $('revivePay').disabled = S.crystal < cost;
     }
     // 有技能點未使用 → 技能分頁亮紅點；可以轉職 → 角色分頁亮紅點
-    setDot('skills', G.partyMembers().concat(Object.keys(S.partners)).some(w => G.spOf(w) > 0 && G.charOf(w).cls !== 'villager'));
+    setDot('skills', ['hero', ...Object.keys(S.partners)].some(w => G.spOf(w) > 0 && G.charOf(w).cls !== 'villager'));
+    $('hudName').textContent = G.myName();
     setDot('hero', h.cls === 'villager' && h.level >= G.CONFIG.classUnlockLevel);
   }
   // ── Buff 圖示（戰鬥畫面左上角，點一下看說明）─────────────────────────────
@@ -355,13 +356,142 @@
           </div>
         </div></div>`;
     }).join('');
-    return `<div class="card"><h3>${t('partners.title')} <small>${t('partners.deployed', { n: S.party.length, max: G.CONFIG.maxParty })}</small></h3>
+    return `${renderFriends()}${renderMerc()}
+      <div class="card"><h3>${t('partners.title')} <small>${t('partners.deployed', { n: S.party.length, max: G.CONFIG.maxParty })}</small></h3>
       <p class="muted" style="margin:0;font-size:12px">${t('partners.help')}</p></div>${cards}`;
+  }
+
+  // ── 好友：我的 ID、加好友、好友列表（查看 / 雇用 / 移除）──────────────────
+  function renderFriends() {
+    const S = G.S;
+    // 超過 30 秒沒抓就重抓（抓完自動重畫）
+    if (!UI.friendLoading && Date.now() - G.friendFetchedAt > 30000) {
+      UI.friendLoading = true;
+      G.fetchFriends().then(() => { UI.friendErr = false; }).catch(() => { UI.friendErr = true; })
+        .finally(() => { UI.friendLoading = false; G.friendFetchedAt = Date.now(); UI.refresh(['partners']); });
+    }
+    const myId = G.myId();
+    const rows = S.friends.map(id => {
+      const p = G.friendCache[id];
+      if (!p) return `<div class="friend"><div class="grow"><b>${id}</b><div class="muted" style="font-size:11px">${UI.friendLoading ? t('friends.loading') : t('friends.notFound')}</div></div>
+        <button class="btn small" data-act="unfriend" data-id="${id}">✕</button></div>`;
+      const pr = p.profile || {}, hired = S.merc && S.merc.id === id, can = G.canHire(p);
+      return `<div class="friend ${hired ? 'hired' : ''}">
+        <div class="grow"><b>${esc(p.name)}</b> <span class="muted" style="font-size:11px">${id}</span>
+          <div class="muted" style="font-size:11px">${pr.level ? `Lv ${pr.level} ${G.CLASSES[pr.cls] ? G.clsName(pr.cls) : ''}・${t('friends.floor', { n: pr.maxFloor || pr.floor || 1 })}` : t('friends.noData')}${p.updatedAt ? `・${t('friends.updated', { t: G.agoText(p.updatedAt) })}` : ''}</div></div>
+        <button class="btn small" data-act="fview" data-id="${id}" ${pr.level ? '' : 'disabled'}>${t('friends.view')}</button>
+        ${hired ? `<button class="btn small on" disabled>${t('friends.hired')}</button>`
+          : `<button class="btn small primary" data-act="hire" data-id="${id}" ${can ? '' : 'disabled'}>${t('friends.hire', { cost: G.hireCost(pr.level || 1) })}</button>`}
+        <button class="btn small" data-act="unfriend" data-id="${id}" title="${t('friends.remove')}">✕</button>
+      </div>`;
+    }).join('');
+    return `<div class="card">
+      <h3>👥 ${t('friends.title')} <small>${S.friends.length}/${G.MAX_FRIENDS}</small></h3>
+      <div class="row" style="margin-bottom:8px">
+        <span class="grow">${t('friends.myId')}：<b class="gold">${myId || '—'}</b>${myId ? '' : `<br><small class="muted">${t('friends.noAccount')}</small>`}</span>
+        ${myId ? `<button class="btn small" data-act="copyid">${t('friends.copy')}</button>` : ''}
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <input id="friendInput" class="text-input grow" maxlength="7" value="${UI.friendDraft || ''}" placeholder="${t('friends.inputPh')}" autocomplete="off" autocapitalize="characters">
+        <button class="btn small primary" data-act="addfriend">${t('friends.add')}</button>
+      </div>
+      ${UI.friendErr ? `<p class="muted" style="font-size:11px;margin:0 0 6px">⚠️ ${t('friends.offline')}</p>` : ''}
+      ${rows || `<p class="muted" style="font-size:12px;margin:0">${t('friends.empty')}</p>`}
+    </div>`;
+  }
+
+  // 雇用中的好友主角（佔一個出戰名額）
+  function renderMerc() {
+    const m = G.S.merc;
+    if (!m) return '';
+    const st = m.snap.st, inParty = G.S.party.includes(G.MERC);
+    return `<div class="card partner merc">
+      <canvas data-doll="${G.MERC}" width="64" height="80"></canvas>
+      <div class="grow">
+        <div class="row between"><b>${esc(m.name)} <span class="wtag">${t('merc.tag')}</span></b>
+          <button class="btn small ${inParty ? 'on' : ''}" data-act="party" data-id="${G.MERC}">${inParty ? t('partners.inParty') : t('partners.resting')}</button></div>
+        <div class="tags" style="margin:4px 0">${classTags(m.snap.char.cls)}</div>
+        <div class="muted" style="font-size:12px;margin:4px 0">Lv ${m.snap.level}・${t('partners.stats', { hp: G.fmt(st.maxHp), atk: st.atk, def: st.def })}</div>
+        <p class="muted" style="font-size:11px;margin:4px 0">${t('merc.help')}</p>
+        <button class="btn small danger" data-act="dismiss">${t('merc.dismiss')}</button>
+      </div></div>`;
+  }
+
+  // 查看好友：飛空艇外觀＋主角
+  function friendModal(id) {
+    const p = G.friendCache[id];
+    if (!p) return;
+    const pr = p.profile || {};
+    UI.modal(`<h2>${t('friends.viewTitle', { name: esc(p.name) })}</h2>
+      <div class="muted" style="font-size:12px;margin-bottom:8px">ID ${id}${p.updatedAt ? `・${t('friends.updated', { t: G.agoText(p.updatedAt) })}` : ''}</div>
+      <canvas class="ship-view" id="fShip"></canvas>
+      <div class="doll-wrap" style="margin-top:10px">
+        <canvas class="doll" id="fDoll"></canvas>
+        <div class="grow stats" style="grid-template-columns:1fr">
+          <div>${t('friends.level')} <b>Lv ${pr.level || 1}</b></div>
+          <div>${t('hero.class')} <b>${G.CLASSES[pr.cls] ? G.clsName(pr.cls) : '-'}</b></div>
+          <div>${t('friends.nowFloor')} <b>${t('floor.name', { n: pr.floor || 1 })}</b></div>
+          <div>${t('friends.bestFloor')} <b>${t('floor.name', { n: pr.maxFloor || 1 })}</b></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" data-act="close">${t('common.close')}</button>
+        ${G.canHire(p) && !(G.S.merc && G.S.merc.id === id) ? `<button class="btn primary" data-act="hire" data-id="${id}">${t('friends.hire', { cost: G.hireCost(pr.level || 1) })}</button>` : ''}
+      </div>`);
+    const ship = $('fShip'), doll = $('fDoll');
+    ship.width = 640; ship.height = 480;
+    if (pr.ship) G.ART.drawShip(ship.getContext('2d'), pr.ship, 640, 480);
+    doll.width = 256; doll.height = 320;
+    if (pr.look) G.ART.drawHumanoid(doll.getContext('2d'), pr.look, (256 - 64 * 3.6) / 2, (320 - 80 * 3.6) / 2, 3.6);
+  }
+
+  // ── 開場：輸入冒險者名稱 → 取得遊戲 ID ────────────────────────────────────
+  UI.askName = function (onDone) {
+    const show = (err, busy) => UI.modal(`<div class="prologue name-entry">
+      <h2>${t('name.title')}</h2>
+      <p class="muted" style="font-size:13px;min-height:0">${t('name.help', { max: G.NAME_MAX / 2, en: G.NAME_MAX })}</p>
+      <input id="nameInput" class="text-input" style="width:100%" placeholder="${t('name.placeholder')}" value="${esc(UI.nameDraft || '')}" ${busy ? 'disabled' : ''}>
+      <div class="row between" style="margin-top:6px"><small id="nameErr" style="color:var(--bad)">${err || ''}</small><small id="nameCount" class="muted"></small></div>
+      <div class="modal-actions">
+        ${err === t('name.fail') ? `<button class="btn" data-act="nameoffline">${t('name.offline')}</button>` : ''}
+        <button class="btn primary" data-act="namego" ${busy ? 'disabled' : ''}>${busy ? t('name.registering') : err === t('name.fail') ? t('name.retry') : t('name.ok')}</button>
+      </div></div>`);
+    const count = () => {
+      const el = $('nameInput'); if (!el) return;
+      UI.nameDraft = el.value;
+      const w = G.nameWidth(G.cleanName(el.value));
+      $('nameCount').textContent = `${w}/${G.NAME_MAX}`;
+      $('nameCount').style.color = w > G.NAME_MAX ? 'var(--bad)' : '';
+    };
+    UI.nameShow = show;
+    UI.nameDone = onDone;
+    show();
+    count();
+    setTimeout(() => { const el = $('nameInput'); if (el) el.focus(); }, 50);
+    UI.nameCount = count;
+  };
+
+  async function submitName(offline) {
+    const name = G.cleanName(UI.nameDraft || '');
+    if (!name) return UI.nameShow(t('name.empty'));
+    if (G.nameWidth(name) > G.NAME_MAX) return UI.nameShow(t('name.tooLong'));
+    if (offline) { G.S.pendingName = name; G.save(); UI.close(); return UI.nameDone(); }
+    UI.nameShow('', true);
+    try {
+      const j = await G.register(name);
+      UI.close();
+      UI.toast(t('name.done', { id: j.id }));
+      UI.nameDone();
+    } catch {
+      UI.nameShow(t('name.fail'));
+    }
   }
 
   function mountPartnerDolls() {
     $('panel').querySelectorAll('canvas[data-doll]').forEach(c => {
-      const id = c.dataset.doll, own = G.S.partners[id], def = G.PARTNERS.find(p => p.id === id);
+      const id = c.dataset.doll;
+      if (id === G.MERC) { c.width = 128; c.height = 160; if (G.S.merc) G.ART.drawHumanoid(c.getContext('2d'), G.S.merc.snap.look, 0, 0, 2); return; }
+      const own = G.S.partners[id], def = G.PARTNERS.find(p => p.id === id);
       const look = own ? G.ART.lookFromPartner(id) : { skin: def.skin, hair: def.hair, cls: 'villager' };
       c.width = 128; c.height = 160;
       const ctx = c.getContext('2d');
@@ -514,6 +644,11 @@
     UI.modal(`
       <h2>⚙️ ${t('settings.title')}</h2>
       <div class="set-group">
+        <div class="set-label">🧭 ${t('settings.account')}</div>
+        <div style="font-size:13px">${esc(G.myName() || '—')}　<span class="muted">ID</span> <b class="gold">${G.myId() || '—'}</b>
+          ${G.myId() ? `<button class="btn small" data-act="copyid" style="margin-left:6px">${t('friends.copy')}</button>` : ''}</div>
+      </div>
+      <div class="set-group">
         <div class="set-label">🌐 ${t('settings.language')}</div>
         <div class="chips">${G.LANGS.map(l => `<button class="chip ${G.settings.lang === l.id ? 'on' : ''}" data-act="lang" data-v="${l.id}">${l.name}</button>`).join('')}</div>
       </div>
@@ -636,6 +771,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'slot': slotPicker(d.kind, +d.i); break;
       case 'setslot': G.setSkillSlot(UI.who, d.kind, +d.i, d.id || null); UI.close(); break;
       case 'pskills': UI.who = d.id; switchTab('skills'); break;
+      case 'namego': submitName(false); break;
+      case 'nameoffline': submitName(true); break;
+      case 'addfriend': { const el = $('friendInput'); G.addFriend(el ? el.value : ''); break; }
+      case 'unfriend': G.removeFriend(d.id); break;
+      case 'fview': friendModal(d.id); break;
+      case 'hire': G.hireFriend(d.id); if (!$('modal').hidden) UI.close(); break;
+      case 'dismiss': G.dismissMerc(); break;
+      case 'copyid':
+        try { navigator.clipboard.writeText(G.myId()); UI.toast(t('friends.copied')); } catch { UI.toast(G.myId()); }
+        break;
       case 'recruit': G.recruit(d.id); break;
       case 'party': G.toggleParty(d.id); break;
       case 'plevel': G.partnerLevelUp(d.id); break;
@@ -716,6 +861,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     G.on('skills', () => UI.refresh(['skills', 'hero', 'adventure']));
     G.on('stats', () => UI.refresh(['hero', 'adventure']));
     G.on('party', () => UI.refresh(['partners', 'hero', 'adventure']));
+    G.on('friends', () => UI.refresh(['partners']));
+    G.on('account', () => UI.refresh(['partners']));
+    // 名稱輸入框：即時字數；按 Enter 送出
+    document.addEventListener('input', e => {
+      if (e.target.id === 'nameInput') UI.nameCount && UI.nameCount();
+      if (e.target.id === 'friendInput') { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); UI.friendDraft = e.target.value; }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (e.target.id === 'nameInput') submitName(false);
+      if (e.target.id === 'friendInput') G.addFriend(e.target.value);
+    });
     G.on('ship', () => UI.refresh(['ship', 'home', 'adventure']));
     G.on('home', () => UI.refresh(['home']));
 

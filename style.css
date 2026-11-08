@@ -28,6 +28,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .lv { font-size: 13px; color: var(--muted); }
 .lv b { color: var(--text); font-size: 16px; }
 .lv span { margin-left: 4px; color: var(--gold); }
+.lv .hud-name { margin: 0 6px 0 0; color: var(--text); font-weight: 700; max-width: 9em; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.lv .hud-name:empty { display: none; }
+.text-input { background: #120e20; border: 1px solid var(--line); border-radius: 8px; color: var(--text); padding: 7px 9px; font: inherit; font-size: 14px; min-width: 0; }
+.text-input:focus { outline: none; border-color: var(--gold); }
+.friend { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px solid #2c2448; }
+.friend.hired { background: rgba(63,154,92,.12); border-radius: 8px; }
+.friend .btn { padding: 5px 8px; }
+.card.merc { border-color: #3f9a5c; }
 .xpbar { height: 5px; background: #0d0a18; border-radius: 3px; margin-top: 4px; overflow: hidden; }
 .xpbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7f6bff, #b98bff); transition: width .3s; }
 .hud-right { display: flex; gap: 12px; font-size: 14px; white-space: nowrap; }

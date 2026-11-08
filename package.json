@@ -1,0 +1,8 @@
+{
+  "name": "sky-rift-idle",
+  "private": true,
+  "description": "天空裂洞物語：前端是純靜態網頁，api/ 是好友系統的 Vercel Serverless 後端",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}
