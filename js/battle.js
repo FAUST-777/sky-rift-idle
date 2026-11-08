@@ -443,6 +443,7 @@
       if (!this.party(u)) { const t = this.targetFor(u); if (t) { this.lunge(u); this.hit(u, t, 1); } return; }
       const targets = u.st.range === 'all' ? this.enemiesAlive() : [this.targetFor(u)].filter(Boolean);
       if (!targets.length) return;
+      this.gainMorale(u);
       const shots = u.st.shots || 1;
       const mult = G.BASIC_MULT[u.st.range || 'one'] * (shots > 1 ? 0.6 : 1);
       const onHit = t => { this.hit(u, t, mult); this.applyProcs(u, t); };
@@ -454,6 +455,16 @@
         this.lunge(u);
         targets.forEach(onHit);
       }
+    }
+
+    // 士氣：隊伍有人裝「士氣」被動時，貓鎧者每攻擊一次（普攻或攻擊技能）+1 層（上限依技能等級，戰敗歸零）
+    gainMorale(u) {
+      const cap = G.moraleCap(), S = G.S;
+      if (!cap || S.morale >= cap || !u.key || !this.party(u)) return;
+      const ch = G.charOf(u.key);
+      if (!ch || ch.cls !== 'catknight') return;
+      S.morale = Math.min(cap, S.morale + G.CONFIG.moralePerAttack);
+      if (S.morale % 5 === 0 || S.morale === cap) this.floatText(u.img.x, u.img.y - u.img.displayHeight - 30, G.t('battle.morale', { n: S.morale }), '#9fd8ff', 14, 1100);
     }
 
     // 普攻附加效果（被動 proc）
@@ -478,6 +489,7 @@
 
       const targets = e.target === 'all' ? this.enemiesAlive() : e.target === 'one' ? [this.targetFor(u)].filter(Boolean) : [];
       const hits = e.hits || 1;
+      if (e.mult && targets.length) this.gainMorale(u);
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
         if (u.st.missile) targets.forEach((t, i) => { for (let h = 0; h < Math.min(3, hits); h++) this.shoot(u, t, u.st.missile, i * 3 + h); });
@@ -584,12 +596,6 @@
       S.kills = 0;
       // 圖鑑：打倒層主 → 這一層的怪物都登錄為「已發現」
       G.monsterTier(f).forEach(m => G.dexMark(m.id, 'seen'));
-      // 士氣：隊伍有人裝「士氣」、這層沒戰敗 → +1%（上限依技能等級）
-      const cap = G.moraleCap();
-      if (cap && S.morale < cap) {
-        S.morale = Math.min(cap, S.morale + G.CONFIG.moralePerFloor);
-        this.floatText(W / 2, 108, G.t('battle.morale', { n: S.morale }), '#9fd8ff', 17, 1500);
-      }
       if (f + 1 > S.maxFloor) {
         S.maxFloor = f + 1;
         G.addLog('log.bossDown', { f, n: f + 1 }, '#ffd76a');

@@ -72,7 +72,7 @@
       inventory: [],
       bagExpands: 0,         // 背包擴充次數
       floor: 1, maxFloor: 1, kills: 0, autoAdvance: true,
-      morale: 0,             // 士氣層數（每層 +1% 全隊最終防禦；有人裝「士氣」被動才累積/生效）
+      morale: 0,             // 士氣層數（貓鎧者每攻擊一次 +1 層，每層 +1% 全隊最終防禦；有人裝「士氣」被動才累積/生效）
       partners: {},          // id -> { level, cls, equipped, skills, active, passive }
       party: [],             // 出戰中的夥伴 id
       ship: newShip(),

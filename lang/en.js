@@ -89,7 +89,7 @@ G.I18N['en'] = {
   'skill.ck_fullburst.name': 'Full Burst', 'skill.ck_fullburst.desc': 'Every hatch opens: {v}% damage to all enemies, their attack speed -30% and DEF -20% for 5s',
   'skill.ck_rally.name': 'Meow Rally', 'skill.ck_rally.desc': 'Party ATK +{v}% for 10s',
   'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Heals the party for {v}% HP',
-  'skill.ck_morale.name': 'Morale', 'skill.ck_morale.desc': 'Each floor cleared without a defeat gives the party +1% final DEF, up to +{v}%',
+  'skill.ck_morale.name': 'Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 Morale stack; each stack gives the party +1% final DEF, up to +{v}%',
   'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit on an enemy gives that member +1% damage, up to +{v}%. Resets when they fall',
   'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s',
   'skill.ck_venom.name': 'Venom Cat', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to Poison',
@@ -238,7 +238,7 @@ G.I18N['en'] = {
   'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!',
 
   // ── Buffs ──
-  'buff.morale.name': 'Morale', 'buff.morale.desc': 'Each floor cleared without a defeat gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',
+  'buff.morale.name': 'Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',
   'buff.frenzy.name': 'Cat Frenzy', 'buff.frenzy.desc': 'Each hit on an enemy gives that member +1% damage (up to +{max}%). Resets when they fall. Now: {list}',
   'buff.animal_bear.name': 'Bear', 'buff.animal_bear.desc': 'Party DEF {v}',
   'buff.animal_wolf.name': 'Wolf', 'buff.animal_wolf.desc': 'Party ATK {v}',

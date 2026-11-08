@@ -89,7 +89,7 @@ G.I18N['zh-CN'] = {
   'skill.ck_fullburst.name': '全弹发射', 'skill.ck_fullburst.desc': '全身舱门打开，全体 {v}% 伤害，敌人攻速 -30%、防御 -20%，5 秒',
   'skill.ck_rally.name': '喵喵鼓舞', 'skill.ck_rally.desc': '全队攻击 +{v}%，10 秒',
   'skill.ck_purr.name': '呼噜疗愈', 'skill.ck_purr.desc': '全队恢复 {v}% 生命',
-  'skill.ck_morale.name': '士气', 'skill.ck_morale.desc': '每打过一层（没战败）全队最终防御 +1%，最多 +{v}%',
+  'skill.ck_morale.name': '士气', 'skill.ck_morale.desc': '猫铠者每攻击一次累积 1 层士气，每层全队最终防御 +1%，最多 +{v}%',
   'skill.ck_frenzy.name': '吸猫狂热', 'skill.ck_frenzy.desc': '队员每次击中敌人自身伤害 +1%，最多 +{v}%，倒下才重算',
   'skill.ck_claws.name': '猫抓印记', 'skill.ck_claws.desc': '普攻猫抓让敌人攻速 -{v}%，4 秒',
   'skill.ck_venom.name': '毒猫', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒',
@@ -238,7 +238,7 @@ G.I18N['zh-CN'] = {
   'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！',
 
   // ── Buff ──
-  'buff.morale.name': '士气', 'buff.morale.desc': '每打过一层（没有战败）全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
+  'buff.morale.name': '士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
   'buff.frenzy.name': '吸猫狂热', 'buff.frenzy.desc': '队员每次击中敌人，自身伤害 +1%（最多 +{max}%），倒下才重新计算。当前：{list}',
   'buff.animal_bear.name': '熊在场', 'buff.animal_bear.desc': '全队防御 {v}',
   'buff.animal_wolf.name': '狼在场', 'buff.animal_wolf.desc': '全队攻击 {v}',

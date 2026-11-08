@@ -16,7 +16,7 @@ G.CONFIG = {
   reviveCost: 50,           // 花多少雲晶原地復活
 
   // 貓鎧者被動（上限由技能等級決定，見 ck_morale / ck_frenzy）
-  moralePerFloor: 1,        // 士氣：每打過一層（沒戰敗）全隊最終防禦 +1%
+  moralePerAttack: 1,       // 士氣：貓鎧者每攻擊一次（普攻或攻擊技能）+1 層，每層全隊最終防禦 +1%
   frenzyPerHit: 1,          // 吸貓狂熱：每次打中敵人自身傷害 +1%
   crisisHp: 0.6,            // 學者「危機意識」：任一隊友生命低於 60% 觸發
   evadeCap: 0.6,            // 閃避率上限
