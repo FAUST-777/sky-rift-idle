@@ -41,7 +41,7 @@
       this.enemies = [];
       this.mode = 'walk';
       this.walkT = 1;
-      this.cannonT = 6;
+      this.cannonT = G.CANNON_INTERVAL;
       this.needRebuild = false;
       this.frenzyMem = {};   // 吸貓狂熱層數（重建隊伍時保留，倒下才歸零）
       this.aura = {};
@@ -231,7 +231,7 @@
     }
     // 對敵人上 debuff（持續時間吃施放者的「畫廊」加成；流血/中毒換算成每秒傷害）
     debuff(src, target, id, v, t) {
-      const dur = t * (src.st.debuffDur || 1);
+      const dur = t * ((src.st.debuffDur || 1) + (this.party(src) ? this.aura.debuffDur || 0 : 0));   // 黑暗系團隊特效
       const val = (id === 'bleed' || id === 'poison') ? this.atkOf(src) * G.DOT[id] * v : v;
       this.addFx(target, id, val, dur);
     }
@@ -349,7 +349,7 @@
       if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       const crit = Math.random() * 100 < this.critOf(src) + (opts.critBonus || 0);
-      if (crit) dmg *= src.st.critDmg;
+      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0);   // 團隊特效：暴擊傷害
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
@@ -509,8 +509,10 @@
         if (h === 0) doHit(); else this.time.delayedCall(h * 130, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }
       (e.debuffs || []).forEach(db => targets.forEach(t => { if (this.valid(t)) this.debuff(u, t, db.id, db.v, db.t); }));
-      (e.self || []).forEach(b => { this.addFx(u, b.id, b.v, b.t); this.glow(u, col); });
-      (e.party || []).forEach(b => this.partyAlive().forEach(p => { this.addFx(p, b.id, b.v, b.t); this.glow(p, col); }));
+      // 增益：德魯伊「野性之絆」延長持續時間、「獸群之心」提高數值
+      const bv = b => b.v * (u.st.buffPow || 1), bt = b => b.t * (u.st.buffDur || 1);
+      (e.self || []).forEach(b => { this.addFx(u, b.id, bv(b), bt(b)); this.glow(u, col); });
+      (e.party || []).forEach(b => this.partyAlive().forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.round(p.st.maxHp * e.shield); p.shieldT = 8; this.glow(p, col); });
@@ -774,7 +776,7 @@
       if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {
         this.cannonT -= dt;
         if (this.cannonT <= 0) {
-          this.cannonT = 6;
+          this.cannonT = this.aura.cannonInterval || G.CANNON_INTERVAL;   // 團隊特效可縮短
           const t = this.enemiesAlive()[0];
           const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
           const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);
@@ -822,7 +824,9 @@
         const on = party.filter(u => this.fxv(u, id));
         if (!on.length) return;
         const v = Math.max(...on.map(u => u.fx[id].v)), s = Math.ceil(Math.max(...on.map(u => u.fx[id].t)));
-        out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: pct(v), s } });
+        // critUp 存的是百分點（例如 8 = +8%）；regen 每秒比例很小，留一位小數
+        const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
+        out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });

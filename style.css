@@ -244,3 +244,14 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 #toast { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%) translateY(20px); background: rgba(20,15,36,.95); border: 1px solid var(--gold);
   color: var(--text); padding: 10px 16px; border-radius: 12px; font-size: 13px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; width: max-content; max-width: 88%; text-align: center; }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── 團隊特效（夥伴分頁）──────────────────────────── */
+.syn-lineup { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; }
+.syn-mem { white-space: nowrap; }
+.syn-on { border: 1px solid var(--gold); border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; background: #2a2140; font-size: 12px; }
+.syn-on b { color: var(--gold); margin-right: 6px; }
+.syn-list { margin-top: 10px; font-size: 12px; }
+.syn-list summary { cursor: pointer; color: var(--muted); padding: 4px 0; }
+.syn-row { border-top: 1px solid var(--line); padding: 6px 0; line-height: 1.6; }
+.syn-row b { margin-right: 6px; }
+.syn-row.on b { color: var(--gold); }

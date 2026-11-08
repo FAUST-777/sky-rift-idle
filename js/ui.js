@@ -361,8 +361,46 @@
     }).join('');
     return `${renderFriends()}${renderMerc()}
       <div class="card"><h3>${t('partners.title')} <small>${t('partners.deployed', { n: S.party.length, max: G.CONFIG.maxParty })}</small></h3>
-      <p class="muted" style="margin:0;font-size:12px">${t('partners.help')}</p></div>${cards}`;
+      <p class="muted" style="margin:0;font-size:12px">${t('partners.help')}</p></div>${renderSynergy()}${cards}`;
   }
+
+  // ── 團隊特效：目前組合＋生效效果；全部特效表收在折疊區（展開狀態記在 UI，重繪不會自己收起）──
+  function synBonusText(bonus) {
+    return Object.entries(bonus).map(([k, v]) => t('syn.b.' + k, { v: k === 'cannonInterval' ? v : Math.round(v * 100) })).join(t('syn.sep'));
+  }
+  function dtypeTag(type) {
+    return `<span class="ctag" style="color:${G.DMG_TYPES[type]}">${t('dtype.' + type)}</span>`;
+  }
+  function renderSynergy() {
+    const syn = G.teamSynergy();
+    const lineup = syn.members.map(m => `<span class="syn-mem">${esc(G.whoName(m.who))} ${dtypeTag(m.type)}</span>`).join('');
+    const active = syn.active.map(a => `<div class="syn-on"><b>✦ ${t(`syn.${a.id}.name`)}</b>
+        <span class="muted">${a.n ? t('syn.cond.type', { type: t('dtype.' + G.TEAM_SYNERGIES.find(x => x.id === a.id).type), n: a.n }) : ''}</span>
+        <div>${synBonusText(a.bonus)}</div></div>`).join('');
+    const rows = G.TEAM_SYNERGIES.map(sy => {
+      const on = syn.active.find(a => a.id === sy.id);
+      if (sy.mix) {
+        return `<div class="syn-row ${on ? 'on' : ''}"><b>${t(`syn.${sy.id}.name`)}</b>
+          <span class="muted">${t('syn.cond.mix', { list: sy.mix.map(x => t('dtype.' + x)).join(t('syn.sep')) })}</span>
+          <div>${synBonusText(sy.bonus)}</div></div>`;
+      }
+      return `<div class="syn-row ${on ? 'on' : ''}"><b>${t(`syn.${sy.id}.name`)}</b>
+        ${Object.entries(sy.tiers).map(([n, b]) => `<div class="${on && on.n === +n ? 'gold' : ''}"><span class="muted">${t('syn.cond.type', { type: t('dtype.' + sy.type), n })}</span>：${synBonusText(b)}</div>`).join('')}</div>`;
+    }).join('');
+    return `<div class="card syn">
+      <h3>🔗 ${t('syn.title')}</h3>
+      <p class="muted" style="margin:0 0 8px;font-size:12px">${t('syn.help')}</p>
+      <div class="slot-label" style="margin-top:0">${t('syn.current')}</div>
+      <div class="syn-lineup">${lineup}</div>
+      <div class="slot-label">${t('syn.active')}</div>
+      ${active || `<p class="muted" style="margin:0;font-size:12px">${t('syn.none')}</p>`}
+      <details class="syn-list" ${UI.synOpen ? 'open' : ''} data-syn-list>
+        <summary>${t('syn.list')}</summary>${rows}
+      </details>
+    </div>`;
+  }
+  // 記住折疊區有沒有打開（分頁重繪時保持）
+  document.addEventListener('toggle', e => { if (e.target.matches && e.target.matches('[data-syn-list]')) UI.synOpen = e.target.open; }, true);
 
   // ── 好友（代碼制）：複製我的代碼、貼上匯入、好友列表（查看 / 雇用 / 移除）──
   function renderFriends() {

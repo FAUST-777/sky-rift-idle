@@ -91,16 +91,28 @@ G.CORE_ICON  = { atk: '⚔️', buff: '✨', spc: '🔮', def: '🛡️' };
 G.DMG_TYPES  = { physical: '#ffffff', animal: '#ffd27a', arcane: '#8fd3ff', dark: '#c99bff' };   // 傷害數字顏色
 G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 
-// 組合特效（之後設計）：例如 { types: ['physical', 'animal'], id: 'xxx' }
-// 戰鬥場景每次造成傷害都會記錄系別，之後在 battle.js 的 hit() 加判斷即可
-G.COMBOS = [];
+// ── 團隊特效（名稱：syn.<id>.name；效果文字：syn.b.<key>）──────────────────
+// 依出戰成員（主角＋夥伴／雇用好友）的傷害系別觸發，效果併入全隊光環
+//   mix   = 三人系別各不相同且剛好是這三種
+//   type  = 同系別人數達到 tiers 的門檻（取最高的一階）
+// bonus 欄位：spdPct 攻速  cdr 冷卻縮短  dmgPct 全體傷害  debuffDur 我方施加的減益持續時間
+//   critDmg 暴擊傷害（加在倍率上）  hpPct 生命  defPct 防禦  cannonInterval 船砲間隔秒數（取最短）
+G.TEAM_SYNERGIES = [
+  { id: 'wildhunt', mix: ['animal', 'physical', 'dark'],   bonus: { spdPct: 0.18, cannonInterval: 5 } },
+  { id: 'triad',    mix: ['animal', 'physical', 'arcane'], bonus: { critDmg: 0.10, hpPct: 0.15, defPct: 0.01 } },
+  { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.15 },      3: { cdr: 0.24 } } },
+  { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.16 } } },
+  { id: 'arcane',   type: 'arcane',   tiers: { 2: { dmgPct: 0.15 },   3: { dmgPct: 0.27 } } },
+  { id: 'dark',     type: 'dark',     tiers: { 2: { debuffDur: 0.2 }, 3: { debuffDur: 0.4 } } },
+];
+G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 
 // ── 技能（名稱/說明：skill.<id>.name / .desc；{v} 代入數值）────────────────
 // 主動：fx(v) 回傳這招的效果，戰鬥場景會依欄位執行：
 //   target 'one'|'all'|'none'  mult 傷害倍率  hits 段數  critBonus 額外暴擊率
 //   debuffs [{id,v,t}] 對命中目標上狀態    self / party [{id,v,t}] 給自己/全隊上 buff
 //   heal 全隊回復最大生命比例  shield 全隊護盾比例  taunt {v,t} 挑釁並減傷
-//   drain 傷害轉生命比例  vsBleed 對流血目標額外倍率  summon 動物 id  cdCut 全隊主動技能冷卻減少秒數
+//   drain 傷害轉生命比例  vsBleed 對流血目標額外倍率  summon 動物 id（目前沒有技能使用）  cdCut 全隊主動技能冷卻減少秒數
 // 被動：p = 'self' 自身屬性 / 'party' 全隊光環 / 'proc' 普攻附加 / 'special' 特殊機制
 //   key = 影響的屬性或機制；proc 另有 fx（狀態）、chance（'v' = 機率吃 v）、val、t
 // buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen ｜ defDown slow blind bleed poison
@@ -204,18 +216,20 @@ G.SKILLS = {
     P('wb_thorns',   2, lin(0.1, 0.06),  'special', 'thorns'),
   ],
 
-  // 德魯伊：召喚一隻動物（同時只能一隻），各給不同全隊 buff
+  // 德魯伊：動物之靈附身全隊，各給一種限時全隊 buff（不再召喚動物上場）
+  //   數值略低於其他職業的同類單一 buff（例如貓鎧者鼓舞、城牆者加固），因為德魯伊有四種可輪流掛
+  //   持續 8 秒／冷卻 16 秒 ≈ 50% 覆蓋率；滿級野性之絆 +30% 持續 → 約 65%
   druid: [
-    A('dr_bear',   0, 20, lin(0.15, 0.04),  v => ({ target: 'none', summon: 'bear', aura: v })),
-    A('dr_wolf',   0, 20, lin(0.12, 0.03),  v => ({ target: 'none', summon: 'wolf', aura: v })),
-    A('dr_owl',    1, 20, lin(6, 2),        v => ({ target: 'none', summon: 'owl', aura: v }), { raw: true }),
-    A('dr_deer',   1, 20, lin(0.01, 0.004), v => ({ target: 'none', summon: 'deer', aura: v })),
-    A('dr_thorns', 2, 9,  lin(0.9, 0.15),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
-    P('dr_bond',   0, lin(0.2, 0.1),     'self', 'summonPower'),
+    A('dr_bear',   0, 16, lin(0.15, 0.04),   v => ({ target: 'none', party: [{ id: 'defUp',  v, t: 8 }] })),
+    A('dr_wolf',   0, 16, lin(0.12, 0.03),   v => ({ target: 'none', party: [{ id: 'atkUp',  v, t: 8 }] })),
+    A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
+    A('dr_deer',   1, 18, lin(0.01, 0.003),  v => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }] })),
+    A('dr_thorns', 2, 9,  lin(0.9, 0.15),    v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
+    P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur'),     // 自己施放的增益持續時間 +v
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
     P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen'),
     P('dr_wild',   1, lin(0.06, 0.04),   'self', 'atkPct'),
-    P('dr_herd',   2, lin(0.15, 0.1),    'self', 'animalAura'),
+    P('dr_herd',   2, lin(0.06, 0.04),   'self', 'buffPow'),     // 自己施放的增益數值 +v（相對）
   ],
 
   // 遛狗者：全隊減冷卻、加攻速、加技能傷害
@@ -247,7 +261,7 @@ G.SKILLS = {
   ],
 };
 
-// 德魯伊的動物：aura = 在場時給全隊的加成種類；stats = 以施放者屬性為基準的倍率
+// 動物造型與舊召喚資料（德魯伊已改成全隊 buff，暫時沒有技能召喚）：aura = 在場時給全隊的加成種類；stats = 以施放者屬性為基準的倍率
 G.ANIMALS = {
   bear: { icon: '🐻', aura: 'defPct', stats: { hp: 1.4, atk: 0.4, def: 1.2 }, color: '#7a5230' },
   wolf: { icon: '🐺', aura: 'atkPct', stats: { hp: 0.6, atk: 0.8, def: 0.6 }, color: '#8a8f99' },
@@ -301,7 +315,7 @@ G.HERO_BASE  = { hp: 100, atk: 10, def: 3, spd: 1.0, crit: 5, critDmg: 1.5 };
 // perk = 專屬 buff（永久、不能升級；出戰時給全隊，文字：perk.<stat>）
 //   cdr 技能冷卻縮短、procRate 觸發率（暴擊、流血、中毒、緩速等機率 ×(1+v)）
 G.PARTNERS = [
-  { id: 'ella', floor: 2,  hair: '#d9a066', skin: '#f3d2b3', perk: { stat: 'cdr',      v: 0.05 } },
+  { id: 'ella', floor: 2,  hair: '#d9a066', skin: '#f3d2b3', perk: { stat: 'cdr',      v: 0.10 } },
   { id: 'bram', floor: 4,  hair: '#3b2a1e', skin: '#d9a47a', perk: { stat: 'defPct',   v: 0.06 } },
   { id: 'lina', floor: 7,  hair: '#f5e6a8', skin: '#f6dcc4', perk: { stat: 'hpPct',    v: 0.08 } },
   { id: 'kael', floor: 10, hair: '#222831', skin: '#e0b895', perk: { stat: 'atkPct',   v: 0.06 } },

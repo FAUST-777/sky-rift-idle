@@ -221,7 +221,30 @@
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) add(p.perk.stat, p.perk.v); });   // 出戰夥伴的專屬 buff
+    G.teamSynergy().active.forEach(a => Object.entries(a.bonus).forEach(([k, v]) => {   // 團隊特效
+      if (k === 'cannonInterval') aura[k] = Math.min(aura[k] || G.CANNON_INTERVAL, v);
+      else add(k, v);
+    }));
     return aura;
+  };
+
+  // 團隊特效：看出戰成員的傷害系別組合
+  // 回傳 { members: [{ who, type }], counts: { type: n }, active: [{ id, n?, bonus }] }
+  G.teamSynergy = function () {
+    const members = G.partyMembers().map(who => ({ who, type: G.CLASSES[G.charOf(who).cls].dmgType }));
+    const counts = {};
+    members.forEach(m => { counts[m.type] = (counts[m.type] || 0) + 1; });
+    const types = Object.keys(counts);
+    const active = [];
+    G.TEAM_SYNERGIES.forEach(sy => {
+      if (sy.mix) {
+        if (members.length === sy.mix.length && types.length === sy.mix.length && sy.mix.every(x => counts[x] === 1)) active.push({ id: sy.id, bonus: sy.bonus });
+      } else {
+        const n = Math.max(0, ...Object.keys(sy.tiers).map(Number).filter(k => (counts[sy.type] || 0) >= k));
+        if (n) active.push({ id: sy.id, n, bonus: sy.tiers[n] });
+      }
+    });
+    return { members, counts, active };
   };
   // 隊伍裡某個特殊被動的最大值（例如士氣上限、吸貓狂熱上限）
   G.partySpecial = key => Math.max(0, ...G.partyMembers().map(w => (G.passivesOf(w).special[key] || {}).v || 0));
@@ -258,6 +281,7 @@
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
       summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),
+      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'),
     });
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);
