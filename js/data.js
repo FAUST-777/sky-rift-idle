@@ -214,8 +214,8 @@ G.SKILLS = {
     A('dp_nightmare',   1, 12, lin(1.3, 0.2),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'blind', v: 0.3, t: 5 }, { id: 'slow', v: 0.2, t: 5 }] })),
     A('dp_masterpiece', 2, 18, lin(0.15, 0.05), v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }, { id: 'spdUp', v: 0.15, t: 10 }] })),
     P('dp_ink',     0, lin(0.08, 0.04), 'proc', 'blind',   { fx: 'blind', val: 'v', t: 3 }),
-    // 腐蝕顏料：普攻破防；另外飛空艇砲擊對破防中的敵人傷害 +200%→400%（多人裝不疊加）
-    P('dp_corrode', 0, lin(0.06, 0.03), 'proc', 'defDown', { fx: 'defDown', val: 'v', t: 4, partyAlso: { cannonVsDefDown: lin(2, 0.5) } }),
+    // 腐蝕顏料：普攻破防；另外飛空艇砲擊對破防中的敵人傷害 +200%→1000%（多人裝不疊加）
+    P('dp_corrode', 0, lin(0.06, 0.03), 'proc', 'defDown', { fx: 'defDown', val: 'v', t: 4, partyAlso: { cannonVsDefDown: lin(2, 2) } }),
     // 筆觸節奏：全隊攻速；另外全隊對暈眩敵人的暴擊傷害 +100%→300%（多人裝不疊加）
     P('dp_tempo',   1, lin(0.04, 0.02), 'party', 'spdPct', { partyAlso: { stunCritDmg: lin(1, 0.5) } }),
     P('dp_darkart', 1, lin(0.06, 0.04), 'self', 'atkPct'),
