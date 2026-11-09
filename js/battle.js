@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -374,6 +374,7 @@
       let dmg = this.atkOf(src) * mult;
       if (opts.skill) dmg *= this.skillMult(src);
       if (opts.nextBonus) dmg *= 1 + opts.nextBonus;
+      if (this.fxv(src, 'shieldWall')) dmg *= 1 - this.fxv(src, 'shieldWall');   // 盾牆！期間輸出 -50%
       if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
       if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
@@ -557,6 +558,8 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
+          if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
         if (h === 0) doHit(); else this.time.delayedCall(h * 130, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }

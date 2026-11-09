@@ -134,6 +134,7 @@ G.DOT = { bleed: 0.3, poison: 0.22 };
 // 暈眩：不能攻擊也不能放技能；受到傷害 +15%、無法閃避；被觸發減益、被暴擊的機率 ×1.5
 G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
+const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -227,7 +228,9 @@ G.SKILLS = {
     A('wb_provoke', 0, 12, lin(0.3, 0.06),  v => ({ target: 'none', taunt: { v, t: 6 } })),
     A('wb_bulwark', 1, 14, lin(0.15, 0.04), v => ({ target: 'none', party: [{ id: 'dmgReduce', v, t: 6 }] })),
     A('wb_fortify', 1, 15, lin(0.25, 0.07), v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }] })),
-    A('wb_aegis',   2, 16, lin(0.12, 0.04), v => ({ target: 'none', shield: v })),
+    // 盾牆！（原壁壘護盾）：8 秒內自身輸出 -50%，換防禦 +70%→150%、反彈 +20%→50%、每秒回 0.5%→1% 生命（1→5 級）
+    A('wb_aegis',   2, 16, lin(0.7, 0.2), (v, r) => ({ target: 'none', self: [{ id: 'shieldWall', v: 0.5, t: 8 }, { id: 'defUp', v, t: 8 },
+      { id: 'reflectUp', v: WALL.reflect(r), t: 8 }, { id: 'regen', v: WALL.regen(r), t: 8 }] }), { descV: { reflect: WALL.reflect, regen: WALL.regen } }),
     P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover'),
     P('wb_stone',    0, lin(0.1, 0.08),  'self', 'defPct'),
     P('wb_guardian', 1, lin(0.04, 0.02), 'party', 'dmgReduce'),
@@ -258,13 +261,14 @@ G.SKILLS = {
     A('dw_walkies', 0, 14, lin(2, 0.5), (v, r) => ({ target: 'none', cdCut: v, heal: WALK.heal(r),
       party: [{ id: 'evade', v: WALK.evade(r), t: 2 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: WALK.next(r), t: 20 }] } }),
       { raw: true, v2: WALK.heal, descV: { evade: WALK.evade, next: WALK.next } }),
-    A('dw_zoomies', 1, 14, lin(0.25, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
+    A('dw_zoomies', 1, 14, lin(0.4, 0.15),  v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),   // 狗狗暴衝：全隊攻速 +40%→100%
     A('dw_pack',    1, 10, lin(0.55, 0.08), v => ({ target: 'one', mult: v, hits: 4 })),
-    A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }] })),
+    // 乖狗狗：全隊技能傷害；期間動物系隊友的攻擊技能每次命中 2% 機率暈眩 1.5 秒
+    A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }], partyType: { type: 'animal', fx: [{ id: 'stunSkill', v: 0.02, t: 10 }] } })),
     P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr'),
     P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
     P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct', { key2: 'lifesteal', v2: lin(0.2, 0.025) }),   // 另外吸血 20%→30%
-    P('dw_stride',  1, lin(0.03, 0.02), 'party', 'spdPct'),
+    P('dw_stride',  1, lin(0.04, 0.04), 'party', 'spdPct'),   // 狗蹭蹭：全隊攻速 +4%→20%
     // 狗狗狂吼：觸發時同時上緩速＋致盲（降命中）＋破防；v2 = 致盲與破防數值 10%→17%
     P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3, v2: lin(0.1, 0.0175), more: ['blind', 'defDown'] }),
   ],
@@ -309,7 +313,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
