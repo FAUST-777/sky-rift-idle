@@ -104,7 +104,7 @@ G.I18N['zh-CN'] = {
   'skill.sc_crisis.name': '危机意识', 'skill.sc_crisis.desc': '任一队友生命低于 60% 时，自身伤害 +{v}%、防御 +{v2}%。另外全队最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '奖学金', 'skill.sc_grant.desc': '全队金币获得 +{v}%',
   'skill.sc_wisdom.name': '博学', 'skill.sc_wisdom.desc': '攻击 +{v}%',
-  'skill.sc_speed.name': '速读', 'skill.sc_speed.desc': '攻速 +{v}%',
+  'skill.sc_speed.name': '速读', 'skill.sc_speed.desc': '其他队友攻速 +{v}%（自己不吃）',
   'skill.sc_thesis.name': '论文审查', 'skill.sc_thesis.desc': '技能伤害 +{v}%；自身最大生命 {hpPct}%，其他队友最大生命 +{party_hpPctOthers}%',
 
   'skill.dp_splash.name': '墨泼', 'skill.dp_splash.desc': '全体 {v}% 伤害，敌人命中 -20%，4 秒',
