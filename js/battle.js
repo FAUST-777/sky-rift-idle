@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -373,6 +373,7 @@
 
       let dmg = this.atkOf(src) * mult;
       if (opts.skill) dmg *= this.skillMult(src);
+      if (opts.nextBonus) dmg *= 1 + opts.nextBonus;
       if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
       if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
@@ -538,6 +539,9 @@
 
       const targets = e.target === 'all' ? this.enemiesAlive() : e.target === 'one' ? [this.targetFor(u)].filter(Boolean) : [];
       const hits = e.hits || 1;
+      // 散步時間給的「下一次技能傷害」：這招有傷害就用掉
+      const nextBonus = e.mult && targets.length ? this.fxv(u, 'nextSkill') : 0;
+      if (nextBonus) delete u.fx.nextSkill;
       if (e.mult && targets.length) this.gainMorale(u);
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
@@ -552,7 +556,7 @@
       for (let h = 0; h < hits; h++) {
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, drain: e.drain, noFlash: targets.length > 1 });
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, drain: e.drain, noFlash: targets.length > 1, nextBonus });
         });
         if (h === 0) doHit(); else this.time.delayedCall(h * 130, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }
@@ -565,6 +569,7 @@
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
       if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1))); p.shieldT = 8; this.glow(p, col); });
+      if (e.partyType) this.partyAlive().filter(p => p.st.dmgType === e.partyType.type).forEach(p => e.partyType.fx.forEach(b => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給某系別的隊友
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
       if (e.cdCut) this.partyAlive().forEach(p => p.skills.forEach(x => { if (x !== s) x.cd = Math.max(0, x.cd - e.cdCut); }));

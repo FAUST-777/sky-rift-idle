@@ -487,7 +487,7 @@
   function renderMerc() {
     const m = G.S.merc;
     if (!m) return '';
-    const st = m.snap.st, inParty = G.S.party.includes(G.MERC);
+    const st = G.charStats(G.MERC), inParty = G.S.party.includes(G.MERC);
     return `<div class="card partner merc">
       <canvas data-doll="${G.MERC}" width="64" height="80"></canvas>
       <div class="grow">

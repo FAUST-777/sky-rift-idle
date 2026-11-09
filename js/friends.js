@@ -50,7 +50,7 @@
       v: 1, id: G.myId(), name: G.myName(), at: Date.now(),
       level: h.level, cls: h.cls, floor: G.S.floor, maxFloor: G.S.maxFloor,
       ship: G.shipLook(), look: G.ART.lookFromHero(),
-      merc: { char: { cls: h.cls, level: h.level, skills: h.skills, active: h.active, passive: h.passive }, st: G.heroStats() },
+      merc: { char: { cls: h.cls, level: h.level, skills: h.skills, active: h.active, passive: h.passive }, st: G.heroStats(), bare: G.bareStats('hero') },   // bare：讓對方照新版被動重算
     };
   };
 
@@ -109,7 +109,7 @@
   G.friendList = () => Object.values(G.S.friendData).sort((a, b) => (b.at || 0) - (a.at || 0));
 
   // ── 雇用好友主角：佔一個出戰名額，同時只能雇一位（雇別人會取代）────────────
-  function mercSnap(p) { return { char: p.merc.char, st: p.merc.st, look: p.look, level: p.level }; }
+  function mercSnap(p) { return { char: p.merc.char, st: p.merc.st, bare: p.merc.bare || null, look: p.look, level: p.level }; }
 
   G.hireFriend = function (id) {
     const p = G.S.friendData[id];

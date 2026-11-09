@@ -151,8 +151,8 @@ G.I18N['zh-TW'] = {
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻擊 +{v}%',
   'skill.dr_herd.name': '獸群之心', 'skill.dr_herd.desc': '自己施放的增益效果 +{v}%',
 
-  'skill.dw_fetch.name': '去撿！', 'skill.dw_fetch.desc': '狗狗衝出去咬，單體 {v}% 傷害',
-  'skill.dw_walkies.name': '散步時間', 'skill.dw_walkies.desc': '全隊其他主動技能冷卻立刻減少 {v} 秒，並回復全隊 {v2}% 生命',
+  'skill.dw_fetch.name': '去咬他！', 'skill.dw_fetch.desc': '狗狗衝出去咬，單體 {v}% 傷害，並使敵人中毒 5 秒',
+  'skill.dw_walkies.name': '散步時間', 'skill.dw_walkies.desc': '全隊其他主動技能冷卻立刻減少 {v} 秒，並回復全隊 {v2}% 生命；全隊閃避 +{evade}% 2 秒；動物系隊友下一次攻擊技能傷害 +{next}%',
   'skill.dw_zoomies.name': '暴衝', 'skill.dw_zoomies.desc': '全隊攻速 +{v}%，8 秒',
   'skill.dw_pack.name': '狗群圍攻', 'skill.dw_pack.desc': '連咬 4 下，每下 {v}% 傷害',
   'skill.dw_goodboy.name': '乖狗狗', 'skill.dw_goodboy.desc': '全隊技能傷害 +{v}%，10 秒',
@@ -321,6 +321,7 @@ G.I18N['zh-TW'] = {
   'buff.evade.name': '閃避提升', 'buff.evade.desc': '閃避 +{v}%，還剩 {s} 秒',
   'buff.skillDmg.name': '技能增傷', 'buff.skillDmg.desc': '技能傷害 +{v}%，還剩 {s} 秒',
   'buff.regen.name': '持續回復', 'buff.regen.desc': '每秒回復 {v}% 生命，還剩 {s} 秒',
+  'buff.nextSkill.name': '下次技能強化', 'buff.nextSkill.desc': '下一次攻擊技能傷害 +{v}%（還剩 {s} 秒）',
   'buff.reflectUp.name': '反彈強化', 'buff.reflectUp.desc': '反彈 +{v}% 受到的傷害，還剩 {s} 秒',
   'buff.shield.name': '護盾', 'buff.shield.desc': '全隊護盾還能吸收 {v} 點傷害',
   'buff.taunt.name': '挑釁', 'buff.taunt.desc': '{name} 正在吸引所有敵人',

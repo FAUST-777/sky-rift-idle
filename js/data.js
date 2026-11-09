@@ -122,12 +122,19 @@ G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
 const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(4);
 G.TIER_REQ = [0, 3, 8];
+// 舊版好友快照（沒有 bare 欄位）上傳時，自身被動的舊數值；用來把舊數值扣回去再套新版
+// 只需要記「自身屬性被改過」的被動，其他沿用目前定義
+G.LEGACY_SELF = {
+  ck_plate:  { defPct: r => lin(0.08, 0.06)(r) },   // 第 18 輪前：重裝鎧甲 防禦 +8%→32%
+  ck_frenzy: {},                                    // 第 17 輪前：吸貓狂熱沒有自身屬性
+};
 G.ACTIVE_SLOTS = 4;
 G.PASSIVE_SLOTS = 4;
 G.DOT = { bleed: 0.3, poison: 0.22 };
 // 暈眩：不能攻擊也不能放技能；受到傷害 +15%、無法閃避；被觸發減益、被暴擊的機率 ×1.5
 G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
+const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
 
@@ -246,8 +253,11 @@ G.SKILLS = {
 
   // 遛狗者：全隊減冷卻、加攻速、加技能傷害
   dogwalker: [
-    A('dw_fetch',   0, 6,  lin(1.8, 0.25), v => ({ target: 'one', mult: v })),
-    A('dw_walkies', 0, 14, lin(2, 0.5),    (v, r) => ({ target: 'none', cdCut: v, heal: lin(0.1, 0.0125)(r) }), { raw: true, v2: lin(0.1, 0.0125) }),   // 回血 10%→15%
+    A('dw_fetch',   0, 6,  lin(1.8, 0.25), v => ({ target: 'one', mult: v, debuffs: [{ id: 'poison', v: 1, t: 5 }] })),   // 去咬他！：咬傷中毒
+    // 散步時間：減冷卻＋回血 10%→15%；全隊閃避 +10%→15%（2 秒）；動物系隊友下一次攻擊技能傷害 +10%→20%
+    A('dw_walkies', 0, 14, lin(2, 0.5), (v, r) => ({ target: 'none', cdCut: v, heal: WALK.heal(r),
+      party: [{ id: 'evade', v: WALK.evade(r), t: 2 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: WALK.next(r), t: 20 }] } }),
+      { raw: true, v2: WALK.heal, descV: { evade: WALK.evade, next: WALK.next } }),
     A('dw_zoomies', 1, 14, lin(0.25, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
     A('dw_pack',    1, 10, lin(0.55, 0.08), v => ({ target: 'one', mult: v, hits: 4 })),
     A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }] })),
@@ -299,7 +309,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

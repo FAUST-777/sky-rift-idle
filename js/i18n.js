@@ -75,6 +75,7 @@
     const p = { v: sk.raw ? +v.toFixed(1) : pct(v) };
     if (sk.v2) p.v2 = sk.v2raw ? +sk.v2(rank).toFixed(2) : pct(sk.v2(rank));
     Object.entries(sk.also || {}).forEach(([k, f]) => { p[k] = pct(f(rank)); });
+    Object.entries(sk.descV || {}).forEach(([k, f]) => { p[k] = pct(f(rank)); });   // 主動技能說明用的額外數值
     Object.entries(sk.partyAlso || {}).forEach(([k, f]) => { const v = typeof f === 'function' ? f(rank) : f; p['party_' + k] = (sk.rawKeys || []).includes(k) ? v : pct(v); });
     if (sk.partyStun) { p.stun = pct(sk.partyStun.chance(rank)); p.stunT = +sk.partyStun.t(rank).toFixed(2); }
     return G.t(`skill.${sk.id}.desc`, p);

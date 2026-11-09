@@ -151,8 +151,8 @@ G.I18N['en'] = {
   'skill.dr_wild.name': 'Wildness', 'skill.dr_wild.desc': 'ATK +{v}%',
   'skill.dr_herd.name': 'Heart of the Herd', 'skill.dr_herd.desc': 'Buffs you cast are {v}% stronger',
 
-  'skill.dw_fetch.name': 'Fetch!', 'skill.dw_fetch.desc': 'A dog charges in: {v}% damage to one enemy',
-  'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner and the party heals {v2}% HP',
+  'skill.dw_fetch.name': 'Get Him!', 'skill.dw_fetch.desc': 'The dog charges in to bite: {v}% damage to one enemy and poisons it for 5s',
+  'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner and the party heals {v2}% HP; party evasion +{evade}% for 2s; Animal allies\' next attack skill deals +{next}% damage',
   'skill.dw_zoomies.name': 'Zoomies', 'skill.dw_zoomies.desc': 'Party attack speed +{v}% for 8s',
   'skill.dw_pack.name': 'Pack Attack', 'skill.dw_pack.desc': '4 bites of {v}% damage',
   'skill.dw_goodboy.name': 'Good Boy', 'skill.dw_goodboy.desc': 'Party skill damage +{v}% for 10s',
@@ -321,6 +321,7 @@ G.I18N['en'] = {
   'buff.evade.name': 'Evasion', 'buff.evade.desc': 'Dodge +{v}%, {s}s left',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
+  'buff.nextSkill.name': 'Next Skill Up', 'buff.nextSkill.desc': 'Next attack skill deals +{v}% damage ({s}s left)',
   'buff.reflectUp.name': 'Reflect Up', 'buff.reflectUp.desc': 'Reflect +{v}% of damage taken, {s}s left',
   'buff.shield.name': 'Shield', 'buff.shield.desc': 'Party shields can absorb {v} more damage',
   'buff.taunt.name': 'Taunt', 'buff.taunt.desc': '{name} is drawing all enemies',

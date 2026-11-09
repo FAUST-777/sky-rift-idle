@@ -189,8 +189,8 @@
   G.spOf = who => Math.max(0, G.charOf(who).level - G.spentPoints(who));
 
   // 已裝備的被動 → 依類型加總：self / party（光環）/ proc（普攻附加）/ special（特殊機制）
-  G.passivesOf = function (who) {
-    const ch = G.charOf(who), out = { self: {}, party: {}, proc: [], special: {} };
+  G.passivesOf = function (who, chOverride) {
+    const ch = chOverride || G.charOf(who), out = { self: {}, party: {}, proc: [], special: {} };
     ch.passive.forEach(id => {
       const sk = id && G.skillDef(ch.cls, id), r = id && ch.skills[id];
       if (!sk || !r) return;
@@ -268,8 +268,9 @@
   G.frenzyCap = () => G.partySpecial('frenzy');
 
   // ── 屬性計算（主角與夥伴共用）─────────────────────────────────────────
-  G.charStats = function (who) {
-    if (who === G.MERC) return Object.assign({}, G.S.merc.snap.st);   // 好友的能力照他上傳的數值
+  // 分兩段：bareStats = 等級＋職業＋裝備（還沒套被動）；applySelf = 套上自身被動、四捨五入、補職業欄位
+  // 好友傭兵只上傳 bare，所以技能改版後，雇來的好友會自動照新版被動重算
+  G.bareStats = function (who) {
     const ch = G.charOf(who), cls = G.CLASSES[ch.cls], isHero = who === 'hero' || !who;
     const B = G.HERO_BASE, L = G.LEVEL_GAIN, lv = ch.level;
     // 夥伴底子比主角略低，靠升級、裝備追上
@@ -287,7 +288,10 @@
       st.maxHp += it.stats.hp || 0; st.atk += it.stats.atk || 0; st.def += it.stats.def || 0;
       st.crit += it.stats.crit || 0; st.spd += it.stats.spd || 0;
     });
-    const ps = G.passivesOf(who).self, g = k => ps[k] || 0;
+    return st;
+  };
+  G.applySelf = function (bare, ps, clsId) {
+    const st = Object.assign({}, bare), cls = G.CLASSES[clsId], g = k => ps[k] || 0;
     st.atk   *= 1 + g('atkPct');
     st.def   *= 1 + g('defPct');
     st.maxHp *= 1 + g('hpPct');
@@ -307,6 +311,40 @@
     Object.assign(st, { ranged: cls.ranged, range: cls.range, dmgType: cls.dmgType, missile: cls.missile || null, shots: cls.shots || 1 });
     return st;
   };
+  G.charStats = function (who) {
+    if (who === G.MERC) return G.snapStats(G.S.merc.snap);   // 好友：照他上傳的底子，套「目前版本」的被動
+    return G.applySelf(G.bareStats(who), G.passivesOf(who).self, G.charOf(who).cls);
+  };
+
+  // 好友快照 → 戰鬥數值
+  //   新版快照帶 bare（沒套被動）→ 直接套新版被動
+  //   舊版快照只有 st（已套上傳當時的被動）→ 用 G.LEGACY_SELF 記的舊數值把被動扣回去，再套新版
+  G.snapStats = function (snap) {
+    const ch = snap.char;
+    const bare = snap.bare || unapplySelf(snap.st, legacySelf(ch));
+    return G.applySelf(bare, G.passivesOf(G.MERC, ch).self, ch.cls);
+  };
+  function legacySelf(ch) {
+    const out = {};
+    (ch.passive || []).forEach(id => {
+      const r = id && ch.skills[id], sk = id && G.skillDef(ch.cls, id);
+      if (!r || !sk) return;
+      const old = G.LEGACY_SELF[id];
+      const add = (k, v) => { out[k] = (out[k] || 0) + v; };
+      if (old) return Object.entries(old).forEach(([k, f]) => add(k, f(r)));
+      if (sk.p === 'self') add(sk.key, sk.v(r));
+      if (sk.key2 && sk.p === 'self') add(sk.key2, sk.v2(r));
+      Object.entries(sk.also || {}).forEach(([k, f]) => add(k, f(r)));
+    });
+    return out;
+  }
+  function unapplySelf(st, ps) {
+    const g = k => ps[k] || 0;
+    return {
+      maxHp: st.maxHp / (1 + g('hpPct')), atk: st.atk / (1 + g('atkPct')), def: st.def / (1 + g('defPct')),
+      spd: st.spd / (1 + g('spdPct')), crit: Math.max(0, st.crit - g('crit')), critDmg: Math.max(1, st.critDmg - g('critDmg')),
+    };
+  }
   G.heroStats = () => G.charStats('hero');
   G.partnerStats = id => G.charStats(id);
 
