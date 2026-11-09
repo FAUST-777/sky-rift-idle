@@ -202,6 +202,7 @@
       else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
       if (sk.key2 && (sk.p === 'self' || sk.p === 'party')) out[sk.p][sk.key2] = (out[sk.p][sk.key2] || 0) + sk.v2(r);   // 第二效果（例如忠犬的吸血）
       Object.entries(sk.also || {}).forEach(([k, f]) => { out.self[k] = (out.self[k] || 0) + f(r); });   // 額外自身屬性（例如吸貓狂熱）
+      if (sk.procAlso) { const pa = sk.procAlso; out.proc.push({ fx: pa.fx, chance: pa.chance, val: typeof pa.val === 'function' ? pa.val(r) : pa.val, t: pa.t, more: [] }); }   // 額外普攻附加（例如畫廊）
       Object.entries(sk.partyAlso || {}).forEach(([k, f]) => { out.party[k] = (out.party[k] || 0) + (typeof f === 'function' ? f(r) : f); });   // 額外全隊光環
       if (sk.partyStun) {   // 全隊普攻暈眩（貓貓士氣）：取機率最高的
         const c = sk.partyStun.chance(r);

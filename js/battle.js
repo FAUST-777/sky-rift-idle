@@ -228,8 +228,8 @@
     addFx(u, id, v, t) {
       if (!u || !u.alive || !v) return;
       const f = u.fx[id];
-      if (f && f.t > 0) { f.v = Math.max(f.v, v); f.t = Math.max(f.t, t); }
-      else u.fx[id] = { v, t };
+      if (f && f.t > 0) { f.v = Math.max(f.v, v); f.t = Math.max(f.t, t); f.full = Math.max(f.full || 0, t); }
+      else u.fx[id] = { v, t, full: t };   // full = 完整持續時間（給詛咒油畫刷新用）
     }
     // 對敵人上 debuff（持續時間吃施放者的「畫廊」加成；流血/中毒換算成每秒傷害）
     debuff(src, target, id, v, t) {
@@ -385,7 +385,10 @@
       if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
       if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
-      if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
+      // 對流血（血騎士、詛咒油畫）、對中毒（詛咒油畫）：同一招兩個都中時相加
+      const vsB = this.fxv(target, 'bleed') ? (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0) : 0;
+      const vsP = this.fxv(target, 'poison') ? opts.vsPoisonSkill || 0 : 0;
+      if (vsB || vsP) dmg *= 1 + vsB + vsP;
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
@@ -567,11 +570,13 @@
           this.tweens.add({ targets: ring, scale: 4, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
         });
       }
+      // 詛咒油畫：先把命中敵人身上的減益刷新回完整時間
+      if (e.refreshDebuffs) targets.forEach(t => Object.values(t.fx).forEach(f => { if (f.t > 0 && f.full) f.t = Math.max(f.t, f.full); }));
       // 傷害（多段用延遲打出）
       for (let h = 0; h < hits; h++) {
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
@@ -589,6 +594,9 @@
       if (e.partyType) this.partyAlive().filter(p => p.st.dmgType === e.partyType.type).forEach(p => e.partyType.fx.forEach(b => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給某系別的隊友
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
+      // 速寫：船砲強化一段時間；全隊身上的增益延長
+      if (e.sketch) { this.sketch = { t: e.sketch.t, chance: Math.max(e.sketch.chance, this.sketch && this.sketch.t > 0 ? this.sketch.chance : 0) }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }
+      if (e.buffExtend) this.partyAlive().forEach(p => BUFF_IDS.forEach(id => { const f = p.fx[id]; if (f && f.t > 0) f.t += e.buffExtend; }));
       if (e.cdCut) this.partyAlive().forEach(p => p.skills.forEach(x => { if (x !== s) x.cd = Math.max(0, x.cd - e.cdCut); }));
       return true;
     }
@@ -788,6 +796,7 @@
       if (this.mode === 'walk') {
         this.walkT -= dt;
         this.regenTick(dt);
+      if (this.sketch && this.sketch.t > 0) this.sketch.t -= dt;
         if (this.walkT <= 0) {
           if (this.needRebuild) this.buildParty();
           this.spawnWave();
@@ -848,13 +857,18 @@
       if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {
         this.cannonT -= dt;
         if (this.cannonT <= 0) {
-          this.cannonT = G.cannonInterval(this.aura);   // 團隊特效、貓哈氣爆甲可縮短
+          const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
+          this.cannonT = G.cannonInterval(this.aura) / (sk ? 2 : 1);   // 團隊特效、貓哈氣爆甲可縮短；速寫期間減半
           const t = this.enemiesAlive()[0];
           const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
           const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);
           this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
             ball.destroy();
-            if (this.valid(t)) { this.hit(src, t, G.cannonMult()); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13); this.checkWaveEnd(); }
+            if (this.valid(t)) {
+              this.hit(src, t, G.cannonMult()); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13);
+              if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
+              this.checkWaveEnd();
+            }
           } });
         }
       }
@@ -900,6 +914,7 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);

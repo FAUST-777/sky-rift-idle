@@ -136,6 +136,7 @@ G.DOT = { bleed: 0.3, poison: 0.22 };
 G.DEFDOWN_STACK_CAP = 30;
 G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
+const CURSE = { def: lin(0.2, 0.0125), slow: lin(0.2, 0.025) };   // 暗黑繪師「詛咒油畫」的附加數值
 const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
@@ -199,15 +200,21 @@ G.SKILLS = {
   // 暗黑畫家：降命中、降防、全隊加攻速
   darkpainter: [
     A('dp_splash',      0, 6,  lin(0.8, 0.14), v => ({ target: 'all', mult: v, debuffs: [{ id: 'blind', v: 0.2, t: 4 }] })),
-    A('dp_erase',       0, 8,  lin(0.7, 0.12), v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.25, t: 6 }] })),
-    A('dp_sketch',      1, 14, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),
+    // 詛咒油畫（原抹除）：全體 50%→100%；先把敵人身上的減益刷新回完整時間，再上破防 20%→25%、緩速 20%→30%（6 秒）
+    //   對中毒 +100%、對流血 +200%（兩個都中就相加 +300%）
+    A('dp_erase',       0, 8,  lin(0.5, 0.125), (v, r) => ({ target: 'all', mult: v, refreshDebuffs: true, vsPoisonSkill: 1, vsBleed: 2,
+      debuffs: [{ id: 'defDown', v: CURSE.def(r), t: 6 }, { id: 'slow', v: CURSE.slow(r), t: 6 }] }), { descV: { def: CURSE.def, slow: CURSE.slow } }),
+    // 速寫：8 秒內船砲間隔減半、每發 1%→5% 機率暈眩全體敵人 1.5 秒；施放時全隊技能冷卻 -2 秒、全隊身上增益延長 2→6 秒
+    A('dp_sketch',      1, 14, lin(0.01, 0.01), (v, r) => ({ target: 'none', sketch: { t: 8, chance: v }, cdCut: 2, buffExtend: lin(2, 1)(r) }),
+      { v2: lin(2, 1), v2raw: true }),
     A('dp_nightmare',   1, 12, lin(1.3, 0.2),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'blind', v: 0.3, t: 5 }, { id: 'slow', v: 0.2, t: 5 }] })),
     A('dp_masterpiece', 2, 18, lin(0.15, 0.05), v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }, { id: 'spdUp', v: 0.15, t: 10 }] })),
     P('dp_ink',     0, lin(0.08, 0.04), 'proc', 'blind',   { fx: 'blind', val: 'v', t: 3 }),
     P('dp_corrode', 0, lin(0.06, 0.03), 'proc', 'defDown', { fx: 'defDown', val: 'v', t: 4 }),
     P('dp_tempo',   1, lin(0.04, 0.02), 'party', 'spdPct'),
     P('dp_darkart', 1, lin(0.06, 0.04), 'self', 'atkPct'),
-    P('dp_gallery', 2, lin(0.15, 0.1),  'self', 'debuffDur'),
+    // 畫廊：減益持續時間 +15%→55%；另外普攻讓敵人攻速 -20%→80%，8 秒
+    P('dp_gallery', 2, lin(0.15, 0.1),  'self', 'debuffDur', { procAlso: { fx: 'slow', chance: 1, val: lin(0.2, 0.15), t: 8 }, descV: { slow: lin(0.2, 0.15) } }),
   ],
 
   // 海盜：雙槍高單體、閃避
@@ -318,7 +325,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
