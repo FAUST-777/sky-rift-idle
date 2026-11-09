@@ -213,7 +213,8 @@ G.SKILLS = {
     A('dp_masterpiece', 2, 18, lin(0.15, 0.05), v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }, { id: 'spdUp', v: 0.15, t: 10 }] })),
     P('dp_ink',     0, lin(0.08, 0.04), 'proc', 'blind',   { fx: 'blind', val: 'v', t: 3 }),
     P('dp_corrode', 0, lin(0.06, 0.03), 'proc', 'defDown', { fx: 'defDown', val: 'v', t: 4 }),
-    P('dp_tempo',   1, lin(0.04, 0.02), 'party', 'spdPct'),
+    // 筆觸節奏：全隊攻速；另外全隊對暈眩敵人的暴擊傷害 +100%→300%（多人裝不疊加）
+    P('dp_tempo',   1, lin(0.04, 0.02), 'party', 'spdPct', { partyAlso: { stunCritDmg: lin(1, 0.5) } }),
     P('dp_darkart', 1, lin(0.06, 0.04), 'self', 'atkPct'),
     // 畫廊：減益持續時間 +15%→55%；另外普攻讓敵人攻速 -20%→80%，8 秒
     P('dp_gallery', 2, lin(0.15, 0.1),  'self', 'debuffDur', { procAlso: { fx: 'slow', chance: 1, val: lin(0.2, 0.15), t: 8 }, descV: { slow: lin(0.2, 0.15) } }),

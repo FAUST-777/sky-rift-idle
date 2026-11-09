@@ -393,7 +393,8 @@
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
       const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0);   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
+      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+        + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
