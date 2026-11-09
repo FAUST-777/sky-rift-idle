@@ -73,7 +73,8 @@
   G.skillDesc = function (sk, rank) {
     const v = sk.v(rank);
     const p = { v: sk.raw ? +v.toFixed(1) : pct(v) };
-    if (sk.v2) p.v2 = pct(sk.v2(rank));
+    if (sk.v2) p.v2 = sk.v2raw ? +sk.v2(rank).toFixed(2) : pct(sk.v2(rank));
+    Object.entries(sk.also || {}).forEach(([k, f]) => { p[k] = pct(f(rank)); });
     return G.t(`skill.${sk.id}.desc`, p);
   };
 

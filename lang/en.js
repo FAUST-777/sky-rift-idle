@@ -89,11 +89,11 @@ G.I18N['en'] = {
   'skill.ck_toxic.name': 'Toxic Claws', 'skill.ck_toxic.desc': '{v}% damage to all enemies and Poison for 6s',
   'skill.ck_fullburst.name': 'Full Burst', 'skill.ck_fullburst.desc': 'Every hatch opens: {v}% damage to all enemies, their attack speed -30% and DEF -20% for 5s',
   'skill.ck_rally.name': 'Meow Rally', 'skill.ck_rally.desc': 'Party ATK +{v}% for 10s',
-  'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Heals the party for {v}% HP',
+  'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Party heals {v}% HP, then 1% per second for 5s',
   'skill.ck_morale.name': 'Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 Morale stack; each stack gives the party +1% final DEF, up to +{v}%',
-  'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit on an enemy gives that member +1% damage, up to +{v}%. Resets when they fall',
+  'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit raises the hitter\'s damage by 1%, up to +{v}%, reset on defeat. The wearer also gains evasion +{evade}%, crit damage +{critDmg}% and +{vsPoison}% damage to poisoned enemies',
   'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s',
-  'skill.ck_venom.name': 'Venom Cat', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to Poison',
+  'skill.ck_venom.name': 'Paw Slap', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to poison; plus a 10% chance to stun for {v2}s',
   'skill.ck_plate.name': 'Heavy Plate', 'skill.ck_plate.desc': 'DEF +{v}%',
 
   'skill.sc_barrage.name': 'Sea of Books', 'skill.sc_barrage.desc': 'Bombards all enemies 3 times for {v}% damage each',
@@ -304,7 +304,7 @@ G.I18N['en'] = {
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
   'battle.morale': '🎖️ Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
-  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!',
+  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun',
 
   // ── Buffs ──
   'buff.morale.name': 'Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',
@@ -324,6 +324,7 @@ G.I18N['en'] = {
   'buff.reflectUp.name': 'Reflect Up', 'buff.reflectUp.desc': 'Reflect +{v}% of damage taken, {s}s left',
   'buff.shield.name': 'Shield', 'buff.shield.desc': 'Party shields can absorb {v} more damage',
   'buff.taunt.name': 'Taunt', 'buff.taunt.desc': '{name} is drawing all enemies',
+  'buff.stun.name': 'Enemies Stunned', 'buff.stun.desc': '{n} enemies stunned: can\'t attack or evade, take +15% damage, debuff procs and crits against them ×1.5',
   'buff.defDown.name': 'Armor Break', 'buff.defDown.desc': 'Enemy DEF -{v}%',
   'buff.slow.name': 'Slow', 'buff.slow.desc': 'Enemy attack speed -{v}%',
   'buff.blind.name': 'Blind', 'buff.blind.desc': 'Enemy accuracy -{v}% (attacks may miss)',

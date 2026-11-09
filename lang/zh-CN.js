@@ -89,11 +89,11 @@ G.I18N['zh-CN'] = {
   'skill.ck_toxic.name': '毒爪', 'skill.ck_toxic.desc': '全体 {v}% 伤害，并使敌人中毒 6 秒',
   'skill.ck_fullburst.name': '全弹发射', 'skill.ck_fullburst.desc': '全身舱门打开，全体 {v}% 伤害，敌人攻速 -30%、防御 -20%，5 秒',
   'skill.ck_rally.name': '喵喵鼓舞', 'skill.ck_rally.desc': '全队攻击 +{v}%，10 秒',
-  'skill.ck_purr.name': '呼噜疗愈', 'skill.ck_purr.desc': '全队恢复 {v}% 生命',
+  'skill.ck_purr.name': '呼噜疗愈', 'skill.ck_purr.desc': '全队恢复 {v}% 生命，之后 5 秒每秒再恢复 1%',
   'skill.ck_morale.name': '士气', 'skill.ck_morale.desc': '猫铠者每攻击一次累积 1 层士气，每层全队最终防御 +1%，最多 +{v}%',
-  'skill.ck_frenzy.name': '吸猫狂热', 'skill.ck_frenzy.desc': '队员每次击中敌人自身伤害 +1%，最多 +{v}%，倒下才重算',
+  'skill.ck_frenzy.name': '吸猫狂热', 'skill.ck_frenzy.desc': '队员每次打中敌人自身伤害 +1%，最多 +{v}%，倒下才重算。装备者自己：闪避 +{evade}%、暴击伤害 +{critDmg}%、对中毒敌人伤害 +{vsPoison}%',
   'skill.ck_claws.name': '猫抓印记', 'skill.ck_claws.desc': '普攻猫抓让敌人攻速 -{v}%，4 秒',
-  'skill.ck_venom.name': '毒猫', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒',
+  'skill.ck_venom.name': '猫肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒；另有 10% 概率拍晕敌人 {v2} 秒',
   'skill.ck_plate.name': '重装铠甲', 'skill.ck_plate.desc': '防御 +{v}%',
 
   'skill.sc_barrage.name': '书海', 'skill.sc_barrage.desc': '书本轰炸全体 3 段，每段 {v}% 伤害',
@@ -304,7 +304,7 @@ G.I18N['zh-CN'] = {
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
   'battle.morale': '🎖️ 士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩',
 
   // ── Buff ──
   'buff.morale.name': '士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
@@ -324,6 +324,7 @@ G.I18N['zh-CN'] = {
   'buff.reflectUp.name': '反弹强化', 'buff.reflectUp.desc': '反弹 +{v}% 受到的伤害，还剩 {s} 秒',
   'buff.shield.name': '护盾', 'buff.shield.desc': '全队护盾还能吸收 {v} 点伤害',
   'buff.taunt.name': '嘲讽', 'buff.taunt.desc': '{name} 正在吸引所有敌人',
+  'buff.stun.name': '敌人晕眩', 'buff.stun.desc': '{n} 个敌人晕眩中：不能攻击、无法闪避、受到伤害 +15%、被触发减益与被暴击概率 ×1.5',
   'buff.defDown.name': '敌人破甲', 'buff.defDown.desc': '敌人防御 -{v}%',
   'buff.slow.name': '敌人减速', 'buff.slow.desc': '敌人攻速 -{v}%',
   'buff.blind.name': '敌人致盲', 'buff.blind.desc': '敌人命中 -{v}%（有概率打空）',

@@ -11,7 +11,7 @@
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
   const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp'];
-  const DEBUFF_IDS = ['defDown', 'slow', 'blind', 'bleed', 'poison'];
+  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
   class BattleScene extends Phaser.Scene {
@@ -233,6 +233,7 @@
     // 對敵人上 debuff（持續時間吃施放者的「畫廊」加成；流血/中毒換算成每秒傷害）
     debuff(src, target, id, v, t) {
       const dur = t * ((src.st.debuffDur || 1) + (this.party(src) ? this.aura.debuffDur || 0 : 0));   // 黑暗系團隊特效
+      if (id === 'stun' && target.alive && !this.fxv(target, 'stun')) this.floatText(target.img.x, target.img.y - target.img.displayHeight - 4, G.t('battle.stun'), '#ffe066', 12);
       const val = (id === 'bleed' || id === 'poison') ? this.atkOf(src) * G.DOT[id] * v : v;
       this.addFx(target, id, val, dur);
     }
@@ -242,7 +243,7 @@
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? this.aura.spdPct || 0 : 0) - this.fxv(u, 'slow'))); }
     critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0)) * this.procMult(u); }
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（占星師米菈的專屬 buff）
-    evadeOf(u) { return Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade')); }
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade')); }   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
@@ -258,6 +259,7 @@
       let m = (1 - (u.st.dmgReduce || 0)) * (1 - this.fxv(u, 'dmgReduce'));
       if (this.party(u)) m *= 1 - (this.aura.dmgReduce || 0);
       if (u.taunt.t > 0) m *= 1 - u.taunt.v;
+      if (this.fxv(u, 'stun')) m *= 1 + G.STUN.taken;   // 暈眩受到傷害 +15%
       return Math.max(0.1, m);
     }
     skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (this.party(u) ? this.aura.skillDmg || 0 : 0); }
@@ -375,7 +377,8 @@
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
       if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
-      const crit = Math.random() * 100 < this.critOf(src) + (opts.critBonus || 0);
+      if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
+      const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0);   // 團隊特效：暴擊傷害
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
@@ -502,9 +505,13 @@
     // 普攻附加效果（被動 proc）
     applyProcs(u, t) {
       u.procs.forEach(p => {
-        if (!this.valid(t) || Math.random() >= p.chance * this.procMult(u)) return;
-        this.debuff(u, t, p.fx, p.val, p.t);
-        (p.more || []).forEach(m => this.debuff(u, t, m.fx, m.val, p.t));
+        if (!this.valid(t)) return;
+        const mult = this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1);   // 暈眩中的敵人更容易被觸發
+        if (Math.random() < p.chance * mult) {
+          this.debuff(u, t, p.fx, p.val, p.t);
+          (p.more || []).filter(m => !m.chance).forEach(m => this.debuff(u, t, m.fx, m.val, p.t));
+        }
+        (p.more || []).filter(m => m.chance).forEach(m => { if (this.valid(t) && Math.random() < m.chance * mult) this.debuff(u, t, m.fx, m.val, m.t); });
       });
     }
 
@@ -795,6 +802,7 @@
           if (!u.alive) return;
         }
         if (this.mode !== 'fight') return;
+        if (this.fxv(u, 'stun')) return;   // 暈眩：不能攻擊、不能放技能（冷卻也暫停）
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
@@ -875,7 +883,8 @@
         if (!on.length) return;
         const v = Math.max(...on.map(u => u.fx[id].v));
         const dot = id === 'bleed' || id === 'poison';
-        out.push({ id, icon: G.FX_ICON[id], val: dot ? `${on.length}` : `-${pct(v)}%`, p: { v: dot ? G.fmt(v) : pct(v), n: on.length } });
+        const val = dot || id === 'stun' ? `${on.length}` : `-${pct(v)}%`;
+        out.push({ id, icon: G.FX_ICON[id], val, p: { v: dot ? G.fmt(v) : pct(v), n: on.length } });
       });
       return out;
     }
@@ -893,7 +902,7 @@
         if (u.taunt.t > 0) g.lineStyle(1, 0xffd23f, 1).strokeRect(x - 1, y - 1, w + 2, 6);
         // 敵人身上的 debuff：血條下方小色點
         if (!this.party(u)) {
-          const dots = [['defDown', 0xffb347], ['slow', 0x9fd8ff], ['blind', 0xb0b0c0], ['bleed', 0xff4040], ['poison', 0x6fdc6f]].filter(([id]) => this.fxv(u, id));
+          const dots = [['stun', 0xffe066], ['defDown', 0xffb347], ['slow', 0x9fd8ff], ['blind', 0xb0b0c0], ['bleed', 0xff4040], ['poison', 0x6fdc6f]].filter(([id]) => this.fxv(u, id));
           dots.forEach(([, c], i) => g.fillStyle(c, 1).fillRect(x + i * 6, y + 6, 4, 3));
         }
       });

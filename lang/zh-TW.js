@@ -89,11 +89,11 @@ G.I18N['zh-TW'] = {
   'skill.ck_toxic.name': '毒爪', 'skill.ck_toxic.desc': '全體 {v}% 傷害，並使敵人中毒 6 秒',
   'skill.ck_fullburst.name': '全彈發射', 'skill.ck_fullburst.desc': '全身艙門打開，全體 {v}% 傷害，敵人攻速 -30%、防禦 -20%，5 秒',
   'skill.ck_rally.name': '喵喵鼓舞', 'skill.ck_rally.desc': '全隊攻擊 +{v}%，10 秒',
-  'skill.ck_purr.name': '呼嚕療癒', 'skill.ck_purr.desc': '全隊回復 {v}% 生命',
+  'skill.ck_purr.name': '呼嚕療癒', 'skill.ck_purr.desc': '全隊回復 {v}% 生命，之後 5 秒每秒再回復 1%',
   'skill.ck_morale.name': '士氣', 'skill.ck_morale.desc': '貓鎧者每攻擊一次累積 1 層士氣，每層全隊最終防禦 +1%，最多 +{v}%',
-  'skill.ck_frenzy.name': '吸貓狂熱', 'skill.ck_frenzy.desc': '隊員每次打中敵人自身傷害 +1%，最多 +{v}%，倒下才重算',
+  'skill.ck_frenzy.name': '吸貓狂熱', 'skill.ck_frenzy.desc': '隊員每次打中敵人自身傷害 +1%，最多 +{v}%，倒下才重算。裝備者自己：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%',
   'skill.ck_claws.name': '貓抓印記', 'skill.ck_claws.desc': '普攻貓抓讓敵人攻速 -{v}%，4 秒',
-  'skill.ck_venom.name': '毒貓', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒',
+  'skill.ck_venom.name': '貓肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒；另有 10% 機率拍暈敵人 {v2} 秒',
   'skill.ck_plate.name': '重裝鎧甲', 'skill.ck_plate.desc': '防禦 +{v}%',
 
   'skill.sc_barrage.name': '書海', 'skill.sc_barrage.desc': '書本轟炸全體 3 段，每段 {v}% 傷害',
@@ -304,7 +304,7 @@ G.I18N['zh-TW'] = {
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
   'battle.morale': '🎖️ 士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩',
 
   // ── Buff ──
   'buff.morale.name': '士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%。戰敗會歸零。',
@@ -324,6 +324,7 @@ G.I18N['zh-TW'] = {
   'buff.reflectUp.name': '反彈強化', 'buff.reflectUp.desc': '反彈 +{v}% 受到的傷害，還剩 {s} 秒',
   'buff.shield.name': '護盾', 'buff.shield.desc': '全隊護盾還能吸收 {v} 點傷害',
   'buff.taunt.name': '挑釁', 'buff.taunt.desc': '{name} 正在吸引所有敵人',
+  'buff.stun.name': '敵人暈眩', 'buff.stun.desc': '{n} 個敵人暈眩中：不能攻擊、無法閃避、受到傷害 +15%、被觸發減益與被暴擊機率 ×1.5',
   'buff.defDown.name': '敵人破甲', 'buff.defDown.desc': '敵人防禦 -{v}%',
   'buff.slow.name': '敵人緩速', 'buff.slow.desc': '敵人攻速 -{v}%',
   'buff.blind.name': '敵人致盲', 'buff.blind.desc': '敵人命中 -{v}%（有機率打空）',

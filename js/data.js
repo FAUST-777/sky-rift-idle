@@ -116,7 +116,7 @@ G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 //   drain 傷害轉生命比例  vsBleed 對流血目標額外倍率  summon 動物 id（目前沒有技能使用）  cdCut 全隊主動技能冷卻減少秒數
 // 被動：p = 'self' 自身屬性 / 'party' 全隊光環 / 'proc' 普攻附加 / 'special' 特殊機制
 //   key = 影響的屬性或機制；proc 另有 fx（狀態）、chance（'v' = 機率吃 v）、val、t
-// buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen reflectUp ｜ defDown slow blind bleed poison
+// buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen reflectUp ｜ stun（暈眩，見 G.STUN） defDown slow blind bleed poison
 // v(rank) = 該等級數值；v2(rank) = 第二個數值（說明 {v2}）；被動有 key2 時 v2 加到 key2 屬性
 // raw: true → {v} 直接顯示不換百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
@@ -124,7 +124,9 @@ const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(4);
 G.TIER_REQ = [0, 3, 8];
 G.ACTIVE_SLOTS = 4;
 G.PASSIVE_SLOTS = 4;
-G.DOT = { bleed: 0.3, poison: 0.22 };   // 每秒傷害 = 施放者攻擊 × 倍率
+G.DOT = { bleed: 0.3, poison: 0.22 };
+// 暈眩：不能攻擊也不能放技能；受到傷害 +15%、無法閃避；被觸發減益、被暴擊的機率 ×1.5
+G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -154,11 +156,14 @@ G.SKILLS = {
     A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
     A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
-    A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v })),
+    A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v, party: [{ id: 'regen', v: 0.01, t: 5 }] })),   // 之後 5 秒每秒再回 1%
     P('ck_morale',  0, lin(5, 2.5),    'special', 'morale', { raw: true }),   // 士氣上限（5 級 = 15%）
-    P('ck_frenzy',  0, lin(4, 1.5),    'special', 'frenzy', { raw: true }),   // 吸貓狂熱上限（5 級 = 10%）
+    // 吸貓狂熱：隊伍傷害疊層上限 5%→15%；裝的人自己另外加閃避、暴擊傷害、對中毒敵人傷害（also = 額外的自身屬性）
+    P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, also: { evade: lin(0.05, 0.0125), critDmg: lin(0.2, 0.025), vsPoison: lin(0.05, 0.025) } }),
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4 }),
-    P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
+    // 貓肉球拍打：普攻機率中毒；另外獨立 10% 機率暈眩 1→1.5 秒
+    P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5, v2: lin(1, 0.125), v2raw: true,
+      more: [{ fx: 'stun', chance: 0.1, val: 1, t: lin(1, 0.125) }] }),
     P('ck_plate',   2, lin(0.08, 0.06), 'self', 'defPct'),
   ],
 
@@ -291,7 +296,7 @@ G.ANIMALS = {
 G.FX_ICON = {
   atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
-  defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
+  stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
 
 // ── 怪物（名稱：monster.<id>）──────────────────────────────────────────────
