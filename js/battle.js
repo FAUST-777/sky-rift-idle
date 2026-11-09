@@ -898,14 +898,23 @@
       const pct = v => Math.round(v * 100);
       if (this.curse) out.push({ id: 'curse', icon: '🌪️', val: G.curseShort(this.curse), p: { text: G.curseText(this.curse), n: G.S.floor } });
       const mc = G.moraleCap();
-      if (mc && S.morale > 0) out.push({ id: 'morale', icon: G.FX_ICON.morale, val: `+${Math.min(S.morale, mc)}%`, p: { n: Math.min(S.morale, mc), max: mc } });
+      // 貓貓士氣：有人裝就顯示（全隊暈眩、閃避不用等疊層）
+      if (mc) {
+        const ps = this.pStun || { chance: 0, t: 0 };
+        out.push({ id: 'morale', icon: G.FX_ICON.morale, val: `+${Math.min(S.morale, mc)}%`,
+          p: { n: Math.min(S.morale, mc), max: mc, stun: +(ps.chance * 100).toFixed(1), stunT: +ps.t.toFixed(2), evade: pct(this.aura.evade || 0) } });
+      }
       const fc = G.frenzyCap();
       if (fc) {
         const members = this.units.filter(u => u.key);
         const top = Math.max(0, ...members.map(u => u.frenzy || 0));
         if (top > 0) {
           const list = members.map(u => `${G.whoName(u.key)} +${u.frenzy}%`).join('、');
-          out.push({ id: 'frenzy', icon: G.FX_ICON.frenzy, val: `+${top}%`, p: { max: fc, list } });
+          // 裝備者自己的額外加成（閃避、暴擊傷害、對中毒）
+          const wearer = members.find(u => G.charOf(u.key).passive.includes('ck_frenzy'));
+          const sk = G.skillDef('catknight', 'ck_frenzy'), r = wearer ? G.charOf(wearer.key).skills.ck_frenzy || 0 : 0;
+          const self = wearer && r ? G.t('buff.frenzy.self', { who: G.whoName(wearer.key), evade: pct(sk.also.evade(r)), critDmg: pct(sk.also.critDmg(r)), vsPoison: pct(sk.also.vsPoison(r)) }) : '';
+          out.push({ id: 'frenzy', icon: G.FX_ICON.frenzy, val: `+${top}%`, p: { max: fc, list, self } });
         }
       }
       if (this.animal && this.animal.unit.alive) {
@@ -924,6 +933,8 @@
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
       if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
+      // 貓哈氣爆甲的全隊效果
+      if (this.aura.vsStun || this.aura.cannonCut) out.push({ id: 'hiss', icon: G.FX_ICON.hiss, val: `+${pct(this.aura.vsStun || 0)}%`, p: { v: pct(this.aura.vsStun || 0), cut: this.aura.cannonCut || 0 } });
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);

@@ -303,12 +303,13 @@ G.I18N['zh-TW'] = {
   'battle.toFloor': '↑ 前往第 {n} 層', 'battle.defeat': '戰敗……', 'battle.revived': '復活！',
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
-  'battle.morale': '🎖️ 士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
+  'battle.morale': '🎖️ 貓貓士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
   'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.hpSlam': '肌肉衝擊！',
 
   // ── Buff ──
-  'buff.morale.name': '士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%。戰敗會歸零。',
-  'buff.frenzy.name': '吸貓狂熱', 'buff.frenzy.desc': '隊員每次打中敵人，自身傷害 +1%（最多 +{max}%），倒下才重新計算。目前：{list}',
+  'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',
+  'buff.frenzy.name': '吸貓狂熱', 'buff.frenzy.desc': '隊員每次打中敵人，自身傷害 +1%（最多 +{max}%），倒下才重新計算。目前：{list}{self}', 'buff.frenzy.self': '。{who}（裝備者）另有：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%',
+  'buff.hiss.name': '貓哈氣爆甲', 'buff.hiss.desc': '全隊攻擊暈眩中的敵人傷害 +{v}%，飛空艇砲擊冷卻 -{cut} 秒',
   'buff.animal_bear.name': '熊在場', 'buff.animal_bear.desc': '全隊防禦 {v}',
   'buff.animal_wolf.name': '狼在場', 'buff.animal_wolf.desc': '全隊攻擊 {v}',
   'buff.animal_owl.name': '貓頭鷹在場', 'buff.animal_owl.desc': '全隊暴擊率 {v}',

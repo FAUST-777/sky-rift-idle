@@ -303,12 +303,13 @@ G.I18N['zh-CN'] = {
   'battle.toFloor': '↑ 前往第 {n} 层', 'battle.defeat': '战败……', 'battle.revived': '复活！',
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
-  'battle.morale': '🎖️ 士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
+  'battle.morale': '🎖️ 猫猫士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
   'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.hpSlam': '肌肉冲击！',
 
   // ── Buff ──
-  'buff.morale.name': '士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
-  'buff.frenzy.name': '吸猫狂热', 'buff.frenzy.desc': '队员每次击中敌人，自身伤害 +1%（最多 +{max}%），倒下才重新计算。当前：{list}',
+  'buff.morale.name': '猫猫士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%（战败归零）。另外全队普攻有 {stun}% 概率晕眩敌人 {stunT} 秒，全队闪避 +{evade}%。',
+  'buff.frenzy.name': '吸猫狂热', 'buff.frenzy.desc': '队员每次击中敌人，自身伤害 +1%（最多 +{max}%），倒下才重新计算。当前：{list}{self}', 'buff.frenzy.self': '。{who}（装备者）另有：闪避 +{evade}%、暴击伤害 +{critDmg}%、对中毒敌人伤害 +{vsPoison}%',
+  'buff.hiss.name': '猫哈气爆甲', 'buff.hiss.desc': '全队攻击晕眩中的敌人伤害 +{v}%，飞空艇炮击冷却 -{cut} 秒',
   'buff.animal_bear.name': '熊在场', 'buff.animal_bear.desc': '全队防御 {v}',
   'buff.animal_wolf.name': '狼在场', 'buff.animal_wolf.desc': '全队攻击 {v}',
   'buff.animal_owl.name': '猫头鹰在场', 'buff.animal_owl.desc': '全队暴击率 {v}',

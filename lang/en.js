@@ -303,12 +303,13 @@ G.I18N['en'] = {
   'battle.toFloor': '↑ To Floor {n}', 'battle.defeat': 'Defeated...', 'battle.revived': 'Revived!',
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
-  'battle.morale': '🎖️ Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
+  'battle.morale': '🎖️ Kitty Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
   'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.hpSlam': 'Muscle Slam!',
 
   // ── Buffs ──
-  'buff.morale.name': 'Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',
-  'buff.frenzy.name': 'Cat Frenzy', 'buff.frenzy.desc': 'Each hit on an enemy gives that member +1% damage (up to +{max}%). Resets when they fall. Now: {list}',
+  'buff.morale.name': 'Kitty Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}% (resets on defeat). Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{evade}%.',
+  'buff.frenzy.name': 'Cat Frenzy', 'buff.frenzy.desc': 'Each hit on an enemy gives that member +1% damage (up to +{max}%). Resets when they fall. Now: {list}{self}', 'buff.frenzy.self': '. {who} (wearer) also gets evasion +{evade}%, crit damage +{critDmg}%, +{vsPoison}% damage to poisoned enemies',
+  'buff.hiss.name': 'Hissing Burst Armor', 'buff.hiss.desc': 'Party deals +{v}% damage to stunned enemies; airship cannon cooldown -{cut}s',
   'buff.animal_bear.name': 'Bear', 'buff.animal_bear.desc': 'Party DEF {v}',
   'buff.animal_wolf.name': 'Wolf', 'buff.animal_wolf.desc': 'Party ATK {v}',
   'buff.animal_owl.name': 'Owl', 'buff.animal_owl.desc': 'Party crit chance {v}',
