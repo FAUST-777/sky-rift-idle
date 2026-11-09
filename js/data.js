@@ -163,7 +163,8 @@ G.SKILLS = {
 
   // 貓鎧者：士氣 / 吸貓狂熱、貓抓降攻速、中毒
   catknight: [
-    A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }] })),
+    // 貓咪齊射：另外給全隊動物系隊友「下一次技能傷害 +100%」（20 秒內用掉）
+    A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: 1, t: 20 }] } })),
     A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
     A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
@@ -172,7 +173,7 @@ G.SKILLS = {
     P('ck_morale',  0, lin(5, 2.5),    'special', 'morale', { raw: true,
       partyStun: { chance: lin(0.01, 0.01), t: lin(1, 0.125) }, partyAlso: { evade: lin(0.05, 0.0075) } }),
     // 吸貓狂熱：隊伍傷害疊層上限 5%→15%；裝的人自己另外加閃避、暴擊傷害、對中毒敵人傷害（also = 額外的自身屬性）
-    P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, also: { evade: lin(0.05, 0.0125), critDmg: lin(0.2, 0.025), vsPoison: lin(0.05, 0.025) } }),
+    P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, also: { evade: lin(0.05, 0.0125), critDmg: () => 0.3, vsPoison: lin(0.05, 0.025) }, partyAlso: { critDmg: 0.15 } }),   // 暴擊傷害：自己 +30%、全隊 +15%
     // 貓抓印記：普攻緩速；全隊普攻 5%→8% 機率中毒 5 秒（多人裝不疊加）
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { basicPoison: lin(0.05, 0.0075) } }),
     // 貓肉球拍打：普攻機率中毒；另外獨立 10% 機率暈眩 1→1.5 秒
