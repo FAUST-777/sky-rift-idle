@@ -433,7 +433,7 @@
     const lineup = syn.members.map(m => `<span class="syn-mem">${esc(G.whoName(m.who))} ${dtypeTag(m.type)}</span>`).join('');
     const active = syn.active.map(a => `<div class="syn-on"><b>✦ ${t(`syn.${a.id}.name`)}</b>
         <span class="muted">${a.n ? t('syn.cond.type', { type: t('dtype.' + G.TEAM_SYNERGIES.find(x => x.id === a.id).type), n: a.n }) : ''}</span>
-        <div>${synBonusText(a.bonus)}</div></div>`).join('');
+        <div>${synBonusText(G.scaleSynergy(a.bonus, G.synergyPow()))}${G.synergyPow() ? ` <span class="tag perk">${t('syn.herd', { v: Math.round(G.synergyPow() * 100) })}</span>` : ''}</div></div>`).join('');
     const rows = G.TEAM_SYNERGIES.map(sy => {
       const on = syn.active.find(a => a.id === sy.id);
       if (sy.mix) {

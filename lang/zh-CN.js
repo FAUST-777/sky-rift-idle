@@ -149,7 +149,7 @@ G.I18N['zh-CN'] = {
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全队生命 +{v}%',
   'skill.dr_spirit.name': '自然之灵', 'skill.dr_spirit.desc': '全队每秒恢复 {v}% 生命',
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻击 +{v}%',
-  'skill.dr_herd.name': '兽群之心', 'skill.dr_herd.desc': '自己施放的增益效果 +{v}%',
+  'skill.dr_herd.name': '兽群之心', 'skill.dr_herd.desc': '全队团队特效的数值 +{v}%；全队普攻暴击时，出手的人回复 {party_critHeal}% 最大生命',
 
   'skill.dw_fetch.name': '去咬他！', 'skill.dw_fetch.desc': '狗狗冲出去咬，单体 {v}% 伤害，并使敌人中毒 5 秒',
   'skill.dw_walkies.name': '散步时间', 'skill.dw_walkies.desc': '全队其他主动技能冷却立刻减少 {v} 秒，并恢复全队 {v2}% 生命；全队闪避 +{evade}% 2 秒；动物系队友下一次攻击技能伤害 +{next}%',
@@ -219,7 +219,7 @@ G.I18N['zh-CN'] = {
   'live.debuffDur': '减益持续',
   'live.shield': '护盾',
   // 團隊特效
-  'syn.title': '团队特效',
+  'syn.herd': '兽群之心 +{v}%', 'syn.title': '团队特效',
   'syn.help': '依出战成员（主角＋伙伴）的攻击系别触发：同系别凑 2～3 位，或三种特定系别各 1 位，都有全队加成。换伙伴职业就能改变组合。',
   'syn.current': '目前组合',
   'syn.active': '生效中',

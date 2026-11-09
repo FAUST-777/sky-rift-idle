@@ -267,7 +267,7 @@ G.SKILLS = {
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
     P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen'),
     P('dr_wild',   1, lin(0.06, 0.04),   'self', 'atkPct'),
-    P('dr_herd',   2, lin(0.06, 0.04),   'self', 'buffPow'),     // 自己施放的增益數值 +v（相對）
+    P('dr_herd',   2, lin(0.1, 0.025),   'party', 'synergyPow', { partyAlso: { critHeal: 0.002 } }),   // 團隊特效數值 +10%→20%（相對）；全隊普攻暴擊回 0.2% 生命
   ],
 
   // 遛狗者：全隊減冷卻、加攻速、加技能傷害

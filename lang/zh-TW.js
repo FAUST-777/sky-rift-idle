@@ -149,7 +149,7 @@ G.I18N['zh-TW'] = {
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全隊生命 +{v}%',
   'skill.dr_spirit.name': '自然之靈', 'skill.dr_spirit.desc': '全隊每秒回復 {v}% 生命',
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻擊 +{v}%',
-  'skill.dr_herd.name': '獸群之心', 'skill.dr_herd.desc': '自己施放的增益效果 +{v}%',
+  'skill.dr_herd.name': '獸群之心', 'skill.dr_herd.desc': '全隊團隊特效的數值 +{v}%；全隊普攻暴擊時，出手的人回復 {party_critHeal}% 最大生命',
 
   'skill.dw_fetch.name': '去咬他！', 'skill.dw_fetch.desc': '狗狗衝出去咬，單體 {v}% 傷害，並使敵人中毒 5 秒',
   'skill.dw_walkies.name': '散步時間', 'skill.dw_walkies.desc': '全隊其他主動技能冷卻立刻減少 {v} 秒，並回復全隊 {v2}% 生命；全隊閃避 +{evade}% 2 秒；動物系隊友下一次攻擊技能傷害 +{next}%',
@@ -219,7 +219,7 @@ G.I18N['zh-TW'] = {
   'live.debuffDur': '減益持續',
   'live.shield': '護盾',
   // 團隊特效
-  'syn.title': '團隊特效',
+  'syn.herd': '獸群之心 +{v}%', 'syn.title': '團隊特效',
   'syn.help': '依出戰成員（主角＋夥伴）的攻擊系別觸發：同系別湊 2～3 位，或三種特定系別各 1 位，都有全隊加成。換夥伴職業就能改變組合。',
   'syn.current': '目前組合',
   'syn.active': '生效中',

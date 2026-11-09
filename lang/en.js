@@ -149,7 +149,7 @@ G.I18N['en'] = {
   'skill.dr_grove.name': 'Grove Blessing', 'skill.dr_grove.desc': 'Party HP +{v}%',
   'skill.dr_spirit.name': 'Nature Spirit', 'skill.dr_spirit.desc': 'Party regenerates {v}% HP per second',
   'skill.dr_wild.name': 'Wildness', 'skill.dr_wild.desc': 'ATK +{v}%',
-  'skill.dr_herd.name': 'Heart of the Herd', 'skill.dr_herd.desc': 'Buffs you cast are {v}% stronger',
+  'skill.dr_herd.name': 'Heart of the Herd', 'skill.dr_herd.desc': 'Team synergy bonuses are {v}% stronger; party basic-attack crits heal the attacker for {party_critHeal}% max HP',
 
   'skill.dw_fetch.name': 'Get Him!', 'skill.dw_fetch.desc': 'The dog charges in to bite: {v}% damage to one enemy and poisons it for 5s',
   'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner and the party heals {v2}% HP; party evasion +{evade}% for 2s; Animal allies\' next attack skill deals +{next}% damage',
@@ -219,7 +219,7 @@ G.I18N['en'] = {
   'live.debuffDur': 'Debuff duration',
   'live.shield': 'Shield',
   // 團隊特效
-  'syn.title': 'Team Synergy',
+  'syn.herd': 'Pack Heart +{v}%', 'syn.title': 'Team Synergy',
   'syn.help': 'Triggered by the damage types of your deployed members (hero + partners): 2–3 of the same type, or one each of three specific types, grant party-wide bonuses. Change partner classes to change the mix.',
   'syn.current': 'Current lineup',
   'syn.active': 'Active',
