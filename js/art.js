@@ -21,6 +21,23 @@
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
 
+  // 劍：握把在 (hx,hy)，劍尖在 (tx,ty)
+  function blade(ctx, color, hx, hy, tx, ty, w) {
+    const dx = tx - hx, dy = ty - hy, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+    const gx = hx + ux * 4, gy = hy + uy * 4;
+    ctx.strokeStyle = shade(color, 70); ctx.lineWidth = w;
+    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(gx + uy * 4, gy - ux * 4); ctx.lineTo(gx - uy * 4, gy + ux * 4); ctx.stroke();
+    ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx - ux * 4, hy - uy * 4); ctx.stroke();
+  }
+  // 燧發槍：握把在 (x,y)
+  function gun(ctx, color, x, y) {
+    ctx.fillStyle = '#5a3a1e'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.lineTo(x + 1, y + 7); ctx.lineTo(x + 4, y + 1); ctx.fill();
+    ctx.fillStyle = shade(color, 30); ctx.fillRect(x, y - 2, 13, 3.5);
+  }
+
   // 稀有度對應的裝備顏色（紙娃娃用）
   const GEAR_COLORS = ['#8d8478', '#4f9d57', '#3f7fd0', '#8a4fd0', '#e0a030'];
 
@@ -41,7 +58,6 @@
     look.helmet = { v: 3, color: look.helmet ? look.helmet.color : steel };
     look.armor  = { v: 2, color: look.armor ? look.armor.color : steel };
     look.boots  = { v: 1, color: look.boots ? look.boots.color : steel };
-    if (!look.weapon) look.weapon = { type: 'none' };
     return look;
   }
 
@@ -51,10 +67,11 @@
     pirate: { v: 4, color: '#2b2b2b' }, scholar: { v: 5, color: '#24304a' }, darkpainter: { v: 6, color: '#3a2450' },
     druid: { v: 2, color: '#3f6b3a' }, wallbringer: { v: 1, color: '#8a8f99' }, gymgoer: { v: 7, color: '#e04040' },
   };
+  // 武器：一律畫職業武器（不管裝備什麼），顏色跟著裝備的武器稀有度
   function classLook(look, tier) {
     const C = G.CLASSES[look.cls] || {};
+    look.weapon = { type: C.weapon || 'pitchfork', color: look.weapon && look.weapon.color || GEAR_COLORS[tier || 0] };
     if (look.cls === 'catknight') return catKnightLook(look);
-    if (!look.weapon && C.weapon) look.weapon = { type: C.weapon, color: GEAR_COLORS[tier || 0] };
     if (!look.helmet && CLASS_HEAD[look.cls]) look.helmet = CLASS_HEAD[look.cls];
     if (!look.armor && look.cls !== 'villager') look.armor = { v: look.cls === 'wallbringer' ? 2 : 0, color: C.color };
     return look;
@@ -102,6 +119,8 @@
     // 後手
     ctx.fillStyle = look.armor ? shade(look.armor.color, -30) : '#7a6040';
     rr(ctx, 21, 34, 6, 17, 3); ctx.fill();
+    const wp = look.weapon || { type: 'pitchfork', color: GEAR_COLORS[0] };
+    ctx.lineCap = 'round';
 
     // 身體 / 鎧甲
     const tc = look.armor ? look.armor.color : cls.color === '#f1e3a6' ? '#e9e1c4' : '#8b6f47';
@@ -191,67 +210,71 @@
     ctx.fillStyle = look.skin;
     ctx.beginPath(); ctx.arc(43, 50, 3.2, 0, Math.PI * 2); ctx.fill();
 
-    // 武器（握在前手）
-    const wp = look.weapon;
-    ctx.lineCap = 'round';
-    if (wp && wp.type === 'none') {
-      // 空手（貓鎧者：小貓就是武器）
-    } else if (wp && wp.type === 'pistol') {      // 海盜：燧發槍（前手一把、腰間一把）
-      const gun = (x, y) => {
-        ctx.fillStyle = '#5a3a1e'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.lineTo(x + 1, y + 7); ctx.lineTo(x + 4, y + 1); ctx.fill();
-        ctx.fillStyle = shade(wp.color, 30); ctx.fillRect(x, y - 2, 13, 3.5);
-      };
-      gun(43, 47); gun(25, 52);
-    } else if (wp && wp.type === 'book') {        // 學者：厚書
-      ctx.fillStyle = shade(wp.color, -10); ctx.fillRect(41, 42, 13, 16);
-      ctx.fillStyle = '#f3ead2'; ctx.fillRect(43, 43, 10, 14);
-      ctx.fillStyle = '#7a2f2f'; ctx.fillRect(41, 42, 3, 16);
-    } else if (wp && wp.type === 'brush') {       // 暗黑畫家：大畫筆
+    // 武器（握在前手）：每個職業固定一種
+    if (wp.type === 'pistol') {                    // 海盜：雙槍（另一把在後手）
+      gun(ctx, wp.color, 36, 55); gun(ctx, wp.color, 43, 47);
+    } else if (wp.type === 'openbook') {          // 學者：打開的書
+      ctx.fillStyle = shade(wp.color, -20);
+      ctx.beginPath(); ctx.moveTo(37, 46); ctx.lineTo(47, 49); ctx.lineTo(57, 46); ctx.lineTo(57, 57); ctx.lineTo(47, 60); ctx.lineTo(37, 57); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#f3ead2';
+      ctx.beginPath(); ctx.moveTo(38.5, 45); ctx.lineTo(47, 48); ctx.lineTo(47, 58); ctx.lineTo(38.5, 55); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(55.5, 45); ctx.lineTo(47, 48); ctx.lineTo(47, 58); ctx.lineTo(55.5, 55); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#9a8c70'; ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      for (let i = 0; i < 3; i++) { ctx.moveTo(40, 48.5 + i * 2.5); ctx.lineTo(45.5, 50.5 + i * 2.5); ctx.moveTo(48.5, 50.5 + i * 2.5); ctx.lineTo(54, 48.5 + i * 2.5); }
+      ctx.stroke();
+    } else if (wp.type === 'brush') {             // 暗黑畫家：大畫筆
       ctx.strokeStyle = '#6b4a26'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(43, 58); ctx.lineTo(53, 20); ctx.stroke();
-      ctx.fillStyle = '#c0c0c0'; ctx.fillRect(51, 17, 5, 5);
+      ctx.fillStyle = shade(wp.color, 20); ctx.fillRect(51, 17, 5, 5);
       ctx.fillStyle = '#7a3dbf'; ctx.beginPath(); ctx.moveTo(51, 17); ctx.quadraticCurveTo(54, 5, 57, 17); ctx.fill();
-    } else if (wp && wp.type === 'tower') {       // 城牆者：大塔盾
+    } else if (wp.type === 'tower') {             // 城牆者：大塔盾
       ctx.fillStyle = shade(wp.color, 10); rr(ctx, 40, 28, 18, 36, 4); ctx.fill();
       ctx.strokeStyle = shade(wp.color, -40); ctx.lineWidth = 2; rr(ctx, 40, 28, 18, 36, 4); ctx.stroke();
       ctx.fillStyle = shade(wp.color, 50); ctx.fillRect(47, 32, 4, 28); ctx.fillRect(42, 42, 14, 4);
-    } else if (wp && wp.type === 'leash') {       // 遛狗者：牽繩
-      ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(43, 50); ctx.quadraticCurveTo(52, 66, 62, 70); ctx.stroke();
-    } else if (wp && wp.type === 'dumbbell') {    // 健身者：啞鈴
+    } else if (wp.type === 'leash') {             // 遛狗者：牽繩 + 狗
+      ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(43, 50); ctx.quadraticCurveTo(50, 64, 54, 63); ctx.stroke();
+      const dc = '#b9874f';
+      ctx.fillStyle = dc;
+      rr(ctx, 48, 64, 12, 7, 3); ctx.fill();                                   // 身體
+      ctx.fillRect(49, 69, 2.5, 5); ctx.fillRect(56.5, 69, 2.5, 5);              // 腳
+      ctx.beginPath(); ctx.ellipse(60, 62, 4.5, 4, 0, 0, Math.PI * 2); ctx.fill(); // 頭
+      ctx.fillRect(61, 63, 4, 3);                                                 // 嘴
+      ctx.fillStyle = shade(dc, -45);
+      ctx.beginPath(); ctx.ellipse(57.5, 61, 1.8, 3.5, 0.4, 0, Math.PI * 2); ctx.fill(); // 耳朵
+      ctx.fillStyle = '#222'; ctx.fillRect(61.5, 60.5, 1.5, 1.5); ctx.fillRect(64, 63, 1.5, 1.5);
+      ctx.strokeStyle = dc; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(48.5, 66); ctx.quadraticCurveTo(45, 62, 46, 59); ctx.stroke(); // 尾巴
+      ctx.fillStyle = '#c0392b'; ctx.fillRect(55, 63, 2, 4);                    // 項圈
+    } else if (wp.type === 'dumbbell') {          // 健身者：啞鈴
       ctx.fillStyle = '#555'; ctx.fillRect(39, 49, 10, 3);
-      ctx.fillStyle = '#2b2b2b'; ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
-    } else if (!wp) {              // 村民：草叉
+      ctx.fillStyle = shade(wp.color, -30); ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
+    } else if (wp.type === 'dualsword') {         // 血騎士：雙劍（前手這把）
+      blade(ctx, wp.color, 38, 54, 62, 40, 2.5); blade(ctx, wp.color, 43, 50, 57, 20, 3);
+    } else if (wp.type === 'longsword') {         // 貓鎧者：長劍
+      ctx.strokeStyle = shade(wp.color, 75); ctx.lineWidth = 3.5;
+      ctx.beginPath(); ctx.moveTo(44, 46); ctx.lineTo(60, 6); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(46, 40); ctx.lineTo(58, 10); ctx.stroke();
+      ctx.strokeStyle = wp.color; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(39, 45); ctx.lineTo(50, 50); ctx.stroke();
+      ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(43.5, 51); ctx.lineTo(41, 58); ctx.stroke();
+      ctx.fillStyle = wp.color; ctx.beginPath(); ctx.arc(40.5, 59.5, 2, 0, Math.PI * 2); ctx.fill();
+    } else if (wp.type === 'axe') {               // 德魯伊：斧頭
+      ctx.strokeStyle = '#6b4a26'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(42, 60); ctx.lineTo(52, 20); ctx.stroke();
+      ctx.fillStyle = shade(wp.color, 40);
+      ctx.beginPath(); ctx.moveTo(51, 22); ctx.quadraticCurveTo(64, 20, 62, 34); ctx.lineTo(49, 30); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#3f6b3a'; ctx.lineWidth = 1.5;                          // 纏繞的藤蔓
+      ctx.beginPath(); ctx.moveTo(44, 52); ctx.quadraticCurveTo(50, 46, 46, 42); ctx.quadraticCurveTo(52, 36, 48, 32); ctx.stroke();
+    } else {                                       // 冒險者：草叉
       ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.moveTo(43, 62); ctx.lineTo(49, 14); ctx.stroke();
       ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(45, 16); ctx.lineTo(53, 17); ctx.moveTo(46, 16); ctx.lineTo(46.5, 8);
       ctx.moveTo(49.5, 16.5); ctx.lineTo(50, 8); ctx.moveTo(53, 17); ctx.lineTo(53.5, 9); ctx.stroke();
-    } else if (wp.type === 'sword') {
-      ctx.strokeStyle = shade(wp.color, 70); ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(45, 46); ctx.lineTo(58, 18); ctx.stroke();
-      ctx.strokeStyle = wp.color; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(40, 47); ctx.lineTo(50, 52); ctx.stroke();
-      ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(43, 52); ctx.lineTo(41, 56); ctx.stroke();
-    } else if (wp.type === 'axe') {
-      ctx.strokeStyle = '#6b4a26'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(42, 60); ctx.lineTo(52, 20); ctx.stroke();
-      ctx.fillStyle = shade(wp.color, 40);
-      ctx.beginPath(); ctx.moveTo(51, 22); ctx.quadraticCurveTo(64, 20, 62, 34); ctx.lineTo(49, 30); ctx.closePath(); ctx.fill();
-    } else if (wp.type === 'staff') {
-      ctx.strokeStyle = '#5d4027'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(41, 66); ctx.lineTo(50, 12); ctx.stroke();
-      ctx.fillStyle = wp.color; ctx.shadowColor = wp.color; ctx.shadowBlur = 8;
-      ctx.beginPath(); ctx.arc(50.5, 10, 4.5, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-    } else if (wp.type === 'mace') {
-      ctx.strokeStyle = '#6b5a40'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(43, 56); ctx.lineTo(52, 28); ctx.stroke();
-      ctx.fillStyle = shade(wp.color, 30);
-      ctx.beginPath(); ctx.arc(53, 25, 6, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = shade(wp.color, 70);
-      ctx.beginPath(); ctx.arc(51, 23, 2, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
   };

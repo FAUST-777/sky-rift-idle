@@ -39,7 +39,7 @@ G.I18N['zh-TW'] = {
   'slot.weapon': '武器', 'slot.helmet': '頭盔', 'slot.armor': '鎧甲', 'slot.boots': '靴子', 'slot.accessory': '飾品',
   'rarity.0': '普通', 'rarity.1': '優良', 'rarity.2': '稀有', 'rarity.3': '史詩', 'rarity.4': '傳說',
   'prefix.1': '雲紋', 'prefix.2': '風暴', 'prefix.3': '星辰', 'prefix.4': '裂界',
-  'base.weapon.0': '長劍', 'base.weapon.1': '戰斧', 'base.weapon.2': '法杖', 'base.weapon.3': '權杖',
+  'base.weapon.0': '長劍', 'base.weapon.1': '戰斧', 'base.weapon.2': '長槍', 'base.weapon.3': '權杖',
   'base.helmet.0': '皮帽', 'base.helmet.1': '鐵盔', 'base.helmet.2': '兜帽',
   'base.armor.0': '布衣', 'base.armor.1': '鎖甲', 'base.armor.2': '板甲',
   'base.boots.0': '皮靴', 'base.boots.1': '鐵靴',

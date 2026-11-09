@@ -52,7 +52,7 @@ G.SLOT_ICON = { weapon: '⚔️', helmet: '⛑️', armor: '🛡️', boots: '�
 
 // 每個部位的底材：紙娃娃外觀樣式（名稱：base.<slot>.<index>）
 G.ITEM_BASES = {
-  weapon:    [{ look: 'sword' }, { look: 'axe' }, { look: 'staff' }, { look: 'mace' }],
+  weapon:    [{ look: 'sword' }, { look: 'axe' }, { look: 'spear' }, { look: 'mace' }],
   helmet:    [{ look: 0 }, { look: 1 }, { look: 2 }],
   armor:     [{ look: 0 }, { look: 1 }, { look: 2 }],
   boots:     [{ look: 0 }, { look: 1 }],
@@ -73,16 +73,16 @@ G.AFFIXES = [{ atk: 2 }, { hp: 12 }, { def: 1.5 }, { crit: 1.5 }, { spd: 0.03 }]
 // range = 普攻範圍：all 打全部敵人但每下較弱 / one 只打一隻但較痛
 // dmgType = 傷害系別：physical 物理 / animal 動物 / arcane 奧術 / dark 黑暗（之後做組合特效用）
 // ranged = 站後排；missile = 普攻投射物造型；shots = 普攻一次打幾發
-// look = 沒裝武器時的職業招牌外觀
+// weapon = 紙娃娃固定拿的職業武器（不受裝備影響）
 G.CLASSES = {
-  villager:    { core: 'atk',  range: 'one', dmgType: 'physical', color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1,    atk: 1,    def: 1 } },
-  bloodknight: { core: 'atk',  range: 'one', dmgType: 'physical', color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.15, atk: 1.35, def: 0.95 }, weapon: 'sword' },
-  catknight:   { core: 'buff', range: 'all', dmgType: 'animal',   color: '#9aa3ad', cape: '#d98a3a', ranged: false, mult: { hp: 1.25, atk: 1.0,  def: 1.25 }, missile: 'cat' },
-  scholar:     { core: 'atk',  range: 'all', dmgType: 'arcane',   color: '#3f6fb5', cape: '#24477a', ranged: true,  mult: { hp: 0.9,  atk: 1.3,  def: 0.85 }, missile: 'book', weapon: 'book' },
+  villager:    { core: 'atk',  range: 'one', dmgType: 'physical', color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1,    atk: 1,    def: 1 }, weapon: 'pitchfork' },
+  bloodknight: { core: 'atk',  range: 'one', dmgType: 'physical', color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.15, atk: 1.35, def: 0.95 }, weapon: 'dualsword' },
+  catknight:   { core: 'buff', range: 'all', dmgType: 'animal',   color: '#9aa3ad', cape: '#d98a3a', ranged: false, mult: { hp: 1.25, atk: 1.0,  def: 1.25 }, missile: 'cat', weapon: 'longsword' },
+  scholar:     { core: 'atk',  range: 'all', dmgType: 'arcane',   color: '#3f6fb5', cape: '#24477a', ranged: true,  mult: { hp: 0.9,  atk: 1.3,  def: 0.85 }, missile: 'book', weapon: 'openbook' },
   darkpainter: { core: 'spc',  range: 'all', dmgType: 'dark',     color: '#5b3d7a', cape: '#2a1a3d', ranged: true,  mult: { hp: 0.95, atk: 1.1,  def: 0.9 },  missile: 'paint', weapon: 'brush' },
   pirate:      { core: 'atk',  range: 'one', dmgType: 'physical', color: '#7a2f2f', cape: '#2b2b2b', ranged: true,  mult: { hp: 1.0,  atk: 1.4,  def: 0.85 }, missile: 'bullet', shots: 2, weapon: 'pistol' },
   wallbringer: { core: 'def',  range: 'one', dmgType: 'physical', color: '#8a8f99', cape: '#4a5560', ranged: false, mult: { hp: 1.5,  atk: 0.8,  def: 1.7 },  weapon: 'tower' },
-  druid:       { core: 'buff', range: 'all', dmgType: 'animal',   color: '#4f8a4a', cape: '#2f5a2c', ranged: true,  mult: { hp: 1.05, atk: 1.0,  def: 1.0 },  missile: 'leaf', weapon: 'staff' },
+  druid:       { core: 'buff', range: 'all', dmgType: 'animal',   color: '#4f8a4a', cape: '#2f5a2c', ranged: true,  mult: { hp: 1.05, atk: 1.0,  def: 1.0 },  missile: 'leaf', weapon: 'axe' },
   dogwalker:   { core: 'spc',  range: 'one', dmgType: 'animal',   color: '#b07a3e', cape: '#6b4a24', ranged: false, mult: { hp: 1.1,  atk: 1.15, def: 1.05 }, missile: 'dog', weapon: 'leash' },
   gymgoer:     { core: 'def',  range: 'one', dmgType: 'physical', color: '#e0703a', cape: null,      ranged: false, mult: { hp: 1.6,  atk: 0.95, def: 1.35 }, weapon: 'dumbbell' },
 };

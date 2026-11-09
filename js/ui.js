@@ -109,7 +109,7 @@
   }
 
   // ── 共用小元件 ───────────────────────────────────────────────────────────
-  const itemIcon = it => it.slot === 'weapon' ? { sword: '🗡️', axe: '🪓', staff: '🔮', mace: '🔨' }[it.look] : G.SLOT_ICON[it.slot];
+  const itemIcon = it => it.slot === 'weapon' ? { sword: '🗡️', axe: '🪓', spear: '🔱', staff: '🔱', mace: '🔨' }[it.look] : G.SLOT_ICON[it.slot];
 
   function dollCanvas(look, w, h, scale) {
     const c = G.ART.canvas(w * 2, h * 2);  // 2 倍解析度，手機上比較清楚

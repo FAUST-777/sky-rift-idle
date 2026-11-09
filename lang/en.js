@@ -39,7 +39,7 @@ G.I18N['en'] = {
   'slot.weapon': 'Weapon', 'slot.helmet': 'Helmet', 'slot.armor': 'Armor', 'slot.boots': 'Boots', 'slot.accessory': 'Accessory',
   'rarity.0': 'Common', 'rarity.1': 'Uncommon', 'rarity.2': 'Rare', 'rarity.3': 'Epic', 'rarity.4': 'Legendary',
   'prefix.1': 'Cloudwoven', 'prefix.2': 'Stormforged', 'prefix.3': 'Starlit', 'prefix.4': 'Riftborn',
-  'base.weapon.0': 'Longsword', 'base.weapon.1': 'Battle Axe', 'base.weapon.2': 'Staff', 'base.weapon.3': 'Mace',
+  'base.weapon.0': 'Longsword', 'base.weapon.1': 'Battle Axe', 'base.weapon.2': 'Spear', 'base.weapon.3': 'Mace',
   'base.helmet.0': 'Leather Cap', 'base.helmet.1': 'Iron Helm', 'base.helmet.2': 'Hood',
   'base.armor.0': 'Tunic', 'base.armor.1': 'Chainmail', 'base.armor.2': 'Plate Armor',
   'base.boots.0': 'Leather Boots', 'base.boots.1': 'Iron Greaves',
