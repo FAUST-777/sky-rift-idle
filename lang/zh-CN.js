@@ -178,10 +178,10 @@ G.I18N['zh-CN'] = {
   'skill.mc_spikes.name': '水晶尖甲', 'skill.mc_spikes.desc': '全队反弹 +{v}%，8 秒',
   'skill.mc_topcoat.name': '亮油封层', 'skill.mc_topcoat.desc': '全队防御 +{v}%、反弹 +50%，10 秒',
   'skill.mc_salon.name': '顶级沙龙', 'skill.mc_salon.desc': '全队反弹 +{v}%，8 秒，并获得最大生命 12% 的护盾',
-  'skill.mc_thorn.name': '倒刺美甲', 'skill.mc_thorn.desc': '全队常驻反弹 {v}% 受到的伤害',
+  'skill.mc_thorn.name': '倒刺美甲', 'skill.mc_thorn.desc': '全队常驻反弹 {v}% 受到的伤害，并让全队反弹可以暴击（吃被打那位队友的暴击率与暴击伤害）',
   'skill.mc_harden.name': '硬化甲油', 'skill.mc_harden.desc': '全队防御 +{v}%',
   'skill.mc_gelcoat.name': '光疗保养', 'skill.mc_gelcoat.desc': '生命 +{v}%',
-  'skill.mc_mirror.name': '镜面甲', 'skill.mc_mirror.desc': '全队反弹伤害 +{v}%',
+  'skill.mc_mirror.name': '镜面甲', 'skill.mc_mirror.desc': '全队反弹伤害 +{v}%，反弹暴击时暴击伤害再 +{party_reflectCritDmg}%',
   'skill.mc_art.name': '指尖艺术', 'skill.mc_art.desc': '自己施放的护盾 +{v}%，自身普攻伤害 +50%',
 
   // ── 伙伴 ──

@@ -412,7 +412,12 @@
       // 反彈：城牆者「尖刺城牆」（自己）＋ 美甲師全隊反彈光環／buff，「鏡面甲」加成反彈傷害
       if (this.party(target) && !this.party(src) && src.alive) {
         const r = this.reflectOf(target);
-        if (r > 0) this.damage(src, Math.max(1, Math.round(dmg * r)), '#ff9ad5', false, true);
+        if (r > 0) {
+          // 倒刺美甲：反彈可暴擊，用被打的那位隊友的暴擊率與暴擊傷害；鏡面甲再加反彈暴擊傷害
+          const rc = this.aura.reflectCrit && Math.random() * 100 < this.critOf(target);
+          const cm = rc ? target.st.critDmg + (this.aura.critDmg || 0) + (this.aura.reflectCritDmg || 0) : 1;
+          this.damage(src, Math.max(1, Math.round(dmg * r * cm)), '#ff9ad5', rc, true);
+        }
       }
       // 吸血
       const ls = (src.st.lifesteal || 0) + (opts.drain || 0);

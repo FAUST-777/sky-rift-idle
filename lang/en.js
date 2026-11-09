@@ -178,10 +178,10 @@ G.I18N['en'] = {
   'skill.mc_spikes.name': 'Crystal Spikes', 'skill.mc_spikes.desc': 'Party reflect +{v}% for 8s',
   'skill.mc_topcoat.name': 'Top Coat', 'skill.mc_topcoat.desc': 'Party DEF +{v}% and reflect +50% for 10s',
   'skill.mc_salon.name': 'Luxury Salon', 'skill.mc_salon.desc': 'Party reflect +{v}% for 8s and a shield worth 12% max HP',
-  'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party always reflects {v}% of damage taken',
+  'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party always reflects {v}% of damage taken, and reflects can crit (using the hit ally\'s crit chance and crit damage)',
   'skill.mc_harden.name': 'Hardener', 'skill.mc_harden.desc': 'Party DEF +{v}%',
   'skill.mc_gelcoat.name': 'Gel Care', 'skill.mc_gelcoat.desc': 'HP +{v}%',
-  'skill.mc_mirror.name': 'Mirror Finish', 'skill.mc_mirror.desc': 'Party reflect damage +{v}%',
+  'skill.mc_mirror.name': 'Mirror Finish', 'skill.mc_mirror.desc': 'Party reflect damage +{v}%; reflect crits deal +{party_reflectCritDmg}% extra crit damage',
   'skill.mc_art.name': 'Nail Art', 'skill.mc_art.desc': 'Shields you cast +{v}%, own basic attack damage +50%',
 
   // ── Party ──
