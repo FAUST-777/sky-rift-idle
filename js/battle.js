@@ -70,7 +70,7 @@
       this.drawShip();
       this.applyFloorTheme();
 
-      this.bars = this.add.graphics().setDepth(50);
+      this.bars = this.add.graphics().setDepth(75);   // 在浮動文字上面，血條不會被數字蓋住
       this.tweens.add({ targets: this.shipImg, y: 66, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
 
       this.buildParty();
@@ -234,7 +234,7 @@
     // 對敵人上 debuff（持續時間吃施放者的「畫廊」加成；流血/中毒換算成每秒傷害）
     debuff(src, target, id, v, t) {
       const dur = t * ((src.st.debuffDur || 1) + (this.party(src) ? this.aura.debuffDur || 0 : 0));   // 黑暗系團隊特效
-      if (id === 'stun' && target.alive && !this.fxv(target, 'stun')) this.floatText(target.img.x, target.img.y - target.img.displayHeight - 4, G.t('battle.stun'), '#ffe066', 12);
+      if (id === 'stun' && target.alive && !this.fxv(target, 'stun')) this.floatText(target.img.x, this.barY(target) - 12, G.t('battle.stun'), '#ffe066', 12);
       const val = (id === 'bleed' || id === 'poison') ? this.atkOf(src) * G.DOT[id] * v : v;
       // 米菈：破防持續時間累加（數值取最高），上限 G.DEFDOWN_STACK_CAP 秒
       const f = target.fx[id];
@@ -357,12 +357,12 @@
       if (!this.valid(target)) return 0;
       // 命中下降（暗黑畫家的墨水）
       if (this.fxv(src, 'blind') && Math.random() < this.fxv(src, 'blind')) {
-        this.floatText(target.img.x, target.img.y - target.img.displayHeight * 0.9, 'MISS', '#b0b0c0', 13);
+        this.floatText(target.img.x, this.barY(target) - 12, 'MISS', '#b0b0c0', 13);
         return 0;
       }
       // 閃避（海盜）→ 閃避反擊
       if (Math.random() < this.evadeOf(target)) {
-        this.floatText(target.img.x, target.img.y - target.img.displayHeight * 0.9, G.t('battle.dodge'), '#9fd8ff', 13);
+        this.floatText(target.img.x, this.barY(target) - 12, G.t('battle.dodge'), '#9fd8ff', 13);
         if (target.special.riposte && !opts.counter && src.alive && target.alive) {
           this.shoot(target, src, 'bullet', 0, () => this.hit(target, src, target.special.riposte.v, { counter: true }));
         }
@@ -372,7 +372,7 @@
       if (this.party(target) && !this.party(src) && !opts.noRedirect) {
         const cover = this.partyAlive().find(p => p !== target && p.special.cover && p.kind !== 'summon');
         if (cover && Math.random() < cover.special.cover.v) {
-          this.floatText(cover.img.x, cover.img.y - cover.img.displayHeight - 10, G.t('battle.cover'), '#ffd23f', 12);
+          this.floatText(cover.img.x, this.barY(cover) - 18, G.t('battle.cover'), '#ffd23f', 12);
           target = cover;
         }
       }
@@ -444,7 +444,7 @@
       let left = amount;
       if (u.shield > 0) { const a = Math.min(u.shield, left); u.shield -= a; left -= a; }
       u.hp -= left;
-      this.floatText(u.img.x + G.rand(-10, 10), u.img.y - u.img.displayHeight * 0.9, (crit ? G.t('battle.crit') + ' ' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
+      this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
       if (u.hp <= 0) this.kill(u);
     }
@@ -452,7 +452,7 @@
     heal(u, amount, show = true) {
       if (!u.alive || amount <= 0) return;
       u.hp = Math.min(u.st.maxHp, u.hp + amount);
-      if (show) this.floatText(u.img.x, u.img.y - u.img.displayHeight * 0.9, '+' + G.fmt(amount), '#7dff9a', 13);
+      if (show) this.floatText(u.img.x, this.barY(u) - 12, '+' + G.fmt(amount), '#7dff9a', 13);
     }
 
     // ── 投射物 ───────────────────────────────────────────────────────────
@@ -506,7 +506,7 @@
       if (u.st.hpSlam && Math.random() < u.st.hpSlam * this.procMult(u)) {
         const minions = this.enemiesAlive().filter(e => !e.boss);
         if (minions.length) {
-          this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, G.t('battle.hpSlam'), '#ffb36b', 15, 900);
+          this.floatText(u.img.x, this.barY(u) - 22, G.t('battle.hpSlam'), '#ffb36b', 15, 900);
           minions.forEach(e => this.damage(e, Math.max(1, Math.round(u.hp)), '#ffb36b', true, true));
           this.checkWaveEnd();
         }
@@ -537,7 +537,7 @@
       const ch = G.charOf(u.key);
       if (!ch || ch.cls !== 'catknight') return;
       S.morale = Math.min(cap, S.morale + G.CONFIG.moralePerAttack);
-      if (S.morale % 5 === 0 || S.morale === cap) this.floatText(u.img.x, u.img.y - u.img.displayHeight - 30, G.t('battle.morale', { n: S.morale }), '#9fd8ff', 14, 1100);
+      if (S.morale % 5 === 0 || S.morale === cap) this.floatText(u.img.x, this.barY(u) - 38, G.t('battle.morale', { n: S.morale }), '#9fd8ff', 14, 1100);
     }
 
     // 普攻附加效果（被動 proc）
@@ -566,7 +566,7 @@
       const d = s.def, v = d.v(s.rank), e = d.fx(v, s.rank);
       if (!this.shouldCast(u, e)) return false;
       const col = e.mult ? '#ffd27a' : e.heal || e.selfHeal ? '#7dff9a' : '#9fd8ff';
-      this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, G.skillName(d.id), col, 15, 900);
+      this.floatText(u.img.x, this.barY(u) - 22, G.skillName(d.id), col, 15, 900);
 
       const targets = e.target === 'all' ? this.enemiesAlive() : e.target === 'one' ? [this.targetFor(u)].filter(Boolean) : [];
       const hits = e.hits || 1;
@@ -779,6 +779,7 @@
     }
 
     // ── 文字特效 ─────────────────────────────────────────────────────────
+    barY(u) { return u.img.y - u.img.displayHeight * 0.95 - 8; }   // 血條的 y（浮動文字從這上面開始，不擋血條）
     floatText(x, y, text, color, size = 14, dur = 700) {
       const t = this.add.text(x, y, text, {
         fontFamily: '"Noto Sans TC", "Microsoft JhengHei", sans-serif', fontSize: size + 'px', fontStyle: 'bold',
@@ -881,7 +882,7 @@
             ball.destroy();
             if (this.valid(t)) {
               const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
-              this.hit(src, t, G.cannonMult() * cvd); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13);
+              this.hit(src, t, G.cannonMult() * cvd); this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
               if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
               this.checkWaveEnd();
             }
@@ -955,7 +956,7 @@
       g.clear();
       [...this.units, ...this.enemies].forEach(u => {
         if (!u.alive || !u.img.visible) return;
-        const w = u.boss ? 70 : 38, x = u.img.x - w / 2, y = u.img.y - u.img.displayHeight * 0.95 - 8;
+        const w = u.boss ? 70 : 38, x = u.img.x - w / 2, y = this.barY(u);
         g.fillStyle(0x000000, 0.55).fillRect(x - 1, y - 1, w + 2, 6);
         const p = Math.max(0, u.hp / u.st.maxHp);
         g.fillStyle(this.party(u) ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, w * p, 4);
