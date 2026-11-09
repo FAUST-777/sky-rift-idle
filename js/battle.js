@@ -380,6 +380,7 @@
       let dmg = this.atkOf(src) * mult;
       if (opts.skill) dmg *= this.skillMult(src);
       if (opts.nextBonus) dmg *= 1 + opts.nextBonus;
+      if (!opts.skill && !opts.counter && src.st.basicDmg) dmg *= 1 + src.st.basicDmg;   // 指尖藝術：普攻傷害
       if (this.fxv(src, 'shieldWall')) dmg *= 1 - this.fxv(src, 'shieldWall');   // 盾牆！期間輸出 -50%
       if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
       if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害

@@ -176,13 +176,13 @@ G.I18N['zh-CN'] = {
   'skill.mc_scratch.name': '指甲刮击', 'skill.mc_scratch.desc': '全体 {v}% 伤害',
   'skill.mc_gel.name': '凝胶护甲', 'skill.mc_gel.desc': '全队获得最大生命 {v}% 的护盾，8 秒',
   'skill.mc_spikes.name': '水晶尖甲', 'skill.mc_spikes.desc': '全队反弹 +{v}%，8 秒',
-  'skill.mc_topcoat.name': '亮油封层', 'skill.mc_topcoat.desc': '全队防御 +{v}%，10 秒',
+  'skill.mc_topcoat.name': '亮油封层', 'skill.mc_topcoat.desc': '全队防御 +{v}%、反弹 +50%，10 秒',
   'skill.mc_salon.name': '顶级沙龙', 'skill.mc_salon.desc': '全队反弹 +{v}%，8 秒，并获得最大生命 12% 的护盾',
   'skill.mc_thorn.name': '倒刺美甲', 'skill.mc_thorn.desc': '全队常驻反弹 {v}% 受到的伤害',
   'skill.mc_harden.name': '硬化甲油', 'skill.mc_harden.desc': '全队防御 +{v}%',
   'skill.mc_gelcoat.name': '光疗保养', 'skill.mc_gelcoat.desc': '生命 +{v}%',
   'skill.mc_mirror.name': '镜面甲', 'skill.mc_mirror.desc': '全队反弹伤害 +{v}%',
-  'skill.mc_art.name': '指尖艺术', 'skill.mc_art.desc': '自己施放的护盾 +{v}%',
+  'skill.mc_art.name': '指尖艺术', 'skill.mc_art.desc': '自己施放的护盾 +{v}%，自身普攻伤害 +50%',
 
   // ── 伙伴 ──
   'perk.cdr': '全队技能冷却 -{v}%', 'perk.defPct': '全队防御 +{v}%', 'perk.hpPct': '全队生命 +{v}%', 'perk.atkPct': '全队攻击 +{v}%', 'perk.procRate': '全队触发率 +{v}%', 'perk.defDownStack': '破防时间可累加（取最高 %，最多 {cap} 秒）', 'partners.perkHint': '专属能力：永久、不能升级，这位伙伴出战时全队生效。触发率影响暴击、流血、中毒、减速等几率。',

@@ -176,13 +176,13 @@ G.I18N['en'] = {
   'skill.mc_scratch.name': 'Nail Swipe', 'skill.mc_scratch.desc': '{v}% damage to all enemies',
   'skill.mc_gel.name': 'Gel Armor', 'skill.mc_gel.desc': 'Party gains a shield worth {v}% max HP for 8s',
   'skill.mc_spikes.name': 'Crystal Spikes', 'skill.mc_spikes.desc': 'Party reflect +{v}% for 8s',
-  'skill.mc_topcoat.name': 'Top Coat', 'skill.mc_topcoat.desc': 'Party DEF +{v}% for 10s',
+  'skill.mc_topcoat.name': 'Top Coat', 'skill.mc_topcoat.desc': 'Party DEF +{v}% and reflect +50% for 10s',
   'skill.mc_salon.name': 'Luxury Salon', 'skill.mc_salon.desc': 'Party reflect +{v}% for 8s and a shield worth 12% max HP',
   'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party always reflects {v}% of damage taken',
   'skill.mc_harden.name': 'Hardener', 'skill.mc_harden.desc': 'Party DEF +{v}%',
   'skill.mc_gelcoat.name': 'Gel Care', 'skill.mc_gelcoat.desc': 'HP +{v}%',
   'skill.mc_mirror.name': 'Mirror Finish', 'skill.mc_mirror.desc': 'Party reflect damage +{v}%',
-  'skill.mc_art.name': 'Nail Art', 'skill.mc_art.desc': 'Shields you cast +{v}%',
+  'skill.mc_art.name': 'Nail Art', 'skill.mc_art.desc': 'Shields you cast +{v}%, own basic attack damage +50%',
 
   // ── Party ──
   'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'perk.defDownStack': 'DEF Down duration stacks (highest %, up to {cap}s)', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',

@@ -282,13 +282,13 @@ G.SKILLS = {
     A('mc_scratch', 0, 6,  lin(0.7, 0.12),  v => ({ target: 'all', mult: v })),
     A('mc_gel',     0, 14, lin(0.1, 0.03),  v => ({ target: 'none', shield: v })),
     A('mc_spikes',  1, 15, lin(0.3, 0.08),  v => ({ target: 'none', party: [{ id: 'reflectUp', v, t: 8 }] })),
-    A('mc_topcoat', 1, 15, lin(0.2, 0.05),  v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }] })),
+    A('mc_topcoat', 1, 15, lin(0.2, 0.05),  v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }, { id: 'reflectUp', v: 0.5, t: 10 }] })),   // 另外全隊反彈 +50%
     A('mc_salon',   2, 18, lin(0.45, 0.1),  v => ({ target: 'none', shield: 0.12, party: [{ id: 'reflectUp', v, t: 8 }] })),
-    P('mc_thorn',   0, lin(0.06, 0.03), 'party', 'reflect'),
+    P('mc_thorn',   0, lin(0.1, 0.05),  'party', 'reflect'),   // 倒刺美甲：全隊常駐反彈 10%→30%
     P('mc_harden',  0, lin(0.04, 0.02), 'party', 'defPct'),
     P('mc_gelcoat', 1, lin(0.1, 0.07),  'self', 'hpPct'),
     P('mc_mirror',  1, lin(0.2, 0.12),  'party', 'reflectPow'),
-    P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow'),
+    P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow', { also: { basicDmg: () => 0.5 } }),   // 另外自身普攻傷害 +50%
   ],
 
   // 健身者：幫隊友平均分攤傷害、自己緩緩回血
