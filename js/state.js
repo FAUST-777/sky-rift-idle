@@ -240,6 +240,9 @@
     return aura;
   };
 
+  // 論文審查：別人分給我的最大生命（提供者自己不吃）
+  G.othersHpPct = who => G.partyMembers().filter(w => w !== who).reduce((a, w) => a + (G.passivesOf(w).party.hpPctOthers || 0), 0);
+
   // 船砲間隔：團隊特效（取最短）再扣貓哈氣爆甲的 -1 秒，最少 2 秒
   G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0));
   // 全隊普攻暈眩（貓貓士氣）：出戰成員中最好的那個

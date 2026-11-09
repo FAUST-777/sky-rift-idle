@@ -101,11 +101,11 @@ G.I18N['en'] = {
   'skill.sc_lecture.name': 'Long Lecture', 'skill.sc_lecture.desc': '{v}% damage to all enemies, enemy DEF -15% for 5s',
   'skill.sc_cram.name': 'Cram Session', 'skill.sc_cram.desc': 'Own ATK +{v}% and attack speed +20% for 8s',
   'skill.sc_exam.name': 'Exam Prediction', 'skill.sc_exam.desc': '{v}% damage to all enemies, always crits',
-  'skill.sc_crisis.name': 'Crisis Mode', 'skill.sc_crisis.desc': 'When any ally is below 60% HP: own damage +{v}% and DEF +{v2}%',
+  'skill.sc_crisis.name': 'Crisis Mode', 'skill.sc_crisis.desc': 'When any ally is below 60% HP: own damage +{v}% and DEF +{v2}%. Also party max HP +{party_hpPct}%',
   'skill.sc_grant.name': 'Scholarship', 'skill.sc_grant.desc': 'Party gold earned +{v}%',
   'skill.sc_wisdom.name': 'Erudition', 'skill.sc_wisdom.desc': 'ATK +{v}%',
   'skill.sc_speed.name': 'Speed Reading', 'skill.sc_speed.desc': 'Attack speed +{v}%',
-  'skill.sc_thesis.name': 'Peer Review', 'skill.sc_thesis.desc': 'Skill damage +{v}%',
+  'skill.sc_thesis.name': 'Peer Review', 'skill.sc_thesis.desc': 'Skill damage +{v}%; own max HP {hpPct}%, other allies max HP +{party_hpPctOthers}%',
 
   'skill.dp_splash.name': 'Ink Splash', 'skill.dp_splash.desc': '{v}% damage to all enemies, enemy accuracy -20% for 4s',
   'skill.dp_erase.name': 'Cursed Oil Painting', 'skill.dp_erase.desc': '{v}% damage to all enemies; first refreshes their debuffs to full duration, then DEF -{def}% and attack speed -{slow}% for 6s. +100% damage to poisoned enemies, +200% to bleeding ones',
@@ -171,7 +171,7 @@ G.I18N['en'] = {
   'skill.gy_recovery.name': 'Plank Recovery', 'skill.gy_recovery.desc': 'Party regenerates {v}% HP per second, party max HP +{party_hpPct}%',
   'skill.gy_bulk.name': 'Bulk Up', 'skill.gy_bulk.desc': 'Party HP +{v}%; the Gym-goer gets another +{hpPct}% (double effect)',
   'skill.gy_core.name': 'Core Training', 'skill.gy_core.desc': 'DEF +{v}%',
-  'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%; basic attacks have a {hpSlam}% chance to unleash a Muscle Slam, dealing damage equal to your current HP to all minions (not bosses), and a {bossSlam}% chance to deal damage equal to your max HP to the boss',
+  'skill.gy_endurance.name': 'Until Failure', 'skill.gy_endurance.desc': 'Damage taken -{v}%; basic attacks have a {hpSlam}% chance to unleash a Muscle Slam, dealing damage equal to your current HP to all minions (not bosses), and a {bossSlam}% chance to deal damage equal to your max HP to the boss',
   // 美甲師
   'skill.mc_scratch.name': 'Nail Swipe', 'skill.mc_scratch.desc': '{v}% damage to all enemies',
   'skill.mc_gel.name': 'Gel Armor', 'skill.mc_gel.desc': 'Party gains a shield worth {v}% max HP for 8s',

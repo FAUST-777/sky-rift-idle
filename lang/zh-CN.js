@@ -101,11 +101,11 @@ G.I18N['zh-CN'] = {
   'skill.sc_lecture.name': '长篇大论', 'skill.sc_lecture.desc': '全体 {v}% 伤害，敌人防御 -15%，5 秒',
   'skill.sc_cram.name': '临时抱佛脚', 'skill.sc_cram.desc': '自身攻击 +{v}%、攻速 +20%，8 秒',
   'skill.sc_exam.name': '考前猜题', 'skill.sc_exam.desc': '全体 {v}% 伤害，必定暴击',
-  'skill.sc_crisis.name': '危机意识', 'skill.sc_crisis.desc': '任一队友生命低于 60% 时，自身伤害 +{v}%、防御 +{v2}%',
+  'skill.sc_crisis.name': '危机意识', 'skill.sc_crisis.desc': '任一队友生命低于 60% 时，自身伤害 +{v}%、防御 +{v2}%。另外全队最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '奖学金', 'skill.sc_grant.desc': '全队金币获得 +{v}%',
   'skill.sc_wisdom.name': '博学', 'skill.sc_wisdom.desc': '攻击 +{v}%',
   'skill.sc_speed.name': '速读', 'skill.sc_speed.desc': '攻速 +{v}%',
-  'skill.sc_thesis.name': '论文审查', 'skill.sc_thesis.desc': '技能伤害 +{v}%',
+  'skill.sc_thesis.name': '论文审查', 'skill.sc_thesis.desc': '技能伤害 +{v}%；自身最大生命 {hpPct}%，其他队友最大生命 +{party_hpPctOthers}%',
 
   'skill.dp_splash.name': '墨泼', 'skill.dp_splash.desc': '全体 {v}% 伤害，敌人命中 -20%，4 秒',
   'skill.dp_erase.name': '诅咒油画', 'skill.dp_erase.desc': '全体 {v}% 伤害；先把敌人身上的减益刷新回完整时间，再让敌人防御 -{def}%、攻速 -{slow}%，6 秒。对中毒敌人伤害 +100%、对流血敌人 +200%',
@@ -171,7 +171,7 @@ G.I18N['zh-CN'] = {
   'skill.gy_recovery.name': '棒式恢复', 'skill.gy_recovery.desc': '全队每秒恢复 {v}% 生命，全队最大生命 +{party_hpPct}%',
   'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '全队生命 +{v}%，健身者自己再 +{hpPct}%（效果加倍）',
   'skill.gy_core.name': '核心训练', 'skill.gy_core.desc': '防御 +{v}%',
-  'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到伤害 -{v}%；普攻有 {hpSlam}% 概率发动肌肉冲击，对全体小兵（层主除外）额外造成等同自己当前生命的伤害；另有 {bossSlam}% 概率对层主额外造成等同自己最大生命的伤害',
+  'skill.gy_endurance.name': '做到力竭为止', 'skill.gy_endurance.desc': '受到伤害 -{v}%；普攻有 {hpSlam}% 概率发动肌肉冲击，对全体小兵（层主除外）额外造成等同自己当前生命的伤害；另有 {bossSlam}% 概率对层主额外造成等同自己最大生命的伤害',
   // 美甲師
   'skill.mc_scratch.name': '指甲刮击', 'skill.mc_scratch.desc': '全体 {v}% 伤害',
   'skill.mc_gel.name': '凝胶护甲', 'skill.mc_gel.desc': '全队获得最大生命 {v}% 的护盾，8 秒',

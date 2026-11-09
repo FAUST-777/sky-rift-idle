@@ -194,11 +194,12 @@ G.SKILLS = {
     A('sc_lecture', 1, 10, lin(0.8, 0.12),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.15, t: 5 }] })),
     A('sc_cram',    1, 15, lin(0.35, 0.08), v => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }, { id: 'spdUp', v: 0.2, t: 8 }] })),
     A('sc_exam',    2, 12, lin(1.1, 0.18),  v => ({ target: 'all', mult: v, critBonus: 100 })),
-    P('sc_crisis',  0, lin(0.1, 0.03),  'special', 'crisis', { v2: lin(0.2, 0.05) }),
+    P('sc_crisis',  0, lin(0.1, 0.03),  'special', 'crisis', { v2: lin(0.2, 0.05), partyAlso: { hpPct: lin(0.02, 0.015) } }),   // 另外全隊最大生命 +2%→8%
     P('sc_grant',   0, lin(0.08, 0.05), 'party', 'goldPct'),
     P('sc_wisdom',  1, lin(0.06, 0.04), 'self', 'atkPct'),
     P('sc_speed',   1, lin(0.06, 0.04), 'self', 'spdPct'),
-    P('sc_thesis',  2, lin(0.08, 0.05), 'self', 'skillDmg'),
+    // 論文審查：技能傷害；另外把自己的最大生命 10%→15% 分給其他隊友（自己 -、其他人 +，各隊友都 +）
+    P('sc_thesis',  2, lin(0.08, 0.05), 'self', 'skillDmg', { also: { hpPct: r => -lin(0.1, 0.0125)(r) }, partyAlso: { hpPctOthers: lin(0.1, 0.0125) } }),
   ],
 
   // 暗黑畫家：降命中、降防、全隊加攻速

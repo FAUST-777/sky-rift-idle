@@ -188,9 +188,11 @@
       this.needRebuild = false;
       this.computeAura();
       // 全隊生命光環（德魯伊「林地祝福」）
-      const hpAura = this.aura.hpPct || 0;
-      if (hpAura) members.forEach(u => { u.st.maxHp = Math.round(u.st.maxHp * (1 + hpAura)); u.hp = u.st.maxHp; });
+      members.forEach(u => { const m = this.hpAuraOf(u); if (m) { u.st.maxHp = Math.round(u.st.maxHp * (1 + m)); u.hp = u.st.maxHp; } });
     }
+
+    // 全隊生命加成（光環）＋ 其他隊友用論文審查分給我的
+    hpAuraOf(u) { return (this.aura.hpPct || 0) + (u.key ? G.othersHpPct(u.key) : 0); }
 
     // 換裝、學技能後即時更新數值（保留血量比例）；外觀改變時換貼圖
     refreshMembers(look) {
@@ -198,7 +200,7 @@
         if (!u.key || (u.key === G.MERC && !G.S.merc)) return;   // 傭兵剛被解雇，等重建隊伍
         const ratio = u.hp / u.st.maxHp;
         u.st = G.charStats(u.key);
-        if (this.aura.hpPct) u.st.maxHp = Math.round(u.st.maxHp * (1 + this.aura.hpPct));
+        const hm = this.hpAuraOf(u); if (hm) u.st.maxHp = Math.round(u.st.maxHp * (1 + hm));
         u.hp = u.alive ? Math.max(1, Math.round(u.st.maxHp * ratio)) : 0;
         const old = u.skills;
         this.applyBuild(u, u.key);
