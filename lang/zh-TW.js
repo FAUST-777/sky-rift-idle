@@ -171,7 +171,7 @@ G.I18N['zh-TW'] = {
   'skill.gy_recovery.name': '棒式恢復', 'skill.gy_recovery.desc': '全隊每秒回復 {v}% 生命，全隊最大生命 +{party_hpPct}%',
   'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '全隊生命 +{v}%，健身者自己再 +{hpPct}%（效果加倍）',
   'skill.gy_core.name': '核心訓練', 'skill.gy_core.desc': '防禦 +{v}%',
-  'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到傷害 -{v}%；普攻有 {hpSlam}% 機率發動肌肉衝擊，對全體小兵（層主除外）額外造成等同自己目前生命的傷害',
+  'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到傷害 -{v}%；普攻有 {hpSlam}% 機率發動肌肉衝擊，對全體小兵（層主除外）額外造成等同自己目前生命的傷害；另有 {bossSlam}% 機率對層主額外造成等同自己最大生命的傷害',
   // 美甲師
   'skill.mc_scratch.name': '指甲刮擊', 'skill.mc_scratch.desc': '全體 {v}% 傷害',
   'skill.mc_gel.name': '凝膠護甲', 'skill.mc_gel.desc': '全隊獲得最大生命 {v}% 的護盾，8 秒',
@@ -304,7 +304,7 @@ G.I18N['zh-TW'] = {
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
   'battle.morale': '🎖️ 貓貓士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.hpSlam': '肌肉衝擊！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.bossSlam': '巨力重擊！', 'battle.hpSlam': '肌肉衝擊！',
 
   // ── Buff ──
   'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',

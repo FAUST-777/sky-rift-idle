@@ -302,7 +302,7 @@
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
       summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),
-      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'),
+      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'), bossSlam: g('bossSlam'),
     });
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);

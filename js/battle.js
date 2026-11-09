@@ -508,6 +508,15 @@
       const targets = u.st.range === 'all' ? this.enemiesAlive() : [this.targetFor(u)].filter(Boolean);
       if (!targets.length) return;
       this.gainMorale(u);
+      // 健身者「耐力」：機率對層主額外造成等同自己最大生命的傷害（無視防禦）
+      if (u.st.bossSlam && Math.random() < u.st.bossSlam * this.procMult(u)) {
+        const boss = this.enemiesAlive().find(e => e.boss);
+        if (boss) {
+          this.floatText(u.img.x, this.barY(u) - 22, G.t('battle.bossSlam'), '#ff8a3d', 15, 900);
+          this.damage(boss, Math.max(1, Math.round(u.st.maxHp)), '#ff8a3d', true, true);
+          this.checkWaveEnd();
+        }
+      }
       // 健身者「耐力」：機率肌肉衝擊，全體小兵（不含層主）額外受到等同自己目前生命的傷害（無視防禦）
       if (u.st.hpSlam && Math.random() < u.st.hpSlam * this.procMult(u)) {
         const minions = this.enemiesAlive().filter(e => !e.boss);

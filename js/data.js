@@ -323,7 +323,7 @@ G.SKILLS = {
     P('gy_bulk',      1, lin(0.12, 0.08), 'party', 'hpPct', { also: { hpPct: lin(0.12, 0.08) } }),
     P('gy_core',      1, lin(0.08, 0.06), 'self', 'defPct'),
     // 耐力：受到傷害 -4%→16%；普攻 5%→25% 機率「肌肉衝擊」：全體小兵（層主除外）額外受到等同自己目前生命的傷害
-    P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce', { also: { hpSlam: lin(0.05, 0.05) } }),
+    P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce', { also: { hpSlam: lin(0.05, 0.05), bossSlam: lin(0.01, 0.01) } }),   // bossSlam：普攻 1%→5% 機率對層主造成等同最大生命的傷害
   ],
 };
 
