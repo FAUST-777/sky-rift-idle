@@ -26,7 +26,7 @@ G.I18N['en'] = {
   // ── Hero / gear ──
   'hero.class': 'Class', 'hero.classLocked': 'Choose a class at Lv {lv} (currently Lv {cur}).', 'hero.current': ' (current)',
   'hero.classChangeNote': 'Changing class costs {cost} gold. All skill points are refunded.',
-  'hero.bag': 'Inventory', 'hero.sellBelow.0': 'Sell white', 'hero.sellBelow.1': 'Sell green & below', 'hero.sellBelow.2': 'Sell blue & below',
+  'hero.bag': 'Inventory', 'hero.sellBelow.0': 'Sell white', 'hero.sellBelow.1': 'Sell green & below', 'hero.sellBelow.2': 'Sell blue & below', 'hero.sellBelow.3': 'Sell purple & below', 'hero.sellConfirm': 'Tap again to confirm',
   'hero.bagEmpty': 'Monsters drop gear. Anything you find shows up here.',
   'hero.who.hero': 'You', 'hero.partnerNote': 'Change companion classes and levels in the Party tab.', 'hero.notRecruited': 'No companions yet. You will meet them as you climb.',
   'hero.expand': 'Expand +{n}', 'hero.bagMax': 'Maxed', 'item.equipTo': 'Equip on {name}',
@@ -248,11 +248,11 @@ G.I18N['en'] = {
   'partners.help': 'You meet new companions as you climb. Pick their class, level them up with gold, give them gear, and set up their skills (+1 skill point per level, use the Skills button). Changing their class is free and refunds all skill points.',
   'partners.unknown': '???', 'partners.meetAt': 'Met after reaching Floor {n}', 'partners.recruit': 'Recruit {cost}💰',
   'partners.inParty': 'Deployed', 'partners.resting': 'Resting', 'partners.stats': 'HP {hp} · ATK {atk} · DEF {def}',
-  'partner.ella.name': 'Ella the Hunter', 'partner.ella.bio': 'The best archer in the village, curious about what game lives in the rift.',
-  'partner.bram.name': 'Bram the Smith', 'partner.bram.bio': 'The blacksmith who patched your balloon. Frighteningly strong.',
-  'partner.lina.name': 'Sister Lina', 'partner.lina.bio': 'A nun lost on Floor 7 who believes the rift is a divine trial.',
-  'partner.kael.name': 'Kael the Wanderer', 'partner.kael.bio': 'An explorer who came up before anyone else. He seems to know something.',
-  'partner.mira.name': 'Mira the Astrologer', 'partner.mira.bio': 'A girl who can read the rift\'s star charts.',
+  'partner.ella.name': 'Emance the Office Drone', 'partner.ella.bio': 'Works overtime every night. Heard nobody clocks in above the rift, so she came along.',
+  'partner.bram.name': 'Mei the Betel Nut Beauty', 'partner.bram.bio': 'The star of the betel nut stand. Sweet talker, fast hands, faster punches.',
+  'partner.lina.name': 'Chen the Security Engineer', 'partner.lina.bio': 'Thinks the rift is an unpatched vulnerability and is busy tracing the logs.',
+  'partner.kael.name': 'Charles Hsu, CTO', 'partner.kael.bio': 'A CTO who came up before anyone else. He seems to have read this system\'s source code.',
+  'partner.mira.name': 'Mira, Stray Shelter Director', 'partner.mira.bio': 'Takes in every stray cat and dog. Came up looking for more land to build a bigger shelter.',
 
   // ── Airship ──
   'ship.help': 'Build a strong, sturdy airship to climb ever higher into the rift. Each part comes in 5 models, and you can switch between owned models anytime. <b>Side Stabilizers and the Engine</b> decide how high you can climb.', 'ship.paint': 'Paint', 'ship.free': 'Free',

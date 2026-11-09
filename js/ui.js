@@ -255,7 +255,7 @@
         <div class="row wrap" style="margin-bottom:10px">
           <button class="btn small good" data-act="autoequip" data-scope="one">${t('hero.autoEquipOne', { name: esc(whoName(who)) })}</button>
           <button class="btn small good" data-act="autoequip" data-scope="all" title="${esc(t('hero.autoEquipHint'))}">${t('hero.autoEquipAll')}</button>
-          ${[0, 1, 2].map(r => `<button class="btn small" data-act="sellbelow" data-v="${r}" style="color:${G.RARITY[r].color}">${t('hero.sellBelow.' + r)}</button>`).join('')}
+          ${[0, 1, 2, 3].map(r => `<button class="btn small" data-act="sellbelow" data-v="${r}" style="color:${G.RARITY[r].color}">${t('hero.sellBelow.' + r)}</button>`).join('')}
         </div>
         <div class="inv">${inv || `<p class="muted" style="grid-column:1/-1;margin:0">${t('hero.bagEmpty')}</p>`}</div>
       </div>`;
@@ -856,7 +856,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'sell': G.sell(+d.id); UI.close(); break;
       case 'autoequip': G.autoEquip(d.scope === 'one' ? UI.who : null); break;
       case 'clspick': UI.clsPick = d.cls; UI.render(); break;
-      case 'sellbelow': G.sellAllBelow(+d.v); break;
+      case 'sellbelow':
+        // 紫色是好東西：要在 3 秒內按第二次才賣，避免手滑
+        if (+d.v >= 3 && UI.sellArmed !== el) {
+          UI.sellArmed = el; const label = el.textContent; el.textContent = t('hero.sellConfirm');
+          setTimeout(() => { if (UI.sellArmed === el) { UI.sellArmed = null; el.textContent = label; } }, 3000);
+          break;
+        }
+        UI.sellArmed = null; G.sellAllBelow(+d.v); break;
       case 'class': {
         if (S.hero.cls === d.cls) break;
         UI.modal(`<h2>${t('classModal.title', { name: G.clsName(d.cls) })}</h2><p>${t(`class.${d.cls}.desc`)}</p>

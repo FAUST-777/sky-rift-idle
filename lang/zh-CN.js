@@ -26,7 +26,7 @@ G.I18N['zh-CN'] = {
   // ── 角色 / 装备 ──
   'hero.class': '职业', 'hero.classLocked': '到 {lv} 级可以转职（当前 {cur} 级）。', 'hero.current': '（当前）',
   'hero.classChangeNote': '更换职业需要 {cost} 金币，技能点会全部返还。',
-  'hero.bag': '背包', 'hero.sellBelow.0': '卖掉白色', 'hero.sellBelow.1': '卖掉绿色以下', 'hero.sellBelow.2': '卖掉蓝色以下',
+  'hero.bag': '背包', 'hero.sellBelow.0': '卖掉白色', 'hero.sellBelow.1': '卖掉绿色以下', 'hero.sellBelow.2': '卖掉蓝色以下', 'hero.sellBelow.3': '卖掉紫色以下', 'hero.sellConfirm': '再按一次确认卖出',
   'hero.bagEmpty': '打怪会掉装备，掉到的会出现在这里。',
   'hero.who.hero': '主角', 'hero.partnerNote': '伙伴的职业与升级在「伙伴」分页。', 'hero.notRecruited': '还没有伙伴，往上爬就会遇到。',
   'hero.expand': '扩充 +{n} 格', 'hero.bagMax': '已达上限', 'item.equipTo': '给 {name} 装备',
@@ -248,11 +248,11 @@ G.I18N['zh-CN'] = {
   'partners.help': '每往上爬几层会遇到新伙伴。伙伴可以选职业、花金币升级、穿装备，也能配置技能（每升一级 +1 技能点，按「技能」按钮设置）。换职业免费，技能点会全部返还。',
   'partners.unknown': '？？？', 'partners.meetAt': '到达第 {n} 层后会遇到', 'partners.recruit': '招募 {cost}💰',
   'partners.inParty': '出战中', 'partners.resting': '休息中', 'partners.stats': '生命 {hp}・攻击 {atk}・防御 {def}',
-  'partner.ella.name': '猎人艾拉', 'partner.ella.bio': '村里最好的弓手，想知道天空洞里有什么猎物。',
-  'partner.bram.name': '铁匠布兰', 'partner.bram.bio': '帮你修过热气球的铁匠，力气大得吓人。',
-  'partner.lina.name': '修女莉娜', 'partner.lina.bio': '在第 7 层迷路的修女，相信裂洞是神的试炼。',
-  'partner.kael.name': '浪人凯尔', 'partner.kael.bio': '比所有人都早上来的探险者，似乎知道些什么。',
-  'partner.mira.name': '占星师米菈', 'partner.mira.bio': '能读懂裂洞星图的少女。',
+  'partner.ella.name': '社畜-艾曼丝', 'partner.ella.bio': '每天加班到半夜的上班族，听说天空破洞上面不用打卡，就跟着上来了。',
+  'partner.bram.name': '槟榔西施-小美', 'partner.bram.bio': '槟榔摊的招牌，嘴甜手快，包槟榔的速度跟出拳一样快。',
+  'partner.lina.name': '资安工程师-小陈', 'partner.lina.bio': '觉得裂洞是一个没修好的漏洞，正在努力追 log。',
+  'partner.kael.name': '技术长-查尔斯.许', 'partner.kael.bio': '比所有人都早上来的技术长，似乎早就看过这个系统的源代码。',
+  'partner.mira.name': '浪浪园区所长-米菈', 'partner.mira.bio': '收留了一整群流浪猫狗，上来是想找一块更大的地盖园区。',
 
   // ── 飞空艇 ──
   'ship.help': '打造优秀强韧的飞空艇，才能往天空破洞的高层冒险。每个部位有 5 款，买过的款式可以随时切换；<b>侧面稳定翼和引擎</b>决定能爬到第几层。', 'ship.paint': '涂装', 'ship.free': '免费',
