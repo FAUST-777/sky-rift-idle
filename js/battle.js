@@ -880,7 +880,8 @@
           this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
             ball.destroy();
             if (this.valid(t)) {
-              this.hit(src, t, G.cannonMult()); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13);
+              const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
+              this.hit(src, t, G.cannonMult() * cvd); this.floatText(t.img.x, t.img.y - 70, G.t('battle.cannon'), '#ffb36b', 13);
               if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
               this.checkWaveEnd();
             }

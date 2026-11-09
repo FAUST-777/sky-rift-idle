@@ -113,7 +113,7 @@ G.I18N['en'] = {
   'skill.dp_nightmare.name': 'Nightmare Canvas', 'skill.dp_nightmare.desc': '{v}% damage to all enemies, enemy accuracy -30% and attack speed -20% for 5s',
   'skill.dp_masterpiece.name': 'Masterpiece', 'skill.dp_masterpiece.desc': 'Party ATK +{v}% and attack speed +15% for 10s',
   'skill.dp_ink.name': 'Shadow Ink', 'skill.dp_ink.desc': 'Basic attacks lower enemy accuracy by {v}% for 3s',
-  'skill.dp_corrode.name': 'Corrosive Paint', 'skill.dp_corrode.desc': 'Basic attacks lower enemy DEF by {v}% for 4s',
+  'skill.dp_corrode.name': 'Corrosive Paint', 'skill.dp_corrode.desc': 'Basic attacks lower enemy DEF by {v}% for 4s. Party: airship cannon deals +{party_cannonVsDefDown}% damage to enemies with DEF Down',
   'skill.dp_tempo.name': 'Brush Tempo', 'skill.dp_tempo.desc': 'Party attack speed +{v}%; party crit damage vs stunned enemies +{party_stunCritDmg}%',
   'skill.dp_darkart.name': 'Dark Arts', 'skill.dp_darkart.desc': 'ATK +{v}%',
   'skill.dp_gallery.name': 'Gallery', 'skill.dp_gallery.desc': 'Debuffs you apply last {v}% longer; basic attacks slow enemy attack speed by {slow}% for 8s',
