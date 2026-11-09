@@ -92,7 +92,7 @@ G.I18N['en'] = {
   'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Party heals {v}% HP, then 1% per second for 5s',
   'skill.ck_morale.name': 'Kitty Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 morale stack, each giving the party +1% final DEF, up to +{v}%. Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{party_evade}%',
   'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit raises the hitter\'s damage by 1%, up to +{v}%, reset on defeat. The wearer also gains evasion +{evade}%, crit damage +{critDmg}% and +{vsPoison}% damage to poisoned enemies',
-  'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s. Party: skill damage has a {party_skillStunChance}% chance to stun for {party_skillStun}s; hitting a stunned enemy heals the attacker for {party_stunHeal}% max HP',
+  'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s',
   'skill.ck_venom.name': 'Paw Slap', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to poison; plus a 10% chance to stun for {v2}s',
   'skill.ck_plate.name': 'Hissing Burst Armor', 'skill.ck_plate.desc': 'Own DEF {v}% and max HP {hpPct}%, but ATK +{atkPct}%, crit damage +{critDmg}%, evasion +{evade}%. Party: airship cannon cooldown -{party_cannonCut}s, +{party_vsStun}% damage to stunned enemies',
 
@@ -309,7 +309,7 @@ G.I18N['en'] = {
   // ── Buffs ──
   'buff.morale.name': 'Kitty Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}% (resets on defeat). Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{evade}%.',
   'buff.frenzy.name': 'Cat Frenzy', 'buff.frenzy.desc': 'Each hit on an enemy gives that member +1% damage (up to +{max}%). Resets when they fall. Now: {list}{self}', 'buff.frenzy.self': '. {who} (wearer) also gets evasion +{evade}%, crit damage +{critDmg}%, +{vsPoison}% damage to poisoned enemies',
-  'buff.claws.name': 'Claw Mark', 'buff.claws.desc': 'Party skill damage has a {c}% chance to stun for {t}s; hitting a stunned enemy heals the attacker for {v}% max HP', 'buff.hiss.name': 'Hissing Burst Armor', 'buff.hiss.desc': 'Party deals +{v}% damage to stunned enemies; airship cannon cooldown -{cut}s',
+  'buff.hiss.name': 'Hissing Burst Armor', 'buff.hiss.desc': 'Party deals +{v}% damage to stunned enemies; airship cannon cooldown -{cut}s',
   'buff.animal_bear.name': 'Bear', 'buff.animal_bear.desc': 'Party DEF {v}',
   'buff.animal_wolf.name': 'Wolf', 'buff.animal_wolf.desc': 'Party ATK {v}',
   'buff.animal_owl.name': 'Owl', 'buff.animal_owl.desc': 'Party crit chance {v}',

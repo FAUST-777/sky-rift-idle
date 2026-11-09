@@ -173,8 +173,7 @@ G.SKILLS = {
       partyStun: { chance: lin(0.01, 0.01), t: lin(1, 0.125) }, partyAlso: { evade: lin(0.05, 0.0075) } }),
     // 吸貓狂熱：隊伍傷害疊層上限 5%→15%；裝的人自己另外加閃避、暴擊傷害、對中毒敵人傷害（also = 額外的自身屬性）
     P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, also: { evade: lin(0.05, 0.0125), critDmg: lin(0.2, 0.025), vsPoison: lin(0.05, 0.025) } }),
-    // 貓抓印記：普攻緩速；全隊：技能傷害 2% 機率暈眩 1.5 秒、攻擊暈眩中的敵人回復自己 5% 最大生命（多人裝不疊加）
-    P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { skillStunChance: 0.02, skillStun: 1.5, stunHeal: 0.05 }, rawKeys: ['skillStun'] }),
+    P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4 }),
     // 貓肉球拍打：普攻機率中毒；另外獨立 10% 機率暈眩 1→1.5 秒
     P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5, v2: lin(1, 0.125), v2raw: true,
       more: [{ fx: 'stun', chance: 0.1, val: 1, t: lin(1, 0.125) }] }),
