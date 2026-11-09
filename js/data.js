@@ -263,7 +263,7 @@ G.SKILLS = {
     A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
     A('dr_deer',   1, 18, lin(0.01, 0.003),  v => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }] })),
     A('dr_thorns', 2, 9,  lin(0.9, 0.15),    v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
-    P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur'),     // 自己施放的增益持續時間 +v
+    P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur', { partyAlso: { hpPctOthers: lin(0.05, 0.0125), spdPctOthers: lin(0.01, 0.0125) } }),   // 自己施放的增益持續時間 +v；其他隊友最大生命 +5%→10%、攻速 +1%→6%
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
     P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen'),
     P('dr_wild',   1, lin(0.06, 0.04),   'self', 'atkPct'),

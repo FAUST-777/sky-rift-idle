@@ -145,7 +145,7 @@ G.I18N['zh-CN'] = {
   'skill.dr_owl.name': '猫头鹰之灵', 'skill.dr_owl.desc': '全队暴击率 +{v}%，8 秒',
   'skill.dr_deer.name': '鹿之灵', 'skill.dr_deer.desc': '全队每秒恢复 {v}% 生命，6 秒',
   'skill.dr_thorns.name': '荆棘缠绕', 'skill.dr_thorns.desc': '全体 {v}% 伤害，敌人攻速 -15%，4 秒',
-  'skill.dr_bond.name': '野性之绊', 'skill.dr_bond.desc': '自己施放的增益持续时间 +{v}%',
+  'skill.dr_bond.name': '野性之绊', 'skill.dr_bond.desc': '自己施放的增益持续时间 +{v}%；其他队友最大生命 +{party_hpPctOthers}%、攻速 +{party_spdPctOthers}%',
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全队生命 +{v}%',
   'skill.dr_spirit.name': '自然之灵', 'skill.dr_spirit.desc': '全队每秒恢复 {v}% 生命',
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻击 +{v}%',

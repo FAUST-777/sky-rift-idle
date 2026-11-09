@@ -145,7 +145,7 @@ G.I18N['en'] = {
   'skill.dr_owl.name': 'Owl Spirit', 'skill.dr_owl.desc': 'Party crit chance +{v}% for 8s',
   'skill.dr_deer.name': 'Deer Spirit', 'skill.dr_deer.desc': 'Party regenerates {v}% HP per second for 6s',
   'skill.dr_thorns.name': 'Thorn Snare', 'skill.dr_thorns.desc': '{v}% damage to all enemies, their attack speed -15% for 4s',
-  'skill.dr_bond.name': 'Wild Bond', 'skill.dr_bond.desc': 'Buffs you cast last {v}% longer',
+  'skill.dr_bond.name': 'Wild Bond', 'skill.dr_bond.desc': 'Buffs you cast last {v}% longer; other allies get max HP +{party_hpPctOthers}% and attack speed +{party_spdPctOthers}%',
   'skill.dr_grove.name': 'Grove Blessing', 'skill.dr_grove.desc': 'Party HP +{v}%',
   'skill.dr_spirit.name': 'Nature Spirit', 'skill.dr_spirit.desc': 'Party regenerates {v}% HP per second',
   'skill.dr_wild.name': 'Wildness', 'skill.dr_wild.desc': 'ATK +{v}%',

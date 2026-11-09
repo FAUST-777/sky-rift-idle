@@ -145,7 +145,7 @@ G.I18N['zh-TW'] = {
   'skill.dr_owl.name': '貓頭鷹之靈', 'skill.dr_owl.desc': '全隊暴擊率 +{v}%，8 秒',
   'skill.dr_deer.name': '鹿之靈', 'skill.dr_deer.desc': '全隊每秒回復 {v}% 生命，6 秒',
   'skill.dr_thorns.name': '荊棘纏繞', 'skill.dr_thorns.desc': '全體 {v}% 傷害，敵人攻速 -15%，4 秒',
-  'skill.dr_bond.name': '野性之絆', 'skill.dr_bond.desc': '自己施放的增益持續時間 +{v}%',
+  'skill.dr_bond.name': '野性之絆', 'skill.dr_bond.desc': '自己施放的增益持續時間 +{v}%；其他隊友最大生命 +{party_hpPctOthers}%、攻速 +{party_spdPctOthers}%',
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全隊生命 +{v}%',
   'skill.dr_spirit.name': '自然之靈', 'skill.dr_spirit.desc': '全隊每秒回復 {v}% 生命',
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻擊 +{v}%',
