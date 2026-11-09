@@ -93,7 +93,7 @@ G.I18N['en'] = {
   'skill.ck_morale.name': 'Kitty Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 morale stack, each giving the party +1% final DEF, up to +{v}%. Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{party_evade}%',
   'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit raises the hitter\'s damage by 1%, up to +{v}%, reset on defeat. The wearer also gains evasion +{evade}%, crit damage +{critDmg}% and +{vsPoison}% damage to poisoned enemies. Party crit damage +{party_critDmg}%',
   'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s. Party basic attacks have a {party_basicPoison}% chance to poison for 5s',
-  'skill.ck_venom.name': 'Paw Slap', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to poison; plus a 10% chance to stun for {v2}s',
+  'skill.ck_venom.name': 'Paw Slap', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to poison; plus a 7% chance to stun for {v2}s',
   'skill.ck_plate.name': 'Hissing Burst Armor', 'skill.ck_plate.desc': 'Own DEF {v}% and max HP {hpPct}%, but ATK +{atkPct}%, crit damage +{critDmg}%, evasion +{evade}%. Party: airship cannon cooldown -{party_cannonCut}s, +{party_vsStun}% damage to stunned enemies',
 
   'skill.sc_barrage.name': 'Sea of Books', 'skill.sc_barrage.desc': 'Bombards all enemies 3 times for {v}% damage each',

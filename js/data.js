@@ -169,16 +169,16 @@ G.SKILLS = {
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
     A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
     A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v, party: [{ id: 'regen', v: 0.01, t: 5 }] })),   // 之後 5 秒每秒再回 1%
-    // 貓貓士氣：士氣上限 5%→15%（原本）；另外全隊普攻 1%→5% 機率暈眩 1→1.5 秒、全隊閃避 +5%→8%
+    // 貓貓士氣：士氣上限 5%→15%（原本）；另外全隊普攻 1%→2% 機率暈眩 1.5 秒、全隊閃避 +5%→8%
     P('ck_morale',  0, lin(5, 2.5),    'special', 'morale', { raw: true,
-      partyStun: { chance: lin(0.01, 0.01), t: lin(1, 0.125) }, partyAlso: { evade: lin(0.05, 0.0075) } }),
+      partyStun: { chance: lin(0.01, 0.0025), t: () => 1.5 }, partyAlso: { evade: lin(0.05, 0.0075) } }),
     // 吸貓狂熱：隊伍傷害疊層上限 5%→15%；裝的人自己另外加閃避、暴擊傷害、對中毒敵人傷害（also = 額外的自身屬性）
     P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, also: { evade: lin(0.05, 0.0125), critDmg: () => 0.3, vsPoison: lin(0.05, 0.025) }, partyAlso: { critDmg: 0.15 } }),   // 暴擊傷害：自己 +30%、全隊 +15%
     // 貓抓印記：普攻緩速；全隊普攻 5%→8% 機率中毒 5 秒（多人裝不疊加）
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { basicPoison: lin(0.05, 0.0075) } }),
-    // 貓肉球拍打：普攻機率中毒；另外獨立 10% 機率暈眩 1→1.5 秒
+    // 貓肉球拍打：普攻機率中毒；另外獨立 7% 機率暈眩 1→1.5 秒
     P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5, v2: lin(1, 0.125), v2raw: true,
-      more: [{ fx: 'stun', chance: 0.1, val: 1, t: lin(1, 0.125) }] }),
+      more: [{ fx: 'stun', chance: 0.07, val: 1, t: lin(1, 0.125) }] }),
     // 貓哈氣爆甲：捨防禦換輸出（1→5 級）。防禦 -80%→-50%、生命 -30%→-20%、攻擊 +30%→50%、暴擊傷害 +66%→77%、閃避 +8%→15%
     //   全隊：飛空艇砲擊間隔 -1 秒、打暈眩中的敵人傷害 +50%（隊上有兩隻不疊加，取最大）
     P('ck_plate',   2, lin(-0.8, 0.075), 'self', 'defPct', { also: { hpPct: lin(-0.3, 0.025), atkPct: lin(0.3, 0.05), critDmg: lin(0.66, 0.0275), evade: lin(0.08, 0.0175) },
