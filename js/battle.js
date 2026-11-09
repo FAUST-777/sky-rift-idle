@@ -404,6 +404,7 @@
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
+      if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2
 
       // 健身者「健身夥伴」：隊友被打時，分一部分傷害到自己身上
       let mine = dmg;

@@ -156,7 +156,7 @@ G.I18N['en'] = {
   'skill.dw_zoomies.name': 'Doggy Zoomies', 'skill.dw_zoomies.desc': 'Party attack speed +{v}% for 8s',
   'skill.dw_pack.name': 'Pack Attack', 'skill.dw_pack.desc': '4 bites of {v}% damage. Crits deal +25% extra crit damage; +50% damage to poisoned enemies; biting a stunned enemy heals you for {heal}% max HP (once per cast). The poison and stun effects can both apply',
   'skill.dw_goodboy.name': 'Good Boy', 'skill.dw_goodboy.desc': 'Party skill damage +{v}% for 10s; meanwhile Animal allies\' attack skills have a 2% chance on hit to stun for 1.5s',
-  'skill.dw_leash.name': 'Leash Rhythm', 'skill.dw_leash.desc': 'Party skill cooldowns -{v}%',
+  'skill.dw_leash.name': 'Leash Rhythm', 'skill.dw_leash.desc': 'Party skill cooldowns -{v}%; animal-type allies deal 2x final skill damage',
   'skill.dw_trainer.name': 'Dog Trainer', 'skill.dw_trainer.desc': 'Party skill damage +{v}%',
   'skill.dw_loyal.name': 'Loyal Hound', 'skill.dw_loyal.desc': 'ATK +{v}%, heal for {v2}% of damage dealt',
   'skill.dw_stride.name': 'Doggy Nuzzle', 'skill.dw_stride.desc': 'Party attack speed +{v}%',

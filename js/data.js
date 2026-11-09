@@ -281,7 +281,8 @@ G.SKILLS = {
     A('dw_pack',    1, 10, lin(0.55, 0.08), (v, r) => ({ target: 'one', mult: v, hits: 4, critDmgBonus: 0.25, vsPoisonSkill: 0.5, stunHeal: lin(0.02, 0.01)(r) }), { descV: { heal: lin(0.02, 0.01) } }),
     // 乖狗狗：全隊技能傷害；期間動物系隊友的攻擊技能每次命中 2% 機率暈眩 1.5 秒
     A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }], partyType: { type: 'animal', fx: [{ id: 'stunSkill', v: 0.02, t: 10 }] } })),
-    P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr'),
+    // 牽繩節奏：全隊冷卻縮短；另外全隊動物系隊友的技能最終傷害 ×2（多人裝不疊加）
+    P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr', { partyAlso: { animalSkillX: 1 }, rawKeys: ['animalSkillX'] }),
     P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
     P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct', { key2: 'lifesteal', v2: lin(0.2, 0.025) }),   // 另外吸血 20%→30%
     P('dw_stride',  1, lin(0.04, 0.04), 'party', 'spdPct'),   // 狗蹭蹭：全隊攻速 +4%→20%
