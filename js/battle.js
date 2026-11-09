@@ -320,7 +320,7 @@
 
     restartFloor() {
       if (this.reviveAt) { this.reviveAt = 0; G.emit('dead', false); }  // 倒地時手動換層 = 直接復活
-      this.enemies.forEach(e => e.img.destroy());
+      this.enemies.forEach(e => { e.img.destroy(); if (e.dbLabel) e.dbLabel.destroy(); });
       this.enemies = [];
       this.applyFloorTheme();
       this.buildParty();
@@ -730,7 +730,7 @@
         if (!u.alive) { u.alive = true; u.hp = u.st.maxHp * 0.3; u.img.setAlpha(1).clearTint(); }
         u.hp = Math.min(u.st.maxHp, u.hp + u.st.maxHp * 0.25);
       });
-      this.enemies.forEach(e => e.img.destroy());
+      this.enemies.forEach(e => { e.img.destroy(); if (e.dbLabel) e.dbLabel.destroy(); });
       this.enemies = [];
       if (this.needRebuild) {
         const ratio = this.hero.hp / this.hero.st.maxHp;
@@ -890,16 +890,7 @@
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);
       if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: G.whoName(taunter.key) } });
-      // 敵人 debuff
-      const foes = this.enemiesAlive();
-      DEBUFF_IDS.forEach(id => {
-        const on = foes.filter(u => this.fxv(u, id));
-        if (!on.length) return;
-        const v = Math.max(...on.map(u => u.fx[id].v));
-        const dot = id === 'bleed' || id === 'poison';
-        const val = dot || id === 'stun' ? `${on.length}` : `-${pct(v)}%`;
-        out.push({ id, icon: G.FX_ICON[id], val, p: { v: dot ? G.fmt(v) : pct(v), n: on.length } });
-      });
+      // 敵人 debuff 不放這裡，改顯示在每隻敵人腳下（drawDebuffLabel）
       return out;
     }
 
@@ -914,12 +905,29 @@
         g.fillStyle(this.party(u) ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, w * p, 4);
         if (u.shield > 0) g.fillStyle(0x9fd8ff, 0.9).fillRect(x, y - 3, w * Math.min(1, u.shield / u.st.maxHp), 2);
         if (u.taunt.t > 0) g.lineStyle(1, 0xffd23f, 1).strokeRect(x - 1, y - 1, w + 2, 6);
-        // 敵人身上的 debuff：血條下方小色點
-        if (!this.party(u)) {
-          const dots = [['stun', 0xffe066], ['defDown', 0xffb347], ['slow', 0x9fd8ff], ['blind', 0xb0b0c0], ['bleed', 0xff4040], ['poison', 0x6fdc6f]].filter(([id]) => this.fxv(u, id));
-          dots.forEach(([, c], i) => g.fillStyle(c, 1).fillRect(x + i * 6, y + 6, 4, 3));
-        }
       });
+      this.enemies.forEach(u => this.drawDebuffLabel(u));
+    }
+
+    // 敵人腳下的 debuff 圖示＋剩餘秒數（例如「💫1.2 💔4」），一眼看出哪隻中了什麼
+    drawDebuffLabel(u) {
+      const parts = u.alive && u.img.visible ? DEBUFF_IDS.filter(id => this.fxv(u, id)).map(id => {
+        const t = u.fx[id].t;
+        return G.FX_ICON[id] + (t < 3 ? t.toFixed(1) : Math.ceil(t));   // 快結束時顯示到小數一位
+      }) : [];
+      // 敵人站得很近：一排最多 2 個（層主 3 個）往下疊，才不會跟隔壁的字疊在一起
+      const per = u.boss ? 3 : 2, rows = [];
+      for (let i = 0; i < parts.length; i += per) rows.push(parts.slice(i, i + per).join(' '));
+      const text = rows.join('\n');
+      if (!text) { if (u.dbLabel) u.dbLabel.setVisible(false); return; }
+      if (!u.dbLabel) {
+        u.dbLabel = this.add.text(u.img.x, GROUND + 3, '', {
+          fontFamily: '"Noto Sans TC", "Microsoft JhengHei", sans-serif', fontSize: '9px', fontStyle: 'bold',
+          color: '#ffffff', stroke: '#1a1428', strokeThickness: 3, align: 'center', lineSpacing: -1,
+        }).setOrigin(0.5, 0).setDepth(60);
+      }
+      u.dbLabel.setPosition(u.img.x, GROUND + 3).setVisible(true);
+      if (u.dbLabel.text !== text) u.dbLabel.setText(text);
     }
   }
 
