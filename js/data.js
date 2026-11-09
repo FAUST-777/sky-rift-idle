@@ -283,6 +283,12 @@ G.MONSTER_TIERS = [
   [{ id: 'thunderBird', shape: 'bird', color: '#f2d24b' }, { id: 'skyJelly', shape: 'jelly', color: '#e58fd6' }, { id: 'ironCrow', shape: 'bird', color: '#5b5f6b' }],
   [{ id: 'gargoyle', shape: 'bat', color: '#6b7d8c' }, { id: 'cloudGiant', shape: 'golem', color: '#d8e4f0' }, { id: 'riftSlime', shape: 'slime', color: '#b04be0' }],
   [{ id: 'voidJelly', shape: 'jelly', color: '#5b3daf' }, { id: 'starGolem', shape: 'golem', color: '#2f3b66' }, { id: 'skyWarden', shape: 'bird', color: '#ffd27a' }],
+  // 第 21 層起：裂洞上方的「天空之海」，海洋生物（每 5 層 2 種）
+  [{ id: 'bubbleCrab', shape: 'crab', color: '#e8604c' }, { id: 'skyStarfish', shape: 'starfish', color: '#ffb347' }],
+  [{ id: 'pearlClam', shape: 'clam', color: '#e9d6c2' }, { id: 'cloudPuffer', shape: 'puffer', color: '#9fd3ef' }],
+  [{ id: 'inkOctopus', shape: 'octopus', color: '#b05a9e' }, { id: 'thunderUrchin', shape: 'urchin', color: '#5a4a8a' }],
+  [{ id: 'tideSeahorse', shape: 'seahorse', color: '#4fc3a1' }, { id: 'isleTurtle', shape: 'turtle', color: '#6b9a5a' }],
+  [{ id: 'stormEel', shape: 'eel', color: '#3a7bd5' }, { id: 'skyWhale', shape: 'whale', color: '#5b7fb5' }],
 ];
 G.monsterTier = f => G.MONSTER_TIERS[Math.min(G.MONSTER_TIERS.length - 1, Math.floor((f - 1) / 5))];
 G.monsterStats = (f, boss) => {

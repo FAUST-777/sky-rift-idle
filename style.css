@@ -264,3 +264,8 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 /* 技能清單：已裝備的整條描框發亮（主動橘、被動藍，跟上方裝備欄同色） */
 .skill.eq.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset, 0 0 10px rgba(255, 154, 77, .35); }
 .skill.eq.passive { border-color: #6fb8ff; box-shadow: 0 0 0 1px #6fb8ff inset, 0 0 10px rgba(111, 184, 255, .35); }
+
+/* ── 飛空艇部件按鈕：使用中紅、可裝上淡藍 ─────────────── */
+.btn.ship-using, .btn.ship-using:disabled { background: #b8323f; border-color: #e0606b; color: #fff; font-weight: 700; opacity: 1; }
+.btn.ship-equip { background: #bfe6ff; border-color: #8fd0ff; color: #0b2a40; font-weight: 700; }
+.cannon-base { font-size: 12px; margin: -2px 0 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 179, 107, .1); color: #ffcf9e; }

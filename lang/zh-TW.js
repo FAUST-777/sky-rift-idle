@@ -174,6 +174,20 @@ G.I18N['zh-TW'] = {
 
   // ── 夥伴 ──
   'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
+  // 天空之海怪物、飛空艇提示
+  'monster.bubbleCrab': '泡泡蟹',
+  'monster.skyStarfish': '星空海星',
+  'monster.pearlClam': '珍珠貝',
+  'monster.cloudPuffer': '雲朵河豚',
+  'monster.inkOctopus': '墨雲章魚',
+  'monster.thunderUrchin': '雷刺海膽',
+  'monster.tideSeahorse': '潮汐海馬',
+  'monster.isleTurtle': '浮島海龜',
+  'monster.stormEel': '雷鳴鰻',
+  'monster.skyWhale': '天空鯨',
+  'ship.tipFloor': '🚢 目前飛空艇最多能到第 {n} 層（基礎 {base} ＋ 穩定翼 {wing} ＋ 引擎 {engine}），你最高到過第 {max} 層。',
+  'ship.tipMore': '要再往上爬，請到「飛空艇」升級穩定翼或引擎。',
+  'ship.cannonBase': '💥 基礎傷害 = 主角攻擊力 {atk} × 倍率，每 {s} 秒一發（不吃暴擊與全隊加成，命中後再扣敵人防禦）',
   // 冒險頁即時數值
   'live.title': '即時數值',
   'live.hint': '含 buff，隨戰鬥變動',
@@ -231,7 +245,7 @@ G.I18N['zh-TW'] = {
   'ship.help': '打造優秀強韌的飛空艇，才能往天空破洞的高層冒險。每個部位有 5 款，買過的款式可以隨時切換；<b>側面穩定翼和引擎</b>決定能爬到第幾層。', 'ship.paint': '塗裝', 'ship.free': '免費',
   'ship.using': '使用中', 'ship.equip': '裝上', 'ship.none': '未安裝',
   'ship.sum.hp': '全隊生命', 'ship.sum.def': '全隊防禦', 'ship.sum.dmg': '全隊傷害',
-  'ship.sum.gold': '冒險金幣', 'ship.sum.cannon': '砲擊傷害', 'ship.sum.floors': '可爬到',
+  'ship.sum.gold': '冒險金幣', 'ship.sum.cannon': '砲擊基礎傷害', 'ship.sum.floors': '可爬到',
   'part.balloon.name': '熱氣球', 'part.balloon.what': '提升全隊生命', 'part.balloon.desc': '全隊生命 +{v}%',
   'part.balloon.0': '拼布氣球', 'part.balloon.1': '條紋氣球', 'part.balloon.2': '雙囊氣球',
   'part.balloon.3': '鋼骨氣囊', 'part.balloon.4': '星辰氣囊', 'part.hull.name': '船身',
@@ -243,7 +257,7 @@ G.I18N['zh-TW'] = {
   'part.charm.name': '船底掛飾', 'part.charm.what': '提升全隊冒險獲得的金幣', 'part.charm.desc': '冒險金幣 +{v}%',
   'part.charm.0': '風燈', 'part.charm.1': '銅鈴', 'part.charm.2': '船錨',
   'part.charm.3': '招財雲晶', 'part.charm.4': '海盜旗', 'part.cannon.name': '船砲',
-  'part.cannon.what': '飛空艇每 6 秒對敵人遠程砲擊', 'part.cannon.desc': '砲擊 {v}% 攻擊力傷害', 'part.cannon.0': '小鐵砲',
+  'part.cannon.what': '飛空艇每 6 秒對敵人遠程砲擊', 'part.cannon.desc': '砲擊 {v}% 攻擊力傷害（基礎 {n}）', 'part.cannon.0': '小鐵砲',
   'part.cannon.1': '雙管砲', 'part.cannon.2': '長程加農砲', 'part.cannon.3': '魔導砲',
   'part.cannon.4': '天穹巨砲', 'part.wing.name': '側面穩定翼', 'part.wing.what': '可以多往上爬幾層',
   'part.wing.desc': '可爬層數 +{v}', 'part.wing.0': '帆布側翼', 'part.wing.1': '木製穩定翼',

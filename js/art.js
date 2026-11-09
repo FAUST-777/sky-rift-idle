@@ -336,6 +336,126 @@
       ctx.globalAlpha = 1;
       ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(24, 22, 5, 3, -0.4, 0, Math.PI * 2); ctx.fill();
       eye(26, 30, 3); eye(36, 30, 3);
+    // ── 天空之海（第 21 層起）：面向左 ──
+    } else if (shape === 'crab') {
+      ctx.strokeStyle = dark; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath(); ctx.moveTo(22, 46 + i * 3); ctx.lineTo(10 + i * 2, 54 + i * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(42, 46 + i * 3); ctx.lineTo(54 - i * 2, 54 + i * 2); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(20, 40); ctx.lineTo(10, 32); ctx.moveTo(44, 40); ctx.lineTo(54, 32); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.ellipse(32, 44, 18, 11, 0, 0, Math.PI * 2); ctx.fill();
+      // 鉗子（開口朝上）
+      [[9, 27], [55, 27]].forEach(([x, y]) => {
+        ctx.beginPath(); ctx.arc(x, y, 7, 0.25 * Math.PI, 1.75 * Math.PI, true); ctx.lineTo(x, y); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x - 6, y - 2); ctx.lineTo(x - 2, y - 11); ctx.lineTo(x + 2, y - 3); ctx.fill();
+      });
+      ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(26, 39, 6, 3, -0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(27, 34); ctx.lineTo(26, 26); ctx.moveTo(37, 34); ctx.lineTo(38, 26); ctx.stroke();
+      eye(26, 24, 3.5); eye(38, 24, 3.5);
+      ctx.fillStyle = 'rgba(200,240,255,.7)'; ctx.beginPath(); ctx.arc(48, 16, 3, 0, Math.PI * 2); ctx.arc(53, 9, 2, 0, Math.PI * 2); ctx.fill();   // 泡泡
+    } else if (shape === 'starfish') {
+      ctx.fillStyle = color; ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 10 : 25;
+        const x = 32 + Math.cos(a) * r, y = 36 + Math.sin(a) * r;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = light;
+      for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / 5; ctx.beginPath(); ctx.arc(32 + Math.cos(a) * 15, 36 + Math.sin(a) * 15, 1.8, 0, Math.PI * 2); ctx.fill(); }
+      eye(27, 36, 3); eye(37, 36, 3);
+    } else if (shape === 'clam') {
+      ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(32, 52, 22, 7, 0, 0, Math.PI); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(32, 50, 5, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(10, 50); ctx.quadraticCurveTo(8, 18, 32, 14); ctx.quadraticCurveTo(56, 18, 54, 50);
+      ctx.quadraticCurveTo(32, 42, 10, 50); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.5;
+      for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(32, 46); ctx.lineTo(32 + i * 9, 17 + Math.abs(i) * 4); ctx.stroke(); }
+      eye(25, 32, 3.5); eye(39, 32, 3.5);
+    } else if (shape === 'puffer') {
+      ctx.fillStyle = dark;
+      ctx.beginPath(); ctx.moveTo(48, 38); ctx.lineTo(62, 28); ctx.lineTo(62, 48); ctx.closePath(); ctx.fill();   // 尾鰭
+      ctx.strokeStyle = dark; ctx.lineWidth = 2;
+      for (let i = 0; i < 14; i++) {
+        const a = i * Math.PI * 2 / 14;
+        ctx.beginPath(); ctx.moveTo(32 + Math.cos(a) * 15, 38 + Math.sin(a) * 15); ctx.lineTo(32 + Math.cos(a) * 21, 38 + Math.sin(a) * 21); ctx.stroke();
+      }
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(32, 38, 16, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.globalAlpha = .6; ctx.beginPath(); ctx.ellipse(32, 46, 12, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(17, 40, 3, 2, 0, 0, Math.PI * 2); ctx.fill();   // 嘟嘴
+      eye(24, 32, 4);
+    } else if (shape === 'octopus') {
+      ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineCap = 'round';
+      for (let i = 0; i < 6; i++) {
+        const x = 17 + i * 6;
+        ctx.beginPath(); ctx.moveTo(x, 36); ctx.quadraticCurveTo(x + (i % 2 ? 7 : -7), 48, x + (i < 3 ? -4 : 4), 58); ctx.stroke();
+      }
+      ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(32, 26, 17, 16, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = light;
+      [[24, 16, 3], [40, 18, 2.5], [36, 11, 2]].forEach(([x, y, r]) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); });
+      eye(25, 30, 4); eye(39, 30, 4);
+    } else if (shape === 'urchin') {
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 18; i++) {
+        const a = i * Math.PI * 2 / 18;
+        ctx.strokeStyle = i % 2 ? dark : light; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(32 + Math.cos(a) * 10, 40 + Math.sin(a) * 10); ctx.lineTo(32 + Math.cos(a) * 24, 40 + Math.sin(a) * 22); ctx.stroke();
+      }
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(32, 40, 13, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ffe14a'; ctx.lineWidth = 2; ctx.shadowColor = '#ffe14a'; ctx.shadowBlur = 6;   // 小閃電
+      ctx.beginPath(); ctx.moveTo(48, 12); ctx.lineTo(44, 19); ctx.lineTo(49, 19); ctx.lineTo(45, 26); ctx.stroke(); ctx.shadowBlur = 0;
+      eye(27, 39, 3.5); eye(37, 39, 3.5);
+    } else if (shape === 'seahorse') {
+      ctx.strokeStyle = color; ctx.lineWidth = 11; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(32, 22); ctx.quadraticCurveTo(44, 34, 34, 44); ctx.quadraticCurveTo(26, 52, 34, 56); ctx.stroke();
+      ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(40, 55, 4, Math.PI, Math.PI * 2.6); ctx.stroke();   // 捲尾
+      ctx.fillStyle = light;
+      ctx.beginPath(); ctx.moveTo(42, 26); ctx.lineTo(52, 30); ctx.lineTo(44, 38); ctx.closePath(); ctx.fill();   // 背鰭
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(29, 17, 8, 0, Math.PI * 2); ctx.fill();
+      rr(ctx, 12, 15, 14, 5, 2); ctx.fill();   // 長吻
+      ctx.fillStyle = dark; ctx.beginPath(); ctx.moveTo(30, 9); ctx.lineTo(34, 3); ctx.lineTo(36, 11); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.5;
+      for (let y = 30; y < 50; y += 5) { ctx.beginPath(); ctx.moveTo(32, y); ctx.lineTo(39, y + 1); ctx.stroke(); }
+      eye(27, 15, 3);
+    } else if (shape === 'turtle') {
+      ctx.fillStyle = shade(color, 30);
+      ctx.beginPath(); ctx.ellipse(20, 55, 7, 3.5, 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(48, 55, 7, 3.5, -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(11, 44, 7, 0, Math.PI * 2); ctx.fill();   // 頭
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.ellipse(34, 48, 22, 16, 0, Math.PI, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = dark; ctx.fillRect(12, 47, 44, 4);
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.5;
+      [[26, 40], [38, 40], [32, 32]].forEach(([x, y]) => { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; ctx.lineTo(x + Math.cos(a) * 5, y + Math.sin(a) * 5); } ctx.closePath(); ctx.stroke(); });
+      ctx.fillStyle = '#7fd36a';   // 背上的小浮島草皮
+      ctx.beginPath(); ctx.ellipse(34, 32, 9, 3, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.arc(36, 26, 2, 0, Math.PI * 2); ctx.fill();
+      eye(9, 42, 2.5);
+    } else if (shape === 'eel') {
+      ctx.lineCap = 'round';
+      const path = () => { ctx.beginPath(); ctx.moveTo(12, 34); ctx.bezierCurveTo(26, 22, 30, 52, 44, 40); ctx.quadraticCurveTo(54, 32, 60, 46); };
+      ctx.strokeStyle = color; ctx.lineWidth = 10; path(); ctx.stroke();
+      ctx.strokeStyle = '#ffe14a'; ctx.lineWidth = 2; ctx.setLineDash([4, 5]); path(); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(12, 33, 9, 7, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(4, 36); ctx.lineTo(12, 37); ctx.stroke();
+      eye(10, 30, 3);
+    } else if (shape === 'whale') {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(52, 38); ctx.quadraticCurveTo(58, 30, 63, 22); ctx.lineTo(60, 36); ctx.lineTo(63, 48); ctx.quadraticCurveTo(58, 44, 52, 42); ctx.fill();   // 尾鰭
+      ctx.beginPath(); ctx.ellipse(31, 39, 25, 16, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = shade(color, 70); ctx.beginPath(); ctx.ellipse(28, 47, 20, 7, 0, 0, Math.PI); ctx.fill();
+      ctx.strokeStyle = dark; ctx.lineWidth = 1.2;
+      for (let x = 14; x < 42; x += 5) { ctx.beginPath(); ctx.moveTo(x, 47); ctx.lineTo(x + 1, 53); ctx.stroke(); }
+      ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(30, 48, 7, 3, 0.5, 0, Math.PI * 2); ctx.fill();   // 胸鰭
+      ctx.strokeStyle = '#bfe8ff'; ctx.lineWidth = 2.5;   // 噴水
+      ctx.beginPath(); ctx.moveTo(22, 23); ctx.quadraticCurveTo(18, 12, 12, 10); ctx.moveTo(22, 23); ctx.quadraticCurveTo(26, 12, 32, 10); ctx.moveTo(22, 23); ctx.lineTo(22, 8); ctx.stroke();
+      eye(13, 38, 3);
     } else if (shape === 'skeleton') {   // 死靈召喚物（面向右）
       ctx.fillStyle = '#e8e4d8';
       ctx.beginPath(); ctx.arc(32, 20, 9, 0, Math.PI * 2); ctx.fill();

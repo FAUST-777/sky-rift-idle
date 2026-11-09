@@ -174,6 +174,20 @@ G.I18N['en'] = {
 
   // ── Party ──
   'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
+  // 天空之海怪物、飛空艇提示
+  'monster.bubbleCrab': 'Bubble Crab',
+  'monster.skyStarfish': 'Sky Starfish',
+  'monster.pearlClam': 'Pearl Clam',
+  'monster.cloudPuffer': 'Cloud Puffer',
+  'monster.inkOctopus': 'Inkcloud Octopus',
+  'monster.thunderUrchin': 'Thunder Urchin',
+  'monster.tideSeahorse': 'Tide Seahorse',
+  'monster.isleTurtle': 'Isle Turtle',
+  'monster.stormEel': 'Storm Eel',
+  'monster.skyWhale': 'Sky Whale',
+  'ship.tipFloor': '🚢 Your airship can reach floor {n} (base {base} + fins {wing} + engine {engine}). Your best is floor {max}.',
+  'ship.tipMore': 'To climb higher, upgrade the fins or engine in the Airship tab.',
+  'ship.cannonBase': '💥 Base damage = hero ATK {atk} × multiplier, one shot every {s}s (no crits or party bonuses; enemy DEF still applies)',
   // 冒險頁即時數值
   'live.title': 'Live Stats',
   'live.hint': 'buffs included, updates in combat',
@@ -231,7 +245,7 @@ G.I18N['en'] = {
   'ship.help': 'Build a strong, sturdy airship to climb ever higher into the rift. Each part comes in 5 models, and you can switch between owned models anytime. <b>Side Stabilizers and the Engine</b> decide how high you can climb.', 'ship.paint': 'Paint', 'ship.free': 'Free',
   'ship.using': 'In use', 'ship.equip': 'Equip', 'ship.none': 'None',
   'ship.sum.hp': 'Party HP', 'ship.sum.def': 'Party DEF', 'ship.sum.dmg': 'Party damage',
-  'ship.sum.gold': 'Adventure gold', 'ship.sum.cannon': 'Cannon damage', 'ship.sum.floors': 'Can reach',
+  'ship.sum.gold': 'Adventure gold', 'ship.sum.cannon': 'Cannon base dmg', 'ship.sum.floors': 'Can reach',
   'part.balloon.name': 'Balloon', 'part.balloon.what': 'Boosts party HP', 'part.balloon.desc': 'Party HP +{v}%',
   'part.balloon.0': 'Patchwork Balloon', 'part.balloon.1': 'Striped Balloon', 'part.balloon.2': 'Twin Envelope',
   'part.balloon.3': 'Steel-Ribbed Envelope', 'part.balloon.4': 'Starlight Envelope', 'part.hull.name': 'Hull',
@@ -243,7 +257,7 @@ G.I18N['en'] = {
   'part.charm.name': 'Hull Charm', 'part.charm.what': 'Boosts gold earned while adventuring', 'part.charm.desc': 'Adventure gold +{v}%',
   'part.charm.0': 'Lantern', 'part.charm.1': 'Brass Bell', 'part.charm.2': 'Anchor',
   'part.charm.3': 'Lucky Cloud Crystal', 'part.charm.4': 'Jolly Roger', 'part.cannon.name': 'Cannon',
-  'part.cannon.what': 'The airship bombards enemies every 6s', 'part.cannon.desc': 'Fires for {v}% ATK damage', 'part.cannon.0': 'Small Iron Cannon',
+  'part.cannon.what': 'The airship bombards enemies every 6s', 'part.cannon.desc': 'Cannon deals {v}% ATK damage (base {n})', 'part.cannon.0': 'Small Iron Cannon',
   'part.cannon.1': 'Double-Barrel Cannon', 'part.cannon.2': 'Long Cannon', 'part.cannon.3': 'Arcane Cannon',
   'part.cannon.4': 'Sky Breaker', 'part.wing.name': 'Side Stabilizers', 'part.wing.what': 'Lets you climb more floors',
   'part.wing.desc': 'Floors +{v}', 'part.wing.0': 'Canvas Fins', 'part.wing.1': 'Wooden Stabilizers',

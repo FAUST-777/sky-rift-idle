@@ -60,6 +60,7 @@
       this.islandsLayer = null;
       // 飛空艇放右上（左上角留給 buff 圖示）
       this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.5);
+      this.shipImg.setInteractive({ useHandCursor: true }).on('pointerdown', () => G.UI && G.UI.shipTip && G.UI.shipTip());   // 點飛空艇 → 提示可爬層數
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
       this.ground = this.add.tileSprite(0, GROUND - 6, W, H - GROUND + 6, '__DEFAULT').setOrigin(0);

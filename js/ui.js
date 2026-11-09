@@ -101,6 +101,14 @@
     ].join('');
   }
 
+  // 點右上角飛空艇：提示最多能到第幾層
+  UI.shipTip = function () {
+    const S = G.S, cap = G.shipMaxFloor();
+    let msg = t('ship.tipFloor', { n: cap, base: G.SHIP_BASE_FLOORS, wing: G.shipVal('wing'), engine: G.shipVal('engine'), max: S.maxFloor });
+    if (S.maxFloor >= cap) msg += ' ' + t('ship.tipMore');
+    UI.toast(msg);
+  };
+
   function setDot(tab, on) {
     const b = document.querySelector(`#tabs [data-tab="${tab}"]`);
     let d = b.querySelector('.dot');
@@ -590,6 +598,7 @@
     const v = G.SHIP_PARTS[slot].v[i], pct = Math.round(v * 100);
     if (slot === 'hull') { const s = G.homeSize(i); return t('part.hull.desc', { v: pct, w: s.w, h: s.h }); }
     if (slot === 'wing' || slot === 'engine') return t(`part.${slot}.desc`, { v });
+    if (slot === 'cannon') return t('part.cannon.desc', { v: pct, n: G.fmt(Math.round(G.heroStats().atk * v)) });   // 基礎傷害 = 主角攻擊 × 倍率
     return t(`part.${slot}.desc`, { v: pct });
   }
 
@@ -599,7 +608,7 @@
     // 目前加成總覽
     const summary = [
       ['🎈', t('ship.sum.hp'), pct(b.hpPct)], ['🚢', t('ship.sum.def'), pct(b.defPct)], ['🗿', t('ship.sum.dmg'), pct(b.dmgPct)],
-      ['🔔', t('ship.sum.gold'), pct(b.goldPct)], ['💣', t('ship.sum.cannon'), G.cannonMult() ? `${Math.round(G.cannonMult() * 100)}%` : '—'],
+      ['🔔', t('ship.sum.gold'), pct(b.goldPct)], ['💣', t('ship.sum.cannon'), G.cannonMult() ? `${G.fmt(Math.round(G.heroStats().atk * G.cannonMult()))}（${Math.round(G.cannonMult() * 100)}%）` : '—'],
       ['🧭', t('ship.sum.floors'), t('floor.name', { n: G.shipMaxFloor() })],
     ].map(([i, k, v]) => `<div>${i} ${k} <b>${v}</b></div>`).join('');
 
@@ -608,8 +617,9 @@
       const rows = P.v.map((_, i) => {
         const own = sh.owned[slot].includes(i), using = cur === i, c = G.shipPartCost(slot, i);
         const price = [c.gold ? `${G.fmt(c.gold)}💰` : '', c.crystal ? `${c.crystal}💎` : ''].filter(Boolean).join(' ') || t('ship.free');
-        const btn = using ? `<button class="btn small on" disabled>${t('ship.using')}</button>`
-          : own ? `<button class="btn small good" data-act="shipeq" data-slot="${slot}" data-i="${i}">${t('ship.equip')}</button>`
+        // 使用中 → 紅色；已擁有可裝上 → 淡藍色
+        const btn = using ? `<button class="btn small ship-using" disabled>${t('ship.using')}</button>`
+          : own ? `<button class="btn small ship-equip" data-act="shipeq" data-slot="${slot}" data-i="${i}">${t('ship.equip')}</button>`
           : `<button class="btn small primary" data-act="shipbuy" data-slot="${slot}" data-i="${i}">${price}</button>`;
         return `<div class="model ${using ? 'using' : ''}">
           <span class="tier">${['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'][i]}</span>
@@ -618,6 +628,7 @@
       return `<div class="card">
         <h3>${P.icon} ${t(`part.${slot}.name`)} <small>${cur >= 0 ? t(`part.${slot}.${cur}`) : t('ship.none')}</small></h3>
         <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t(`part.${slot}.what`)}</p>
+        ${slot === 'cannon' ? `<p class="cannon-base">${t('ship.cannonBase', { atk: G.heroStats().atk, s: G.partyAura().cannonInterval || G.CANNON_INTERVAL })}</p>` : ''}
         ${rows}</div>`;
     }).join('');
 
