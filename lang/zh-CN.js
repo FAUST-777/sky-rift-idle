@@ -182,7 +182,7 @@ G.I18N['zh-CN'] = {
   'skill.mc_harden.name': '硬化甲油', 'skill.mc_harden.desc': '全队防御 +{v}%',
   'skill.mc_gelcoat.name': '光疗保养', 'skill.mc_gelcoat.desc': '生命 +{v}%',
   'skill.mc_mirror.name': '镜面甲', 'skill.mc_mirror.desc': '全队反弹伤害 +{v}%，反弹暴击时暴击伤害再 +{party_reflectCritDmg}%',
-  'skill.mc_art.name': '指尖艺术', 'skill.mc_art.desc': '自己施放的护盾 +{v}%，自身普攻伤害 +50%',
+  'skill.mc_art.name': '指尖艺术', 'skill.mc_art.desc': '自己施放的护盾 +{v}%，自身普攻伤害 +50%。全队反弹可以暴击，反弹暴击率 = 40% ＋ 被打队友的暴击率，反弹暴击伤害再 +25%',
 
   // ── 伙伴 ──
   'perk.cdr': '全队技能冷却 -{v}%', 'perk.defPct': '全队防御 +{v}%', 'perk.hpPct': '全队生命 +{v}%', 'perk.atkPct': '全队攻击 +{v}%', 'perk.procRate': '全队触发率 +{v}%', 'perk.defDownStack': '破防时间可累加（取最高 %，最多 {cap} 秒）', 'partners.perkHint': '专属能力：永久、不能升级，这位伙伴出战时全队生效。触发率影响暴击、流血、中毒、减速等几率。',

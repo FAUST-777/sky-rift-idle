@@ -290,7 +290,8 @@ G.SKILLS = {
     P('mc_gelcoat', 1, lin(0.1, 0.07),  'self', 'hpPct'),
     // 鏡面甲：全隊反彈傷害 +20%→68%；反彈暴擊時暴擊傷害再 +50%→100%（要有倒刺美甲讓反彈能暴擊才有用）
     P('mc_mirror',  1, lin(0.2, 0.12),  'party', 'reflectPow', { partyAlso: { reflectCritDmg: lin(0.5, 0.125) } }),
-    P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow', { also: { basicDmg: () => 0.5 } }),   // 另外自身普攻傷害 +50%
+    // 指尖藝術：護盾 +15%→55%、自身普攻 +50%；全隊反彈可暴擊，反彈暴擊率 = 40% ＋ 被打者暴擊率，反彈暴擊傷害再 +25%（固定）
+    P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow', { also: { basicDmg: () => 0.5 }, partyAlso: { reflectCrit: 1, reflectCritBase: 40, reflectCritAdd: 0.25 } }),
   ],
 
   // 健身者：幫隊友平均分攤傷害、自己緩緩回血

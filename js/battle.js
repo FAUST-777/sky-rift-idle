@@ -414,8 +414,10 @@
         const r = this.reflectOf(target);
         if (r > 0) {
           // 倒刺美甲：反彈可暴擊，用被打的那位隊友的暴擊率與暴擊傷害；鏡面甲再加反彈暴擊傷害
-          const rc = this.aura.reflectCrit && Math.random() * 100 < this.critOf(target);
-          const cm = rc ? target.st.critDmg + (this.aura.critDmg || 0) + (this.aura.reflectCritDmg || 0) : 1;
+          //   指尖藝術：反彈暴擊率再 +40（百分點）、反彈暴擊傷害再 +25%
+          const a = this.aura;
+          const rc = a.reflectCrit && Math.random() * 100 < (a.reflectCritBase || 0) + this.critOf(target);
+          const cm = rc ? target.st.critDmg + (a.critDmg || 0) + (a.reflectCritDmg || 0) + (a.reflectCritAdd || 0) : 1;
           this.damage(src, Math.max(1, Math.round(dmg * r * cm)), '#ff9ad5', rc, true);
         }
       }
