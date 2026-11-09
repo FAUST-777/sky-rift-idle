@@ -160,7 +160,7 @@ G.I18N['en'] = {
   'skill.dw_trainer.name': 'Dog Trainer', 'skill.dw_trainer.desc': 'Party skill damage +{v}%',
   'skill.dw_loyal.name': 'Loyal Hound', 'skill.dw_loyal.desc': 'ATK +{v}%, heal for {v2}% of damage dealt',
   'skill.dw_stride.name': 'Power Walk', 'skill.dw_stride.desc': 'Party attack speed +{v}%',
-  'skill.dw_bark.name': 'Bark', 'skill.dw_bark.desc': 'Basic attacks have a {v}% chance to slow enemy attacks by 20% for 3s',
+  'skill.dw_bark.name': 'Howling Pack', 'skill.dw_bark.desc': 'Basic attacks have a {v}% chance to give enemies -20% attack speed, -{v2}% accuracy and -{v2}% DEF for 3s',
 
   'skill.gy_punch.name': 'Power Punch', 'skill.gy_punch.desc': '{v}% damage to one enemy',
   'skill.gy_squat.name': 'Squats', 'skill.gy_squat.desc': 'Heals self for {v}% HP',

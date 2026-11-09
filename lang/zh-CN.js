@@ -160,7 +160,7 @@ G.I18N['zh-CN'] = {
   'skill.dw_trainer.name': '训犬师', 'skill.dw_trainer.desc': '全队技能伤害 +{v}%',
   'skill.dw_loyal.name': '忠犬', 'skill.dw_loyal.desc': '攻击 +{v}%，造成伤害的 {v2}% 转为自己的生命',
   'skill.dw_stride.name': '健走', 'skill.dw_stride.desc': '全队攻速 +{v}%',
-  'skill.dw_bark.name': '吠叫', 'skill.dw_bark.desc': '普攻有 {v}% 概率让敌人攻速 -20%，3 秒',
+  'skill.dw_bark.name': '狗狗狂吼', 'skill.dw_bark.desc': '普攻有 {v}% 概率让敌人攻速 -20%、命中 -{v2}%、防御 -{v2}%，3 秒',
 
   'skill.gy_punch.name': '重拳', 'skill.gy_punch.desc': '单体 {v}% 伤害',
   'skill.gy_squat.name': '深蹲', 'skill.gy_squat.desc': '恢复自身 {v}% 生命',

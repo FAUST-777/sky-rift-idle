@@ -501,7 +501,11 @@
 
     // 普攻附加效果（被動 proc）
     applyProcs(u, t) {
-      u.procs.forEach(p => { if (this.valid(t) && Math.random() < p.chance * this.procMult(u)) this.debuff(u, t, p.fx, p.val, p.t); });
+      u.procs.forEach(p => {
+        if (!this.valid(t) || Math.random() >= p.chance * this.procMult(u)) return;
+        this.debuff(u, t, p.fx, p.val, p.t);
+        (p.more || []).forEach(m => this.debuff(u, t, m.fx, m.val, p.t));
+      });
     }
 
     // ── 主動技能 ─────────────────────────────────────────────────────────

@@ -245,7 +245,8 @@ G.SKILLS = {
     P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
     P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct', { key2: 'lifesteal', v2: lin(0.2, 0.025) }),   // 另外吸血 20%→30%
     P('dw_stride',  1, lin(0.03, 0.02), 'party', 'spdPct'),
-    P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3 }),
+    // 狗狗狂吼：觸發時同時上緩速＋致盲（降命中）＋破防；v2 = 致盲與破防數值 10%→17%
+    P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3, v2: lin(0.1, 0.0175), more: ['blind', 'defDown'] }),
   ],
 
   // 美甲師：全隊反彈傷害、護盾、防禦；特化反彈

@@ -195,7 +195,8 @@
       const sk = id && G.skillDef(ch.cls, id), r = id && ch.skills[id];
       if (!sk || !r) return;
       const v = sk.v(r);
-      if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t });
+      if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t,
+        more: (sk.more || []).map(fx => ({ fx, val: sk.v2(r) })) });   // 一次觸發附帶的其他減益（例如狗狗狂吼）
       else if (sk.p === 'special') out.special[sk.key] = { v, v2: sk.v2 ? sk.v2(r) : 0 };
       else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
       if (sk.key2 && (sk.p === 'self' || sk.p === 'party')) out[sk.p][sk.key2] = (out[sk.p][sk.key2] || 0) + sk.v2(r);   // 第二效果（例如忠犬的吸血）
