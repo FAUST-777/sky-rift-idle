@@ -154,7 +154,7 @@ G.I18N['en'] = {
   'skill.dw_fetch.name': 'Get Him!', 'skill.dw_fetch.desc': 'The dog charges in to bite: {v}% damage to one enemy and poisons it for 5s',
   'skill.dw_walkies.name': 'Walkies', 'skill.dw_walkies.desc': 'All other party active skills come off cooldown {v}s sooner and the party heals {v2}% HP; party evasion +{evade}% for 2s; Animal allies\' next attack skill deals +{next}% damage',
   'skill.dw_zoomies.name': 'Doggy Zoomies', 'skill.dw_zoomies.desc': 'Party attack speed +{v}% for 8s',
-  'skill.dw_pack.name': 'Pack Attack', 'skill.dw_pack.desc': '4 bites of {v}% damage',
+  'skill.dw_pack.name': 'Pack Attack', 'skill.dw_pack.desc': '4 bites of {v}% damage. Crits deal +25% extra crit damage; +50% damage to poisoned enemies; biting a stunned enemy heals you for {heal}% max HP (once per cast). The poison and stun effects can both apply',
   'skill.dw_goodboy.name': 'Good Boy', 'skill.dw_goodboy.desc': 'Party skill damage +{v}% for 10s; meanwhile Animal allies\' attack skills have a 2% chance on hit to stun for 1.5s',
   'skill.dw_leash.name': 'Leash Rhythm', 'skill.dw_leash.desc': 'Party skill cooldowns -{v}%',
   'skill.dw_trainer.name': 'Dog Trainer', 'skill.dw_trainer.desc': 'Party skill damage +{v}%',

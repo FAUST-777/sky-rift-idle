@@ -273,7 +273,8 @@ G.SKILLS = {
       party: [{ id: 'evade', v: WALK.evade(r), t: 2 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: WALK.next(r), t: 20 }] } }),
       { raw: true, v2: WALK.heal, descV: { evade: WALK.evade, next: WALK.next } }),
     A('dw_zoomies', 1, 14, lin(0.4, 0.15),  v => ({ target: 'none', party: [{ id: 'spdUp', v, t: 8 }] })),   // 狗狗暴衝：全隊攻速 +40%→100%
-    A('dw_pack',    1, 10, lin(0.55, 0.08), v => ({ target: 'one', mult: v, hits: 4 })),
+    // 狗群圍攻：暴擊時暴擊傷害再 +25%；咬到中毒敵人傷害 +50%；咬到暈眩敵人回復自己 2%→6% 最大生命（每次施放最多回一次）；兩者可同時成立
+    A('dw_pack',    1, 10, lin(0.55, 0.08), (v, r) => ({ target: 'one', mult: v, hits: 4, critDmgBonus: 0.25, vsPoisonSkill: 0.5, stunHeal: lin(0.02, 0.01)(r) }), { descV: { heal: lin(0.02, 0.01) } }),
     // 乖狗狗：全隊技能傷害；期間動物系隊友的攻擊技能每次命中 2% 機率暈眩 1.5 秒
     A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }], partyType: { type: 'animal', fx: [{ id: 'stunSkill', v: 0.02, t: 10 }] } })),
     P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr'),

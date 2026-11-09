@@ -393,7 +393,7 @@
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
       const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0);   // 團隊特效：暴擊傷害
+      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0);   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
@@ -584,10 +584,12 @@
       // 詛咒油畫：先把命中敵人身上的減益刷新回完整時間
       if (e.refreshDebuffs) targets.forEach(t => Object.values(t.fx).forEach(f => { if (f.t > 0 && f.full) f.t = Math.max(f.t, f.full); }));
       // 傷害（多段用延遲打出）
+      let stunHealed = false;   // 狗群圍攻：咬到暈眩敵人回血，每次施放只回一次
       for (let h = 0; h < hits; h++) {
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, critDmgBonus: e.critDmgBonus, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });

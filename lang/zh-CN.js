@@ -154,7 +154,7 @@ G.I18N['zh-CN'] = {
   'skill.dw_fetch.name': '去咬他！', 'skill.dw_fetch.desc': '狗狗冲出去咬，单体 {v}% 伤害，并使敌人中毒 5 秒',
   'skill.dw_walkies.name': '散步时间', 'skill.dw_walkies.desc': '全队其他主动技能冷却立刻减少 {v} 秒，并恢复全队 {v2}% 生命；全队闪避 +{evade}% 2 秒；动物系队友下一次攻击技能伤害 +{next}%',
   'skill.dw_zoomies.name': '狗狗暴冲', 'skill.dw_zoomies.desc': '全队攻速 +{v}%，8 秒',
-  'skill.dw_pack.name': '狗群围攻', 'skill.dw_pack.desc': '连咬 4 下，每下 {v}% 伤害',
+  'skill.dw_pack.name': '狗群围攻', 'skill.dw_pack.desc': '连咬 4 下，每下 {v}% 伤害。暴击时暴击伤害再 +25%；咬到中毒的敌人伤害 +50%；咬到眩晕的敌人回复自己 {heal}% 最大生命（每次施放一次）。中毒和眩晕的效果可以同时触发',
   'skill.dw_goodboy.name': '乖狗狗', 'skill.dw_goodboy.desc': '全队技能伤害 +{v}%，10 秒；期间动物系队友的攻击技能命中时有 2% 概率使敌人晕眩 1.5 秒',
   'skill.dw_leash.name': '牵绳节奏', 'skill.dw_leash.desc': '全队技能冷却 -{v}%',
   'skill.dw_trainer.name': '训犬师', 'skill.dw_trainer.desc': '全队技能伤害 +{v}%',
