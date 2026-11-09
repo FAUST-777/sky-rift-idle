@@ -444,7 +444,7 @@
       let left = amount;
       if (u.shield > 0) { const a = Math.min(u.shield, left); u.shield -= a; left -= a; }
       u.hp -= left;
-      this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
+      this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
       if (u.hp <= 0) this.kill(u);
     }
