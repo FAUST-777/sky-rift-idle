@@ -548,6 +548,15 @@
     skillsChanged(who);
   };
 
+  // 免費重置技能點：全部退回（職業第一招保留 1 級）
+  G.resetSkillPoints = function (who = 'hero') {
+    const ch = G.charOf(who);
+    if (!ch) return;
+    resetSkills(ch);
+    skillsChanged(who);
+    toast('toast.skillsReset', { n: G.spOf(who) });
+  };
+
   function skillsChanged(who) {
     G.emit('skills');
     G.emit(who === 'hero' ? 'stats' : 'party');

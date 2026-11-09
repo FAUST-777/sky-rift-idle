@@ -62,7 +62,7 @@ G.I18N['zh-CN'] = {
   'class.manicurist.name': '美甲师', 'class.manicurist.desc': '让全队身上长出反弹伤害的尖甲，还能给全队上护盾、提升全队防御。特化反弹伤害：敌人打得越痛，反弹越痛。',
 
   // ── 技能 ──
-  'skills.points': '技能点', 'skills.help': '装在格子里的技能才会生效：主动 {a} 格（自动施放）、被动 {p} 格。学了 5 招但只能装 4 招，选哪 4 招 = 你的 Build。',
+  'skills.reset': '重置技能点', 'skills.resetHint': '免费，随时都能重置', 'skills.resetBody': '{who} 的技能点会全部退还（职业第一招保留 1 级），技能栏清空。免费，可以随时重新分配。', 'skills.resetConfirm': '免费重置', 'toast.skillsReset': '技能点已重置，可用 {n} 点', 'skills.points': '技能点', 'skills.help': '装在格子里的技能才会生效：主动 {a} 格（自动施放）、被动 {p} 格。学了 5 招但只能装 4 招，选哪 4 招 = 你的 Build。',
   'skills.activeSlots': '主动技能', 'skills.passiveSlots': '被动技能', 'skills.equipped': '已装备',
   'skills.empty': '空格', 'skills.emptyHint': '点我放技能', 'skills.tree': '{cls} 技能树',
   'skills.villager': '村民只会「猛击」。到 {lv} 级转职后会开启完整技能树。',

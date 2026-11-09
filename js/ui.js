@@ -346,8 +346,11 @@
     return `
       <div class="card">
         ${whoBarHtml(true)}
-        <h3 class="row" style="gap:6px">${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span>${G.S.partners[who] ? `<span class="grow"></span><span class="muted" style="font-size:12px;font-weight:400">Lv ${G.S.partners[who].level}</span><button class="btn small good" data-act="plevel" data-id="${who}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(G.S.partners[who].level)) })}</button>` : ''}</h3>
-        <p class="muted" style="margin:0 0 10px;font-size:12px">${t('skills.help', { a: G.ACTIVE_SLOTS, p: G.PASSIVE_SLOTS })}</p>
+        <h3 class="row" style="gap:6px">${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span>${G.S.partners[who] ? `<span class="grow"></span><span class="muted" style="font-size:12px;font-weight:400;white-space:nowrap">Lv ${G.S.partners[who].level}</span><button class="btn small good" data-act="plevel" data-id="${who}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(G.S.partners[who].level)) })}</button>` : ''}</h3>
+        <div class="row" style="gap:10px;align-items:flex-start;margin:0 0 10px">
+          <p class="muted grow" style="margin:0;font-size:12px">${t('skills.help', { a: G.ACTIVE_SLOTS, p: G.PASSIVE_SLOTS })}</p>
+          <button class="btn small" style="white-space:nowrap" data-act="skreset" data-id="${who}" title="${esc(t('skills.resetHint'))}">${t('skills.reset')}</button>
+        </div>
         <div class="slot-label">${t('skills.activeSlots')}</div>
         ${slotGrid('active', ch, list)}
         <div class="slot-label">${t('skills.passiveSlots')}</div>
@@ -891,6 +894,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'recruit': G.recruit(d.id); break;
       case 'party': G.toggleParty(d.id); break;
       case 'plevel': G.partnerLevelUp(d.id); break;
+      case 'skreset': UI.modal(`<h2>${t('skills.reset')}</h2><p>${t('skills.resetBody', { who: esc(whoName(d.id)) })}</p>
+        <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn good" data-act="skreset2" data-id="${d.id}">${t('skills.resetConfirm')}</button></div>`); break;
+      case 'skreset2': UI.close(); G.resetSkillPoints(d.id); break;
       case 'shipbuy': G.buyShipPart(d.slot, +d.i); break;
       case 'shipeq': G.equipShipPart(d.slot, +d.i); break;
       case 'paint': G.setShipPaint(+d.v); break;
