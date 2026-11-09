@@ -202,6 +202,11 @@
       else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
       if (sk.key2 && (sk.p === 'self' || sk.p === 'party')) out[sk.p][sk.key2] = (out[sk.p][sk.key2] || 0) + sk.v2(r);   // 第二效果（例如忠犬的吸血）
       Object.entries(sk.also || {}).forEach(([k, f]) => { out.self[k] = (out.self[k] || 0) + f(r); });   // 額外自身屬性（例如吸貓狂熱）
+      Object.entries(sk.partyAlso || {}).forEach(([k, f]) => { out.party[k] = (out.party[k] || 0) + (typeof f === 'function' ? f(r) : f); });   // 額外全隊光環
+      if (sk.partyStun) {   // 全隊普攻暈眩（貓貓士氣）：取機率最高的
+        const c = sk.partyStun.chance(r);
+        if (!out.partyStun || c > out.partyStun.chance) out.partyStun = { chance: c, t: sk.partyStun.t(r) };
+      }
     });
     return out;
   };
@@ -218,10 +223,12 @@
   G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
+  const AURA_MAX = ['cannonCut', 'vsStun'];
   G.partyAura = function () {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
-    G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => add(k, v)));
+    // AURA_MAX 的欄位多人裝也不疊加（取最大）
+    G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => { if (AURA_MAX.includes(k)) aura[k] = Math.max(aura[k] || 0, v); else add(k, v); }));
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) add(p.perk.stat, p.perk.v); });   // 出戰夥伴的專屬 buff
@@ -231,6 +238,11 @@
     }));
     return aura;
   };
+
+  // 船砲間隔：團隊特效（取最短）再扣貓哈氣爆甲的 -1 秒，最少 2 秒
+  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0));
+  // 全隊普攻暈眩（貓貓士氣）：出戰成員中最好的那個
+  G.partyStun = () => G.partyMembers().map(w => G.passivesOf(w).partyStun).filter(Boolean).sort((a, b) => b.chance - a.chance)[0] || null;
 
   // 團隊特效：看出戰成員的傷害系別組合
   // 回傳 { members: [{ who, type }], counts: { type: n }, active: [{ id, n?, bonus }] }

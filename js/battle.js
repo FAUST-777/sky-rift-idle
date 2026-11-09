@@ -220,6 +220,7 @@
         a[k] = (a[k] || 0) + this.animal.v;
       }
       this.aura = a;
+      this.pStun = G.partyStun();   // 貓貓士氣：全隊普攻暈眩
     }
 
     // ── 狀態效果 ─────────────────────────────────────────────────────────
@@ -243,7 +244,7 @@
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? this.aura.spdPct || 0 : 0) - this.fxv(u, 'slow'))); }
     critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0)) * this.procMult(u); }
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（占星師米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade')); }   // 暈眩無法閃避
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? this.aura.evade || 0 : 0)); }   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
@@ -377,6 +378,7 @@
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
       if (this.fxv(target, 'bleed')) dmg *= 1 + (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0);   // 血騎士對流血
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
+      if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
       const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0);   // 團隊特效：暴擊傷害
@@ -481,7 +483,11 @@
       this.gainMorale(u);
       const shots = u.st.shots || 1;
       const mult = G.BASIC_MULT[u.st.range || 'one'] * (shots > 1 ? 0.6 : 1);
-      const onHit = t => { this.hit(u, t, mult); this.applyProcs(u, t); };
+      const onHit = t => {
+        this.hit(u, t, mult); this.applyProcs(u, t);
+        const ps = this.pStun;   // 貓貓士氣：全隊普攻機率暈眩
+        if (ps && this.valid(t) && Math.random() < ps.chance * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, ps.t);
+      };
       if (u.st.missile) {
         let i = 0;
         targets.forEach(t => { for (let s = 0; s < shots; s++) this.shoot(u, t, u.st.missile, i++, () => onHit(t)); });
@@ -820,7 +826,7 @@
       if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {
         this.cannonT -= dt;
         if (this.cannonT <= 0) {
-          this.cannonT = this.aura.cannonInterval || G.CANNON_INTERVAL;   // 團隊特效可縮短
+          this.cannonT = G.cannonInterval(this.aura);   // 團隊特效、貓哈氣爆甲可縮短
           const t = this.enemiesAlive()[0];
           const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
           const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);

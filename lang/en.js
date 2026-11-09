@@ -90,11 +90,11 @@ G.I18N['en'] = {
   'skill.ck_fullburst.name': 'Full Burst', 'skill.ck_fullburst.desc': 'Every hatch opens: {v}% damage to all enemies, their attack speed -30% and DEF -20% for 5s',
   'skill.ck_rally.name': 'Meow Rally', 'skill.ck_rally.desc': 'Party ATK +{v}% for 10s',
   'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Party heals {v}% HP, then 1% per second for 5s',
-  'skill.ck_morale.name': 'Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 Morale stack; each stack gives the party +1% final DEF, up to +{v}%',
+  'skill.ck_morale.name': 'Kitty Morale', 'skill.ck_morale.desc': 'Each Cat Knight attack adds 1 morale stack, each giving the party +1% final DEF, up to +{v}%. Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{party_evade}%',
   'skill.ck_frenzy.name': 'Cat Frenzy', 'skill.ck_frenzy.desc': 'Each hit raises the hitter\'s damage by 1%, up to +{v}%, reset on defeat. The wearer also gains evasion +{evade}%, crit damage +{critDmg}% and +{vsPoison}% damage to poisoned enemies',
   'skill.ck_claws.name': 'Claw Marks', 'skill.ck_claws.desc': 'Basic attack scratches slow enemy attacks by {v}% for 4s',
   'skill.ck_venom.name': 'Paw Slap', 'skill.ck_venom.desc': 'Basic attacks have a {v}% chance to poison; plus a 10% chance to stun for {v2}s',
-  'skill.ck_plate.name': 'Heavy Plate', 'skill.ck_plate.desc': 'DEF +{v}%',
+  'skill.ck_plate.name': 'Hissing Burst Armor', 'skill.ck_plate.desc': 'Own DEF {v}% and max HP {hpPct}%, but ATK +{atkPct}%, crit damage +{critDmg}%, evasion +{evade}%. Party: airship cannon cooldown -{party_cannonCut}s, +{party_vsStun}% damage to stunned enemies',
 
   'skill.sc_barrage.name': 'Sea of Books', 'skill.sc_barrage.desc': 'Bombards all enemies 3 times for {v}% damage each',
   'skill.sc_tome.name': 'Encyclopedia', 'skill.sc_tome.desc': '{v}% damage to all enemies',

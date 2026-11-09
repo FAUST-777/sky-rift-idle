@@ -629,7 +629,7 @@
       return `<div class="card">
         <h3>${P.icon} ${t(`part.${slot}.name`)} <small>${cur >= 0 ? t(`part.${slot}.${cur}`) : t('ship.none')}</small></h3>
         <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t(`part.${slot}.what`)}</p>
-        ${slot === 'cannon' ? `<p class="cannon-base">${t('ship.cannonBase', { atk: G.heroStats().atk, s: G.partyAura().cannonInterval || G.CANNON_INTERVAL })}</p>` : ''}
+        ${slot === 'cannon' ? `<p class="cannon-base">${t('ship.cannonBase', { atk: G.heroStats().atk, s: G.cannonInterval() })}</p>` : ''}
         ${rows}</div>`;
     }).join('');
 
