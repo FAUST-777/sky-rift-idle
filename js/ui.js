@@ -323,7 +323,7 @@
           const equipped = (s.type === 'active' ? ch.active : ch.passive).includes(s.id);
           const now = r ? G.skillDesc(s, r) : t('skills.notLearned');
           const next = r < s.max ? t('skills.next', { desc: G.skillDesc(s, r + 1) }) : t('skills.maxed');
-          return `<div class="skill ${locked ? 'locked' : ''}">
+          return `<div class="skill ${locked ? 'locked' : ''} ${equipped ? 'eq ' + s.type : ''}">
             <div class="info">
               <div class="name">${G.skillName(s.id)}<span class="tag ${s.type}">${s.type === 'active' ? t('skills.active', { cd: s.cd }) : t('skills.passive')}</span>${equipped ? `<span class="tag eq">${t('skills.equipped')}</span>` : ''}</div>
               <div class="desc">${now}</div><div class="desc">${next}</div>

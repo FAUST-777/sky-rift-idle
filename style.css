@@ -260,3 +260,7 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .live-who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .stats.live b.up { color: var(--good); }
 .stats.live b.down { color: #ff7070; }
+
+/* 技能清單：已裝備的整條描框發亮（主動橘、被動藍，跟上方裝備欄同色） */
+.skill.eq.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset, 0 0 10px rgba(255, 154, 77, .35); }
+.skill.eq.passive { border-color: #6fb8ff; box-shadow: 0 0 0 1px #6fb8ff inset, 0 0 10px rgba(111, 184, 255, .35); }
