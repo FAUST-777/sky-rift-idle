@@ -168,8 +168,8 @@ G.I18N['en'] = {
   'skill.gy_protein.name': 'Protein Shake', 'skill.gy_protein.desc': 'Heals the party for {v}% HP',
   'skill.gy_superset.name': 'Superset', 'skill.gy_superset.desc': '3 punches of {v}% damage',
   'skill.gy_buddy.name': 'Gym Buddy', 'skill.gy_buddy.desc': 'When an ally is hit, takes {v}% of the damage for them',
-  'skill.gy_recovery.name': 'Rest Day', 'skill.gy_recovery.desc': 'Regenerates {v}% HP per second',
-  'skill.gy_bulk.name': 'Bulking', 'skill.gy_bulk.desc': 'HP +{v}%',
+  'skill.gy_recovery.name': 'Plank Recovery', 'skill.gy_recovery.desc': 'Party regenerates {v}% HP per second, party max HP +{party_hpPct}%',
+  'skill.gy_bulk.name': 'Bulk Up', 'skill.gy_bulk.desc': 'Party HP +{v}%; the Gym-goer gets another +{hpPct}% (double effect)',
   'skill.gy_core.name': 'Core Training', 'skill.gy_core.desc': 'DEF +{v}%',
   'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%',
   // 美甲師

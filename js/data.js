@@ -309,8 +309,10 @@ G.SKILLS = {
     A('gy_protein',  1, 14, lin(0.1, 0.03),  v => ({ target: 'none', heal: v })),
     A('gy_superset', 2, 10, lin(0.7, 0.1),   v => ({ target: 'one', mult: v, hits: 3 })),
     P('gy_buddy',     0, lin(0.3, 0.05),  'special', 'share'),
-    P('gy_recovery',  0, lin(0.01, 0.005), 'self', 'regen'),
-    P('gy_bulk',      1, lin(0.12, 0.08), 'self', 'hpPct'),
+    // 棒式恢復（原恢復日）：全隊每秒回 1%→5% 生命、全隊最大生命 +5%→15%
+    P('gy_recovery',  0, lin(0.01, 0.01), 'party', 'regen', { partyAlso: { hpPct: lin(0.05, 0.025) } }),
+    // 增肌：全隊生命 +12%→44%；健身者自己再多一份（自身 = 全隊那份 ＋ 同樣數值）
+    P('gy_bulk',      1, lin(0.12, 0.08), 'party', 'hpPct', { also: { hpPct: lin(0.12, 0.08) } }),
     P('gy_core',      1, lin(0.08, 0.06), 'self', 'defPct'),
     P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce'),
   ],

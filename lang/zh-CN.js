@@ -168,8 +168,8 @@ G.I18N['zh-CN'] = {
   'skill.gy_protein.name': '分享高蛋白', 'skill.gy_protein.desc': '全队恢复 {v}% 生命',
   'skill.gy_superset.name': '超级组', 'skill.gy_superset.desc': '连打 3 下，每下 {v}% 伤害',
   'skill.gy_buddy.name': '健身伙伴', 'skill.gy_buddy.desc': '队友被攻击时，替他分摊 {v}% 伤害',
-  'skill.gy_recovery.name': '恢复日', 'skill.gy_recovery.desc': '每秒恢复 {v}% 生命',
-  'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '生命 +{v}%',
+  'skill.gy_recovery.name': '棒式恢复', 'skill.gy_recovery.desc': '全队每秒恢复 {v}% 生命，全队最大生命 +{party_hpPct}%',
+  'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '全队生命 +{v}%，健身者自己再 +{hpPct}%（效果加倍）',
   'skill.gy_core.name': '核心训练', 'skill.gy_core.desc': '防御 +{v}%',
   'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到伤害 -{v}%',
   // 美甲師
