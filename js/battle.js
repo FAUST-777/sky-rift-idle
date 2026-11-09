@@ -392,6 +392,11 @@
       if (vsB || vsP || vsS) dmg *= 1 + vsB + vsP + vsS;
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
+      // 貓肉球拍打：全隊打到暈眩敵人，出手的人回復生命（範圍攻擊同一次出手只回一次）
+      if (this.party(src) && this.aura.stunHit && this.fxv(target, 'stun') && src.alive && src.st.maxHp && src.stunHitAt !== this.time.now) {
+        src.stunHitAt = this.time.now;
+        this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
+      }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
       const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)

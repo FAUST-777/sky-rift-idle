@@ -180,7 +180,7 @@ G.SKILLS = {
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { basicPoison: lin(0.05, 0.0075) } }),
     // 貓肉球拍打：普攻機率中毒；另外獨立 7% 機率暈眩 1→1.5 秒
     P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5, v2: lin(1, 0.125), v2raw: true,
-      more: [{ fx: 'stun', chance: 0.07, val: 1, t: lin(1, 0.125) }] }),
+      more: [{ fx: 'stun', chance: 0.07, val: 1, t: lin(1, 0.125) }], partyAlso: { stunHit: 0.005 } }),   // 全隊打到暈眩敵人回 0.5% 生命
     // 貓哈氣爆甲：捨防禦換輸出（1→5 級）。防禦 -80%→-50%、生命 -30%→-20%、攻擊 +30%→50%、暴擊傷害 +66%→77%、閃避 +8%→15%
     //   全隊：飛空艇砲擊間隔 -1 秒、打暈眩中的敵人傷害 +50%（隊上有兩隻不疊加，取最大）
     P('ck_plate',   2, lin(-0.8, 0.075), 'self', 'defPct', { also: { hpPct: lin(-0.3, 0.025), atkPct: lin(0.3, 0.05), critDmg: lin(0.66, 0.0275), evade: lin(0.08, 0.0175) },
