@@ -92,7 +92,7 @@ G.I18N['zh-TW'] = {
   'skill.ck_purr.name': '呼嚕療癒', 'skill.ck_purr.desc': '全隊回復 {v}% 生命，之後 5 秒每秒再回復 1%',
   'skill.ck_morale.name': '貓貓士氣', 'skill.ck_morale.desc': '貓鎧者每攻擊一次累積 1 層士氣，每層全隊最終防禦 +1%，最多 +{v}%。另外全隊普攻有 {stun}% 機率使敵人暈眩 {stunT} 秒，全隊閃避 +{party_evade}%',
   'skill.ck_frenzy.name': '吸貓狂熱', 'skill.ck_frenzy.desc': '隊員每次打中敵人自身傷害 +1%，最多 +{v}%，倒下才重算。裝備者自己：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%',
-  'skill.ck_claws.name': '貓抓印記', 'skill.ck_claws.desc': '普攻貓抓讓敵人攻速 -{v}%，4 秒',
+  'skill.ck_claws.name': '貓抓印記', 'skill.ck_claws.desc': '普攻貓抓讓敵人攻速 -{v}%，4 秒。全隊：技能傷害有 {party_skillStunChance}% 機率暈眩 {party_skillStun} 秒；攻擊暈眩中的敵人時，出手的人回復 {party_stunHeal}% 最大生命',
   'skill.ck_venom.name': '貓肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒；另有 10% 機率拍暈敵人 {v2} 秒',
   'skill.ck_plate.name': '貓哈氣爆甲', 'skill.ck_plate.desc': '自身防禦 {v}%、最大生命 {hpPct}%，但攻擊 +{atkPct}%、暴擊傷害 +{critDmg}%、閃避 +{evade}%。全隊：飛空艇砲擊冷卻 -{party_cannonCut} 秒、攻擊暈眩中的敵人傷害 +{party_vsStun}%',
 
@@ -309,7 +309,7 @@ G.I18N['zh-TW'] = {
   // ── Buff ──
   'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',
   'buff.frenzy.name': '吸貓狂熱', 'buff.frenzy.desc': '隊員每次打中敵人，自身傷害 +1%（最多 +{max}%），倒下才重新計算。目前：{list}{self}', 'buff.frenzy.self': '。{who}（裝備者）另有：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%',
-  'buff.hiss.name': '貓哈氣爆甲', 'buff.hiss.desc': '全隊攻擊暈眩中的敵人傷害 +{v}%，飛空艇砲擊冷卻 -{cut} 秒',
+  'buff.claws.name': '貓抓印記', 'buff.claws.desc': '全隊技能傷害有 {c}% 機率暈眩 {t} 秒；攻擊暈眩中的敵人回復自己 {v}% 最大生命', 'buff.hiss.name': '貓哈氣爆甲', 'buff.hiss.desc': '全隊攻擊暈眩中的敵人傷害 +{v}%，飛空艇砲擊冷卻 -{cut} 秒',
   'buff.animal_bear.name': '熊在場', 'buff.animal_bear.desc': '全隊防禦 {v}',
   'buff.animal_wolf.name': '狼在場', 'buff.animal_wolf.desc': '全隊攻擊 {v}',
   'buff.animal_owl.name': '貓頭鷹在場', 'buff.animal_owl.desc': '全隊暴擊率 {v}',

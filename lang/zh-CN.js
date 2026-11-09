@@ -92,7 +92,7 @@ G.I18N['zh-CN'] = {
   'skill.ck_purr.name': '呼噜疗愈', 'skill.ck_purr.desc': '全队恢复 {v}% 生命，之后 5 秒每秒再恢复 1%',
   'skill.ck_morale.name': '猫猫士气', 'skill.ck_morale.desc': '猫铠者每攻击一次累积 1 层士气，每层全队最终防御 +1%，最多 +{v}%。另外全队普攻有 {stun}% 概率使敌人晕眩 {stunT} 秒，全队闪避 +{party_evade}%',
   'skill.ck_frenzy.name': '吸猫狂热', 'skill.ck_frenzy.desc': '队员每次打中敌人自身伤害 +1%，最多 +{v}%，倒下才重算。装备者自己：闪避 +{evade}%、暴击伤害 +{critDmg}%、对中毒敌人伤害 +{vsPoison}%',
-  'skill.ck_claws.name': '猫抓印记', 'skill.ck_claws.desc': '普攻猫抓让敌人攻速 -{v}%，4 秒',
+  'skill.ck_claws.name': '猫抓印记', 'skill.ck_claws.desc': '普攻猫抓让敌人攻速 -{v}%，4 秒。全队：技能伤害有 {party_skillStunChance}% 几率眩晕 {party_skillStun} 秒；攻击眩晕中的敌人时，出手的人回复 {party_stunHeal}% 最大生命',
   'skill.ck_venom.name': '猫肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒；另有 10% 概率拍晕敌人 {v2} 秒',
   'skill.ck_plate.name': '猫哈气爆甲', 'skill.ck_plate.desc': '自身防御 {v}%、最大生命 {hpPct}%，但攻击 +{atkPct}%、暴击伤害 +{critDmg}%、闪避 +{evade}%。全队：飞空艇炮击冷却 -{party_cannonCut} 秒、攻击晕眩中的敌人伤害 +{party_vsStun}%',
 
@@ -309,7 +309,7 @@ G.I18N['zh-CN'] = {
   // ── Buff ──
   'buff.morale.name': '猫猫士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%（战败归零）。另外全队普攻有 {stun}% 概率晕眩敌人 {stunT} 秒，全队闪避 +{evade}%。',
   'buff.frenzy.name': '吸猫狂热', 'buff.frenzy.desc': '队员每次击中敌人，自身伤害 +1%（最多 +{max}%），倒下才重新计算。当前：{list}{self}', 'buff.frenzy.self': '。{who}（装备者）另有：闪避 +{evade}%、暴击伤害 +{critDmg}%、对中毒敌人伤害 +{vsPoison}%',
-  'buff.hiss.name': '猫哈气爆甲', 'buff.hiss.desc': '全队攻击晕眩中的敌人伤害 +{v}%，飞空艇炮击冷却 -{cut} 秒',
+  'buff.claws.name': '猫抓印记', 'buff.claws.desc': '全队技能伤害有 {c}% 几率眩晕 {t} 秒；攻击眩晕中的敌人回复自己 {v}% 最大生命', 'buff.hiss.name': '猫哈气爆甲', 'buff.hiss.desc': '全队攻击晕眩中的敌人伤害 +{v}%，飞空艇炮击冷却 -{cut} 秒',
   'buff.animal_bear.name': '熊在场', 'buff.animal_bear.desc': '全队防御 {v}',
   'buff.animal_wolf.name': '狼在场', 'buff.animal_wolf.desc': '全队攻击 {v}',
   'buff.animal_owl.name': '猫头鹰在场', 'buff.animal_owl.desc': '全队暴击率 {v}',

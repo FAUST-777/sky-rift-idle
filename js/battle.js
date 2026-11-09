@@ -391,6 +391,10 @@
       if (vsB || vsP) dmg *= 1 + vsB + vsP;
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
+      if (this.party(src) && this.aura.stunHeal && this.fxv(target, 'stun') && src.alive && src.st.maxHp && src.stunHealAt !== this.time.now) {   // 貓抓印記：打暈眩敵人回血（範圍技一次出手只回一次）
+        src.stunHealAt = this.time.now;
+        this.heal(src, Math.round(src.st.maxHp * this.aura.stunHeal));
+      }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
       const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0);   // 團隊特效：暴擊傷害
@@ -586,6 +590,7 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          if (this.aura.skillStun && this.party(u) && this.valid(t) && Math.random() < (this.aura.skillStunChance || 0) * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, this.aura.skillStun);   // 貓抓印記：全隊技能傷害附帶暈眩
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
@@ -935,6 +940,7 @@
       if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
       // 貓哈氣爆甲的全隊效果
       if (this.aura.vsStun || this.aura.cannonCut) out.push({ id: 'hiss', icon: G.FX_ICON.hiss, val: `+${pct(this.aura.vsStun || 0)}%`, p: { v: pct(this.aura.vsStun || 0), cut: this.aura.cannonCut || 0 } });
+      if (this.aura.skillStun || this.aura.stunHeal) out.push({ id: 'claws', icon: G.FX_ICON.stun, val: `${this.aura.skillStun || 0}s`, p: { t: this.aura.skillStun || 0, c: pct(this.aura.skillStunChance || 0), v: pct(this.aura.stunHeal || 0) } });   // 貓抓印記的全隊效果
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);
