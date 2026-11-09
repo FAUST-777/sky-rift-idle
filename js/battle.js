@@ -388,7 +388,8 @@
       // 對流血（血騎士、詛咒油畫）、對中毒（詛咒油畫）：同一招兩個都中時相加
       const vsB = this.fxv(target, 'bleed') ? (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0) : 0;
       const vsP = this.fxv(target, 'poison') ? opts.vsPoisonSkill || 0 : 0;
-      if (vsB || vsP) dmg *= 1 + vsB + vsP;
+      const vsS = this.fxv(target, 'stun') ? opts.vsStunSkill || 0 : 0;   // 毒爪：對暈眩敵人
+      if (vsB || vsP || vsS) dmg *= 1 + vsB + vsP + vsS;
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
@@ -590,7 +591,7 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, critDmgBonus: e.critDmgBonus, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });

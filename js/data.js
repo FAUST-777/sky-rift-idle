@@ -165,7 +165,8 @@ G.SKILLS = {
   catknight: [
     // 貓咪齊射：另外給全隊動物系隊友「下一次技能傷害 +100%」（20 秒內用掉）
     A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: 1, t: 20 }] } })),
-    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
+    // 毒爪：對暈眩中的敵人技能傷害 +500%
+    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, vsStunSkill: 5, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
     A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
     A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v, party: [{ id: 'regen', v: 0.01, t: 5 }] })),   // 之後 5 秒每秒再回 1%

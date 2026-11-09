@@ -86,7 +86,7 @@ G.I18N['en'] = {
   'skill.bk_vitality.name': 'Blood Vitality', 'skill.bk_vitality.desc': 'HP +{v}%',
 
   'skill.ck_volley.name': 'Kitten Volley', 'skill.ck_volley.desc': '{v}% damage to all enemies; scratches slow their attacks by 20% for 4s. Animal-type allies get +100% damage on their next skill (within 20s)',
-  'skill.ck_toxic.name': 'Toxic Claws', 'skill.ck_toxic.desc': '{v}% damage to all enemies and Poison for 6s',
+  'skill.ck_toxic.name': 'Toxic Claws', 'skill.ck_toxic.desc': '{v}% damage to all enemies and Poison for 6s. +500% skill damage to stunned enemies',
   'skill.ck_fullburst.name': 'Full Burst', 'skill.ck_fullburst.desc': 'Every hatch opens: {v}% damage to all enemies, their attack speed -30% and DEF -20% for 5s',
   'skill.ck_rally.name': 'Meow Rally', 'skill.ck_rally.desc': 'Party ATK +{v}% for 10s',
   'skill.ck_purr.name': 'Healing Purr', 'skill.ck_purr.desc': 'Party heals {v}% HP, then 1% per second for 5s',
