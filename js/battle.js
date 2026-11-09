@@ -285,7 +285,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
-        cdr: Math.min(0.5, a.cdr || 0),
+        cdr: Math.min(G.CONFIG.cdrCap, a.cdr || 0),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -858,7 +858,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(0.5, this.aura.cdr || 0)); break; }
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, this.aura.cdr || 0)); break; }
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }

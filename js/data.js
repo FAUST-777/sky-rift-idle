@@ -20,6 +20,7 @@ G.CONFIG = {
   frenzyPerHit: 1,          // 吸貓狂熱：每次打中敵人自身傷害 +1%
   crisisHp: 0.6,            // 學者「危機意識」：任一隊友生命低於 60% 觸發
   evadeCap: 0.6,            // 閃避率上限
+  cdrCap: 0.8,              // 技能冷卻縮短上限（原本 50%）
 
   // 背包擴充
   bagExpandSlots: 5,        // 每次擴充幾格
