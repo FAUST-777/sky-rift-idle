@@ -408,7 +408,7 @@ G.SHIP_PARTS = {
   wing:    { icon: '🕊️', stat: 'floors',  v: [5, 10, 15, 20, 25], costMult: 0.9 },
   engine:  { icon: '⚙️', stat: 'floors',  v: [5, 10, 15, 20, 25], costMult: 1 },
 };
-G.SHIP_BASE_FLOORS = 5;   // 沒有穩定翼和引擎時只能到第 5 層
+G.SHIP_BASE_FLOORS = 20;  // 沒有穩定翼和引擎時只能到第 20 層（全滿 20+25+25 = 70）
 G.SHIP_COST = [
   { gold: 400,    crystal: 0 },
   { gold: 2500,   crystal: 5 },
