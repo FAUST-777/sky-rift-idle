@@ -515,6 +515,8 @@
         this.hit(u, t, mult); this.applyProcs(u, t);
         const ps = this.pStun;   // 貓貓士氣：全隊普攻機率暈眩
         if (ps && this.valid(t) && Math.random() < ps.chance * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, ps.t);
+        const bp = this.party(u) && this.aura.basicPoison;   // 貓抓印記：全隊普攻機率中毒
+        if (bp && this.valid(t) && Math.random() < bp * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'poison', 1, 5);
       };
       if (u.st.missile) {
         let i = 0;
