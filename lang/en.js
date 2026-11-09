@@ -185,7 +185,7 @@ G.I18N['en'] = {
   'skill.mc_art.name': 'Nail Art', 'skill.mc_art.desc': 'Shields you cast +{v}%',
 
   // ── Party ──
-  'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
+  'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'perk.defDownStack': 'DEF Down duration stacks (highest %, up to {cap}s)', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
   // 天空之海怪物、飛空艇提示
   'monster.bubbleCrab': 'Bubble Crab',
   'monster.skyStarfish': 'Sky Starfish',

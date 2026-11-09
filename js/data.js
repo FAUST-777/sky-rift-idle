@@ -101,7 +101,7 @@ G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 G.TEAM_SYNERGIES = [
   { id: 'wildhunt', mix: ['animal', 'physical', 'dark'],   bonus: { spdPct: 0.18, cannonInterval: 5 } },
   { id: 'triad',    mix: ['animal', 'physical', 'arcane'], bonus: { critDmg: 0.10, hpPct: 0.15, defPct: 0.01 } },
-  { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.15 },      3: { cdr: 0.24 } } },
+  { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.25 },      3: { cdr: 0.35 } } },
   { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.16 } } },
   { id: 'arcane',   type: 'arcane',   tiers: { 2: { dmgPct: 0.15 },   3: { dmgPct: 0.27 } } },
   { id: 'dark',     type: 'dark',     tiers: { 2: { debuffDur: 0.2 }, 3: { debuffDur: 0.4 } } },
@@ -132,6 +132,8 @@ G.ACTIVE_SLOTS = 4;
 G.PASSIVE_SLOTS = 4;
 G.DOT = { bleed: 0.3, poison: 0.22 };
 // 暈眩：不能攻擊也不能放技能；受到傷害 +15%、無法閃避；被觸發減益、被暴擊的機率 ×1.5
+// 破防累加（米菈 extra）：再次破防時持續時間相加、數值取最高，最多累到幾秒
+G.DEFDOWN_STACK_CAP = 30;
 G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
 const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
@@ -361,14 +363,14 @@ G.HERO_BASE  = { hp: 100, atk: 10, def: 3, spd: 1.0, crit: 5, critDmg: 1.5 };
 
 // ── 夥伴（名稱/介紹：partner.<id>.name / .bio）─────────────────────────────
 // floor = 打到第幾層後可招募
-// perk = 專屬 buff（永久、不能升級；出戰時給全隊，文字：perk.<stat>）
+// perk = 專屬 buff（永久、不能升級；出戰時給全隊，文字：perk.<stat>）；extra = 額外特殊效果（文字：perk.<extra>）
 //   cdr 技能冷卻縮短、procRate 觸發率（暴擊、流血、中毒、緩速等機率 ×(1+v)）
 G.PARTNERS = [
   { id: 'ella', floor: 2,  hair: '#d9a066', skin: '#f3d2b3', perk: { stat: 'cdr',      v: 0.10 } },
   { id: 'bram', floor: 4,  hair: '#3b2a1e', skin: '#d9a47a', perk: { stat: 'defPct',   v: 0.06 } },
   { id: 'lina', floor: 7,  hair: '#f5e6a8', skin: '#f6dcc4', perk: { stat: 'hpPct',    v: 0.08 } },
   { id: 'kael', floor: 10, hair: '#222831', skin: '#e0b895', perk: { stat: 'atkPct',   v: 0.06 } },
-  { id: 'mira', floor: 14, hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15 } },
+  { id: 'mira', floor: 14, hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15, extra: 'defDownStack' } },   // extra：破防持續時間可累加
 ];
 G.partnerRecruitCost = p => 80 * p.floor;
 G.partnerLevelCost = lv => Math.round(50 * Math.pow(1.3, lv - 1));

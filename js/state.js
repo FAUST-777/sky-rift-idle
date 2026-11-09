@@ -231,7 +231,7 @@
     G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => { if (AURA_MAX.includes(k)) aura[k] = Math.max(aura[k] || 0, v); else add(k, v); }));
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
-    G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) add(p.perk.stat, p.perk.v); });   // 出戰夥伴的專屬 buff
+    G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) { add(p.perk.stat, p.perk.v); if (p.perk.extra) aura[p.perk.extra] = 1; } });   // 出戰夥伴的專屬 buff（extra 是開關）
     G.teamSynergy().active.forEach(a => Object.entries(a.bonus).forEach(([k, v]) => {   // 團隊特效
       if (k === 'cannonInterval') aura[k] = Math.min(aura[k] || G.CANNON_INTERVAL, v);
       else add(k, v);

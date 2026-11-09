@@ -377,7 +377,9 @@
   // ── 分頁：夥伴 ───────────────────────────────────────────────────────────
   // 夥伴專屬 buff 標籤（永久、不能升級，出戰時給全隊）
   function perkTag(p) {
-    return p.perk ? `<span class="tag perk" title="${esc(t('partners.perkHint'))}">★ ${t('perk.' + p.perk.stat, { v: Math.round(p.perk.v * 100) })}</span>` : '';
+    if (!p.perk) return '';
+    const tag = txt => `<span class="tag perk" title="${esc(t('partners.perkHint'))}">★ ${txt}</span>`;
+    return tag(t('perk.' + p.perk.stat, { v: Math.round(p.perk.v * 100) })) + (p.perk.extra ? tag(t('perk.' + p.perk.extra, { cap: G.DEFDOWN_STACK_CAP })) : '');
   }
   function renderPartners() {
     const S = G.S;

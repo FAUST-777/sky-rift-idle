@@ -185,7 +185,7 @@ G.I18N['zh-TW'] = {
   'skill.mc_art.name': '指尖藝術', 'skill.mc_art.desc': '自己施放的護盾 +{v}%',
 
   // ── 夥伴 ──
-  'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
+  'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'perk.defDownStack': '破防時間可累加（取最高 %，最多 {cap} 秒）', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
   // 天空之海怪物、飛空艇提示
   'monster.bubbleCrab': '泡泡蟹',
   'monster.skyStarfish': '星空海星',

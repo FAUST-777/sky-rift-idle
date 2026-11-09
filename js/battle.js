@@ -236,6 +236,12 @@
       const dur = t * ((src.st.debuffDur || 1) + (this.party(src) ? this.aura.debuffDur || 0 : 0));   // 黑暗系團隊特效
       if (id === 'stun' && target.alive && !this.fxv(target, 'stun')) this.floatText(target.img.x, target.img.y - target.img.displayHeight - 4, G.t('battle.stun'), '#ffe066', 12);
       const val = (id === 'bleed' || id === 'poison') ? this.atkOf(src) * G.DOT[id] * v : v;
+      // 米菈：破防持續時間累加（數值取最高），上限 G.DEFDOWN_STACK_CAP 秒
+      const f = target.fx[id];
+      if (id === 'defDown' && this.party(src) && this.aura.defDownStack && f && f.t > 0 && target.alive) {
+        f.v = Math.max(f.v, val); f.t = Math.min(G.DEFDOWN_STACK_CAP, f.t + dur);
+        return;
+      }
       this.addFx(target, id, val, dur);
     }
 
