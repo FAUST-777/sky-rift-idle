@@ -59,6 +59,7 @@ G.I18N['en'] = {
   'class.druid.name': 'Druid', 'class.druid.desc': 'Calls animal spirits onto the whole party: bear for DEF, wolf for ATK, owl for crit, deer for regen. Rotate them to keep all four up.',
   'class.dogwalker.name': 'Dog Walker', 'class.dogwalker.desc': 'Sends dogs to bite enemies. Cuts party cooldowns, speeds up party attacks and boosts party skill damage.',
   'class.gymgoer.name': 'Gym-goer', 'class.gymgoer.desc': 'Shares the damage when allies get hit, and slowly regenerates HP.',
+  'class.manicurist.name': 'Manicurist', 'class.manicurist.desc': 'Grows damage-reflecting spikes on the whole party, shields the party and raises party DEF. Specializes in reflect: the harder enemies hit, the harder it bounces back.',
 
   // ── Skills ──
   'skills.points': 'Skill Points', 'skills.help': 'Only skills in slots take effect: {a} active (cast automatically) and {p} passive. You can learn 5 of each but only equip 4. Your picks are your build.',
@@ -171,6 +172,17 @@ G.I18N['en'] = {
   'skill.gy_bulk.name': 'Bulking', 'skill.gy_bulk.desc': 'HP +{v}%',
   'skill.gy_core.name': 'Core Training', 'skill.gy_core.desc': 'DEF +{v}%',
   'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%',
+  // 美甲師
+  'skill.mc_scratch.name': 'Nail Swipe', 'skill.mc_scratch.desc': '{v}% damage to all enemies',
+  'skill.mc_gel.name': 'Gel Armor', 'skill.mc_gel.desc': 'Party gains a shield worth {v}% max HP for 8s',
+  'skill.mc_spikes.name': 'Crystal Spikes', 'skill.mc_spikes.desc': 'Party reflect +{v}% for 8s',
+  'skill.mc_topcoat.name': 'Top Coat', 'skill.mc_topcoat.desc': 'Party DEF +{v}% for 10s',
+  'skill.mc_salon.name': 'Luxury Salon', 'skill.mc_salon.desc': 'Party reflect +{v}% for 8s and a shield worth 12% max HP',
+  'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party always reflects {v}% of damage taken',
+  'skill.mc_harden.name': 'Hardener', 'skill.mc_harden.desc': 'Party DEF +{v}%',
+  'skill.mc_gelcoat.name': 'Gel Care', 'skill.mc_gelcoat.desc': 'HP +{v}%',
+  'skill.mc_mirror.name': 'Mirror Finish', 'skill.mc_mirror.desc': 'Party reflect damage +{v}%',
+  'skill.mc_art.name': 'Nail Art', 'skill.mc_art.desc': 'Shields you cast +{v}%',
 
   // ── Party ──
   'perk.cdr': 'Party skill cooldown -{v}%', 'perk.defPct': 'Party DEF +{v}%', 'perk.hpPct': 'Party HP +{v}%', 'perk.atkPct': 'Party ATK +{v}%', 'perk.procRate': 'Party proc rate +{v}%', 'partners.perkHint': 'Signature perk: permanent, cannot be upgraded, applies to the whole party while this partner is deployed. Proc rate boosts crit, bleed, poison, slow and similar chances.',
@@ -203,6 +215,7 @@ G.I18N['en'] = {
   'live.dmg': 'Damage',
   'live.skillDmg': 'Skill damage',
   'live.dmgReduce': 'Damage reduction',
+  'live.reflect': 'Reflect',
   'live.debuffDur': 'Debuff duration',
   'live.shield': 'Shield',
   // 團隊特效
@@ -308,6 +321,7 @@ G.I18N['en'] = {
   'buff.evade.name': 'Evasion', 'buff.evade.desc': 'Dodge +{v}%, {s}s left',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
+  'buff.reflectUp.name': 'Reflect Up', 'buff.reflectUp.desc': 'Reflect +{v}% of damage taken, {s}s left',
   'buff.shield.name': 'Shield', 'buff.shield.desc': 'Party shields can absorb {v} more damage',
   'buff.taunt.name': 'Taunt', 'buff.taunt.desc': '{name} is drawing all enemies',
   'buff.defDown.name': 'Armor Break', 'buff.defDown.desc': 'Enemy DEF -{v}%',

@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp'];
   const DEBUFF_IDS = ['defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -262,6 +262,13 @@
     }
     skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (this.party(u) ? this.aura.skillDmg || 0 : 0); }
 
+    // 反彈率（已含鏡面甲加成）
+    reflectOf(u) {
+      if (!this.party(u)) return 0;
+      const base = ((u.special.thorns || {}).v || 0) + (this.aura.reflect || 0) + this.fxv(u, 'reflectUp');
+      return base * (1 + (this.aura.reflectPow || 0));
+    }
+
     // 即時能力值（冒險頁「即時數值」用）：吃 buff、光環、團隊特效、詛咒，隨戰鬥波動
     liveStats(u) {
       const a = this.aura, curse = this.curse || {};
@@ -277,7 +284,7 @@
         skillDmg: this.skillMult(u) - 1,
         dmgReduce: 1 - this.takenMult(u),
         debuffDur: (u.st.debuffDur || 1) + (a.debuffDur || 0) - 1,
-        shield: u.shield || 0,
+        shield: u.shield || 0, reflect: this.reflectOf(u),
       };
     }
 
@@ -388,7 +395,11 @@
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
 
       // 城牆者「尖刺城牆」反傷
-      if (target.special.thorns && !this.party(src) && src.alive) this.damage(src, Math.max(1, Math.round(dmg * target.special.thorns.v)), '#d0d0d0', false, true);
+      // 反彈：城牆者「尖刺城牆」（自己）＋ 美甲師全隊反彈光環／buff，「鏡面甲」加成反彈傷害
+      if (this.party(target) && !this.party(src) && src.alive) {
+        const r = this.reflectOf(target);
+        if (r > 0) this.damage(src, Math.max(1, Math.round(dmg * r)), '#ff9ad5', false, true);
+      }
       // 吸血
       const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
       if (ls && src.alive) src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
@@ -535,7 +546,8 @@
       (e.party || []).forEach(b => this.partyAlive().forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
-      if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.round(p.st.maxHp * e.shield); p.shieldT = 8; this.glow(p, col); });
+      // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
+      if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1))); p.shieldT = 8; this.glow(p, col); });
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
       if (e.cdCut) this.partyAlive().forEach(p => p.skills.forEach(x => { if (x !== s) x.cd = Math.max(0, x.cd - e.cdCut); }));

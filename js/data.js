@@ -85,8 +85,9 @@ G.CLASSES = {
   druid:       { core: 'buff', range: 'all', dmgType: 'animal',   color: '#4f8a4a', cape: '#2f5a2c', ranged: true,  mult: { hp: 1.05, atk: 1.0,  def: 1.0 },  missile: 'leaf', weapon: 'axe' },
   dogwalker:   { core: 'spc',  range: 'one', dmgType: 'animal',   color: '#b07a3e', cape: '#6b4a24', ranged: false, mult: { hp: 1.1,  atk: 1.15, def: 1.05 }, missile: 'dog', weapon: 'leash' },
   gymgoer:     { core: 'def',  range: 'one', dmgType: 'physical', color: '#e0703a', cape: null,      ranged: false, mult: { hp: 1.6,  atk: 0.95, def: 1.35 }, weapon: 'dumbbell' },
+  manicurist:  { core: 'def',  range: 'all', dmgType: 'arcane',   color: '#d9649e', cape: '#7a2f5c', ranged: false, mult: { hp: 1.3,  atk: 0.85, def: 1.45 }, missile: 'nail', weapon: 'claw' },
 };
-G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer'];
+G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer', 'manicurist'];
 G.CORE_ICON  = { atk: '⚔️', buff: '✨', spc: '🔮', def: '🛡️' };
 G.DMG_TYPES  = { physical: '#ffffff', animal: '#ffd27a', arcane: '#8fd3ff', dark: '#c99bff' };   // 傷害數字顏色
 G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
@@ -115,7 +116,7 @@ G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 //   drain 傷害轉生命比例  vsBleed 對流血目標額外倍率  summon 動物 id（目前沒有技能使用）  cdCut 全隊主動技能冷卻減少秒數
 // 被動：p = 'self' 自身屬性 / 'party' 全隊光環 / 'proc' 普攻附加 / 'special' 特殊機制
 //   key = 影響的屬性或機制；proc 另有 fx（狀態）、chance（'v' = 機率吃 v）、val、t
-// buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen ｜ defDown slow blind bleed poison
+// buff/debuff id：atkUp spdUp defUp dmgReduce critUp evade skillDmg regen reflectUp ｜ defDown slow blind bleed poison
 // v(rank) = 該等級數值；v2(rank) = 第二個數值（說明 {v2}）；被動有 key2 時 v2 加到 key2 屬性
 // raw: true → {v} 直接顯示不換百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
@@ -247,6 +248,22 @@ G.SKILLS = {
     P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3 }),
   ],
 
+  // 美甲師：全隊反彈傷害、護盾、防禦；特化反彈
+  //   反彈 = 隊友被敵人打到時，把「實際受到的傷害 × 反彈率」打回去（不吃攻擊力，所以敵人越痛反越痛）
+  //   全隊反彈率 = 倒刺美甲（常駐光環）＋ 水晶尖甲／頂級沙龍（限時 buff）＋ 城牆者尖刺城牆（只算自己）
+  manicurist: [
+    A('mc_scratch', 0, 6,  lin(0.7, 0.12),  v => ({ target: 'all', mult: v })),
+    A('mc_gel',     0, 14, lin(0.1, 0.03),  v => ({ target: 'none', shield: v })),
+    A('mc_spikes',  1, 15, lin(0.3, 0.08),  v => ({ target: 'none', party: [{ id: 'reflectUp', v, t: 8 }] })),
+    A('mc_topcoat', 1, 15, lin(0.2, 0.05),  v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }] })),
+    A('mc_salon',   2, 18, lin(0.45, 0.1),  v => ({ target: 'none', shield: 0.12, party: [{ id: 'reflectUp', v, t: 8 }] })),
+    P('mc_thorn',   0, lin(0.06, 0.03), 'party', 'reflect'),
+    P('mc_harden',  0, lin(0.04, 0.02), 'party', 'defPct'),
+    P('mc_gelcoat', 1, lin(0.1, 0.07),  'self', 'hpPct'),
+    P('mc_mirror',  1, lin(0.2, 0.12),  'party', 'reflectPow'),
+    P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow'),
+  ],
+
   // 健身者：幫隊友平均分攤傷害、自己緩緩回血
   gymgoer: [
     A('gy_punch',    0, 6,  lin(1.6, 0.2),   v => ({ target: 'one', mult: v })),
@@ -271,7 +288,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

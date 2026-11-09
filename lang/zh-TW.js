@@ -59,6 +59,7 @@ G.I18N['zh-TW'] = {
   'class.druid.name': '德魯伊', 'class.druid.desc': '喚來動物之靈附在全隊身上：熊加防禦、狼加攻擊、貓頭鷹加暴擊、鹿持續回血，四種可以輪流施放同時生效。',
   'class.dogwalker.name': '遛狗者', 'class.dogwalker.desc': '讓狗狗衝出去咬敵人。可以減少全隊技能冷卻、加快全隊攻擊、提升全隊技能傷害。',
   'class.gymgoer.name': '健身者', 'class.gymgoer.desc': '隊友被攻擊時幫忙平均分攤傷害，自己會緩緩回血。',
+  'class.manicurist.name': '美甲師', 'class.manicurist.desc': '讓全隊身上長出反彈傷害的尖甲，還能給全隊上護盾、提升全隊防禦。特化反彈傷害：敵人打得越痛，反彈越痛。',
 
   // ── 技能 ──
   'skills.points': '技能點', 'skills.help': '裝在格子裡的技能才會生效：主動 {a} 格（自動施放）、被動 {p} 格。學了 5 招但只能裝 4 招，選哪 4 招 = 你的 Build。',
@@ -171,6 +172,17 @@ G.I18N['zh-TW'] = {
   'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '生命 +{v}%',
   'skill.gy_core.name': '核心訓練', 'skill.gy_core.desc': '防禦 +{v}%',
   'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到傷害 -{v}%',
+  // 美甲師
+  'skill.mc_scratch.name': '指甲刮擊', 'skill.mc_scratch.desc': '全體 {v}% 傷害',
+  'skill.mc_gel.name': '凝膠護甲', 'skill.mc_gel.desc': '全隊獲得最大生命 {v}% 的護盾，8 秒',
+  'skill.mc_spikes.name': '水晶尖甲', 'skill.mc_spikes.desc': '全隊反彈 +{v}%，8 秒',
+  'skill.mc_topcoat.name': '亮油封層', 'skill.mc_topcoat.desc': '全隊防禦 +{v}%，10 秒',
+  'skill.mc_salon.name': '頂級沙龍', 'skill.mc_salon.desc': '全隊反彈 +{v}%，8 秒，並獲得最大生命 12% 的護盾',
+  'skill.mc_thorn.name': '倒刺美甲', 'skill.mc_thorn.desc': '全隊常駐反彈 {v}% 受到的傷害',
+  'skill.mc_harden.name': '硬化甲油', 'skill.mc_harden.desc': '全隊防禦 +{v}%',
+  'skill.mc_gelcoat.name': '光療保養', 'skill.mc_gelcoat.desc': '生命 +{v}%',
+  'skill.mc_mirror.name': '鏡面甲', 'skill.mc_mirror.desc': '全隊反彈傷害 +{v}%',
+  'skill.mc_art.name': '指尖藝術', 'skill.mc_art.desc': '自己施放的護盾 +{v}%',
 
   // ── 夥伴 ──
   'perk.cdr': '全隊技能冷卻 -{v}%', 'perk.defPct': '全隊防禦 +{v}%', 'perk.hpPct': '全隊生命 +{v}%', 'perk.atkPct': '全隊攻擊 +{v}%', 'perk.procRate': '全隊觸發率 +{v}%', 'partners.perkHint': '專屬能力：永久、不能升級，這位夥伴出戰時全隊生效。觸發率影響暴擊、流血、中毒、緩速等機率。',
@@ -203,6 +215,7 @@ G.I18N['zh-TW'] = {
   'live.dmg': '全體傷害',
   'live.skillDmg': '技能傷害',
   'live.dmgReduce': '減傷',
+  'live.reflect': '反彈',
   'live.debuffDur': '減益持續',
   'live.shield': '護盾',
   // 團隊特效
@@ -308,6 +321,7 @@ G.I18N['zh-TW'] = {
   'buff.evade.name': '閃避提升', 'buff.evade.desc': '閃避 +{v}%，還剩 {s} 秒',
   'buff.skillDmg.name': '技能增傷', 'buff.skillDmg.desc': '技能傷害 +{v}%，還剩 {s} 秒',
   'buff.regen.name': '持續回復', 'buff.regen.desc': '每秒回復 {v}% 生命，還剩 {s} 秒',
+  'buff.reflectUp.name': '反彈強化', 'buff.reflectUp.desc': '反彈 +{v}% 受到的傷害，還剩 {s} 秒',
   'buff.shield.name': '護盾', 'buff.shield.desc': '全隊護盾還能吸收 {v} 點傷害',
   'buff.taunt.name': '挑釁', 'buff.taunt.desc': '{name} 正在吸引所有敵人',
   'buff.defDown.name': '敵人破甲', 'buff.defDown.desc': '敵人防禦 -{v}%',

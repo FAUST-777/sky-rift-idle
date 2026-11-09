@@ -96,6 +96,7 @@
       cell('live.dmg', (L.dmg >= 0 ? '+' : '') + pc(L.dmg), L.dmg > 0 ? 'up' : L.dmg < 0 ? 'down' : ''),
       cell('live.skillDmg', '+' + pc(L.skillDmg)),
       cell('live.dmgReduce', pc(L.dmgReduce)),
+      cell('live.reflect', pc(L.reflect), L.reflect > 0 ? 'up' : ''),
       cell('live.debuffDur', '+' + pc(L.debuffDur)),
       L.shield ? cell('live.shield', G.fmt(L.shield), 'up') : '',
     ].join('');

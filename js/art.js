@@ -66,6 +66,7 @@
   const CLASS_HEAD = {
     pirate: { v: 4, color: '#2b2b2b' }, scholar: { v: 5, color: '#24304a' }, darkpainter: { v: 6, color: '#3a2450' },
     druid: { v: 2, color: '#3f6b3a' }, wallbringer: { v: 1, color: '#8a8f99' }, gymgoer: { v: 7, color: '#e04040' },
+    manicurist: { v: 6, color: '#ff8fc8' },
   };
   // 武器：一律畫職業武器（不管裝備什麼），顏色跟著裝備的武器稀有度
   function classLook(look, tier) {
@@ -247,6 +248,16 @@
       ctx.strokeStyle = dc; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(48.5, 66); ctx.quadraticCurveTo(45, 62, 46, 59); ctx.stroke(); // 尾巴
       ctx.fillStyle = '#c0392b'; ctx.fillRect(55, 63, 2, 4);                    // 項圈
+    } else if (wp.type === 'claw') {              // 美甲師：三爪拳刃，爪尖是亮粉色指甲
+      ctx.fillStyle = shade(wp.color, 20); rr(ctx, 39, 46, 9, 8, 2); ctx.fill();            // 護手
+      ctx.strokeStyle = shade(wp.color, -30); ctx.lineWidth = 1; rr(ctx, 39, 46, 9, 8, 2); ctx.stroke();
+      ctx.lineCap = 'round';
+      [-4, 0, 4].forEach(d => {
+        ctx.strokeStyle = '#d8dde6'; ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.moveTo(47, 50 + d * 0.8); ctx.quadraticCurveTo(55, 46 + d, 60, 38 + d * 1.6); ctx.stroke();
+        ctx.fillStyle = '#ff5fae'; ctx.beginPath(); ctx.arc(60, 38 + d * 1.6, 1.9, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.fillRect(58, 33, 1.5, 1.5);             // 亮晶晶
     } else if (wp.type === 'dumbbell') {          // 健身者：啞鈴
       ctx.fillStyle = '#555'; ctx.fillRect(39, 49, 10, 3);
       ctx.fillStyle = shade(wp.color, -30); ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
@@ -505,6 +516,12 @@
     bullet(ctx) {      // 海盜：鉛彈＋火光尾
       ctx.fillStyle = 'rgba(255,190,80,.6)'; ctx.beginPath(); ctx.ellipse(10, 11, 9, 2.5, 0, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#3a3a3a'; ctx.beginPath(); ctx.arc(20, 11, 3.5, 0, Math.PI * 2); ctx.fill();
+    },
+    nail(ctx) {        // 美甲師：飛出去的水晶甲片
+      ctx.fillStyle = G.pick(['#ff5fae', '#ff9ad5', '#c86bff', '#ffd1ec']);
+      ctx.beginPath(); ctx.moveTo(4, 11); ctx.quadraticCurveTo(8, 4, 20, 6); ctx.quadraticCurveTo(27, 11, 20, 16); ctx.quadraticCurveTo(8, 18, 4, 11); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.ellipse(17, 9, 3.5, 1.5, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,200,240,.5)'; ctx.fillRect(0, 10, 3, 2);
     },
     leaf(ctx) {        // 德魯伊：葉刃
       ctx.fillStyle = '#5fae4f'; ctx.beginPath(); ctx.moveTo(2, 11); ctx.quadraticCurveTo(14, 1, 26, 11); ctx.quadraticCurveTo(14, 21, 2, 11); ctx.fill();
