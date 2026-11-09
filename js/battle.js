@@ -500,6 +500,15 @@
       const targets = u.st.range === 'all' ? this.enemiesAlive() : [this.targetFor(u)].filter(Boolean);
       if (!targets.length) return;
       this.gainMorale(u);
+      // 健身者「耐力」：機率肌肉衝擊，全體小兵（不含層主）額外受到等同自己目前生命的傷害（無視防禦）
+      if (u.st.hpSlam && Math.random() < u.st.hpSlam * this.procMult(u)) {
+        const minions = this.enemiesAlive().filter(e => !e.boss);
+        if (minions.length) {
+          this.floatText(u.img.x, u.img.y - u.img.displayHeight - 14, G.t('battle.hpSlam'), '#ffb36b', 15, 900);
+          minions.forEach(e => this.damage(e, Math.max(1, Math.round(u.hp)), '#ffb36b', true, true));
+          this.checkWaveEnd();
+        }
+      }
       const shots = u.st.shots || 1;
       const mult = G.BASIC_MULT[u.st.range || 'one'] * (shots > 1 ? 0.6 : 1);
       const onHit = t => {

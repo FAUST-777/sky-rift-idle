@@ -314,7 +314,8 @@ G.SKILLS = {
     // 增肌：全隊生命 +12%→44%；健身者自己再多一份（自身 = 全隊那份 ＋ 同樣數值）
     P('gy_bulk',      1, lin(0.12, 0.08), 'party', 'hpPct', { also: { hpPct: lin(0.12, 0.08) } }),
     P('gy_core',      1, lin(0.08, 0.06), 'self', 'defPct'),
-    P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce'),
+    // 耐力：受到傷害 -4%→16%；普攻 5%→25% 機率「肌肉衝擊」：全體小兵（層主除外）額外受到等同自己目前生命的傷害
+    P('gy_endurance', 2, lin(0.04, 0.03), 'self', 'dmgReduce', { also: { hpSlam: lin(0.05, 0.05) } }),
   ],
 };
 

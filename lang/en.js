@@ -171,7 +171,7 @@ G.I18N['en'] = {
   'skill.gy_recovery.name': 'Plank Recovery', 'skill.gy_recovery.desc': 'Party regenerates {v}% HP per second, party max HP +{party_hpPct}%',
   'skill.gy_bulk.name': 'Bulk Up', 'skill.gy_bulk.desc': 'Party HP +{v}%; the Gym-goer gets another +{hpPct}% (double effect)',
   'skill.gy_core.name': 'Core Training', 'skill.gy_core.desc': 'DEF +{v}%',
-  'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%',
+  'skill.gy_endurance.name': 'Endurance', 'skill.gy_endurance.desc': 'Damage taken -{v}%; basic attacks have a {hpSlam}% chance to unleash a Muscle Slam, dealing damage equal to your current HP to all minions (not bosses)',
   // 美甲師
   'skill.mc_scratch.name': 'Nail Swipe', 'skill.mc_scratch.desc': '{v}% damage to all enemies',
   'skill.mc_gel.name': 'Gel Armor', 'skill.mc_gel.desc': 'Party gains a shield worth {v}% max HP for 8s',
@@ -304,7 +304,7 @@ G.I18N['en'] = {
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
   'battle.morale': '🎖️ Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
-  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun',
+  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.hpSlam': 'Muscle Slam!',
 
   // ── Buffs ──
   'buff.morale.name': 'Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}%. Resets on defeat.',

@@ -171,7 +171,7 @@ G.I18N['zh-CN'] = {
   'skill.gy_recovery.name': '棒式恢复', 'skill.gy_recovery.desc': '全队每秒恢复 {v}% 生命，全队最大生命 +{party_hpPct}%',
   'skill.gy_bulk.name': '增肌', 'skill.gy_bulk.desc': '全队生命 +{v}%，健身者自己再 +{hpPct}%（效果加倍）',
   'skill.gy_core.name': '核心训练', 'skill.gy_core.desc': '防御 +{v}%',
-  'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到伤害 -{v}%',
+  'skill.gy_endurance.name': '耐力', 'skill.gy_endurance.desc': '受到伤害 -{v}%；普攻有 {hpSlam}% 概率发动肌肉冲击，对全体小兵（层主除外）额外造成等同自己当前生命的伤害',
   // 美甲師
   'skill.mc_scratch.name': '指甲刮击', 'skill.mc_scratch.desc': '全体 {v}% 伤害',
   'skill.mc_gel.name': '凝胶护甲', 'skill.mc_gel.desc': '全队获得最大生命 {v}% 的护盾，8 秒',
@@ -304,7 +304,7 @@ G.I18N['zh-CN'] = {
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
   'battle.morale': '🎖️ 士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.hpSlam': '肌肉冲击！',
 
   // ── Buff ──
   'buff.morale.name': '士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%。战败会归零。',
