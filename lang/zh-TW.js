@@ -125,7 +125,7 @@ G.I18N['zh-TW'] = {
   'skill.pi_plunder.name': '掠奪', 'skill.pi_plunder.desc': '單體 {v}% 傷害，自身攻擊 +20%，6 秒',
   'skill.pi_nimble.name': '閃身步！！', 'skill.pi_nimble.desc': '閃避 +{v}%',
   'skill.pi_sharp.name': '神槍手', 'skill.pi_sharp.desc': '暴擊率 +{v}%；全隊物理系角色暴擊率 +{party_physCrit}%',
-  'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻擊必定暴擊，超過 100% 的暴擊率全部轉成暴擊傷害（每 1% 轉 1%）；閃避 {v}%',
+  'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻擊必定暴擊，超過 100% 的暴擊率全部轉成暴擊傷害（每 1% 轉 1%）；閃避 {v}%。全隊物理系隊員的傷害技能每累積 50 次，自己發動「狙擊爆頭！！！」：4 秒內輸出最終傷害 ×5（發動間隔 5 秒）',
   'skill.pi_ruthless.name': '冷血', 'skill.pi_ruthless.desc': '暴擊傷害 +{v}%',
   'skill.pi_riposte.name': '閃避反擊', 'skill.pi_riposte.desc': '閃避成功時開槍反擊，{v}% 傷害',
 
@@ -305,7 +305,7 @@ G.I18N['zh-TW'] = {
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
   'battle.morale': '🎖️ 貓貓士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙擊爆頭！！！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
 
   // ── Buff ──
   'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',
@@ -328,6 +328,8 @@ G.I18N['zh-TW'] = {
   'buff.fever.name': '血之狂熱', 'buff.fever.desc': '全隊攻速 +100%、技能冷卻 -{cdr}%、每秒回復 {regen}% 最大生命，還剩 {s} 秒',
   'buff.nextExecute.name': '處決蓄勢', 'buff.nextExecute.desc': '下一次處決傷害 +{v}%',
   'buff.bloodRush.name': '血性加速', 'buff.bloodRush.desc': '全隊技能冷卻一律 1 秒，還剩 {s} 秒',
+  'buff.snipeX.name': '狙擊爆頭！！！', 'buff.snipeX.desc': '輸出最終傷害 ×5，還剩 {s} 秒',
+  'buff.snipeCount.name': '狙擊準備', 'buff.snipeCount.desc': '全隊物理系傷害技能累積 {v}/50 次',
   'buff.skillDmg.name': '技能增傷', 'buff.skillDmg.desc': '技能傷害 +{v}%，還剩 {s} 秒',
   'buff.regen.name': '持續回復', 'buff.regen.desc': '每秒回復 {v}% 生命，還剩 {s} 秒',
   'buff.nextSkill.name': '下次技能強化', 'buff.nextSkill.desc': '下一次攻擊技能傷害 +{v}%（還剩 {s} 秒）',

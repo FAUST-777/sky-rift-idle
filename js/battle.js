@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -245,6 +245,19 @@
     }
     rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
 
+    // 美式居合：全隊物理系隊員的傷害技能累積 50 次 → 有美式居合的海盜「狙擊爆頭！！！」4 秒，輸出最終傷害 ×5（發動間隔 5 秒）
+    snipeTick() {
+      const p = this.partyAlive().find(x => x.st.iai);
+      if (!p) return;
+      this.snipeCount = (this.snipeCount || 0) + 1;
+      const now = this.time.now;
+      if (this.snipeCount >= 50 && !(this.snipeNext && now < this.snipeNext)) {
+        this.snipeCount = 0; this.snipeNext = now + 5000;
+        this.addFx(p, 'snipeX', 4, 4); this.glow(p, '#ffd23f');
+        this.floatText(p.img.x, this.barY(p) - 40, G.t('battle.snipe'), '#ffd23f', 17, 1200);
+      }
+    }
+
     feverSum() {
       if (!(this.fever && this.fever.t > 0)) return 0;
       return this.partyAlive().filter(p => p.kind !== 'summon').reduce((a, p) => a + (p.st.iai ? 100 : Math.min(100, this.critOf(p))), 0);
@@ -447,6 +460,7 @@
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
       if (crit && opts.critFinalX) dmg *= opts.critFinalX;   // 爆頭！！！：暴擊時最終傷害 ×3
+      if (this.fxv(src, 'snipeX')) dmg *= 1 + this.fxv(src, 'snipeX');   // 狙擊爆頭！！！：最終傷害 ×5
       if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2
 
       // 健身者「健身夥伴」：隊友被打時，分一部分傷害到自己身上
@@ -651,6 +665,7 @@
       const exB = e.useNextExecute && targets.length ? this.fxv(u, 'nextExecute') : 0;   // 撕裂：下一次處決加傷害
       if (exB) { delete u.fx.nextExecute; nextBonus += exB; }
       if (e.mult && targets.length) this.gainMorale(u);
+      if (e.mult && targets.length && this.party(u) && u.kind !== 'summon' && u.st.dmgType === 'physical') this.snipeTick();   // 美式居合：物理技能計數
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
         if (u.st.missile) targets.forEach((t, i) => { for (let h = 0; h < Math.min(3, hits); h++) this.shoot(u, t, u.st.missile, i * 3 + h); });
@@ -1038,6 +1053,7 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      if (party.some(u => u.st.iai)) out.push({ id: 'snipeCount', icon: G.FX_ICON.snipeCount, val: `${Math.min(50, this.snipeCount || 0)}/50`, p: { v: Math.min(50, this.snipeCount || 0) } });
       if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
