@@ -673,7 +673,7 @@
       ${renderNets()}
       <div class="card">
         <h3>${t('home.pets')} <small>${t('home.petsInfo', { n: S.pets.length, cap: petCap })}</small></h3>
-        <div class="pets">${S.pets.map((p, i) => `<div class="pet"><canvas data-pet="${i}"></canvas><small>${esc(G.petName(p))}</small><small class="gold">${petBonusText(p)}</small></div>`).join('') || `<span class="muted">${t('home.noPets')}</span>`}</div>
+        <div class="pets">${S.pets.map((p, i) => `<div class="pet"><button class="pet-x" data-act="petsell" data-i="${i}" aria-label="sell">✕</button><canvas data-pet="${i}"></canvas><small>${esc(G.petName(p))}</small><small class="gold">${petBonusText(p)}</small></div>`).join('') || `<span class="muted">${t('home.noPets')}</span>`}</div>
       </div>
       ${renderDex()}`;
   }
@@ -854,6 +854,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'prologue': UI.nextPrologue(); break;
       case 'settings': UI.modalKind = 'settings'; settingsModal(); break;
       case 'exchange': exchangeModal(); break;
+      case 'petsell': {
+        const p = S.pets[+d.i]; if (!p) break;
+        UI.modal(`<h2>${t('pet.sellTitle')}</h2><p>${t('pet.sellBody', { name: esc(G.petName(p)), n: G.petSellPrice(p), bonus: petBonusText(p) })}</p>
+          <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn good" data-act="petsell2" data-i="${d.i}">${t('pet.sellConfirm', { n: G.petSellPrice(p) })}</button></div>`);
+        break;
+      }
+      case 'petsell2': UI.close(); G.sellPet(+d.i); break;
       case 'exdo': {
         const n = d.n === 'max' ? G.exchangeMax(d.dir) : d.n === 'input' ? +($('exN') || {}).value : +d.n;
         if (G.exchange(d.dir, n)) exchangeModal();

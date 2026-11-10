@@ -714,6 +714,18 @@
     G.emit('home'); G.emit('party');
   };
 
+  // 賣掉捕獲的怪物：換雲晶，增益跟著消失（圖鑑紀錄保留）
+  G.sellPet = function (i) {
+    const p = G.S.pets[i];
+    if (!p) return;
+    const price = G.petSellPrice(p);
+    G.S.pets.splice(i, 1);
+    G.S.crystal += price;
+    toast('toast.petSold', { name: G.petName(p), n: price });
+    G.save();
+    G.emit('home'); G.emit('party');
+  };
+
   // ── 怪物圖鑑 ─────────────────────────────────────────────────────────────
   G.dexMark = function (id, kind, S = G.S) {
     const e = S.dex[id] = S.dex[id] || { seen: false, caught: false, seenClaimed: false, caughtClaimed: false };

@@ -374,6 +374,10 @@ G.I18N['zh-CN'] = {
   'ex.buyN': '用金币换这么多云晶',
   'ex.sellN': '把这么多云晶换成金币',
   'toast.exchanged': '兑换完成：{from} → {to}',
+  'pet.sellTitle': '卖掉怪物？',
+  'pet.sellBody': '把「{name}」卖掉，可以拿到 {n} 云晶。卖掉后它的增益（{bonus}）会消失，图鉴记录会保留。',
+  'pet.sellConfirm': '卖掉（+{n}💎）',
+  'toast.petSold': '卖掉了 {name}，获得 {n} 云晶',
   'toast.notEnoughGold': '金币不够', 'toast.notEnoughCrystal': '云晶不够', 'toast.bought': '买了 {name}，到家园点空格摆放',
   'toast.capReached': '飞空艇只能到第 {n} 层，升级「侧面稳定翼」或「引擎」才能继续往上', 'toast.reviveNeed': '云晶不够，需要 {n} 💎',
 

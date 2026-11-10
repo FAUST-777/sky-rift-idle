@@ -484,15 +484,16 @@ G.curseFor = f => {
 
 // ── 捕獸網（裝備型，名稱：net.<id>）：裝一張就永久生效 ────────────────────
 G.NETS = [
-  { id: 'spider',  icon: '🕸️', rate: 0.01, gold: 300,    crystal: 0 },
-  { id: 'fishing', icon: '🎣', rate: 0.02, gold: 2000,   crystal: 0 },
-  { id: 'wire',    icon: '⛓️', rate: 0.03, gold: 8000,   crystal: 10 },
-  { id: 'money',   icon: '💰', rate: 0.04, gold: 30000,  crystal: 40 },
-  { id: 'mystery', icon: '🔮', rate: 0.05, gold: 100000, crystal: 120 },
+  { id: 'spider',  icon: '🕸️', rate: 0.06, gold: 300,    crystal: 0 },
+  { id: 'fishing', icon: '🎣', rate: 0.07, gold: 2000,   crystal: 0 },
+  { id: 'wire',    icon: '⛓️', rate: 0.12, gold: 8000,   crystal: 10 },
+  { id: 'money',   icon: '💰', rate: 0.17, gold: 30000,  crystal: 40 },
+  { id: 'mystery', icon: '🔮', rate: 0.25, gold: 100000, crystal: 120 },
 ];
 
 // ── 怪物圖鑑：打倒層主登錄該層怪物、捕獲再點亮一次，各領一次雲晶 ─────────
 G.dexReward = (tier, kind) => (kind === 'caught' ? 10 + tier * 5 : 3 + tier * 2);
+G.petSellPrice = p => 5 + Math.max(0, G.monsterTierOf(p.id)) * 3;   // 賣掉捕獲的怪物換雲晶
 G.monsterTierOf = id => G.MONSTER_TIERS.findIndex(t => t.some(m => m.id === id));
 
 // 捕獲的怪物：隨機一個小增益（全隊），主要是收集用

@@ -374,6 +374,10 @@ G.I18N['en'] = {
   'ex.buyN': 'Buy this many crystals',
   'ex.sellN': 'Sell this many crystals',
   'toast.exchanged': 'Exchanged: {from} → {to}',
+  'pet.sellTitle': 'Sell this monster?',
+  'pet.sellBody': 'Sell “{name}” for {n} crystals. Its bonus ({bonus}) will be lost; your dex record stays.',
+  'pet.sellConfirm': 'Sell (+{n}💎)',
+  'toast.petSold': 'Sold {name} for {n} crystals',
   'toast.notEnoughGold': 'Not enough gold', 'toast.notEnoughCrystal': 'Not enough Cloud Crystals', 'toast.bought': 'Bought {name}. Place it in your Home',
   'toast.capReached': 'Your airship only reaches Floor {n}. Upgrade the Side Stabilizers or Engine to go higher', 'toast.reviveNeed': 'Not enough Cloud Crystals. Need {n} 💎',
 
