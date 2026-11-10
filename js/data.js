@@ -243,7 +243,7 @@ G.SKILLS = {
     A('pi_doubletap', 0, 5,  lin(1.2, 0.15), v => ({ target: 'one', mult: v, hits: 2 })),
     A('pi_headshot',  0, 9,  lin(3.0, 0.35), v => ({ target: 'one', mult: v, critBonus: 20, critFinalX: 3 })),   // 爆頭！！！：暴擊率 +50% 再 -30%（淨 +20%），暴擊時最終傷害 ×3
     // 舷砲齊射：連開 5 槍；另外額外發動一次飛空艇砲擊，這發傷害 +10%→77%（不影響砲擊的計時）
-    A('pi_broadside', 1, 12, lin(0.5, 0.08), (v, r) => ({ target: 'one', mult: v, hits: 5, cannonShot: lin(0.1, 0.1675)(r) }), { descV: { cannon: lin(0.1, 0.1675) } }),
+    A('pi_broadside', 1, 12, lin(0.5, 0.08), (v, r) => ({ target: 'one', mult: v, hits: 5, cannonShot: lin(0.1, 0.1675)(r), tauntCdr: { v: 0.5, t: 5 } }), { descV: { cannon: lin(0.1, 0.1675) } }),
     // 煙霧彈：自己閃避 +30%→54%；另外全隊閃避 +15%→30%（6 秒，跟自己的取高）、其他隊友立刻回 2% 最大生命
     A('pi_smoke',     1, 14, lin(0.3, 0.06), (v, r) => ({ target: 'none', self: [{ id: 'evade', v, t: 6 }], party: [{ id: 'evade', v: lin(0.15, 0.0375)(r), t: 6 }], healOthers: 0.02 }),
       { descV: { party: lin(0.15, 0.0375) } }),
@@ -359,7 +359,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

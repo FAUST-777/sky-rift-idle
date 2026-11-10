@@ -120,7 +120,7 @@ G.I18N['zh-TW'] = {
 
   'skill.pi_doubletap.name': '雙槍連射', 'skill.pi_doubletap.desc': '雙槍 2 發，每發 {v}% 傷害',
   'skill.pi_headshot.name': '爆頭！！！', 'skill.pi_headshot.desc': '單體 {v}% 傷害，暴擊率 +50%、再 -30%（合計 +20%）；暴擊時最終傷害 ×3',
-  'skill.pi_broadside.name': '舷砲齊射', 'skill.pi_broadside.desc': '連開 5 槍，每發 {v}% 傷害；並額外發動一次飛空艇砲擊，這發砲擊傷害 +{cannon}%',
+  'skill.pi_broadside.name': '舷砲齊射', 'skill.pi_broadside.desc': '連開 5 槍，每發 {v}% 傷害；並額外發動一次飛空艇砲擊，這發砲擊傷害 +{cannon}%。施放時如果有其他隊友正在挑釁，全隊技能冷卻 -50%，5 秒',
   'skill.pi_smoke.name': '煙霧彈', 'skill.pi_smoke.desc': '自身閃避 +{v}%，6 秒；另外全隊閃避 +{party}%（6 秒），其他隊友立刻回復 2% 最大生命',
   'skill.pi_plunder.name': '掠奪', 'skill.pi_plunder.desc': '單體 {v}% 傷害，自身攻擊 +20%，6 秒',
   'skill.pi_nimble.name': '閃身步！！', 'skill.pi_nimble.desc': '閃避 +{v}%',
@@ -305,7 +305,7 @@ G.I18N['zh-TW'] = {
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
   'battle.morale': '🎖️ 貓貓士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙擊爆頭！！！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙擊爆頭！！！', 'battle.cover_fire': '掩護射擊！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
 
   // ── Buff ──
   'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',
@@ -330,6 +330,7 @@ G.I18N['zh-TW'] = {
   'buff.bloodRush.name': '血性加速', 'buff.bloodRush.desc': '全隊技能冷卻一律 1 秒，還剩 {s} 秒',
   'buff.snipeX.name': '狙擊爆頭！！！', 'buff.snipeX.desc': '輸出最終傷害 ×10，還剩 {s} 秒',
   'buff.snipeCount.name': '狙擊準備', 'buff.snipeCount.desc': '全隊物理系傷害技能累積 {v}/50 次',
+  'buff.coverFire.name': '掩護射擊', 'buff.coverFire.desc': '全隊技能冷卻 -{v}%，還剩 {s} 秒',
   'buff.skillDmg.name': '技能增傷', 'buff.skillDmg.desc': '技能傷害 +{v}%，還剩 {s} 秒',
   'buff.regen.name': '持續回復', 'buff.regen.desc': '每秒回復 {v}% 生命，還剩 {s} 秒',
   'buff.nextSkill.name': '下次技能強化', 'buff.nextSkill.desc': '下一次攻擊技能傷害 +{v}%（還剩 {s} 秒）',

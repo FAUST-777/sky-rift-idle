@@ -120,7 +120,7 @@ G.I18N['zh-CN'] = {
 
   'skill.pi_doubletap.name': '双枪连射', 'skill.pi_doubletap.desc': '双枪 2 发，每发 {v}% 伤害',
   'skill.pi_headshot.name': '爆头！！！', 'skill.pi_headshot.desc': '单体 {v}% 伤害，暴击率 +50%、再 -30%（合计 +20%）；暴击时最终伤害 ×3',
-  'skill.pi_broadside.name': '舷炮齐射', 'skill.pi_broadside.desc': '连开 5 枪，每发 {v}% 伤害；并额外发动一次飞空艇炮击，这发炮击伤害 +{cannon}%',
+  'skill.pi_broadside.name': '舷炮齐射', 'skill.pi_broadside.desc': '连开 5 枪，每发 {v}% 伤害；并额外发动一次飞空艇炮击，这发炮击伤害 +{cannon}%。施放时如果有其他队友正在挑衅，全队技能冷却 -50%，5 秒',
   'skill.pi_smoke.name': '烟雾弹', 'skill.pi_smoke.desc': '自身闪避 +{v}%，6 秒；另外全队闪避 +{party}%（6 秒），其他队友立刻回复 2% 最大生命',
   'skill.pi_plunder.name': '掠夺', 'skill.pi_plunder.desc': '单体 {v}% 伤害，自身攻击 +20%，6 秒',
   'skill.pi_nimble.name': '闪身步！！', 'skill.pi_nimble.desc': '闪避 +{v}%',
@@ -305,7 +305,7 @@ G.I18N['zh-CN'] = {
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
   'battle.morale': '🎖️ 猫猫士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.fever': '血之狂热！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙击爆头！！！', 'battle.bossSlam': '巨力重击！！！！！', 'battle.hpSlam': '肌肉冲击！！！！！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.fever': '血之狂热！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙击爆头！！！', 'battle.cover_fire': '掩护射击！', 'battle.bossSlam': '巨力重击！！！！！', 'battle.hpSlam': '肌肉冲击！！！！！',
 
   // ── Buff ──
   'buff.morale.name': '猫猫士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%（战败归零）。另外全队普攻有 {stun}% 概率晕眩敌人 {stunT} 秒，全队闪避 +{evade}%。',
@@ -330,6 +330,7 @@ G.I18N['zh-CN'] = {
   'buff.bloodRush.name': '血性加速', 'buff.bloodRush.desc': '全队技能冷却一律 1 秒，还剩 {s} 秒',
   'buff.snipeX.name': '狙击爆头！！！', 'buff.snipeX.desc': '输出最终伤害 ×10，还剩 {s} 秒',
   'buff.snipeCount.name': '狙击准备', 'buff.snipeCount.desc': '全队物理系伤害技能累积 {v}/50 次',
+  'buff.coverFire.name': '掩护射击', 'buff.coverFire.desc': '全队技能冷却 -{v}%，还剩 {s} 秒',
   'buff.skillDmg.name': '技能增伤', 'buff.skillDmg.desc': '技能伤害 +{v}%，还剩 {s} 秒',
   'buff.regen.name': '持续恢复', 'buff.regen.desc': '每秒恢复 {v}% 生命，还剩 {s} 秒',
   'buff.nextSkill.name': '下次技能强化', 'buff.nextSkill.desc': '下一次攻击技能伤害 +{v}%（还剩 {s} 秒）',

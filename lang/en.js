@@ -120,7 +120,7 @@ G.I18N['en'] = {
 
   'skill.pi_doubletap.name': 'Double Tap', 'skill.pi_doubletap.desc': '2 shots of {v}% damage',
   'skill.pi_headshot.name': 'Headshot!!!', 'skill.pi_headshot.desc': '{v}% damage to one enemy, crit chance +50% then -30% (net +20%); on crit, final damage x3',
-  'skill.pi_broadside.name': 'Broadside', 'skill.pi_broadside.desc': 'Fire 5 shots, each dealing {v}% damage; also triggers an extra airship cannon shot with +{cannon}% damage',
+  'skill.pi_broadside.name': 'Broadside', 'skill.pi_broadside.desc': 'Fire 5 shots, each dealing {v}% damage; also triggers an extra airship cannon shot with +{cannon}% damage. If another ally is taunting when cast, party skill cooldowns -50% for 5s',
   'skill.pi_smoke.name': 'Smoke Bomb', 'skill.pi_smoke.desc': 'Own dodge +{v}% for 6s; party dodge +{party}% for 6s, and other allies instantly heal 2% max HP',
   'skill.pi_plunder.name': 'Plunder', 'skill.pi_plunder.desc': '{v}% damage to one enemy, own ATK +20% for 6s',
   'skill.pi_nimble.name': 'Sidestep!!', 'skill.pi_nimble.desc': 'Dodge +{v}%',
@@ -305,7 +305,7 @@ G.I18N['en'] = {
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
   'battle.morale': '🎖️ Kitty Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
-  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bloodRush': 'Blood Rush!', 'battle.snipe': 'Sniper Headshot!!!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
+  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bloodRush': 'Blood Rush!', 'battle.snipe': 'Sniper Headshot!!!', 'battle.cover_fire': 'Covering Fire!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
 
   // ── Buffs ──
   'buff.morale.name': 'Kitty Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}% (resets on defeat). Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{evade}%.',
@@ -330,6 +330,7 @@ G.I18N['en'] = {
   'buff.bloodRush.name': 'Blood Rush', 'buff.bloodRush.desc': 'All party skill cooldowns are 1s, {s}s left',
   'buff.snipeX.name': 'Sniper Headshot!!!', 'buff.snipeX.desc': 'Final damage x10, {s}s left',
   'buff.snipeCount.name': 'Sniper Ready', 'buff.snipeCount.desc': 'Physical damage skills: {v}/50',
+  'buff.coverFire.name': 'Covering Fire', 'buff.coverFire.desc': 'Party skill cooldown -{v}%, {s}s left',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
   'buff.nextSkill.name': 'Next Skill Up', 'buff.nextSkill.desc': 'Next attack skill deals +{v}% damage ({s}s left)',

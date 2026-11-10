@@ -243,6 +243,7 @@
       this.units.forEach(p => { if (p.alive && p.skills) p.skills.forEach(s => { s.cd = Math.min(s.cd, 1); }); });
       if (fresh) this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.bloodRush'), '#ff6b8a', 15, 1000);
     }
+    cdrBoostV() { return this.cdrBoost && this.cdrBoost.t > 0 ? this.cdrBoost.v : 0; }
     rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
 
     // 美式居合：全隊物理系隊員的傷害技能累積 50 次 → 有美式居合的海盜「狙擊爆頭！！！」4 秒，輸出最終傷害 ×10（發動間隔 5 秒）
@@ -336,7 +337,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
-        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100),
+        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100 + this.cdrBoostV()),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -702,6 +703,12 @@
       (e.selfDebuff || []).forEach(b => this.addFx(u, b.id, b.v, bt(b)));   // 施放者自己的代價
       if (e.hpCost) { const c = Math.floor(u.hp * e.hpCost); if (c > 0) { u.hp = Math.max(1, u.hp - c); this.floatText(u.img.x, this.barY(u) - 6, '-' + c, '#ff6b6b', 13, 700); } }   // 扣目前生命
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
+      // 舷砲齊射：施放時有其他隊友正在挑釁 → 全隊技能冷卻 -50%，5 秒（跟其他冷卻縮短相加，受上限）
+      if (e.tauntCdr && this.partyAlive().some(p => p !== u && p.taunt && p.taunt.t > 0)) {
+        this.cdrBoost = { v: e.tauntCdr.v, t: e.tauntCdr.t };
+        this.partyAlive().forEach(p => this.glow(p, '#9fd8ff'));
+        this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.cover_fire'), '#9fd8ff', 15, 1000);
+      }
       if (e.cannonShot && G.cannonMult() > 0) this.fireCannon(e.cannonShot);   // 舷砲齊射：額外一發船砲
       if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
@@ -942,6 +949,7 @@
     fightTick(dt) {
       if (this.fever && this.fever.t > 0) this.fever.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
+      if (this.cdrBoost && this.cdrBoost.t > 0) this.cdrBoost.t -= dt;
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
       this.units.forEach(u => this.syncHpBoost(u));   // 野性狂暴到期：最大生命恢復
@@ -965,7 +973,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100)); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100 + this.cdrBoostV())); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }
@@ -1054,6 +1062,7 @@
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
       if (party.some(u => u.st.iai)) out.push({ id: 'snipeCount', icon: G.FX_ICON.snipeCount, val: `${Math.min(50, this.snipeCount || 0)}/50`, p: { v: Math.min(50, this.snipeCount || 0) } });
+      if (this.cdrBoostV()) out.push({ id: 'coverFire', icon: G.FX_ICON.coverFire, val: `${Math.ceil(this.cdrBoost.t)}s`, p: { v: pct(this.cdrBoost.v), s: Math.ceil(this.cdrBoost.t) } });
       if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
