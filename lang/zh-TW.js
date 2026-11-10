@@ -120,7 +120,7 @@ G.I18N['zh-TW'] = {
 
   'skill.pi_doubletap.name': '雙槍連射', 'skill.pi_doubletap.desc': '雙槍 2 發，每發 {v}% 傷害',
   'skill.pi_headshot.name': '爆頭', 'skill.pi_headshot.desc': '單體 {v}% 傷害，暴擊率 +50%',
-  'skill.pi_broadside.name': '舷砲齊射', 'skill.pi_broadside.desc': '連開 5 槍，每發 {v}% 傷害',
+  'skill.pi_broadside.name': '舷砲齊射', 'skill.pi_broadside.desc': '連開 5 槍，每發 {v}% 傷害；並額外發動一次飛空艇砲擊，這發砲擊傷害 +{cannon}%',
   'skill.pi_smoke.name': '煙霧彈', 'skill.pi_smoke.desc': '自身閃避 +{v}%，6 秒；另外全隊閃避 +{party}%（6 秒），其他隊友立刻回復 2% 最大生命',
   'skill.pi_plunder.name': '掠奪', 'skill.pi_plunder.desc': '單體 {v}% 傷害，自身攻擊 +20%，6 秒',
   'skill.pi_nimble.name': '閃身步！！', 'skill.pi_nimble.desc': '閃避 +{v}%',

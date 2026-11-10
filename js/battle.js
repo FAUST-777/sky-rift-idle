@@ -638,6 +638,7 @@
       (e.selfDebuff || []).forEach(b => this.addFx(u, b.id, b.v, bt(b)));   // 施放者自己的代價
       if (e.hpCost) { const c = Math.floor(u.hp * e.hpCost); if (c > 0) { u.hp = Math.max(1, u.hp - c); this.floatText(u.img.x, this.barY(u) - 6, '-' + c, '#ff6b6b', 13, 700); } }   // 扣目前生命
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
+      if (e.cannonShot && G.cannonMult() > 0) this.fireCannon(e.cannonShot);   // 舷砲齊射：額外一發船砲
       if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
@@ -914,21 +915,28 @@
         if (this.cannonT <= 0) {
           const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
           this.cannonT = G.cannonInterval(this.aura) / (sk ? 2 : 1);   // 團隊特效、貓哈氣爆甲可縮短；速寫期間減半
-          const t = this.enemiesAlive()[0];
-          const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
-          const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, 5, 0x222222).setDepth(40);
-          this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
-            ball.destroy();
-            if (this.valid(t)) {
-              const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
-              this.hit(src, t, G.cannonMult() * cvd); this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
-              if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
-              this.checkWaveEnd();
-            }
-          } });
+          this.fireCannon(0);
         }
       }
       this.checkWaveEnd();
+    }
+
+    // 發射一發船砲；bonus = 這一發的額外傷害（舷砲齊射）
+    fireCannon(bonus) {
+      const t = this.enemiesAlive()[0];
+      if (!t || !this.hero || !this.shipImg) return;
+      const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
+      const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
+      const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, bonus ? 7 : 5, bonus ? 0x7a2f2f : 0x222222).setDepth(40);
+      this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
+        ball.destroy();
+        if (this.valid(t)) {
+          const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
+          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus)); this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
+          if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
+          this.checkWaveEnd();
+        }
+      } });
     }
 
     checkWaveEnd() {
