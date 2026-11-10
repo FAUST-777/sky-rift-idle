@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -417,7 +417,8 @@
       if (Math.random() < this.evadeOf(target)) {
         this.floatText(target.img.x, this.barY(target) - 12, G.t('battle.dodge'), '#9fd8ff', 13);
         if (target.special.riposte && !opts.counter && src.alive && target.alive) {
-          this.shoot(target, src, 'bullet', 0, () => this.hit(target, src, target.special.riposte.v, { counter: true }));
+          const rv = target.special.riposte.v;
+          this.enemiesAlive().forEach((en, i) => this.shoot(target, en, 'bullet', i, () => this.hit(target, en, rv, { counter: true, stunBonus: { critDmg: 1.5, finalX: 10 }, breakStun: true })));
         }
         return 0;
       }
@@ -452,18 +453,24 @@
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
       if (src.st.minionDmg && this.minionAlive() && this.minion.owner === src) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢            // 吸貓狂熱：對中毒敵人
+      const stunnedNow = this.fxv(target, 'stun') > 0;
+      const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
+      if (stunnedNow && this.fxv(src, 'stunHunter')) { sb.forceCrit = true; sb.dmgPct = (sb.dmgPct || 0) + this.fxv(src, 'stunHunter'); }   // 大爆射一波！之後 6 秒
+      if (sb && sb.dmgPct) dmg *= 1 + sb.dmgPct;
+      if (!stunnedNow && opts.elseDmgPct) dmg *= 1 + opts.elseDmgPct;
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      const crit = src.st.iai ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
+      const crit = src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
-      if (crit) dmg *= src.st.critDmg + iaiOver + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
       if (opts.skill && this.party(src) && this.aura.stunSkillX && this.fxv(target, 'stun')) dmg *= 1 + this.aura.stunSkillX;   // 筆觸節奏：技能打暈眩敵人最終傷害 ×5
-      if (crit && opts.critFinalX) dmg *= opts.critFinalX;   // 爆頭！！！：暴擊時最終傷害 ×3
+      if (crit && opts.critFinalX) dmg *= opts.critFinalX;
+      if (sb && sb.finalX) dmg *= sb.finalX;   // 閃避反擊打暈眩：最終傷害 ×10   // 爆頭！！！：暴擊時最終傷害 ×3
       if (this.fxv(src, 'snipeX')) dmg *= 1 + this.fxv(src, 'snipeX');   // 狙擊爆頭！！！：最終傷害 ×10
       if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2
 
@@ -478,6 +485,7 @@
         }
       }
       const type = this.party(src) ? src.st.dmgType : null;
+      if (opts.breakStun && stunnedNow && target.fx.stun) delete target.fx.stun;   // 解除暈眩
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
 
       // 城牆者「尖刺城牆」反傷
@@ -700,8 +708,9 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
-          const wasAlive = t.alive;
-          this.hit(u, t, mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          const wasAlive = t.alive, wasStunned = this.fxv(t, 'stun') > 0;
+          this.hit(u, t, mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, stunBonus: e.stunBonus, elseDmgPct: e.elseDmgPct, breakStun: e.breakStun, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          if (e.stunHunter && wasStunned) this.addFx(u, 'stunHunter', e.stunHunter.v, e.stunHunter.t);   // 大爆射一波！
           if (e.feverOnKill && wasAlive && !t.alive) this.startFever(u, e.feverOnKill);   // 處決擊殺
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);

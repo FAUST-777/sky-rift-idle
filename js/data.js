@@ -249,7 +249,9 @@ G.SKILLS = {
     // 煙霧彈：自己閃避 +30%→54%；另外全隊閃避 +15%→30%（6 秒，跟自己的取高）、其他隊友立刻回 2% 最大生命
     A('pi_smoke',     1, 14, lin(0.3, 0.06), (v, r) => ({ target: 'none', self: [{ id: 'evade', v, t: 6 }], party: [{ id: 'evade', v: lin(0.15, 0.0375)(r), t: 6 }], healOthers: 0.02 }),
       { descV: { party: lin(0.15, 0.0375) } }),
-    A('pi_plunder',   2, 10, lin(2.0, 0.25), v => ({ target: 'one', mult: v, self: [{ id: 'atkUp', v: 0.2, t: 6 }] })),
+    // 大爆射一波！（原掠奪）：打暈眩者 → 傷害 +300%→777%、必定暴擊、暴擊傷害 +777%，打完解除暈眩，之後 6 秒打暈眩者必定暴擊、傷害 +777%；打沒暈眩者只有 +300%
+    A('pi_plunder',   2, 10, lin(2.0, 0.25), (v, r) => ({ target: 'one', mult: v, stunBonus: { dmgPct: lin(3, 1.1925)(r), forceCrit: true, critDmg: 7.77 }, elseDmgPct: 3, breakStun: true,
+      stunHunter: { v: 7.77, t: 6 } }), { descV: { stun: lin(3, 1.1925) } }),
     P('pi_nimble',   0, lin(0.06, 0.03), 'self', 'evade'),
     P('pi_sharp',    0, lin(5, 3),       'self', 'crit', { raw: true, partyAlso: { physCrit: lin(10, 1.5) }, rawKeys: ['physCrit'] }),   // 另外全隊物理系角色暴擊率 +10→16
     // 美式居合（1→5 級）：必定暴擊，溢出暴擊率轉暴擊傷害；閃避 -50%→-20%；狙擊爆頭！！！最終傷害 ×2/3/4/4.5/5
@@ -404,7 +406,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
