@@ -709,6 +709,7 @@
         this.partyAlive().forEach(p => this.glow(p, '#9fd8ff'));
         this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.cover_fire'), '#9fd8ff', 15, 1000);
       }
+      if (e.feverChance && targets.length && !(this.fever && this.fever.t > 0) && Math.random() < e.feverChance) this.startFever(u, e.feverOnKill);   // 處決：2% 機率直接血之狂熱
       if (e.cannonShot && G.cannonMult() > 0) this.fireCannon(e.cannonShot);   // 舷砲齊射：額外一發船砲
       if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }

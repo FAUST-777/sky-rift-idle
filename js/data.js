@@ -162,7 +162,7 @@ G.SKILLS = {
     // 血性狂暴（原嗜血）：自身攻擊 +v，8 秒；期間血騎士每次吸血，其他隊友回復 1%→1.5% 最大生命
     A('bk_bloodlust', 1, 15, lin(0.4, 0.1),  (v, r) => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }, { id: 'bloodShare', v: lin(0.01, 0.00125)(r), t: 8 }] }),
       { descV: { share: lin(0.01, 0.00125) } }),
-    A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1, feverOnKill: 7, useNextExecute: true })),   // 處決擊殺 → 全隊「血之狂熱」7 秒
+    A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1, feverOnKill: 7, feverChance: 0.02, useNextExecute: true })),   // 處決擊殺 → 全隊「血之狂熱」7 秒
     P('bk_drain',      0, lin(0.05, 0.03), 'self', 'lifesteal'),
     P('bk_hemorrhage', 0, lin(0.25, 0.1),  'proc', 'bleed', { fx: 'bleed', chance: 'v', val: 1, t: 4, also: { bleedHeal: lin(0.02, 0) } }),   // bleedHeal：滿血時普攻吸血 50% 機率改補失血最多的隊友 2%
     P('bk_frenzy',     1, lin(5, 3),       'self', 'crit', { raw: true }),

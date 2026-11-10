@@ -78,7 +78,7 @@ G.I18N['zh-TW'] = {
   'skill.bk_rend.name': '撕裂', 'skill.bk_rend.desc': '連砍 3 下，每下 {v}% 傷害並造成流血；下一次處決傷害 +{exe}%',
   'skill.bk_feast.name': '血之盛宴', 'skill.bk_feast.desc': '單體 {v}% 傷害，傷害全部轉為生命',
   'skill.bk_bloodlust.name': '血性狂暴', 'skill.bk_bloodlust.desc': '自身攻擊 +{v}%，8 秒；期間吸血時，其他隊友回復 {share}% 最大生命（每秒最多 3 次）',
-  'skill.bk_execute.name': '處決', 'skill.bk_execute.desc': '單體 {v}% 傷害，目標流血中時傷害翻倍。用處決擊殺敵人時，全隊進入「血之狂熱」7 秒：攻速 +100%，並依全隊暴擊率加總（每人最多 100%，美式居合算 100%）降低技能冷卻（每 1% = -1%）、每秒回復生命（每 100% = 1% 最大生命）',
+  'skill.bk_execute.name': '處決', 'skill.bk_execute.desc': '單體 {v}% 傷害，目標流血時傷害翻倍。用處決打死敵人（或 2% 機率直接觸發）時，全隊進入「血之狂熱」7 秒：攻速 +100%，而且全隊暴擊率越高，技能冷卻越短、每秒回血越多',
   'skill.bk_drain.name': '吸血', 'skill.bk_drain.desc': '傷害的 {v}% 轉為生命',
   'skill.bk_hemorrhage.name': '出血', 'skill.bk_hemorrhage.desc': '普攻有 {v}% 機率造成流血。普攻吸血時如果自己是滿血，有 50% 機率改為幫失血比例最高的隊友回復 {bleedHeal}% 最大生命（每秒最多 3 次），並讓全隊進入「血性加速」4 秒：全隊技能冷卻一律變成 1 秒（每 7 秒最多觸發一次）',
   'skill.bk_frenzy.name': '狂怒', 'skill.bk_frenzy.desc': '暴擊率 +{v}%',

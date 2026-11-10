@@ -78,7 +78,7 @@ G.I18N['en'] = {
   'skill.bk_rend.name': 'Rend', 'skill.bk_rend.desc': '3 slashes of {v}% damage, each causing Bleed; your next Execute deals +{exe}% damage',
   'skill.bk_feast.name': 'Blood Feast', 'skill.bk_feast.desc': '{v}% damage to one enemy, healing for all damage dealt',
   'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile lifesteal heals other allies for {share}% max HP (up to 3 times per second)',
-  'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if the target is bleeding. Killing with Execute grants the party Blood Fever for 7s: attack speed +100%, and the party total crit rate (max 100% each, American Iai counts as 100%) reduces skill cooldowns (1% each) and heals per second (1% max HP per 100%)',
+  'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if the target is bleeding. Killing with Execute (or a 2% chance on cast) grants the party Blood Fever for 7s: attack speed +100%, and the higher the party crit rate, the shorter the skill cooldowns and the more HP regenerated per second',
   'skill.bk_drain.name': 'Lifedrain', 'skill.bk_drain.desc': 'Heals for {v}% of damage dealt',
   'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause bleeding. When your basic attack lifesteals at full HP, 50% chance to heal the most injured ally (by %) for {bleedHeal}% of their max HP (up to 3 times per second) and grant the party Blood Rush for 4s: all skill cooldowns become 1s (at most once every 7s)',
   'skill.bk_frenzy.name': 'Frenzy', 'skill.bk_frenzy.desc': 'Crit chance +{v}%',
