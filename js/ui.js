@@ -871,7 +871,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'exchange': exchangeModal(); break;
       case 'secret': {   // 神秘模式：測試用密碼
         const inp = $('secretCode'), code = inp ? inp.value.trim() : '';
-        if (code === '7777777') { S.gold += 25000000; S.crystal += 999; G.save(); UI.toast(t('toast.secretOk')); }
+        if (code === '7777777') { S.gold += 25000000; S.crystal += 9999; G.save(); UI.toast(t('toast.secretOk')); }
         else UI.toast(t('toast.secretBad'));
         if (inp) inp.value = '';
         break;
