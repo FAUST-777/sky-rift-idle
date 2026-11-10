@@ -861,11 +861,11 @@
       return true;
     }
 
-    // 技能基礎冷卻：破牆而出時城牆衝撞改 G.BREAKOUT_BASH_CD 秒
+    // 技能基礎冷卻：破牆而出時塔盾衝鋒改 G.BREAKOUT_BASH_CD 秒
     baseCd(u, s) { return s.def.id === 'wb_bash' && u.st.bashDmg ? G.BREAKOUT_BASH_CD : s.def.cd; }
     castSkill(u, s) {
       const d = s.def, v = d.v(s.rank), e = d.fx(v, s.rank);
-      if (d.id === 'wb_bash' && u.st.bashDmg) { e.mult *= 1 + u.st.bashDmg; e.target = 'all'; }   // 破牆而出：城牆衝撞變全體、傷害 +300%
+      if (d.id === 'wb_bash' && u.st.bashDmg) { e.mult *= 1 + u.st.bashDmg; e.target = 'all'; }   // 破牆而出：塔盾衝鋒變全體、傷害 +300%
       if (!this.shouldCast(u, e)) return false;
       const col = e.mult ? '#ffd27a' : e.heal || e.selfHeal ? '#7dff9a' : '#9fd8ff';
       this.floatText(u.img.x, this.barY(u) - 22, G.skillName(d.id), col, 15, 900);

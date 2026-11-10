@@ -193,7 +193,7 @@ G.I18N['en'] = {
   'skill.pi_ruthless.name': 'Ruthless', 'skill.pi_ruthless.desc': 'Crit damage +{v}%',
   'skill.pi_riposte.name': 'Riposte', 'skill.pi_riposte.desc': 'On a successful dodge, shoot back at all enemies for {v}% damage each. Vs stunned enemies: crit damage +150% and final damage x10, then the stun is removed. Also party evasion +{party_evade}%',
 
-  'skill.wb_bash.name': 'Wall Slam', 'skill.wb_bash.desc': '{v}% damage to one enemy',
+  'skill.wb_bash.name': 'Tower Shield Charge', 'skill.wb_bash.desc': '{v}% damage to one enemy',
   'skill.wb_provoke.name': 'Provoke', 'skill.wb_provoke.desc': 'Draws all enemies and reduces damage taken by {v}% for 6s',
   'skill.wb_bulwark.name': 'Moving Wall', 'skill.wb_bulwark.desc': 'Party damage taken -{v}% for 6s',
   'skill.wb_fortify.name': 'Hold the Line', 'skill.wb_fortify.desc': 'Party DEF +{v}% for 10s',
@@ -201,7 +201,7 @@ G.I18N['en'] = {
   'skill.wb_cover.name': 'Cover', 'skill.wb_cover.desc': '{v}% chance to take a hit for an ally. Your HP +{hpPct}%, damage taken -{dmgReduce}%; when hit you gain Breeze on the Wall: regen 1% HP/s for 6s',
   'skill.wb_stone.name': 'Stonewall', 'skill.wb_stone.desc': 'DEF +{v}%',
   'skill.wb_guardian.name': 'Guardian', 'skill.wb_guardian.desc': 'Party damage taken -{v}%',
-  'skill.wb_rampart.name': 'Breakout', 'skill.wb_rampart.desc': 'All-out attack: DEF {v}%, HP -77%, crit rate +{crit}%, crit damage +{critDmg}%, attack speed +{spdPct}%, Wall Bash hits all enemies with +300% damage and a 3s cooldown',
+  'skill.wb_rampart.name': 'Breakout', 'skill.wb_rampart.desc': 'All-out attack: DEF {v}%, HP -77%, crit rate +{crit}%, crit damage +{critDmg}%, attack speed +{spdPct}%, Tower Shield Charge hits all enemies with +300% damage and a 3s cooldown',
   'skill.wb_thorns.name': 'Spiked Wall', 'skill.wb_thorns.desc': 'Reflects {v}% of damage taken',
 
   'skill.dr_bear.name': 'Bear Spirit', 'skill.dr_bear.desc': 'Party DEF +{v}% for 8s',

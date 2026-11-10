@@ -283,7 +283,7 @@ G.SKILLS = {
     P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover', { also: { hpPct: lin(0.3, 0.075), dmgReduce: lin(0.15, 0.0875) } }),
     P('wb_stone',    0, lin(0.1, 0.08),  'self', 'defPct'),
     P('wb_guardian', 1, lin(0.04, 0.02), 'party', 'dmgReduce'),
-    // 破牆而出（原城垛，id 不變）：防禦 -99%→-50%、生命 -77%、暴擊率 +10→100、暴擊傷害 +200%→777%、攻速 +100%→350%、城牆衝撞傷害 +300%
+    // 破牆而出（原城垛，id 不變）：防禦 -99%→-50%、生命 -77%、暴擊率 +10→100、暴擊傷害 +200%→777%、攻速 +100%→350%、塔盾衝鋒傷害 +300%
     P('wb_rampart',  1, lin(-0.99, 0.1225), 'self', 'defPct', { also: { hpPct: () => -0.77, crit: lin(10, 22.5), critDmg: lin(2, 1.4425), spdPct: lin(1, 0.625), bashDmg: () => 3 }, descV: { crit: lin(10, 22.5) }, rawKeys: ['crit'] }),
     P('wb_thorns',   2, lin(0.1, 0.06),  'special', 'thorns'),
   ],
@@ -453,7 +453,7 @@ G.shipSkillBonus = () => {
 //   （第 129 輪：怨靈替死移到「怨靈召喚」本身）
 //   普攻打恐懼敵人傷害 +vsFear；打衰老詛咒敵人暴擊傷害 +vsDecayCritDmg（可疊加）
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
-G.BREAKOUT_BASH_CD = 3;   // 城牆者「破牆而出」：城牆衝撞冷卻 6 → 3 秒、改打全體
+G.BREAKOUT_BASH_CD = 3;   // 城牆者「破牆而出」：塔盾衝鋒冷卻 6 → 3 秒、改打全體
 G.WALL_BREEZE = { v: 0.01, t: 6 };   // 城牆者「掩護」：被攻擊後「城牆上微風」每秒回 1%，6 秒
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };

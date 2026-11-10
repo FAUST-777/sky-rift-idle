@@ -193,7 +193,7 @@ G.I18N['zh-CN'] = {
   'skill.pi_ruthless.name': '冷血', 'skill.pi_ruthless.desc': '暴击伤害 +{v}%',
   'skill.pi_riposte.name': '闪避反击', 'skill.pi_riposte.desc': '闪避成功时开枪反击全体敌人，每发 {v}% 伤害。打到眩晕中的敌人时暴击伤害 +150%、最终伤害 ×10，并解除它的眩晕。另外全队闪避 +{party_evade}%',
 
-  'skill.wb_bash.name': '城墙冲撞', 'skill.wb_bash.desc': '单体 {v}% 伤害',
+  'skill.wb_bash.name': '塔盾冲锋', 'skill.wb_bash.desc': '单体 {v}% 伤害',
   'skill.wb_provoke.name': '嘲讽', 'skill.wb_provoke.desc': '吸引所有敌人，自身减伤 {v}%，6 秒',
   'skill.wb_bulwark.name': '移动城墙', 'skill.wb_bulwark.desc': '全队受到伤害 -{v}%，6 秒',
   'skill.wb_fortify.name': '坚守', 'skill.wb_fortify.desc': '全队防御 +{v}%，10 秒',
@@ -201,7 +201,7 @@ G.I18N['zh-CN'] = {
   'skill.wb_cover.name': '掩护', 'skill.wb_cover.desc': '{v}% 概率替队友挡下攻击。自己生命 +{hpPct}%、受到伤害 -{dmgReduce}%；被攻击后获得「城墙上微风」：6 秒内每秒回复 1% 生命',
   'skill.wb_stone.name': '石墙', 'skill.wb_stone.desc': '防御 +{v}%',
   'skill.wb_guardian.name': '守护者', 'skill.wb_guardian.desc': '全队受到伤害 -{v}%',
-  'skill.wb_rampart.name': '破墙而出', 'skill.wb_rampart.desc': '舍弃防守全力进攻：防御 {v}%、生命 -77%、暴击率 +{crit}%、暴击伤害 +{critDmg}%、攻速 +{spdPct}%，城墙冲撞改为全体攻击、伤害 +300%、冷却变 3 秒',
+  'skill.wb_rampart.name': '破墙而出', 'skill.wb_rampart.desc': '舍弃防守全力进攻：防御 {v}%、生命 -77%、暴击率 +{crit}%、暴击伤害 +{critDmg}%、攻速 +{spdPct}%，塔盾冲锋改为全体攻击、伤害 +300%、冷却变 3 秒',
   'skill.wb_thorns.name': '尖刺城墙', 'skill.wb_thorns.desc': '反弹受到伤害的 {v}%',
 
   'skill.dr_bear.name': '熊之灵', 'skill.dr_bear.desc': '全队防御 +{v}%，8 秒',
