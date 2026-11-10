@@ -311,7 +311,7 @@ G.I18N['zh-CN'] = {
   'syn.b.darkRegen': '每秒回复 {v}% 生命',
   'syn.b.darkDur': '持续 {v} 秒',
   'buff.shadow.name': '暗影缠绕',
-  'buff.shadow.desc': '全队攻速 +{spd}%、技能冷却 -{cdr}%、闪避 +{ev}%、每秒回复 {rg}% 生命，还剩 {s} 秒',
+  'buff.shadow.desc': '全队攻速 +{spd}%、技能冷却 -{cdr}%、每秒回复 {rg}% 生命，还剩 {s} 秒',
   'buff.shadowCount.name': '暗影累积',
   'buff.shadowCount.desc': '对敌人施加减益 {v}/{n} 次',
   'battle.shadow': '🌑 暗影缠绕！',

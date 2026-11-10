@@ -311,7 +311,7 @@ G.I18N['en'] = {
   'syn.b.darkRegen': 'regen {v}% HP/s',
   'syn.b.darkDur': 'for {v}s',
   'buff.shadow.name': 'Shadow Entwine',
-  'buff.shadow.desc': 'Party attack speed +{spd}%, skill cooldown -{cdr}%, evasion +{ev}%, regen {rg}% HP/s, {s}s left',
+  'buff.shadow.desc': 'Party attack speed +{spd}%, skill cooldown -{cdr}%, regen {rg}% HP/s, {s}s left',
   'buff.shadowCount.name': 'Shadow Charge',
   'buff.shadowCount.desc': 'Debuffs applied {v}/{n}',
   'battle.shadow': '🌑 Shadow Entwine!',
