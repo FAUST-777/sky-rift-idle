@@ -356,8 +356,8 @@ G.SKILLS = {
     A('nc_archer',    1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
     // 怨靈召喚：每位死靈頭上一隻尖刺骷髏頭，18 秒，不會被打也不會死；攻擊力 = 死靈 80%→120%、攻速 = 死靈 ×(1 + 50%→100%)
     //   每次攻擊上「死亡詛咒」6 秒：記錄期間受到的傷害，到期引爆 110%→200%；被刷新時先馬上引爆再重上
-    A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: lin(1.1, 0.225)(r), t: 18 } }),
-      { descV: { spd: lin(0.5, 0.125), curse: lin(1.1, 0.225) } }),
+    A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: G.DOOM_MULT, t: 18 } }),
+      { descV: { spd: lin(0.5, 0.125) } }),
     P('nc_bond',      1, lin(0.1, 0.05),  'self', 'summonPower'),   // 第 107 輪：跟亡者之力對調到第二階
     // 白骨風暴（原腐朽，id 不變）：見 G.BONE_STORM；v = 中毒強度
     P('nc_rot',       0, lin(1, 0.25),    'special', 'boneStorm'),
@@ -447,7 +447,8 @@ G.shipSkillBonus = () => {
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
 G.GRUDGE = { regen: 0.01, bleedT: 3 };
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
-G.DOOM_MAX_STACKS = 4;   // 死亡詛咒最多疊幾層
+G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
+G.DOOM_MULT = 1;         // 死亡詛咒引爆倍率（第 110 輪：110%→200% 改固定 100%）
 G.UNDEAD_LEGION = { hp: lin(0.1, 0.1), evade: lin(0.1, 0.0125), fearChance: 0.1, decayDmg: 0.5 };
 G.DEATH_PACT = {
   regen: lin(0.01, 0.005), dmg: lin(0.01, 0.01), spd: lin(0.05, 0.0175),
