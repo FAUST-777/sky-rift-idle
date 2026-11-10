@@ -99,6 +99,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn.small { padding: 5px 9px; font-size: 12px; border-radius: 8px; }
 .btn:disabled { opacity: .4; pointer-events: none; }
 .btn.on { background: var(--sky); color: #0b1d2a; border-color: var(--sky); font-weight: 700; }
+/* 即時數值：選中的人用青綠色，職業名用橘色 */
+.live-who .btn.on { background: #2ec4b6; border-color: #2ec4b6; color: #062a26; }
+.live-who .live-cls { color: var(--accent); font-weight: 700; }
+.live-who .btn.on .live-cls { color: #a33a00; }
 
 .switch { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
 .switch input { display: none; }

@@ -75,7 +75,7 @@
     const whoSig = members.map(u => u.key).join('|') + '#' + UI.liveWho + G.settings.lang;
     if (whoSig !== lastWhoSig || !whoBox.children.length) {   // 成員有變才重畫按鈕，避免點擊被打斷
       lastWhoSig = whoSig;
-      whoBox.innerHTML = members.map(u => `<button class="btn small ${u.key === UI.liveWho ? 'on' : ''}" data-act="livewho" data-v="${esc(u.key)}">${esc(G.whoName(u.key))} <span class="muted">${G.clsName(G.charOf(u.key).cls)}</span></button>`).join('');
+      whoBox.innerHTML = members.map(u => `<button class="btn small ${u.key === UI.liveWho ? 'on' : ''}" data-act="livewho" data-v="${esc(u.key)}">${esc(G.whoName(u.key))} <span class="live-cls">${G.clsName(G.charOf(u.key).cls)}</span></button>`).join('');
     }
     const u = members.find(x => x.key === UI.liveWho), L = sc.liveStats(u), base = u.st;
     const pc = (v, d = 0) => (v * 100).toFixed(d) + '%';
