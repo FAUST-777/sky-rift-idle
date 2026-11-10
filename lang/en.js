@@ -144,7 +144,7 @@ G.I18N['en'] = {
   'skill.dr_wolf.name': 'Wolf Spirit', 'skill.dr_wolf.desc': 'Party ATK +{v}% and attack speed +{spd}% for 8s; your own attack speed -{slow}% meanwhile',
   'skill.dr_owl.name': 'Owl Spirit', 'skill.dr_owl.desc': 'Party crit chance +{v}% for 8s',
   'skill.dr_deer.name': 'Deer Spirit', 'skill.dr_deer.desc': 'Party regenerates {v}% HP per second for 6s',
-  'skill.dr_thorns.name': 'Thorn Snare', 'skill.dr_thorns.desc': '{v}% damage to all enemies, their attack speed -15% for 4s',
+  'skill.dr_thorns.name': 'Feral Rage', 'skill.dr_thorns.desc': 'Other allies get attack speed +55% and regenerate 1% max HP per second for {v}s; your own attack speed -55% meanwhile',
   'skill.dr_bond.name': 'Wild Bond', 'skill.dr_bond.desc': 'Buffs you cast last {v}% longer; other allies get max HP +{party_hpPctOthers}% and attack speed +{party_spdPctOthers}%',
   'skill.dr_grove.name': 'Grove Blessing', 'skill.dr_grove.desc': 'Party HP +{v}%',
   'skill.dr_spirit.name': 'Nature Spirit', 'skill.dr_spirit.desc': 'Party regenerates {v}% HP per second; other allies max HP +{party_hpPctOthers}%',

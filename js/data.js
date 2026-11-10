@@ -272,7 +272,9 @@ G.SKILLS = {
       { descV: { spd: WOLF.spd, slow: WOLF.slow } }),
     A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
     A('dr_deer',   1, 18, lin(0.01, 0.003),  v => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }] })),
-    A('dr_thorns', 2, 9,  lin(0.9, 0.15),    v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
+    // 野性狂暴（原荊棘纏繞）：持續 3/3.5/4/5/6 秒，其他隊友攻速 +55%、每秒回 1% 生命；德魯伊自己攻速 -55%
+    A('dr_thorns', 2, 20, r => [3, 3.5, 4, 5, 6][r - 1], v => ({ target: 'none',
+      partyOthers: [{ id: 'spdUp', v: 0.55, t: v }, { id: 'regen', v: 0.01, t: v }], selfDebuff: [{ id: 'slow', v: 0.55, t: v }] }), { raw: true }),
     P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur', { partyAlso: { hpPctOthers: lin(0.05, 0.0125), spdPctOthers: lin(0.01, 0.0125) } }),   // 自己施放的增益持續時間 +v；其他隊友最大生命 +5%→10%、攻速 +1%→6%
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
     P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen', { partyAlso: { hpPctOthers: lin(0.05, 0.0125) } }),   // 另外其他隊友最大生命 +5%→10%
