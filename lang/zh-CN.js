@@ -442,6 +442,11 @@ G.I18N['zh-CN'] = {
   'pet.sellBody': '把「{name}」卖掉，可以拿到 {n} 云晶。卖掉后它的增益（{bonus}）会消失，图鉴记录会保留。',
   'pet.sellConfirm': '卖掉（+{n}💎）',
   'toast.petSold': '卖掉了 {name}，获得 {n} 云晶',
+  'settings.secret': '神秘模式',
+  'settings.secretPh': '请输入密码',
+  'settings.secretOk': '确认',
+  'toast.secretOk': '神秘力量降临！获得 25M 金币＋999 云晶',
+  'toast.secretBad': '密码错误',
   'toast.notEnoughGold': '金币不够', 'toast.notEnoughCrystal': '云晶不够', 'toast.bought': '买了 {name}，到家园点空格摆放',
   'toast.capReached': '飞空艇只能到第 {n} 层，升级「侧面稳定翼」或「引擎」才能继续往上', 'toast.reviveNeed': '云晶不够，需要 {n} 💎',
 

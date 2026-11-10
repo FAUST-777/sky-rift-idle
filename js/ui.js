@@ -771,6 +771,11 @@
           <button class="btn small danger" data-act="reset">${t('settings.reset')}</button>
           <button class="btn small" data-act="credits">${t('settings.credits')}</button>
         </div>
+        <div class="set-label" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)">🔮 ${t('settings.secret')}</div>
+        <div class="row" style="gap:6px;align-items:center">
+          <input id="secretCode" type="password" placeholder="${esc(t('settings.secretPh'))}" style="flex:1;min-width:0">
+          <button class="btn small good" data-act="secret">${t('settings.secretOk')}</button>
+        </div>
       </div>
       <div class="modal-actions"><button class="btn primary" data-act="close">${t('common.close')}</button></div>`);
   }
@@ -864,6 +869,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'prologue': UI.nextPrologue(); break;
       case 'settings': UI.modalKind = 'settings'; settingsModal(); break;
       case 'exchange': exchangeModal(); break;
+      case 'secret': {   // 神秘模式：測試用密碼
+        const inp = $('secretCode'), code = inp ? inp.value.trim() : '';
+        if (code === '7777777') { S.gold += 25000000; S.crystal += 999; G.save(); UI.toast(t('toast.secretOk')); }
+        else UI.toast(t('toast.secretBad'));
+        if (inp) inp.value = '';
+        break;
+      }
       case 'petsell': {
         const p = S.pets[+d.i]; if (!p) break;
         UI.modal(`<h2>${t('pet.sellTitle')}</h2><p>${t('pet.sellBody', { name: esc(G.petName(p)), n: G.petSellPrice(p), bonus: petBonusText(p) })}</p>

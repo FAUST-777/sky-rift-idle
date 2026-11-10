@@ -442,6 +442,11 @@ G.I18N['zh-TW'] = {
   'pet.sellBody': '把「{name}」賣掉，可以拿到 {n} 雲晶。賣掉後牠的增益（{bonus}）會消失，圖鑑紀錄會保留。',
   'pet.sellConfirm': '賣掉（+{n}💎）',
   'toast.petSold': '賣掉了 {name}，獲得 {n} 雲晶',
+  'settings.secret': '神秘模式',
+  'settings.secretPh': '請輸入密碼',
+  'settings.secretOk': '確認',
+  'toast.secretOk': '神秘力量降臨！獲得 25M 金幣＋999 雲晶',
+  'toast.secretBad': '密碼錯誤',
   'toast.notEnoughGold': '金幣不夠', 'toast.notEnoughCrystal': '雲晶不夠', 'toast.bought': '買了 {name}，到家園點空格擺放',
   'toast.capReached': '飛空艇只能到第 {n} 層，升級「側面穩定翼」或「引擎」才能繼續往上', 'toast.reviveNeed': '雲晶不夠，需要 {n} 💎',
 
