@@ -154,7 +154,7 @@
         const def = G.skillDef(ch.cls, id), r = ch.skills[id];
         // 開場冷卻最多 5 秒，讓每場戰鬥一開始就會有技能出手
         return def && r && def.type === 'active' ? { def, rank: r, cd: Math.min(5, def.cd * G.rand(0.2, 0.5)) } : null;
-      }).filter(Boolean);
+      }).filter(Boolean).sort((a, b) => (G.CAST_PRIORITY[a.def.id] ?? 99) - (G.CAST_PRIORITY[b.def.id] ?? 99));   // 同時轉好時，排前面的先放
     }
 
     memberUnit(who) {

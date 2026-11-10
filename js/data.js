@@ -459,6 +459,9 @@ G.DEATH_PACT = {
 // 召喚物自己的技能（名稱：skill.<id>.name）；cd0 = 召出來後第一次施放要等幾秒
 //   石魔人「挑釁」：敵方全體只打它、自己受到傷害 -50%，10 秒，CD 9 秒
 //   骷髏弓箭手「箭雨」：敵方全體 200% 傷害，自己攻速 +100% 5 秒，CD 8 秒
+// 技能施放優先順序：同一刻有好幾招都轉好時，數字小的先放（沒列的照技能欄順序排在後面）
+//   死靈：召喚石魔人 > 召喚骷髏弓箭手 > 怨靈召喚 > 其他
+G.CAST_PRIORITY = { nc_golem: 0, nc_archer: 1, nc_wraith: 2 };
 G.SUMMON_SKILLS = {
   golem:    { id: 'sm_taunt',  cd: 9, cd0: 0.5, v: () => 0.5, fx: v => ({ target: 'none', taunt: { v, t: 10 } }) },
   skeleton: { id: 'sm_arrows', cd: 8, cd0: 1.5, v: () => 2,   fx: v => ({ target: 'all', mult: v, self: [{ id: 'spdUp', v: 1, t: 5 }] }) },
