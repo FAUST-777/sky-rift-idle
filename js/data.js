@@ -100,14 +100,15 @@ G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 //   mix   = 三人系別各不相同且剛好是這三種
 //   type  = 同系別人數達到 tiers 的門檻（取最高的一階）
 // bonus 欄位：spdPct 攻速  cdr 冷卻縮短  dmgPct 全體傷害  debuffDur 我方施加的減益持續時間
-//   critDmg 暴擊傷害（加在倍率上）  hpPct 生命  defPct 防禦  cannonInterval 船砲間隔秒數（取最短）  basicLifesteal 普攻命中回復最大生命比例
+//   critDmg 暴擊傷害（加在倍率上）  hpPct 生命  defPct 防禦  cannonInterval 船砲間隔秒數（取最短）  procRate 觸發率
+//   arcaneCrit / arcaneCritDmg / arcaneDur：全隊對怪物造成傷害累積 100 次 → 全隊暴擊率（×100 個百分點）、暴擊傷害提升，持續秒數  basicLifesteal 普攻命中回復最大生命比例
 G.TEAM_SYNERGIES = [
   { id: 'wildhunt', mix: ['animal', 'physical', 'dark'],   bonus: { spdPct: 0.18, cannonInterval: 5 } },
   { id: 'triad',    mix: ['animal', 'physical', 'arcane'], bonus: { critDmg: 0.10, hpPct: 0.15, defPct: 0.01 } },
   { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.25 },      3: { cdr: 0.35 } } },
   { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.10, basicLifesteal: 0.005 } } },   // basicLifesteal：普攻命中回復自己最大生命的比例
-  { id: 'arcane',   type: 'arcane',   tiers: { 2: { dmgPct: 0.15 },   3: { dmgPct: 0.27 } } },
-  { id: 'dark',     type: 'dark',     tiers: { 2: { debuffDur: 0.2 }, 3: { debuffDur: 0.4 } } },
+  { id: 'arcane',   type: 'arcane',   tiers: { 2: { arcaneCrit: 0.5, arcaneCritDmg: 1.0, arcaneDur: 6 }, 3: { arcaneCrit: 0.55, arcaneCritDmg: 1.1, arcaneDur: 12 } } },   // 全隊打怪累積 100 次 → 全隊暴擊率／暴擊傷害提升 N 秒
+  { id: 'dark',     type: 'dark',     tiers: { 2: { cdr: 0.1, procRate: 0.05 }, 3: { cdr: 0.1, procRate: 0.1 } } },
 ];
 G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 
@@ -406,7 +407,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

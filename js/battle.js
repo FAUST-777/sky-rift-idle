@@ -301,7 +301,8 @@
     party(u) { return u.side === 'party'; }
     atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0)); }
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) : 0) - this.fxv(u, 'slow'))); }   // othersSpd：野性之絆（德魯伊自己不吃）
-    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系
+    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
+    arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
     evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
@@ -337,7 +338,7 @@
       return {
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
-        crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
+        crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0),
         cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100 + this.cdrBoostV()),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
@@ -462,7 +463,7 @@
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       const crit = src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
-      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
@@ -486,6 +487,14 @@
       }
       const type = this.party(src) ? src.st.dmgType : null;
       if (opts.breakStun && stunnedNow && target.fx.stun) delete target.fx.stun;   // 解除暈眩
+      if (this.aura.arcaneCrit && target.side === 'enemy' && (this.party(src) || src.kind === 'cannon')) {   // 奧術共振：累積 100 次
+        this.arcaneCount = (this.arcaneCount || 0) + 1;
+        if (this.arcaneCount >= 100) {
+          this.arcaneCount = 0; this.arcane = { t: this.aura.arcaneDur || 6 };
+          this.partyAlive().forEach(p => this.glow(p, '#8fd3ff'));
+          if (this.hero) this.floatText(this.hero.img.x, this.barY(this.hero) - 40, G.t('battle.arcane'), '#8fd3ff', 16, 1100);
+        }
+      }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
 
       // 城牆者「尖刺城牆」反傷
@@ -1020,6 +1029,7 @@
 
     fightTick(dt) {
       if (this.fever && this.fever.t > 0) this.fever.t -= dt;
+      if (this.arcane && this.arcane.t > 0) this.arcane.t -= dt;
       if (this.overdrive && this.overdrive.t > 0) this.overdrive.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
       if (this.cdrBoost && this.cdrBoost.t > 0) this.cdrBoost.t -= dt;
@@ -1138,6 +1148,8 @@
       if (party.some(u => u.st.iai)) out.push({ id: 'snipeCount', icon: G.FX_ICON.snipeCount, val: `${Math.min(50, this.snipeCount || 0)}/50`, p: { v: Math.min(50, this.snipeCount || 0) } });
       if (this.cdrBoostV()) out.push({ id: 'coverFire', icon: G.FX_ICON.coverFire, val: `${Math.ceil(this.cdrBoost.t)}s`, p: { v: pct(this.cdrBoost.v), s: Math.ceil(this.cdrBoost.t) } });
       if (this.overdrive && this.overdrive.t > 0) out.push({ id: 'overdrive', icon: G.FX_ICON.overdrive, val: `${Math.ceil(this.overdrive.t)}s`, p: { s: Math.ceil(this.overdrive.t) } });
+      if (this.arcaneOn()) out.push({ id: 'arcane', icon: G.FX_ICON.arcane, val: `${Math.ceil(this.arcane.t)}s`, p: { c: Math.round((this.aura.arcaneCrit || 0) * 100), d: Math.round((this.aura.arcaneCritDmg || 0) * 100), s: Math.ceil(this.arcane.t) } });
+      else if (this.aura.arcaneCrit) out.push({ id: 'arcaneCount', icon: G.FX_ICON.arcaneCount, val: `${this.arcaneCount || 0}/100`, p: { v: this.arcaneCount || 0 } });
       if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
