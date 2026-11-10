@@ -522,11 +522,11 @@
     enemiesAlive() { return this.enemies.filter(u => u.alive); }
     valid(t) { return t && t.alive && (this.enemies.includes(t) || this.units.includes(t)); }
 
-    // 我方打最前面的敵人；敵人：挑釁 > 召喚獸 > 加權隨機（近戰位 3、後排 1，後排偶爾也會被打）
+    // 我方打最前面的敵人；敵人：挑釁（石魔人優先於其他挑釁者）> 召喚獸 > 加權隨機（近戰位 3、後排 1，後排偶爾也會被打）
     targetFor(u) {
       if (u.side === 'party') { const es = this.enemiesAlive(); return u.kind === 'summon' ? G.pick(es) : es[0]; }   // 死靈的召喚物：隨機一隻
       const alive = this.partyAlive();
-      const forced = alive.find(p => p.taunt.t > 0) || (this.animal && this.animal.unit.alive ? this.animal.unit : null);
+      const forced = alive.find(p => p.taunt.t > 0 && p.minion === 'golem') || alive.find(p => p.taunt.t > 0) || (this.animal && this.animal.unit.alive ? this.animal.unit : null);
       if (forced) return forced;
       const w = alive.map(p => (p.st.ranged && p.kind !== 'summon' ? 1 : 3));   // 召喚物站最前面，跟前排一樣常被打
       let x = Math.random() * w.reduce((a, b) => a + b, 0);
