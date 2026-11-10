@@ -198,7 +198,7 @@
       if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t,
         // 附帶減益：字串 = 跟主效果一起觸發（狗狗狂吼）；物件 = 自己獨立擲機率（貓肉球拍打的暈眩）
         more: (sk.more || []).map(m => typeof m === 'string' ? { fx: m, val: sk.v2(r) } : { fx: m.fx, chance: m.chance, val: m.val, t: typeof m.t === 'function' ? m.t(r) : m.t }) });
-      else if (sk.p === 'special') out.special[sk.key] = { v, v2: sk.v2 ? sk.v2(r) : 0 };
+      else if (sk.p === 'special') out.special[sk.key] = { v, r, v2: sk.v2 ? sk.v2(r) : 0 };   // r = 等級（死亡契約用）
       else out[sk.p][sk.key] = (out[sk.p][sk.key] || 0) + v;
       if (sk.key2 && (sk.p === 'self' || sk.p === 'party')) out[sk.p][sk.key2] = (out[sk.p][sk.key2] || 0) + sk.v2(r);   // 第二效果（例如忠犬的吸血）
       Object.entries(sk.also || {}).forEach(([k, f]) => { out.self[k] = (out.self[k] || 0) + f(r); });   // 額外自身屬性（例如吸貓狂熱）

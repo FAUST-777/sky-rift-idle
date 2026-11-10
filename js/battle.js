@@ -11,7 +11,7 @@
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
   const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
-  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown', 'fear', 'decay'];   // fear 恐懼：傷害下降；decay 衰老詛咒：無法暴擊＋最大生命下降
+  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown', 'fear', 'decay', 'doom'];   // doom 死亡詛咒（怨靈）   // fear 恐懼：傷害下降；decay 衰老詛咒：無法暴擊＋最大生命下降
   const MISSILE_VARIANTS = 4;
 
   class BattleScene extends Phaser.Scene {
@@ -180,6 +180,7 @@
       this.units.forEach(u => u.img.destroy());
       this.units = [];
       this.animal = null; this.minion = null;
+      (this.wraiths || []).forEach(w => w.img.destroy()); this.wraiths = [];
       const members = G.partyMembers().map(w => this.memberUnit(w));
       this.hero = members[0];
       // 近戰站前排、遠程站後排
@@ -302,20 +303,100 @@
         target.st.maxHp = Math.max(1, Math.round(target.st.maxHp * (1 - val)));
         target.hp = Math.min(target.hp, target.st.maxHp);
       }
+      // 死亡詛咒：還在倒數就先馬上引爆，再重新上一個（重新開始記錄）
+      if (id === 'doom' && target.alive) {
+        if (f && f.t > 0) this.doomBlast(target);
+        target.doomAcc = 0;
+        target.fx.doom = { v: val, t: dur, full: dur };
+        return;
+      }
       this.addFx(target, id, val, dur);
+    }
+    doomBlast(u) {
+      const f = u.fx.doom, dmg = f ? Math.round((u.doomAcc || 0) * f.v) : 0;
+      if (f) f.t = 0;
+      u.doomAcc = 0;
+      if (!u.alive || dmg <= 0) return;
+      this.doomBlasting = true;
+      this.floatText(u.img.x, this.barY(u) - 26, G.t('battle.doomBlast'), '#e8e4d8', 13, 700);
+      this.damage(u, dmg, '#e8e4d8', true, true);
+      this.doomBlasting = false;
+    }
+
+    // ── 死靈「死亡契約」與召喚物 ──────────────────────────────────────────
+    pactRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.deathPact || {}).r || 0)); }
+    summonCount() { return (this.minionAlive() ? 1 : 0) + (this.wraiths || []).length; }
+    pactDebuffs() { return Math.max(0, ...this.enemiesAlive().map(e => DEBUFF_IDS.filter(id => this.fxv(e, id)).length)); }
+    // 死亡契約的加成：k = G.DEATH_PACT 的欄位；need = 需要幾隻召喚物在場
+    pactV(k, need = 0) {
+      const r = this.pactRank();
+      if (!r || this.summonCount() < need) return 0;
+      return G.DEATH_PACT[k](r);
+    }
+    pactAll(k) { return this.pactV(k, 1); }                                   // 全隊（召喚物 ≥1）
+    pactSummon(k) { return this.pactV(k, 2); }                                // 召喚物（召喚物 ≥2）
+    pactPerDebuff(k) { return this.pactV(k) * this.pactDebuffs(); }           // 召喚物：每個減益
+
+    // 怨靈召喚：飄在死靈頭上的尖刺骷髏頭，不會被打、不會死
+    summonWraith(owner, w) {
+      if (!this.textures.exists('wraith')) this.tex('wraith', 34, 34, ctx => {
+        ctx.fillStyle = '#f2efe4';
+        for (let i = 0; i < 9; i++) {   // 尖刺
+          const a = -Math.PI * 0.95 + i * Math.PI * 0.95 / 4;
+          ctx.beginPath(); ctx.moveTo(17 + Math.cos(a - 0.22) * 10, 16 + Math.sin(a - 0.22) * 10);
+          ctx.lineTo(17 + Math.cos(a) * 16, 16 + Math.sin(a) * 16); ctx.lineTo(17 + Math.cos(a + 0.22) * 10, 16 + Math.sin(a + 0.22) * 10); ctx.fill();
+        }
+        ctx.beginPath(); ctx.arc(17, 16, 10, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(12, 22, 10, 7);
+        ctx.fillStyle = '#1b1b2a'; ctx.beginPath(); ctx.arc(13.5, 16, 2.6, 0, Math.PI * 2); ctx.arc(20.5, 16, 2.6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(15, 26, 1.2, 3); ctx.fillRect(18, 26, 1.2, 3);
+        ctx.fillStyle = 'rgba(160,255,170,.9)'; ctx.beginPath(); ctx.arc(13.5, 16, 1, 0, Math.PI * 2); ctx.arc(20.5, 16, 1, 0, Math.PI * 2); ctx.fill();
+      });
+      this.wraiths = (this.wraiths || []).filter(x => x.owner !== owner || (x.img.destroy(), false));
+      const img = this.add.image(owner.img.x, owner.img.y - 70, 'wraith').setDepth(42).setAlpha(0);
+      this.tweens.add({ targets: img, alpha: 0.95, duration: 300 });
+      this.wraiths.push({ owner, img, t: w.t, atk: w.atk, spd: w.spd, curse: w.curse, atkCd: 0.3 });
+      this.floatText(owner.img.x, this.barY(owner) - 40, G.t('summon.wraith'), '#e8e4d8', 15, 900);
+    }
+    wraithTick(dt) {
+      if (!this.wraiths || !this.wraiths.length) return;
+      this.wraiths = this.wraiths.filter(w => {
+        w.t -= dt;
+        if (w.t <= 0 || !w.owner.alive) { this.tweens.add({ targets: w.img, alpha: 0, duration: 300, onComplete: () => w.img.destroy() }); return false; }
+        if (this.mode !== 'fight') return true;
+        w.atkCd -= dt;
+        if (w.atkCd > 0) return true;
+        const o = w.owner;
+        w.atkCd = 1 / Math.max(0.25, this.spdOf(o) * (1 + w.spd + this.pactPerDebuff('spd')));
+        const t = this.targetFor(o);
+        if (!t) return true;
+        const k = this.add.image(w.img.x, w.img.y, 'wraith').setDepth(41).setScale(0.45);
+        this.tweens.add({ targets: k, x: t.img.x, y: t.img.y - 34, duration: 220, onComplete: () => {
+          k.destroy();
+          if (!this.valid(t) || !o.alive) return;
+          const bonus = (1 + this.pactPerDebuff('dmg')) * (1 + this.pactSummon('sAtk')) - 1;
+          this.hit(o, t, w.atk, { wraith: true, nextBonus: bonus, critDmgBonus: this.pactSummon('sCritDmg') });
+          if (this.valid(t)) this.debuff(o, t, 'doom', w.curse, 6);
+          this.checkWaveEnd();
+        } });
+        return true;
+      });
+    }
+    wraithFollow() {
+      (this.wraiths || []).forEach(w => { w.img.x = w.owner.img.x; w.img.y = this.barY(w.owner) - 22 + Math.sin(this.time.now / 260) * 4; });
     }
 
     party(u) { return u.side === 'party'; }
-    atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0)); }
-    spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) : 0) - this.fxv(u, 'slow'))); }   // othersSpd：野性之絆（德魯伊自己不吃）
-    critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
+    atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0) + (u.kind === 'summon' && u.minion ? this.pactSummon('sAtk') : 0)); }   // 死亡契約：召喚物攻擊
+    spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) + this.pactAll('aSpd') + (u.kind === 'summon' && u.minion ? this.pactPerDebuff('spd') : 0) : 0) - this.fxv(u, 'slow'))); }   // 死亡契約：全隊攻速、召喚物每個減益攻速   // othersSpd：野性之絆（德魯伊自己不吃）
+    critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) + this.pactAll('aCrit') : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
         m += this.aura.defPct || 0;
+        if (u.kind === 'summon' && u.minion) m += this.pactSummon('sDef');   // 死亡契約：召喚物防禦
         if (u.shield > 0 && this.aura.shieldDef) m += this.aura.shieldDef;   // 領航員：有護盾時防禦 +100%
         if (u.special.crisis && this.crisisOn()) m += u.special.crisis.v2;   // 學者危機意識
       }
@@ -463,6 +544,7 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
+      if (src.kind === 'summon' && src.minion) dmg *= 1 + this.pactPerDebuff('dmg');   // 死亡契約：召喚物每個減益加傷
       if (src.st.minionDmg && this.minionAlive()) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢：場上有召喚物就算（不限誰召喚的）            // 吸貓狂熱：對中毒敵人
       const stunnedNow = this.fxv(target, 'stun') > 0;
       const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
@@ -473,7 +555,7 @@
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
-      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
@@ -569,6 +651,7 @@
         }
       }
       u.hp -= left;
+      if (!this.doomBlasting && u.fx.doom && u.fx.doom.t > 0) u.doomAcc = (u.doomAcc || 0) + amount;   // 死亡詛咒：記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
       if (u.hp <= 0) this.kill(u);
@@ -693,6 +776,7 @@
       if (e.heal && !e.cdCut) return this.partyAlive().some(p => p.hp / p.st.maxHp < 0.8);   // 散步時間：減冷卻為主，順便回血，不用等人受傷
       if (e.selfHeal) return u.hp / u.st.maxHp < 0.75;
       if (e.summon) return !(this.animal && this.animal.unit.alive);
+      if (e.wraith) return !(this.wraiths || []).some(w => w.owner === u);   // 怨靈：每位死靈頭上一隻
       if (e.summonMinion) return !this.minionAlive();          // 場上最多一隻
       if (e.corpseBlast) return this.minionAlive();             // 要有召喚物才能引爆
       if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
@@ -776,6 +860,7 @@
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
       if (e.summonMinion) this.summonMinion(u, e.summonMinion.kind, e.summonMinion.power);
+      if (e.wraith) this.summonWraith(u, e.wraith);
       if (e.corpseBlast && this.minionAlive()) {   // 屍爆：引爆召喚物，打全體（無視防禦）
         const m = this.minion.unit, dmg = Math.max(1, Math.round(m.st.maxHp * e.corpseBlast));
         this.floatText(m.img.x, this.barY(m) - 30, G.t('battle.corpseBlast'), '#9dff9d', 16, 1000);
@@ -1063,6 +1148,7 @@
       } else if (this.mode === 'dead' && this.reviveAt && Date.now() >= this.reviveAt) {
         this.reviveFree();
       }
+      this.wraithFollow();
       this.drawBars();
     }
 
@@ -1073,7 +1159,7 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.st.regen || 0) + (this.aura.regen || 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
+        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }
@@ -1093,6 +1179,7 @@
         if (!u.alive) return;
         // 狀態倒數
         Object.values(u.fx).forEach(f => { if (f.t > 0) f.t -= dt; });
+        if (u.fx.doom && u.fx.doom.t <= 0 && u.doomAcc !== undefined && u.fx.doom.v) { this.doomBlast(u); delete u.fx.doom; if (!u.alive) return; }   // 死亡詛咒到期：引爆
         if (u.decayBase && !this.fxv(u, 'decay')) { u.st.maxHp = u.decayBase; delete u.decayBase; }   // 衰老詛咒到期：最大生命還原
         if (u.taunt.t > 0) u.taunt.t -= dt;
         if (u.shieldT > 0 && (u.shieldT -= dt) <= 0) u.shield = 0;
@@ -1119,6 +1206,7 @@
         if (u.atkCd <= 0) { u.atkCd = 1 / this.spdOf(u); this.basicAttack(u); }
       });
       this.regenTick(dt);
+      this.wraithTick(dt);
 
       // 船砲支援
       if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {

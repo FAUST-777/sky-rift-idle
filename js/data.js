@@ -353,12 +353,19 @@ G.SKILLS = {
     A('nc_plague',    0, 10, lin(2, 0.125),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'decay', v: 0.15, t: 6 }] })),
     A('nc_golem',     1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'golem', power: v } })),
     A('nc_archer',    1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
+    // 怨靈召喚：每位死靈頭上一隻尖刺骷髏頭，18 秒，不會被打也不會死；攻擊力 = 死靈 80%→120%、攻速 = 死靈 ×(1 + 50%→100%)
+    //   每次攻擊上「死亡詛咒」6 秒：記錄期間受到的傷害，到期引爆 110%→200%；被刷新時先馬上引爆再重上
+    A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: lin(1.1, 0.225)(r), t: 18 } }),
+      { descV: { spd: lin(0.5, 0.125), curse: lin(1.1, 0.225) } }),
     A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
     P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
     P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
     P('nc_undying',   1, lin(0.1, 0.05),  'self', 'minionDeathHeal'),
     P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
     P('nc_legion',    2, lin(0.15, 0.05), 'self', 'minionDmg'),
+    // 死亡契約：數值見 G.DEATH_PACT（v = 每個減益的召喚物回血）
+    P('nc_pact',      2, lin(0.01, 0.005), 'special', 'deathPact', { descV: Object.fromEntries(Object.entries({
+      dmg: 'dmg', spd: 'spd', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),
   ],
 
   // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
@@ -421,6 +428,15 @@ G.shipSkillBonus = () => {
   Object.entries(G.SHIP_SKILL_BONUS).forEach(([slot, b]) => Object.entries(b).forEach(([k, v]) => { out[k] += v * G.shipLv(slot); }));
   return out;
 };
+// 死靈「死亡契約」（1→5 級）。召喚物 = 石魔人／骷髏弓箭手＋怨靈（每位死靈各一隻）
+//   每個減益（取減益最多的那隻敵人）：召喚物每秒回 regen、傷害 +dmg、攻速 +spd
+//   場上召喚物 ≥1：全隊攻速 aSpd、暴擊率 aCrit（百分點）、暴擊傷害 aCritDmg、閃避 aEvade
+//   場上召喚物 ≥2：召喚物再加防禦 sDef、閃避 sEvade、攻擊 sAtk、暴擊傷害 sCritDmg
+G.DEATH_PACT = {
+  regen: lin(0.01, 0.005), dmg: lin(0.01, 0.01), spd: lin(0.05, 0.0175),
+  aSpd: lin(0.4, 0.05), aCrit: lin(10, 4.25), aCritDmg: lin(0.5, 0.175), aEvade: lin(0.1, 0.025),
+  sDef: lin(0.1, 0.225), sEvade: lin(0.2, 0.0375), sAtk: lin(0.18, 0.08), sCritDmg: lin(1, 0.5),
+};
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
   golem:    { icon: '🗿', stats: { hp: 3.0, atk: 0.25, def: 2.0 }, spd: 0.7 },                     // 石魔人：肉盾
@@ -430,7 +446,7 @@ G.SUMMONS = {
 G.FX_ICON = {
   atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
-  stun: '💫', fear: '😱', decay: '🥀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
+  stun: '💫', fear: '😱', decay: '🥀', doom: '💀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
 
 // ── 怪物（名稱：monster.<id>）──────────────────────────────────────────────
