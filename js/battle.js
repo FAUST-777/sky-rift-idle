@@ -461,12 +461,12 @@
       return {
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
-        crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0),
+        crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0) + this.pactAll('aCritDmg'),   // 死亡契約（召喚物 ≥1）
         cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr')),
-        regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
+        regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen') + this.shadowV('darkRegen') + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.feverSum() / 10000,   // 暗影纏繞、咒怨之力、血之狂熱
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
-        dmg: (1 + (a.dmgPct || 0)) * (1 - (curse.dmg || 0)) - 1,
+        dmg: (1 + (a.dmgPct || 0)) * (1 - (curse.dmg || 0)) * (this.isDark(u) ? 1 + this.grudgeV() : 1) - 1,   // 咒怨之力：黑暗系傷害
         skillDmg: this.skillMult(u) - 1,
         dmgReduce: 1 - this.takenMult(u),
         debuffDur: (u.st.debuffDur || 1) + (a.debuffDur || 0) - 1,
