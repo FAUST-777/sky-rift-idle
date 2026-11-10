@@ -235,7 +235,7 @@ G.I18N['zh-TW'] = {
   'syn.arcane.name': '奧術共振',
   'syn.dark.name': '暗影纏繞',
   'syn.b.spdPct': '全隊攻速 +{v}%',
-  'syn.b.basicLifesteal': '全隊普攻吸血 {v}%',
+  'syn.b.basicLifesteal': '全隊普攻吸血：每次命中回復 {v}% 最大生命',
   'syn.b.cdr': '全隊技能冷卻 -{v}%',
   'syn.b.dmgPct': '全隊全體傷害 +{v}%',
   'syn.b.debuffDur': '對敵人施加的減益持續時間 +{v}%',

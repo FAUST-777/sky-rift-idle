@@ -235,7 +235,7 @@ G.I18N['en'] = {
   'syn.arcane.name': 'Arcane Resonance',
   'syn.dark.name': 'Shadow Snare',
   'syn.b.spdPct': 'Party attack speed +{v}%',
-  'syn.b.basicLifesteal': 'Party basic-attack lifesteal {v}%',
+  'syn.b.basicLifesteal': 'Party basic-attack lifesteal: each hit heals {v}% max HP',
   'syn.b.cdr': 'Party skill cooldown -{v}%',
   'syn.b.dmgPct': 'Party damage +{v}%',
   'syn.b.debuffDur': 'Debuffs you apply last +{v}% longer',

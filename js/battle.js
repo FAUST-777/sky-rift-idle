@@ -447,8 +447,10 @@
         }
       }
       // 吸血
-      const ls = (src.st.lifesteal || 0) + (opts.drain || 0) + (!opts.skill && !opts.counter && this.party(src) ? this.aura.basicLifesteal || 0 : 0);   // basicLifesteal：鋼鐵陣線普攻吸血
+      const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
       if (ls && src.alive) src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
+      // 鋼鐵陣線：我方普攻命中回復自己最大生命的 0.5%（不是看傷害）
+      if (!opts.skill && !opts.counter && this.party(src) && this.aura.basicLifesteal && src.alive && src.st.maxHp) src.hp = Math.min(src.st.maxHp, src.hp + src.st.maxHp * this.aura.basicLifesteal);
       // 吸貓狂熱累積（隊伍有人裝「吸貓狂熱」被動才有）
       const cap = G.frenzyCap();
       if (cap && !this.party(target) && (src.kind === 'hero' || src.kind === 'partner') && src.frenzy < cap) {
