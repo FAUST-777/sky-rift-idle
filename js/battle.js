@@ -324,7 +324,7 @@
       if (this.fxv(u, 'stun')) m *= 1 + G.STUN.taken;   // 暈眩受到傷害 +15%
       return Math.max(0.1, m);
     }
-    skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (u.st.dmgType === 'animal' ? this.fxv(u, 'animalSkill') : 0) + (this.party(u) ? this.aura.skillDmg || 0 : 0); }   // animalSkill：喵喵鼓舞
+    skillMult(u) { return 1 + (u.st.skillDmg || 0) + (u.st.shipSkill || 0) * G.shipTotalLv() + this.fxv(u, 'skillDmg') + (u.st.dmgType === 'animal' ? this.fxv(u, 'animalSkill') : 0) + (this.party(u) ? this.aura.skillDmg || 0 : 0); }   // animalSkill：喵喵鼓舞
 
     // 反彈率（已含鏡面甲加成）
     reflectOf(u) {
@@ -340,7 +340,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0),
-        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100 + this.cdrBoostV()),
+        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV()),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -1085,7 +1085,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100 + this.cdrBoostV())); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV())); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }

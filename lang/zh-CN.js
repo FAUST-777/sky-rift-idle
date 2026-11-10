@@ -89,7 +89,7 @@ G.I18N['zh-CN'] = {
   'skill.cp_crew.name': '热气球补给',
   'skill.cp_crew.desc': '热气球每 1 阶，全队最大生命 +{v}%（目前 +{now}%）',
   'skill.cp_ace.name': '舰炮武装齐射！！',
-  'skill.cp_ace.desc': '飞空艇发射一大堆小飞弹加三颗蓝色炮弹，对全体造成 {v}% 伤害。飞空艇各部位加成同核弹（目前伤害 +{sdmg}%、暴击率 +{scrit}%、暴击伤害 +{scd}%）',
+  'skill.cp_ace.desc': '飞空艇所有部位每升 1 阶，自己的技能伤害 +{v}%、技能冷却 -{shipCdr}%（目前技能伤害 +{now}%、冷却 -{cdnow}%）',
   'summon.golem': '石魔人！',
   'summon.skeleton': '骷髅弓箭手！',
   'battle.corpseBlast': '尸爆！',

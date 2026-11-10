@@ -89,7 +89,7 @@ G.I18N['en'] = {
   'skill.cp_crew.name': 'Balloon Supplies',
   'skill.cp_crew.desc': 'Party max HP +{v}% per balloon level (now +{now}%)',
   'skill.cp_ace.name': 'Full Broadside!!',
-  'skill.cp_ace.desc': 'The airship fires a swarm of small missiles plus three blue shells: {v}% damage to all. Same airship part bonuses as Nuke (now damage +{sdmg}%, crit rate +{scrit}%, crit damage +{scd}%)',
+  'skill.cp_ace.desc': 'For every airship part level: your skill damage +{v}% and skill cooldown -{shipCdr}% (now damage +{now}%, cooldown -{cdnow}%)',
   'summon.golem': 'Stone Golem!',
   'summon.skeleton': 'Skeleton Archer!',
   'battle.corpseBlast': 'Corpse Explosion!',
