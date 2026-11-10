@@ -593,11 +593,15 @@
       if (!stunnedNow && opts.elseDmgPct) dmg *= 1 + opts.elseDmgPct;
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
+      // 咒怨之力（黑暗系全隊）：普攻打恐懼敵人傷害 +50%；打衰老詛咒敵人暴擊傷害 +50%（兩者可疊加）
+      const grudgeOn = this.isDark(src) && this.grudgeV() > 0;
+      if (grudgeOn && !opts.skill && !opts.counter && this.fxv(target, 'fear')) dmg *= 1 + G.GRUDGE.vsFear;
+      const grudgeCritDmg = grudgeOn && this.fxv(target, 'decay') ? G.GRUDGE.vsDecayCritDmg : 0;
       const legionDecay = (opts.wraith || (src.kind === 'summon' && src.minion)) && this.fxv(target, 'decay') && this.legionRank() > 0;   // 亡靈軍團：召喚物打衰老詛咒的敵人
       if (legionDecay) dmg *= 1 + G.UNDEAD_LEGION.decayDmg;
       const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) || legionDecay ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
-      if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
+      if (crit) dmg *= src.st.critDmg + grudgeCritDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
@@ -704,7 +708,7 @@
       if (!this.doomBlasting && u.doomStacks) u.doomStacks.forEach(s => { s.acc += amount; });   // 死亡詛咒：每層都記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
-      if (u.hp <= 0 && u.special.grudge && this.party(u)) {   // 咒怨之力：怨靈代替死靈倒下
+      if (u.hp <= 0 && this.party(u) && this.wraiths && this.wraiths.length) {   // 怨靈召喚：頭上的怨靈代替死靈倒下，生命回滿
         const w = (this.wraiths || []).find(x => x.owner === u);
         if (w) {
           u.hp = u.st.maxHp;   // 替死後生命回滿

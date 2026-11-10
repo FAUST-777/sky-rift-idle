@@ -443,9 +443,10 @@ G.shipSkillBonus = () => {
 // 死靈「白骨風暴」：裝了的死靈自己、或場上召喚物（含怨靈，隊上取最高等級）每次攻擊（普攻＋技能）→
 //   破防 def、命中下降 blind（敵人 miss 機率）、中毒（強度 poison × 一般中毒），都是 t 秒
 // 死靈「咒怨之力」（隊上取最高等級）：
-//   裝了的死靈要倒下時，頭上的怨靈代替他死（怨靈消失，死靈生命回滿）
+//   （第 129 輪：怨靈替死移到「怨靈召喚」本身）
+//   普攻打恐懼敵人傷害 +vsFear；打衰老詛咒敵人暴擊傷害 +vsDecayCritDmg（可疊加）
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
-G.GRUDGE = { regen: 0.01, bleedT: 3 };
+G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
 G.DOOM_MULT = 1;         // 死亡詛咒引爆倍率（第 110 輪：110%→200% 改固定 100%）
