@@ -494,7 +494,7 @@
         }
       }
       // 吸血
-      const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
+      const ls = (src.st.lifesteal || 0) + (opts.drain || 0) + (crit ? opts.critDrain || 0 : 0);   // critDrain：毒爪暴擊吸血
       if (ls && src.alive) {
         // 出血：普攻吸血時自己是滿血 → 50% 機率補失血比例最高的隊友 2% 最大生命（每秒最多 3 次）
         if (src.st.bleedHeal && !opts.skill && !opts.counter && src.hp >= src.st.maxHp && Math.random() < 0.5) {
@@ -688,7 +688,7 @@
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
           const wasAlive = t.alive;
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critDrain: e.critDrain, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           if (e.feverOnKill && wasAlive && !t.alive) this.startFever(u, e.feverOnKill);   // 處決擊殺
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
