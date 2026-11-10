@@ -728,7 +728,7 @@
       if (e.refreshDebuffs) targets.forEach(t => Object.values(t.fx).forEach(f => { if (f.t > 0 && f.full) f.t = Math.max(f.t, f.full); }));
       // 傷害（多段用延遲打出）
       let stunHealed = false;
-      const mult = e.mult * (e.minionBonus && this.minionAlive() ? 1 + e.minionBonus : 1);   // 骨刺風暴：召喚物在場時加傷
+      const mult = e.mult;
       const castState = {};   // 同一次施放共用（毒爪暴擊回血只回一次）   // 狗群圍攻：咬到暈眩敵人回血，每次施放只回一次
       for (let h = 0; h < hits; h++) {
         const doHit = () => targets.forEach(t => {

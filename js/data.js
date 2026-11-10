@@ -353,8 +353,6 @@ G.SKILLS = {
     A('nc_plague',    0, 10, lin(2, 0.125),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'decay', v: 0.15, t: 6 }] })),
     A('nc_golem',     1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'golem', power: v } })),
     A('nc_archer',    1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
-    A('nc_drain',     1, 8,  lin(1.6, 0.25), v => ({ target: 'one', mult: v, drain: 0.3 })),
-    A('nc_bone',      1, 10, lin(0.8, 0.12), v => ({ target: 'all', mult: v, minionBonus: 0.5 })),   // 召喚物在場時傷害 ×1.5
     A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
     P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
     P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
