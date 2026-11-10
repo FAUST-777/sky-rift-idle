@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -216,7 +216,7 @@
     }
 
     computeAura() {
-      const a = G.partyAura();
+      const a = G.partyAura(this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0);
       this.units.forEach(u => { u.othersSpd = u.key ? G.othersBonus(u.key, 'spdPctOthers') : 0; });   // 每次重算光環時快取，不要每幀算
       if (this.animal && this.animal.unit.alive) {
         const k = G.ANIMALS[this.animal.kind].aura;
@@ -272,7 +272,7 @@
       if (this.fxv(u, 'stun')) m *= 1 + G.STUN.taken;   // 暈眩受到傷害 +15%
       return Math.max(0.1, m);
     }
-    skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (this.party(u) ? this.aura.skillDmg || 0 : 0); }
+    skillMult(u) { return 1 + (u.st.skillDmg || 0) + this.fxv(u, 'skillDmg') + (u.st.dmgType === 'animal' ? this.fxv(u, 'animalSkill') : 0) + (this.party(u) ? this.aura.skillDmg || 0 : 0); }   // animalSkill：喵喵鼓舞
 
     // 反彈率（已含鏡面甲加成）
     reflectOf(u) {
@@ -630,6 +630,7 @@
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
       if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1))); p.shieldT = 8; this.glow(p, col); });
       if (e.partyType) this.partyAlive().filter(p => p.st.dmgType === e.partyType.type).forEach(p => e.partyType.fx.forEach(b => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給某系別的隊友
+      if (e.synBoost) { this.synBoost = { v: Math.max(e.synBoost.v, this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0), t: e.synBoost.t }; this.computeAura(); }   // 喵喵鼓舞：團隊特效暫時加強
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
       // 速寫：船砲強化一段時間；全隊身上的增益延長
@@ -861,6 +862,7 @@
     }
 
     fightTick(dt) {
+      if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
       all.forEach(u => {
         if (!u.alive) return;
@@ -963,6 +965,7 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      if (this.synBoost && this.synBoost.t > 0) out.push({ id: 'synBoost', icon: G.FX_ICON.synBoost, val: `${Math.ceil(this.synBoost.t)}s`, p: { v: pct(this.synBoost.v), s: Math.ceil(this.synBoost.t) } });
       if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
       // 貓哈氣爆甲的全隊效果
       if (this.aura.vsStun || this.aura.cannonCut) out.push({ id: 'hiss', icon: G.FX_ICON.hiss, val: `+${pct(this.aura.vsStun || 0)}%`, p: { v: pct(this.aura.vsStun || 0), cut: this.aura.cannonCut || 0 } });

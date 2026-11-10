@@ -225,7 +225,7 @@
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
   const AURA_MAX = ['cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
-  G.partyAura = function () {
+  G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
     // AURA_MAX 的欄位多人裝也不疊加（取最大）
@@ -233,7 +233,8 @@
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) { add(p.perk.stat, p.perk.v); if (p.perk.extra) aura[p.perk.extra] = 1; } });   // 出戰夥伴的專屬 buff（extra 是開關）
-    G.teamSynergy().active.forEach(a => Object.entries(G.scaleSynergy(a.bonus, aura.synergyPow)).forEach(([k, v]) => {   // 團隊特效（獸群之心加強）
+    const synPow = Math.max(aura.synergyPow || 0, synBoost || 0);   // 獸群之心、喵喵鼓舞取高
+    G.teamSynergy().active.forEach(a => Object.entries(G.scaleSynergy(a.bonus, synPow)).forEach(([k, v]) => {   // 團隊特效（獸群之心加強）
       if (k === 'cannonInterval') aura[k] = Math.min(aura[k] || G.CANNON_INTERVAL, v);
       else add(k, v);
     }));

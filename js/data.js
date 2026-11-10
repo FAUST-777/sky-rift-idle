@@ -140,6 +140,7 @@ G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施�
 const CURSE = { def: lin(0.2, 0.0125), slow: lin(0.2, 0.025) };   // 暗黑繪師「詛咒油畫」的附加數值
 const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
 const CRAM = { spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
+const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -168,9 +169,11 @@ G.SKILLS = {
     // 貓咪齊射：另外給全隊動物系隊友「下一次技能傷害 +100%」（20 秒內用掉）
     A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: 1, t: 20 }] } })),
     // 毒爪：對暈眩中的敵人技能傷害 +500%
-    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   v => ({ target: 'all', mult: v, vsStunSkill: 5, debuffs: [{ id: 'poison', v: 1, t: 6 }] })),
+    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   (v, r) => ({ target: 'all', mult: v, vsStunSkill: lin(5, 0.165)(r), debuffs: [{ id: 'poison', v: 1, t: 6 }] }), { descV: { stun: lin(5, 0.165) } }),   // 對暈眩敵人技能傷害 +500%→566%
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
-    A('ck_rally',     1, 15, lin(0.2, 0.06),  v => ({ target: 'none', party: [{ id: 'atkUp', v, t: 10 }] })),
+    // 喵喵鼓舞：全隊攻擊；10 秒內團隊特效數值 +10%→20%（跟獸群之心取高）、全隊動物系技能傷害 +7%→15%
+    A('ck_rally',     1, 15, lin(0.2, 0.06),  (v, r) => ({ target: 'none', synBoost: { v: RALLY.syn(r), t: 10 }, party: [{ id: 'atkUp', v, t: 10 }, { id: 'animalSkill', v: RALLY.animal(r), t: 10 }] }),
+      { descV: { syn: RALLY.syn, animal: RALLY.animal } }),
     A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v, party: [{ id: 'regen', v: 0.01, t: 5 }] })),   // 之後 5 秒每秒再回 1%
     // 貓貓士氣：士氣上限 5%→15%（原本）；另外全隊普攻 1%→2% 機率暈眩 1.5 秒、全隊閃避 +5%→8%
     P('ck_morale',  0, lin(5, 2.5),    'special', 'morale', { raw: true,
@@ -342,7 +345,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
