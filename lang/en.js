@@ -124,8 +124,8 @@ G.I18N['en'] = {
   'skill.pi_smoke.name': 'Smoke Bomb', 'skill.pi_smoke.desc': 'Own dodge +{v}% for 6s; party dodge +{party}% for 6s, and other allies instantly heal 2% max HP',
   'skill.pi_plunder.name': 'Plunder', 'skill.pi_plunder.desc': '{v}% damage to one enemy, own ATK +20% for 6s',
   'skill.pi_nimble.name': 'Sidestep!!', 'skill.pi_nimble.desc': 'Dodge +{v}%',
-  'skill.pi_sharp.name': 'Sharpshooter', 'skill.pi_sharp.desc': 'Crit chance +{v}%',
-  'skill.pi_quick.name': 'Quick Draw', 'skill.pi_quick.desc': 'Attack speed +{v}%',
+  'skill.pi_sharp.name': 'Sharpshooter', 'skill.pi_sharp.desc': 'Crit rate +{v}%; physical-type party members crit rate +{party_physCrit}%',
+  'skill.pi_quick.name': 'American Iai', 'skill.pi_quick.desc': 'Your attacks always crit; crit rate above 100% converts 1:1 into crit damage. Evasion {v}%',
   'skill.pi_ruthless.name': 'Ruthless', 'skill.pi_ruthless.desc': 'Crit damage +{v}%',
   'skill.pi_riposte.name': 'Riposte', 'skill.pi_riposte.desc': 'After dodging, fire back for {v}% damage',
 

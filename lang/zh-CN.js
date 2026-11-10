@@ -124,8 +124,8 @@ G.I18N['zh-CN'] = {
   'skill.pi_smoke.name': '烟雾弹', 'skill.pi_smoke.desc': '自身闪避 +{v}%，6 秒；另外全队闪避 +{party}%（6 秒），其他队友立刻回复 2% 最大生命',
   'skill.pi_plunder.name': '掠夺', 'skill.pi_plunder.desc': '单体 {v}% 伤害，自身攻击 +20%，6 秒',
   'skill.pi_nimble.name': '闪身步！！', 'skill.pi_nimble.desc': '闪避 +{v}%',
-  'skill.pi_sharp.name': '神枪手', 'skill.pi_sharp.desc': '暴击率 +{v}%',
-  'skill.pi_quick.name': '快拔', 'skill.pi_quick.desc': '攻速 +{v}%',
+  'skill.pi_sharp.name': '神枪手', 'skill.pi_sharp.desc': '暴击率 +{v}%；全队物理系角色暴击率 +{party_physCrit}%',
+  'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻击必定暴击，超过 100% 的暴击率全部转成暴击伤害（每 1% 转 1%）；闪避 {v}%',
   'skill.pi_ruthless.name': '冷血', 'skill.pi_ruthless.desc': '暴击伤害 +{v}%',
   'skill.pi_riposte.name': '闪避反击', 'skill.pi_riposte.desc': '闪避成功时开枪反击，{v}% 伤害',
 

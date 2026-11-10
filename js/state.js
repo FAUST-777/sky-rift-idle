@@ -224,7 +224,7 @@
   G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
-  const AURA_MAX = ['cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
+  const AURA_MAX = ['physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
   G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
@@ -310,7 +310,7 @@
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
       summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),
-      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'), bossSlam: g('bossSlam'), cdr: g('cdr'), bleedHeal: g('bleedHeal'),
+      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'), bossSlam: g('bossSlam'), cdr: g('cdr'), bleedHeal: g('bleedHeal'), iai: g('iai'),
     });
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);

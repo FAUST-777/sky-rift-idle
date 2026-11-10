@@ -261,7 +261,7 @@
     party(u) { return u.side === 'party'; }
     atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0)); }
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) : 0) - this.fxv(u, 'slow'))); }   // othersSpd：野性之絆（德魯伊自己不吃）
-    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0)) * this.procMult(u); }
+    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
     evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
@@ -411,8 +411,10 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
-      const crit = Math.random() * 100 < (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      if (crit) dmg *= src.st.critDmg + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+      const critChance = (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
+      const crit = src.st.iai ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
+      const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
+      if (crit) dmg *= src.st.critDmg + iaiOver + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
