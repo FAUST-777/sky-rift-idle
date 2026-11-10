@@ -75,7 +75,7 @@ G.I18N['en'] = {
   'skill.smash.name': 'Smash', 'skill.smash.desc': 'Deals {v}% ATK damage',
 
   'skill.bk_slash.name': 'Blood Slash', 'skill.bk_slash.desc': '{v}% damage to one enemy and Bleed for 5s',
-  'skill.bk_rend.name': 'Rend', 'skill.bk_rend.desc': '3 slashes of {v}% damage, each causing Bleed',
+  'skill.bk_rend.name': 'Rend', 'skill.bk_rend.desc': '3 slashes of {v}% damage, each causing Bleed; your next Execute deals +{exe}% damage',
   'skill.bk_feast.name': 'Blood Feast', 'skill.bk_feast.desc': '{v}% damage to one enemy, healing for all damage dealt',
   'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile lifesteal heals other allies for {share}% max HP (up to 3 times per second)',
   'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if the target is bleeding. Killing with Execute grants the party Blood Fever for 7s: attack speed +100%, and the party total crit rate (max 100% each, American Iai counts as 100%) reduces skill cooldowns (1% each) and heals per second (1% max HP per 100%)',
@@ -326,6 +326,7 @@ G.I18N['en'] = {
   'buff.hpUp.name': 'Vitality', 'buff.hpUp.desc': 'Max HP +{v}%, {s}s left',
   'buff.bloodShare.name': 'Blood Rage', 'buff.bloodShare.desc': 'Lifesteal heals other allies {v}% max HP, {s}s left',
   'buff.fever.name': 'Blood Fever', 'buff.fever.desc': 'Party attack speed +100%, skill cooldown -{cdr}%, heal {regen}% max HP per second, {s}s left',
+  'buff.nextExecute.name': 'Execution Primed', 'buff.nextExecute.desc': 'Next Execute deals +{v}% damage',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
   'buff.nextSkill.name': 'Next Skill Up', 'buff.nextSkill.desc': 'Next attack skill deals +{v}% damage ({s}s left)',

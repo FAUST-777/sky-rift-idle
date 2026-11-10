@@ -75,7 +75,7 @@ G.I18N['zh-TW'] = {
   'skill.smash.name': '猛擊', 'skill.smash.desc': '造成 {v}% 攻擊傷害',
 
   'skill.bk_slash.name': '血斬', 'skill.bk_slash.desc': '單體 {v}% 傷害，並造成流血 5 秒',
-  'skill.bk_rend.name': '撕裂', 'skill.bk_rend.desc': '連砍 3 下，每下 {v}% 傷害並造成流血',
+  'skill.bk_rend.name': '撕裂', 'skill.bk_rend.desc': '連砍 3 下，每下 {v}% 傷害並造成流血；下一次處決傷害 +{exe}%',
   'skill.bk_feast.name': '血之盛宴', 'skill.bk_feast.desc': '單體 {v}% 傷害，傷害全部轉為生命',
   'skill.bk_bloodlust.name': '血性狂暴', 'skill.bk_bloodlust.desc': '自身攻擊 +{v}%，8 秒；期間吸血時，其他隊友回復 {share}% 最大生命（每秒最多 3 次）',
   'skill.bk_execute.name': '處決', 'skill.bk_execute.desc': '單體 {v}% 傷害，目標流血中時傷害翻倍。用處決擊殺敵人時，全隊進入「血之狂熱」7 秒：攻速 +100%，並依全隊暴擊率加總（每人最多 100%，美式居合算 100%）降低技能冷卻（每 1% = -1%）、每秒回復生命（每 100% = 1% 最大生命）',
@@ -326,6 +326,7 @@ G.I18N['zh-TW'] = {
   'buff.hpUp.name': '生命提升', 'buff.hpUp.desc': '最大生命 +{v}%，還剩 {s} 秒',
   'buff.bloodShare.name': '血性狂暴', 'buff.bloodShare.desc': '吸血時其他隊友回復 {v}% 最大生命，還剩 {s} 秒',
   'buff.fever.name': '血之狂熱', 'buff.fever.desc': '全隊攻速 +100%、技能冷卻 -{cdr}%、每秒回復 {regen}% 最大生命，還剩 {s} 秒',
+  'buff.nextExecute.name': '處決蓄勢', 'buff.nextExecute.desc': '下一次處決傷害 +{v}%',
   'buff.skillDmg.name': '技能增傷', 'buff.skillDmg.desc': '技能傷害 +{v}%，還剩 {s} 秒',
   'buff.regen.name': '持續回復', 'buff.regen.desc': '每秒回復 {v}% 生命，還剩 {s} 秒',
   'buff.nextSkill.name': '下次技能強化', 'buff.nextSkill.desc': '下一次攻擊技能傷害 +{v}%（還剩 {s} 秒）',

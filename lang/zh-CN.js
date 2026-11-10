@@ -75,7 +75,7 @@ G.I18N['zh-CN'] = {
   'skill.smash.name': '猛击', 'skill.smash.desc': '造成 {v}% 攻击伤害',
 
   'skill.bk_slash.name': '血斩', 'skill.bk_slash.desc': '单体 {v}% 伤害，并造成流血 5 秒',
-  'skill.bk_rend.name': '撕裂', 'skill.bk_rend.desc': '连砍 3 下，每下 {v}% 伤害并造成流血',
+  'skill.bk_rend.name': '撕裂', 'skill.bk_rend.desc': '连砍 3 下，每下 {v}% 伤害并造成流血；下一次处决伤害 +{exe}%',
   'skill.bk_feast.name': '血之盛宴', 'skill.bk_feast.desc': '单体 {v}% 伤害，伤害全部转为生命',
   'skill.bk_bloodlust.name': '血性狂暴', 'skill.bk_bloodlust.desc': '自身攻击 +{v}%，8 秒；期间吸血时，其他队友回复 {share}% 最大生命（每秒最多 3 次）',
   'skill.bk_execute.name': '处决', 'skill.bk_execute.desc': '单体 {v}% 伤害，目标流血中时伤害翻倍。用处决击杀敌人时，全队进入「血之狂热」7 秒：攻速 +100%，并依全队暴击率加总（每人最多 100%，美式居合算 100%）降低技能冷却（每 1% = -1%）、每秒回复生命（每 100% = 1% 最大生命）',
@@ -326,6 +326,7 @@ G.I18N['zh-CN'] = {
   'buff.hpUp.name': '生命提升', 'buff.hpUp.desc': '最大生命 +{v}%，还剩 {s} 秒',
   'buff.bloodShare.name': '血性狂暴', 'buff.bloodShare.desc': '吸血时其他队友回复 {v}% 最大生命，还剩 {s} 秒',
   'buff.fever.name': '血之狂热', 'buff.fever.desc': '全队攻速 +100%、技能冷却 -{cdr}%、每秒回复 {regen}% 最大生命，还剩 {s} 秒',
+  'buff.nextExecute.name': '处决蓄势', 'buff.nextExecute.desc': '下一次处决伤害 +{v}%',
   'buff.skillDmg.name': '技能增伤', 'buff.skillDmg.desc': '技能伤害 +{v}%，还剩 {s} 秒',
   'buff.regen.name': '持续恢复', 'buff.regen.desc': '每秒恢复 {v}% 生命，还剩 {s} 秒',
   'buff.nextSkill.name': '下次技能强化', 'buff.nextSkill.desc': '下一次攻击技能伤害 +{v}%（还剩 {s} 秒）',

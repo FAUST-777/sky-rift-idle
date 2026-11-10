@@ -633,8 +633,10 @@
       const targets = e.target === 'all' ? this.enemiesAlive() : e.target === 'one' ? [this.targetFor(u)].filter(Boolean) : [];
       const hits = e.hits || 1;
       // 散步時間給的「下一次技能傷害」：這招有傷害就用掉
-      const nextBonus = e.mult && targets.length ? this.fxv(u, 'nextSkill') : 0;
+      let nextBonus = e.mult && targets.length ? this.fxv(u, 'nextSkill') : 0;
       if (nextBonus) delete u.fx.nextSkill;
+      const exB = e.useNextExecute && targets.length ? this.fxv(u, 'nextExecute') : 0;   // 撕裂：下一次處決加傷害
+      if (exB) { delete u.fx.nextExecute; nextBonus += exB; }
       if (e.mult && targets.length) this.gainMorale(u);
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
@@ -1022,6 +1024,8 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      const nx = party.find(u => this.fxv(u, 'nextExecute'));
+      if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
       if (this.fever && this.fever.t > 0) { const fs = this.feverSum(); out.push({ id: 'fever', icon: G.FX_ICON.fever, val: `${Math.ceil(this.fever.t)}s`, p: { cdr: Math.round(Math.min(G.CONFIG.cdrCap * 100, fs)), regen: +(fs / 100).toFixed(2), s: Math.ceil(this.fever.t) } }); }
       if (this.synBoost && this.synBoost.t > 0) out.push({ id: 'synBoost', icon: G.FX_ICON.synBoost, val: `${Math.ceil(this.synBoost.t)}s`, p: { v: pct(this.synBoost.v), s: Math.ceil(this.synBoost.t) } });
       if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
