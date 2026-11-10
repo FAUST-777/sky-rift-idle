@@ -467,7 +467,7 @@ G.SUMMON_SKILLS = {
   skeleton: { id: 'sm_arrows', cd: 8, cd0: 1.5, v: () => 2,   fx: v => ({ target: 'all', mult: v, self: [{ id: 'spdUp', v: 1, t: 5 }] }) },
 };
 G.GOLEM_EVADE_CAP = 0.2;   // 石魔人閃避上限（一般角色是 G.CONFIG.evadeCap 90%）
-G.GOLEM_HEAL_CUT = 0.7;    // 石魔人受到的所有回復 -70%（回血、治療、吸血）
+G.GOLEM_HEAL_CUT = 0.9;    // 石魔人受到的所有回復 -90%（回血、治療、吸血）
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
   golem:    { icon: '🗿', stats: { hp: 3.0, atk: 0.25, def: 2.0 }, spd: 0.7 },                     // 石魔人：肉盾
