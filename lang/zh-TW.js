@@ -154,7 +154,7 @@ G.I18N['zh-TW'] = {
   'skill.ck_fullburst.name': '全彈發射', 'skill.ck_fullburst.desc': '全身艙門打開，全體 {v}% 傷害，敵人攻速 -30%、防禦 -20%，5 秒',
   'skill.ck_rally.name': '喵喵鼓舞', 'skill.ck_rally.desc': '全隊攻擊 +{v}%、動物系隊友技能傷害 +{animal}%，並且團隊特效數值 +{syn}%，10 秒',
   'skill.ck_purr.name': '呼嚕療癒', 'skill.ck_purr.desc': '全隊回復 {v}% 生命，之後 5 秒每秒再回復 1%',
-  'skill.ck_morale.name': '貓貓士氣', 'skill.ck_morale.desc': '貓鎧者每攻擊一次累積 1 層士氣，每層全隊最終防禦 +1%，最多 +{v}%。另外全隊普攻有 {stun}% 機率使敵人暈眩 {stunT} 秒，全隊閃避 +{party_evade}%。貓鎧者自己打暈眩敵人傷害 +{selfStun}%',
+  'skill.ck_morale.name': '貓貓士氣', 'skill.ck_morale.desc': '貓鎧者每攻擊一次累積 1 層士氣，每層全隊最終防禦 +1%，最多 +{v}%。另外全隊普攻有 {stun}% 機率使敵人暈眩 {stunT} 秒，全隊閃避 +{party_evade}%',
   'skill.ck_frenzy.name': '吸貓狂熱', 'skill.ck_frenzy.desc': '隊員每次打中敵人自身傷害 +1%，最多 +{v}%，倒下才重算。裝備者自己：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%。全隊暴擊傷害 +{party_critDmg}%、打暈眩敵人傷害 +{partyStun}%',
   'skill.ck_claws.name': '貓抓印記', 'skill.ck_claws.desc': '普攻貓抓讓敵人攻速 -{v}%，4 秒。全隊普攻有 {party_basicPoison}% 機率使敵人中毒 5 秒',
   'skill.ck_venom.name': '貓肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒；另有 7% 機率拍暈敵人 {v2} 秒。全隊：打到暈眩中的敵人時，出手的人回復 {party_stunHit}% 最大生命',

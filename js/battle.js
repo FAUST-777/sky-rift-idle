@@ -579,7 +579,6 @@
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       if (this.party(src) && this.fxv(target, 'stun')) {
-        if (src.special.morale) dmg *= 1 + G.CAT_STUN.self(src.special.morale.r);   // 貓貓士氣：裝的人自己打暈眩敵人
         const fr = Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.frenzy || {}).r || 0));
         if (fr) dmg *= 1 + G.CAT_STUN.party(fr);   // 吸貓狂熱：全隊打暈眩敵人（取最高）
       }

@@ -126,8 +126,8 @@ G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 // raw: true → {v} 直接顯示不換百分比
 // tier = 技能樹層級（需要在該職業投入 G.TIER_REQ 點）
 const lin = (base, per) => r => +(base + per * (r - 1)).toFixed(4);
-// 貓鎧者打暈眩敵人：self = 貓貓士氣（裝的人自己）、party = 吸貓狂熱（全隊，取最高）
-const CAT_STUN = { self: lin(5, 1.25), party: lin(3, 1.1925) };
+// 貓鎧者打暈眩敵人：party = 吸貓狂熱（全隊，取最高）300%→444%（第 132 輪：原 777%；貓貓士氣的自身加傷取消）
+const CAT_STUN = { party: lin(3, 0.36) };
 G.CAT_STUN = CAT_STUN;
 G.TIER_REQ = [0, 3, 8];
 // 舊版好友快照（沒有 bare 欄位）上傳時，自身被動的舊數值；用來把舊數值扣回去再套新版
@@ -189,11 +189,11 @@ G.SKILLS = {
     A('ck_rally',     1, 15, lin(0.2, 0.06),  (v, r) => ({ target: 'none', synBoost: { v: RALLY.syn(r), t: 10 }, party: [{ id: 'atkUp', v, t: 10 }, { id: 'animalSkill', v: RALLY.animal(r), t: 10 }] }),
       { descV: { syn: RALLY.syn, animal: RALLY.animal } }),
     A('ck_purr',      2, 14, lin(0.12, 0.04), v => ({ target: 'none', heal: v, party: [{ id: 'regen', v: 0.01, t: 5 }] })),   // 之後 5 秒每秒再回 1%
-    // 貓貓士氣：士氣上限（全隊防禦）5%→35%；另外全隊普攻 1%→2% 機率暈眩 1.5 秒、全隊閃避 +5%→8%；裝的人自己打暈眩敵人傷害 +500%→1000%
-    P('ck_morale',  0, r => Math.round(5 + 7.5 * (r - 1)),    'special', 'morale', { raw: true, descV: { selfStun: CAT_STUN.self },
+    // 貓貓士氣：士氣上限（全隊防禦）5%→35%；另外全隊普攻 1%→2% 機率暈眩 1.5 秒、全隊閃避 +5%→8%
+    P('ck_morale',  0, r => Math.round(5 + 7.5 * (r - 1)),    'special', 'morale', { raw: true,
       partyStun: { chance: lin(0.01, 0.0025), t: () => 1.5 }, partyAlso: { evade: lin(0.05, 0.0075) } }),
     // 吸貓狂熱：隊伍傷害疊層上限 5%→15%；裝的人自己另外加閃避、暴擊傷害、對中毒敵人傷害（also = 額外的自身屬性）
-    // 另外全隊打暈眩敵人傷害 +300%→777%（多人裝取最高）
+    // 另外全隊打暈眩敵人傷害 +300%→444%（多人裝取最高）
     P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, descV: { partyStun: CAT_STUN.party }, also: { evade: lin(0.05, 0.0125), critDmg: () => 0.3, vsPoison: lin(0.05, 0.025) }, partyAlso: { critDmg: 0.15 } }),   // 暴擊傷害：自己 +30%、全隊 +15%
     // 貓抓印記：普攻緩速；全隊普攻 5%→8% 機率中毒 5 秒（多人裝不疊加）
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { basicPoison: lin(0.05, 0.0075) } }),
