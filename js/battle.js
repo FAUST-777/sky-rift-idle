@@ -217,7 +217,7 @@
 
     computeAura() {
       const a = G.partyAura(this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0);
-      this.units.forEach(u => { u.othersSpd = u.key ? G.othersBonus(u.key, 'spdPctOthers') : 0; });   // 每次重算光環時快取，不要每幀算
+      this.units.forEach(u => { u.othersSpd = u.key ? G.othersBonus(u.key, 'spdPctOthers') : 0; u.othersEvade = u.key ? G.othersBonus(u.key, 'evadeOthers') : 0; });   // 每次重算光環時快取，不要每幀算
       if (this.animal && this.animal.unit.alive) {
         const k = G.ANIMALS[this.animal.kind].aura;
         a[k] = (a[k] || 0) + this.animal.v;
@@ -253,7 +253,7 @@
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) : 0) - this.fxv(u, 'slow'))); }   // othersSpd：野性之絆（德魯伊自己不吃）
     critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? this.aura.crit || 0 : 0)) * this.procMult(u); }
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? this.aura.evade || 0 : 0)); }   // 暈眩無法閃避
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {

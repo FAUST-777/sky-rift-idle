@@ -292,9 +292,9 @@ G.SKILLS = {
     A('dw_goodboy', 2, 16, lin(0.2, 0.06), v => ({ target: 'none', party: [{ id: 'skillDmg', v, t: 10 }], partyType: { type: 'animal', fx: [{ id: 'stunSkill', v: 0.02, t: 10 }] } })),
     // 牽繩節奏：全隊冷卻縮短；另外全隊動物系隊友的技能最終傷害 ×2（多人裝不疊加）
     P('dw_leash',   0, lin(0.05, 0.03), 'party', 'cdr', { partyAlso: { animalSkillX: 1 }, rawKeys: ['animalSkillX'] }),
-    P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg'),
+    P('dw_trainer', 0, lin(0.04, 0.03), 'party', 'skillDmg', { partyAlso: { evadeOthers: lin(0.05, 0.0125) } }),   // 另外其他隊友閃避 +5%→10%（遛狗者自己不吃）
     P('dw_loyal',   1, lin(0.06, 0.04), 'self', 'atkPct', { key2: 'lifesteal', v2: lin(0.2, 0.025) }),   // 另外吸血 20%→30%
-    P('dw_stride',  1, lin(0.04, 0.04), 'party', 'spdPct'),   // 狗蹭蹭：全隊攻速 +4%→20%
+    P('dw_stride',  1, lin(0.04, 0.04), 'party', 'spdPct', { also: { evade: r => -lin(0.05, 0.0075)(r), defPct: lin(0.1, 0.0175) }, partyAlso: { evadeOthers: lin(0.03, 0.01) } }),   // 狗蹭蹭：全隊攻速 +4%→20%；自己閃避 -5%→-8%、防禦 +10%→17%；其他隊友閃避 +3%→7%
     // 狗狗狂吼：觸發時同時上緩速＋致盲（降命中）＋破防；v2 = 致盲與破防數值 10%→17%
     P('dw_bark',    2, lin(0.15, 0.08), 'proc', 'slow', { fx: 'slow', chance: 'v', val: 0.2, t: 3, v2: lin(0.1, 0.0175), more: ['blind', 'defDown'] }),
   ],

@@ -157,9 +157,9 @@ G.I18N['zh-TW'] = {
   'skill.dw_pack.name': '狗群圍攻', 'skill.dw_pack.desc': '連咬 4 下，每下 {v}% 傷害。暴擊時暴擊傷害再 +25%；咬到中毒的敵人傷害 +50%；咬到暈眩的敵人回復自己 {heal}% 最大生命（每次施放一次）。中毒和暈眩的效果可以同時觸發',
   'skill.dw_goodboy.name': '乖狗狗', 'skill.dw_goodboy.desc': '全隊技能傷害 +{v}%，10 秒；期間動物系隊友的攻擊技能命中時有 2% 機率使敵人暈眩 1.5 秒',
   'skill.dw_leash.name': '牽繩節奏', 'skill.dw_leash.desc': '全隊技能冷卻 -{v}%；全隊動物系隊友的技能最終傷害 2 倍',
-  'skill.dw_trainer.name': '訓犬師', 'skill.dw_trainer.desc': '全隊技能傷害 +{v}%',
+  'skill.dw_trainer.name': '訓犬師', 'skill.dw_trainer.desc': '全隊技能傷害 +{v}%；其他隊友閃避 +{party_evadeOthers}%',
   'skill.dw_loyal.name': '忠犬', 'skill.dw_loyal.desc': '攻擊 +{v}%，造成傷害的 {v2}% 轉為自己的生命',
-  'skill.dw_stride.name': '狗蹭蹭', 'skill.dw_stride.desc': '全隊攻速 +{v}%',
+  'skill.dw_stride.name': '狗蹭蹭', 'skill.dw_stride.desc': '全隊攻速 +{v}%；自己閃避 {evade}%、防禦 +{defPct}%，其他隊友閃避 +{party_evadeOthers}%',
   'skill.dw_bark.name': '狗狗狂吼', 'skill.dw_bark.desc': '普攻有 {v}% 機率讓敵人攻速 -20%、命中 -{v2}%、防禦 -{v2}%，3 秒',
 
   'skill.gy_punch.name': '重拳', 'skill.gy_punch.desc': '單體 {v}% 傷害',
