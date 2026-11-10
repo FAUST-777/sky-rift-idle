@@ -89,7 +89,7 @@ G.I18N['zh-CN'] = {
   'skill.cp_crew.name': '热气球补给',
   'skill.cp_crew.desc': '热气球每 1 阶，全队最大生命 +{v}%（目前 +{now}%）',
   'skill.cp_ace.name': '舰炮武装齐射！！',
-  'skill.cp_ace.desc': '飞空艇所有部位每升 1 阶，自己的技能伤害 +{v}%、技能冷却 -{shipCdr}%（目前技能伤害 +{now}%、冷却 -{cdnow}%）。另外全队的护盾被打破时，会再产生一次相同的护盾，护盾量 +{party_shieldReborn}%（每个护盾一次）',
+  'skill.cp_ace.desc': '飞空艇所有部位每升 1 阶，自己的技能伤害 +{v}%、技能冷却 -{shipCdr}%（目前技能伤害 +{now}%、冷却 -{cdnow}%）。另外全队的护盾被打破时，会再产生一次相同的护盾，护盾量 +{party_shieldReborn}%（每个护盾一次，同一人间隔 8 秒）',
   'summon.golem': '石魔人！',
   'summon.skeleton': '骷髅弓箭手！',
   'battle.corpseBlast': '尸爆！',

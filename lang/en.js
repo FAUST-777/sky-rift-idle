@@ -89,7 +89,7 @@ G.I18N['en'] = {
   'skill.cp_crew.name': 'Balloon Supplies',
   'skill.cp_crew.desc': 'Party max HP +{v}% per balloon level (now +{now}%)',
   'skill.cp_ace.name': 'Full Broadside!!',
-  'skill.cp_ace.desc': 'For every airship part level: your skill damage +{v}% and skill cooldown -{shipCdr}% (now damage +{now}%, cooldown -{cdnow}%). Also when an ally’s shield breaks, it regenerates once with +{party_shieldReborn}% shield',
+  'skill.cp_ace.desc': 'For every airship part level: your skill damage +{v}% and skill cooldown -{shipCdr}% (now damage +{now}%, cooldown -{cdnow}%). Also when an ally’s shield breaks, it regenerates once with +{party_shieldReborn}% shield (8s cooldown per ally)',
   'summon.golem': 'Stone Golem!',
   'summon.skeleton': 'Skeleton Archer!',
   'battle.corpseBlast': 'Corpse Explosion!',

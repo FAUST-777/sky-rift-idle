@@ -553,8 +553,8 @@
       if (u.shield > 0) {
         const a = Math.min(u.shield, left); u.shield -= a; left -= a;
         // 艦砲武裝齊射：護盾被打破 → 再生一次相同的護盾，量 +5%→25%（每個護盾只再生一次）
-        if (u.shield <= 0 && this.party(u) && this.aura.shieldReborn && u.shieldBase && !u.shieldReborn && u.alive) {
-          u.shieldReborn = true; u.shield = Math.round(u.shieldBase * (1 + this.aura.shieldReborn)); u.shieldT = u.shieldDurBase || 8;
+        if (u.shield <= 0 && this.party(u) && this.aura.shieldReborn && u.shieldBase && !u.shieldReborn && u.alive && !(u.shieldRebornAt && this.time.now - u.shieldRebornAt < 8000)) {   // 每人間隔 8 秒
+          u.shieldReborn = true; u.shieldRebornAt = this.time.now; u.shield = Math.round(u.shieldBase * (1 + this.aura.shieldReborn)); u.shieldT = u.shieldDurBase || 8;
           this.glow(u, '#9fd8ff');
           this.floatText(u.img.x, this.barY(u) - 22, G.t('battle.shieldReborn'), '#9fd8ff', 13, 800);
         }
