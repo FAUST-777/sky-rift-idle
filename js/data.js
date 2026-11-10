@@ -419,7 +419,7 @@ G.PARTNERS = [
   { id: 'mira', floor: 14, hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15, extra: 'defDownStack' } },   // extra：破防持續時間可累加
 ];
 G.partnerRecruitCost = p => 80 * p.floor;
-G.partnerLevelCost = lv => Math.round(50 * Math.pow(1.3, lv - 1));
+G.partnerLevelCost = lv => Math.round(25 * Math.pow(1.3, lv - 1));   // 原本 50 起跳，-50%
 
 // ── 飛空艇（部位名稱：part.<id>.name；款式名稱：part.<id>.<0~4>）───────────
 // 每個部位 5 款，越後面越強、外觀也不同；買過的款式可以自由切換

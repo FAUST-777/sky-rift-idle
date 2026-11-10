@@ -62,7 +62,7 @@ G.I18N['en'] = {
   'class.manicurist.name': 'Manicurist', 'class.manicurist.desc': 'Grows damage-reflecting spikes on the whole party, shields the party and raises party DEF. Specializes in reflect: the harder enemies hit, the harder it bounces back.',
 
   // ── Skills ──
-  'skills.reset': 'Reset points', 'skills.resetHint': 'Free, any time', 'skills.resetBody': 'All of {who}\'s skill points are refunded (the class starter skill keeps 1 rank) and skill slots are cleared. It\'s free, so you can reallocate any time.', 'skills.resetConfirm': 'Reset for free', 'toast.skillsReset': 'Skill points reset: {n} available', 'skills.points': 'Skill Points', 'skills.help': 'Only skills in slots take effect: {a} active (cast automatically) and {p} passive. You can learn 5 of each but only equip 4. Your picks are your build.',
+  'skills.resetBtn': 'Reset', 'skills.reset': 'Reset points', 'skills.resetHint': 'Free, any time', 'skills.resetBody': 'All of {who}\'s skill points are refunded (the class starter skill keeps 1 rank) and skill slots are cleared. It\'s free, so you can reallocate any time.', 'skills.resetConfirm': 'Reset for free', 'toast.skillsReset': 'Skill points reset: {n} available', 'skills.points': 'Skill Points', 'skills.help': 'Only skills in slots take effect: {a} active (cast automatically) and {p} passive. You can learn 5 of each but only equip 4. Your picks are your build.',
   'skills.activeSlots': 'Active skills', 'skills.passiveSlots': 'Passive skills', 'skills.equipped': 'Equipped',
   'skills.empty': 'Empty', 'skills.emptyHint': 'Tap to assign', 'skills.tree': '{cls} Skill Tree',
   'skills.villager': 'Villagers only know Smash. The full skill tree opens after choosing a class at Lv {lv}.',

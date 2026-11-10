@@ -346,10 +346,9 @@
     return `
       <div class="card">
         ${whoBarHtml(true)}
-        <h3 class="row" style="gap:6px">${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span>${G.S.partners[who] ? `<span class="grow"></span><span class="muted" style="font-size:12px;font-weight:400;white-space:nowrap">Lv ${G.S.partners[who].level}</span><button class="btn small good" data-act="plevel" data-id="${who}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(G.S.partners[who].level)) })}</button>` : ''}</h3>
+        <h3 class="row" style="gap:6px;justify-content:flex-start">${who === 'hero' ? '' : esc(whoName(who)) + '・'}${t('skills.points')} <span class="gold">${sp}</span><button class="btn small" style="white-space:nowrap" data-act="skreset" data-id="${who}" title="${esc(t('skills.resetHint'))}">${t('skills.resetBtn')}</button>${G.S.partners[who] ? `<span class="grow"></span><span class="muted" style="font-size:12px;font-weight:400;white-space:nowrap">Lv ${G.S.partners[who].level}</span><button class="btn small good" data-act="plevel" data-id="${who}">${t('partners.levelUp', { cost: G.fmt(G.partnerLevelCost(G.S.partners[who].level)) })}</button>` : ''}</h3>
         <div class="row" style="gap:10px;align-items:flex-start;margin:0 0 10px">
           <p class="muted grow" style="margin:0;font-size:12px">${t('skills.help', { a: G.ACTIVE_SLOTS, p: G.PASSIVE_SLOTS })}</p>
-          <button class="btn small" style="white-space:nowrap" data-act="skreset" data-id="${who}" title="${esc(t('skills.resetHint'))}">${t('skills.reset')}</button>
         </div>
         <div class="slot-label">${t('skills.activeSlots')}</div>
         ${slotGrid('active', ch, list)}
