@@ -455,6 +455,14 @@ G.DEATH_PACT = {
   sDef: lin(0.1, 0.225), sEvade: lin(0.2, 0.0375), sAtk: lin(0.18, 0.08), sCritDmg: lin(1, 0.5),
   tSpd: lin(0.5, 0.125), tEvade: () => 0.5,   // 場上召喚物 ≥3：全隊（含召喚物）攻速、閃避
 };
+// 召喚物自己的技能（名稱：skill.<id>.name）；cd0 = 召出來後第一次施放要等幾秒
+//   石魔人「挑釁」：敵方全體只打它、自己受到傷害 -50%，10 秒，CD 9 秒
+//   骷髏弓箭手「箭雨」：敵方全體 200% 傷害，自己攻速 +100% 5 秒，CD 8 秒
+G.SUMMON_SKILLS = {
+  golem:    { id: 'sm_taunt',  cd: 9, cd0: 0.5, v: () => 0.5, fx: v => ({ target: 'none', taunt: { v, t: 10 } }) },
+  skeleton: { id: 'sm_arrows', cd: 8, cd0: 1.5, v: () => 2,   fx: v => ({ target: 'all', mult: v, self: [{ id: 'spdUp', v: 1, t: 5 }] }) },
+};
+G.GOLEM_OWNER_HP = 0.5;   // 石魔人生命額外 + 主人最大生命 × 50%
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
   golem:    { icon: '🗿', stats: { hp: 3.0, atk: 0.25, def: 2.0 }, spd: 0.7 },                     // 石魔人：肉盾

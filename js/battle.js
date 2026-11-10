@@ -934,9 +934,12 @@
         spd: S.spd, crit: 5, critDmg: 1.5, ranged: false, range: 'one', dmgType: 'dark', missile: S.missile,
       };
       const lr = this.legionRank(); if (lr) st.maxHp = Math.round(st.maxHp * (1 + G.UNDEAD_LEGION.hp(lr)));   // 亡靈軍團：召喚物生命
+      if (kind === 'golem') st.maxHp = Math.round(st.maxHp + owner.st.maxHp * G.GOLEM_OWNER_HP);   // 石魔人：額外 + 主人最大生命 50%
       const unit = this.makeUnit({ side: 'party', kind: 'summon', minion: kind, st, x: 224, texture: 'summon_' + kind, originY: 0.94, scale: 0.85 });
       unit.img.setAlpha(0);
       this.tweens.add({ targets: unit.img, alpha: 1, duration: 300 });
+      const sk = G.SUMMON_SKILLS[kind];   // 召喚物自己的技能（挑釁／箭雨）
+      if (sk) unit.skills = [{ def: sk, rank: 1, cd: sk.cd0 }];
       this.units.push(unit);
       this.minion = { kind, unit, owner };
       this.floatText(224, GROUND - 80, G.t('summon.' + kind), '#c99bff', 15, 900);
@@ -1362,7 +1365,7 @@
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
       if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
       const taunter = party.find(u => u.taunt.t > 0);
-      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: G.whoName(taunter.key) } });
+      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: taunter.minion ? G.t('minion.' + taunter.minion) : G.whoName(taunter.key) } });
       // 敵人 debuff 不放這裡，改顯示在每隻敵人腳下（drawDebuffLabel）
       return out;
     }
