@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -201,6 +201,7 @@
         const ratio = u.hp / u.st.maxHp;
         u.st = G.charStats(u.key);
         const hm = this.hpAuraOf(u); if (hm) u.st.maxHp = Math.round(u.st.maxHp * (1 + hm));
+        if (u.hpBoostV) u.st.maxHp = Math.round(u.st.maxHp * (1 + u.hpBoostV));   // 野性狂暴期間換裝：保留暫時生命加成
         u.hp = u.alive ? Math.max(1, Math.round(u.st.maxHp * ratio)) : 0;
         const old = u.skills;
         this.applyBuild(u, u.key);
@@ -213,6 +214,15 @@
         }
       });
       this.computeAura();
+    }
+
+    // 暫時的最大生命加成（野性狂暴 hpUp）：最大生命跟著 buff 變，增加的部分直接補血，到期時扣回（不會扣到死）
+    syncHpBoost(u) {
+      const want = u.alive ? this.fxv(u, 'hpUp') : 0, cur = u.hpBoostV || 0;
+      if (want === cur || !u.st || !u.st.maxHp) return;
+      const base = u.st.maxHp / (1 + cur), max = Math.round(base * (1 + want)), diff = max - u.st.maxHp;
+      u.st.maxHp = max; u.hpBoostV = want;
+      if (u.alive) u.hp = diff > 0 ? u.hp + diff : Math.max(1, Math.min(u.hp, max));
     }
 
     computeAura() {
@@ -624,6 +634,7 @@
       (e.party || []).forEach(b => this.partyAlive().forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));
       (e.partyOthers || []).forEach(b => this.partyAlive().filter(p => p !== u).forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給其他隊友
       if (e.partyOthersType) this.partyAlive().filter(p => p !== u && p.kind !== 'summon' && p.st.dmgType === e.partyOthersType.type).forEach(p => e.partyOthersType.fx.forEach(b => this.addFx(p, b.id, bv(b), bt(b))));   // 某系別的其他隊友（取高）
+      this.units.forEach(p => this.syncHpBoost(p));
       (e.selfDebuff || []).forEach(b => this.addFx(u, b.id, b.v, bt(b)));   // 施放者自己的代價
       if (e.hpCost) { const c = Math.floor(u.hp * e.hpCost); if (c > 0) { u.hp = Math.max(1, u.hp - c); this.floatText(u.img.x, this.barY(u) - 6, '-' + c, '#ff6b6b', 13, 700); } }   // 扣目前生命
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
@@ -865,6 +876,7 @@
     fightTick(dt) {
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
+      this.units.forEach(u => this.syncHpBoost(u));   // 野性狂暴到期：最大生命恢復
       all.forEach(u => {
         if (!u.alive) return;
         // 狀態倒數
