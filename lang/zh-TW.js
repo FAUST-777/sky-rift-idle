@@ -201,7 +201,7 @@ G.I18N['zh-TW'] = {
   'skill.wb_cover.name': '掩護', 'skill.wb_cover.desc': '{v}% 機率替隊友擋下攻擊。自己生命 +{hpPct}%、受到傷害 -{dmgReduce}%；被攻擊後獲得「城牆上微風」：6 秒內每秒回復 1% 生命',
   'skill.wb_stone.name': '石牆', 'skill.wb_stone.desc': '防禦 +{v}%',
   'skill.wb_guardian.name': '守護者', 'skill.wb_guardian.desc': '全隊受到傷害 -{v}%',
-  'skill.wb_rampart.name': '破牆而出', 'skill.wb_rampart.desc': '捨棄防守全力進攻：防禦 {v}%、生命 -77%、暴擊率 +{crit}%、暴擊傷害 +{critDmg}%、攻速 +{spdPct}%，城牆衝撞傷害 +300%',
+  'skill.wb_rampart.name': '破牆而出', 'skill.wb_rampart.desc': '捨棄防守全力進攻：防禦 {v}%、生命 -77%、暴擊率 +{crit}%、暴擊傷害 +{critDmg}%、攻速 +{spdPct}%，城牆衝撞改為全體攻擊、傷害 +300%、冷卻變 3 秒',
   'skill.wb_thorns.name': '尖刺城牆', 'skill.wb_thorns.desc': '反彈受到傷害的 {v}%',
 
   'skill.dr_bear.name': '熊之靈', 'skill.dr_bear.desc': '全隊防禦 +{v}%，8 秒',

@@ -861,9 +861,11 @@
       return true;
     }
 
+    // 技能基礎冷卻：破牆而出時城牆衝撞改 G.BREAKOUT_BASH_CD 秒
+    baseCd(u, s) { return s.def.id === 'wb_bash' && u.st.bashDmg ? G.BREAKOUT_BASH_CD : s.def.cd; }
     castSkill(u, s) {
       const d = s.def, v = d.v(s.rank), e = d.fx(v, s.rank);
-      if (d.id === 'wb_bash' && u.st.bashDmg) e.mult *= 1 + u.st.bashDmg;   // 破牆而出：城牆衝撞傷害 +300%
+      if (d.id === 'wb_bash' && u.st.bashDmg) { e.mult *= 1 + u.st.bashDmg; e.target = 'all'; }   // 破牆而出：城牆衝撞變全體、傷害 +300%
       if (!this.shouldCast(u, e)) return false;
       const col = e.mult ? '#ffd27a' : e.heal || e.selfHeal ? '#7dff9a' : '#9fd8ff';
       this.floatText(u.img.x, this.barY(u) - 22, G.skillName(d.id), col, 15, 900);
@@ -1279,7 +1281,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr'))); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
+            if (this.castSkill(u, s)) { s.cd = this.baseCd(u, s) * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr'))); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }

@@ -453,6 +453,7 @@ G.shipSkillBonus = () => {
 //   （第 129 輪：怨靈替死移到「怨靈召喚」本身）
 //   普攻打恐懼敵人傷害 +vsFear；打衰老詛咒敵人暴擊傷害 +vsDecayCritDmg（可疊加）
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
+G.BREAKOUT_BASH_CD = 3;   // 城牆者「破牆而出」：城牆衝撞冷卻 6 → 3 秒、改打全體
 G.WALL_BREEZE = { v: 0.01, t: 6 };   // 城牆者「掩護」：被攻擊後「城牆上微風」每秒回 1%，6 秒
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };

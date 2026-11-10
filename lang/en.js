@@ -201,7 +201,7 @@ G.I18N['en'] = {
   'skill.wb_cover.name': 'Cover', 'skill.wb_cover.desc': '{v}% chance to take a hit for an ally. Your HP +{hpPct}%, damage taken -{dmgReduce}%; when hit you gain Breeze on the Wall: regen 1% HP/s for 6s',
   'skill.wb_stone.name': 'Stonewall', 'skill.wb_stone.desc': 'DEF +{v}%',
   'skill.wb_guardian.name': 'Guardian', 'skill.wb_guardian.desc': 'Party damage taken -{v}%',
-  'skill.wb_rampart.name': 'Breakout', 'skill.wb_rampart.desc': 'All-out attack: DEF {v}%, HP -77%, crit rate +{crit}%, crit damage +{critDmg}%, attack speed +{spdPct}%, Wall Bash damage +300%',
+  'skill.wb_rampart.name': 'Breakout', 'skill.wb_rampart.desc': 'All-out attack: DEF {v}%, HP -77%, crit rate +{crit}%, crit damage +{critDmg}%, attack speed +{spdPct}%, Wall Bash hits all enemies with +300% damage and a 3s cooldown',
   'skill.wb_thorns.name': 'Spiked Wall', 'skill.wb_thorns.desc': 'Reflects {v}% of damage taken',
 
   'skill.dr_bear.name': 'Bear Spirit', 'skill.dr_bear.desc': 'Party DEF +{v}% for 8s',
