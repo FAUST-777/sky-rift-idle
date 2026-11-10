@@ -288,7 +288,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
-        cdr: Math.min(G.CONFIG.cdrCap, a.cdr || 0),
+        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0)),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -578,6 +578,7 @@
       if (e.heal && !e.cdCut) return this.partyAlive().some(p => p.hp / p.st.maxHp < 0.8);   // 散步時間：減冷卻為主，順便回血，不用等人受傷
       if (e.selfHeal) return u.hp / u.st.maxHp < 0.75;
       if (e.summon) return !(this.animal && this.animal.unit.alive);
+      if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
       return true;
     }
 
@@ -621,6 +622,9 @@
       const bv = b => b.v * (u.st.buffPow || 1), bt = b => b.t * (u.st.buffDur || 1);
       (e.self || []).forEach(b => { this.addFx(u, b.id, bv(b), bt(b)); this.glow(u, col); });
       (e.party || []).forEach(b => this.partyAlive().forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));
+      (e.partyOthers || []).forEach(b => this.partyAlive().filter(p => p !== u).forEach(p => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給其他隊友
+      (e.selfDebuff || []).forEach(b => this.addFx(u, b.id, b.v, b.t));   // 施放者自己的代價
+      if (e.hpCost) { const c = Math.floor(u.hp * e.hpCost); if (c > 0) { u.hp = Math.max(1, u.hp - c); this.floatText(u.img.x, this.barY(u) - 6, '-' + c, '#ff6b6b', 13, 700); } }   // 扣目前生命
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
@@ -878,7 +882,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, this.aura.cdr || 0)); break; }
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0))); break; }
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }
