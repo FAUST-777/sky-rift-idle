@@ -359,7 +359,8 @@ G.SKILLS = {
     A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: lin(1.1, 0.225)(r), t: 18 } }),
       { descV: { spd: lin(0.5, 0.125), curse: lin(1.1, 0.225) } }),
     P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
-    P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
+    // 白骨風暴（原腐朽，id 不變）：見 G.BONE_STORM；v = 中毒強度
+    P('nc_rot',       0, lin(1, 0.25),    'special', 'boneStorm'),
     // 亡靈軍團（原不死之契，id 不變）：數值見 G.UNDEAD_LEGION；v = 召喚物生命
     P('nc_undying',   1, lin(0.1, 0.1),   'special', 'undeadLegion', { descV: { evade: r => G.UNDEAD_LEGION.evade(r) } }),
     P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
@@ -438,6 +439,10 @@ G.shipSkillBonus = () => {
 //   打到有衰老詛咒的敵人：傷害 ×(1 + decayDmg) 且必定暴擊
 //   召喚物倒下 → 屍爆：對敵方全體造成（召喚物最大生命＋主人最大生命）的傷害，無視防禦
 //   場上有召喚物：死靈自己閃避 +evade
+// 死靈「白骨風暴」：裝了的死靈自己、或場上召喚物（含怨靈，隊上取最高等級）每次攻擊（普攻＋技能）→
+//   破防 def、命中下降 blind（敵人 miss 機率）、中毒（強度 poison × 一般中毒），都是 t 秒
+G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
+G.DOOM_MAX_STACKS = 4;   // 死亡詛咒最多疊幾層
 G.UNDEAD_LEGION = { hp: lin(0.1, 0.1), evade: lin(0.1, 0.0125), fearChance: 0.1, decayDmg: 0.5 };
 G.DEATH_PACT = {
   regen: lin(0.01, 0.005), dmg: lin(0.01, 0.01), spd: lin(0.05, 0.0175),

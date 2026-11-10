@@ -304,19 +304,34 @@
         target.st.maxHp = Math.max(1, Math.round(target.st.maxHp * (1 - val)));
         target.hp = Math.min(target.hp, target.st.maxHp);
       }
-      // 死亡詛咒：還在倒數就先馬上引爆，再重新上一個（重新開始記錄）
+      // 死亡詛咒：固定 6 秒（不吃延長），可疊層（最多 G.DOOM_MAX_STACKS），每層各自記錄、各自到期引爆；疊滿時不再上
       if (id === 'doom' && target.alive) {
-        if (f && f.t > 0) this.doomBlast(target);
-        target.doomAcc = 0;
-        target.fx.doom = { v: val, t: dur, full: dur };
+        const st = target.doomStacks || (target.doomStacks = []);
+        if (st.length >= G.DOOM_MAX_STACKS) return;
+        st.push({ t, v: val, acc: 0 });
+        this.syncDoom(target);
         return;
       }
       this.addFx(target, id, val, dur);
     }
-    doomBlast(u) {
-      const f = u.fx.doom, dmg = f ? Math.round((u.doomAcc || 0) * f.v) : 0;
-      if (f) f.t = 0;
-      u.doomAcc = 0;
+    // fx.doom 只用來顯示／算減益數：t = 最快引爆那層的剩餘秒數
+    syncDoom(u) {
+      const st = u.doomStacks || [];
+      if (st.length) u.fx.doom = { v: st[0].v, t: Math.min(...st.map(s => s.t)), full: 6 };
+      else delete u.fx.doom;
+    }
+    // 每層倒數；到期的那層引爆（記錄傷害 × 倍率）
+    doomTick(u, dt) {
+      const st = u.doomStacks;
+      if (!st || !st.length) return;
+      st.forEach(s => { s.t -= dt; });
+      const done = st.filter(s => s.t <= 0);
+      u.doomStacks = st.filter(s => s.t > 0);
+      done.forEach(s => this.doomBlast(u, s));
+      this.syncDoom(u);
+    }
+    doomBlast(u, s) {
+      const dmg = Math.round(s.acc * s.v);
       if (!u.alive || dmg <= 0) return;
       this.doomBlasting = true;
       this.floatText(u.img.x, this.barY(u) - 26, G.t('battle.doomBlast'), '#e8e4d8', 13, 700);
@@ -338,6 +353,7 @@
     }
 
     // ── 死靈「死亡契約」與召喚物 ──────────────────────────────────────────
+    boneRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.boneStorm || {}).r || 0)); }
     legionRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.undeadLegion || {}).r || 0)); }
     pactRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.deathPact || {}).r || 0)); }
     summonCount() { return (this.minionAlive() ? 1 : 0) + (this.wraiths || []).length; }
@@ -605,6 +621,12 @@
         }
       }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
+      // 白骨風暴：裝了的死靈自己、或場上召喚物（含怨靈）的攻擊 → 破防、命中下降、中毒
+      if (!opts.counter && target.alive && !this.party(target)) {
+        const isSummon = opts.wraith || (src.kind === 'summon' && src.minion);
+        const br = src.special.boneStorm && !opts.wraith ? src.special.boneStorm.r : isSummon ? this.boneRank() : 0;
+        if (br) { const B = G.BONE_STORM; this.debuff(src, target, 'defDown', B.def, B.t); this.debuff(src, target, 'blind', B.blind, B.t); this.debuff(src, target, 'poison', B.poison(br), B.t); }
+      }
       if ((opts.wraith || (src.kind === 'summon' && src.minion)) && target.alive && this.legionRank() > 0 && Math.random() < G.UNDEAD_LEGION.fearChance * this.procMult(src)) this.debuff(src, target, 'fear', 0.2, 6);   // 亡靈軍團：召喚物攻擊機率上恐懼
 
       // 城牆者「尖刺城牆」反傷
@@ -669,7 +691,7 @@
         }
       }
       u.hp -= left;
-      if (!this.doomBlasting && u.fx.doom && u.fx.doom.t > 0) u.doomAcc = (u.doomAcc || 0) + amount;   // 死亡詛咒：記錄受到的傷害（引爆本身不算）
+      if (!this.doomBlasting && u.doomStacks) u.doomStacks.forEach(s => { s.acc += amount; });   // 死亡詛咒：每層都記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
       if (u.hp <= 0) this.kill(u);
@@ -1197,7 +1219,7 @@
         if (!u.alive) return;
         // 狀態倒數
         Object.values(u.fx).forEach(f => { if (f.t > 0) f.t -= dt; });
-        if (u.fx.doom && u.fx.doom.t <= 0 && u.doomAcc !== undefined && u.fx.doom.v) { this.doomBlast(u); delete u.fx.doom; if (!u.alive) return; }   // 死亡詛咒到期：引爆
+        this.doomTick(u, dt); if (!u.alive) return;   // 死亡詛咒：逐層到期引爆
         if (u.decayBase && !this.fxv(u, 'decay')) { u.st.maxHp = u.decayBase; delete u.decayBase; }   // 衰老詛咒到期：最大生命還原
         if (u.taunt.t > 0) u.taunt.t -= dt;
         if (u.shieldT > 0 && (u.shieldT -= dt) <= 0) u.shield = 0;
@@ -1349,8 +1371,8 @@
     // 敵人腳下的 debuff 圖示＋剩餘秒數（例如「💫1.2 💔4」），一眼看出哪隻中了什麼
     drawDebuffLabel(u) {
       const parts = u.alive && u.img.visible ? DEBUFF_IDS.filter(id => this.fxv(u, id)).map(id => {
-        const t = u.fx[id].t;
-        return G.FX_ICON[id] + (t < 3 ? t.toFixed(1) : Math.ceil(t));   // 快結束時顯示到小數一位
+        const t = u.fx[id].t, n = id === 'doom' && u.doomStacks ? u.doomStacks.length : 0;
+        return G.FX_ICON[id] + (n > 1 ? '×' + n + ' ' : '') + (t < 3 ? t.toFixed(1) : Math.ceil(t));   // 死亡詛咒顯示層數   // 快結束時顯示到小數一位
       }) : [];
       // 敵人站得很近：一排最多 2 個（層主 3 個）往下疊，才不會跟隔壁的字疊在一起
       const per = u.boss ? 3 : 2, rows = [];
