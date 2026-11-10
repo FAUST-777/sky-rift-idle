@@ -175,7 +175,7 @@ G.SKILLS = {
     // 貓咪齊射：另外給全隊動物系隊友「下一次技能傷害 +100%」（20 秒內用掉）
     A('ck_volley',    0, 6,  lin(0.9, 0.15),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.2, t: 4 }], partyType: { type: 'animal', fx: [{ id: 'nextSkill', v: 1, t: 20 }] } })),
     // 毒爪：對暈眩中的敵人技能傷害 +500%
-    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   (v, r) => ({ target: 'all', mult: v, vsStunSkill: lin(5, 0.165)(r), critDrain: lin(0.1, 0.1)(r), debuffs: [{ id: 'poison', v: 1, t: 6 }] }), { descV: { stun: lin(5, 0.165), drain: lin(0.1, 0.1) } }),   // 對暈眩敵人技能傷害 +500%→566%
+    A('ck_toxic',     0, 8,  lin(0.6, 0.1),   (v, r) => ({ target: 'all', mult: v, vsStunSkill: lin(5, 0.165)(r), critHealMax: lin(0.04, 0.01)(r), debuffs: [{ id: 'poison', v: 1, t: 6 }] }), { descV: { stun: lin(5, 0.165), heal: lin(0.04, 0.01) } }),   // 對暈眩敵人技能傷害 +500%→566%
     A('ck_fullburst', 1, 12, lin(1.2, 0.2),   v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.3, t: 5 }, { id: 'defDown', v: 0.2, t: 5 }] })),
     // 喵喵鼓舞：全隊攻擊；10 秒內團隊特效數值 +10%→20%（跟獸群之心取高）、全隊動物系技能傷害 +7%→15%
     A('ck_rally',     1, 15, lin(0.2, 0.06),  (v, r) => ({ target: 'none', synBoost: { v: RALLY.syn(r), t: 10 }, party: [{ id: 'atkUp', v, t: 10 }, { id: 'animalSkill', v: RALLY.animal(r), t: 10 }] }),

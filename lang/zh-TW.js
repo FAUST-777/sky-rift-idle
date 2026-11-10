@@ -86,7 +86,7 @@ G.I18N['zh-TW'] = {
   'skill.bk_vitality.name': '血之活力', 'skill.bk_vitality.desc': '生命 +{v}%',
 
   'skill.ck_volley.name': '貓咪齊射', 'skill.ck_volley.desc': '全體 {v}% 傷害，貓抓讓敵人攻速 -20%，4 秒。全隊動物系隊友下一次技能傷害 +100%（20 秒內）',
-  'skill.ck_toxic.name': '毒爪', 'skill.ck_toxic.desc': '全體 {v}% 傷害，並使敵人中毒 6 秒。對暈眩中的敵人技能傷害 +{stun}%；暴擊時把傷害的 {drain}% 轉成自己的生命',
+  'skill.ck_toxic.name': '毒爪', 'skill.ck_toxic.desc': '全體 {v}% 傷害，並使敵人中毒 6 秒。對暈眩中的敵人技能傷害 +{stun}%；有打出暴擊時，回復自己 {heal}% 最大生命（每次施放一次）',
   'skill.ck_fullburst.name': '全彈發射', 'skill.ck_fullburst.desc': '全身艙門打開，全體 {v}% 傷害，敵人攻速 -30%、防禦 -20%，5 秒',
   'skill.ck_rally.name': '喵喵鼓舞', 'skill.ck_rally.desc': '全隊攻擊 +{v}%、動物系隊友技能傷害 +{animal}%，並且團隊特效數值 +{syn}%，10 秒',
   'skill.ck_purr.name': '呼嚕療癒', 'skill.ck_purr.desc': '全隊回復 {v}% 生命，之後 5 秒每秒再回復 1%',
