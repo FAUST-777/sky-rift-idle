@@ -449,6 +449,13 @@
       // 吸血
       const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
       if (ls && src.alive) {
+        // 出血：普攻吸血時自己是滿血 → 50% 機率補失血比例最高的隊友 2% 最大生命（每秒最多 3 次）
+        if (src.st.bleedHeal && !opts.skill && !opts.counter && src.hp >= src.st.maxHp && Math.random() < 0.5) {
+          const now = this.time.now, recent = (src.bleedHealAt || []).filter(x => now - x < 1000);
+          src.bleedHealAt = recent;
+          const hurt = this.partyAlive().filter(p => p !== src && p.kind !== 'summon' && p.hp < p.st.maxHp).sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0];
+          if (hurt && recent.length < 3) { recent.push(now); this.heal(hurt, Math.max(1, Math.round(hurt.st.maxHp * src.st.bleedHeal)), false); }
+        }
         src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
         const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友（每秒最多一次）
         // 每秒最多 3 次：記錄最近 1 秒內的觸發時間

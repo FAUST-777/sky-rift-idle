@@ -80,7 +80,7 @@ G.I18N['zh-CN'] = {
   'skill.bk_bloodlust.name': '血性狂暴', 'skill.bk_bloodlust.desc': '自身攻击 +{v}%，8 秒；期间吸血时，其他队友回复 {share}% 最大生命（每秒最多 3 次）',
   'skill.bk_execute.name': '处决', 'skill.bk_execute.desc': '单体 {v}% 伤害，目标流血中时伤害翻倍',
   'skill.bk_drain.name': '吸血', 'skill.bk_drain.desc': '伤害的 {v}% 转为生命',
-  'skill.bk_hemorrhage.name': '出血', 'skill.bk_hemorrhage.desc': '普攻有 {v}% 概率造成流血',
+  'skill.bk_hemorrhage.name': '出血', 'skill.bk_hemorrhage.desc': '普攻有 {v}% 概率造成流血。普攻吸血时如果自己是满血，有 50% 概率改为帮失血比例最高的队友回复 {bleedHeal}% 最大生命（每秒最多 3 次）',
   'skill.bk_frenzy.name': '狂怒', 'skill.bk_frenzy.desc': '暴击率 +{v}%',
   'skill.bk_thirst.name': '渴血', 'skill.bk_thirst.desc': '对流血中的敌人伤害 +{v}%',
   'skill.bk_vitality.name': '血之活力', 'skill.bk_vitality.desc': '生命 +{v}%',

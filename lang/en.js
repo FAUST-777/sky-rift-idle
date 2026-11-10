@@ -80,7 +80,7 @@ G.I18N['en'] = {
   'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile lifesteal heals other allies for {share}% max HP (up to 3 times per second)',
   'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if it is bleeding',
   'skill.bk_drain.name': 'Lifedrain', 'skill.bk_drain.desc': 'Heals for {v}% of damage dealt',
-  'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause Bleed',
+  'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause bleeding. When your basic attack lifesteals at full HP, 50% chance to heal the most injured ally (by %) for {bleedHeal}% of their max HP (up to 3 times per second)',
   'skill.bk_frenzy.name': 'Frenzy', 'skill.bk_frenzy.desc': 'Crit chance +{v}%',
   'skill.bk_thirst.name': 'Bloodthirst', 'skill.bk_thirst.desc': '+{v}% damage to bleeding enemies',
   'skill.bk_vitality.name': 'Blood Vitality', 'skill.bk_vitality.desc': 'HP +{v}%',
