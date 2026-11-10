@@ -463,7 +463,7 @@ G.SUMMON_SKILLS = {
   golem:    { id: 'sm_taunt',  cd: 9, cd0: 0.5, v: () => 0.5, fx: v => ({ target: 'none', taunt: { v, t: 10 } }) },
   skeleton: { id: 'sm_arrows', cd: 8, cd0: 1.5, v: () => 2,   fx: v => ({ target: 'all', mult: v, self: [{ id: 'spdUp', v: 1, t: 5 }] }) },
 };
-G.GOLEM_EVADE_CAP = 0.7;   // 石魔人閃避上限（一般角色是 G.CONFIG.evadeCap 90%）
+G.GOLEM_EVADE_CAP = 0.55;  // 石魔人閃避上限（一般角色是 G.CONFIG.evadeCap 90%）
 G.GOLEM_OWNER_HP = 0.5;   // 石魔人生命額外 + 主人最大生命 × 50%
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
