@@ -106,7 +106,7 @@ G.I18N['en'] = {
   'core.atk': 'Attack', 'core.buff': 'Support', 'core.def': 'Defense',
   'range.all': 'All enemies', 'range.one': 'Single target',
   'dtype.physical': 'Physical', 'dtype.animal': 'Animal', 'dtype.arcane': 'Arcane', 'dtype.dark': 'Dark',
-  'class.villager.name': 'Villager', 'class.villager.desc': 'An ordinary villager. Choose a class at Lv 5.',
+  'class.villager.name': 'Villager', 'class.villager.desc': 'An ordinary villager. Choose a class at Lv 3.',
   'class.bloodknight.name': 'Blood Knight', 'class.bloodknight.desc': 'Survives by draining life. Attacks make enemies bleed.',
   'class.catknight.name': 'Cat Knight', 'class.catknight.desc': 'A mysterious knight in full armor who launches kittens from hatches. Boosts party Morale and Cat Frenzy, slows enemies with scratches, and can poison them.',
   'class.scholar.name': 'Scholar', 'class.scholar.desc': 'Bombards all enemies with books; Long Lecture breaks armor and Exam Prediction always crits. Also the party support: Speed Reading boosts allies’ attack speed, while Peer Review and Cram Session trade the scholar’s own HP to empower allies. Crisis Mode kicks in when allies are in danger, and scholars earn extra gold.',

@@ -106,7 +106,7 @@ G.I18N['zh-TW'] = {
   'core.atk': '攻擊', 'core.buff': '輔助', 'core.def': '防禦',
   'range.all': '全體', 'range.one': '單體',
   'dtype.physical': '物理', 'dtype.animal': '動物', 'dtype.arcane': '奧術', 'dtype.dark': '黑暗',
-  'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 級可以轉職。',
+  'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 3 級可以轉職。',
   'class.bloodknight.name': '血騎士', 'class.bloodknight.desc': '以吸血增加生存為主，攻擊會讓敵人流血。',
   'class.catknight.name': '貓鎧者', 'class.catknight.desc': '全身鎧甲的神祕騎士，從鎧甲開口射出小貓。提升全隊士氣與吸貓狂熱，貓抓降低敵人攻速，也能讓敵人中毒。',
   'class.scholar.name': '學者', 'class.scholar.desc': '用書本轟炸全體敵人，長篇大論能破防、考前猜題必定暴擊。同時也是隊伍的後勤：速讀幫隊友加攻速，論文審查、臨時抱佛腳會犧牲自己的生命換隊友變強；隊友危急時觸發危機意識，還能多賺金幣。',

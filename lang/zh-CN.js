@@ -106,7 +106,7 @@ G.I18N['zh-CN'] = {
   'core.atk': '攻击', 'core.buff': '辅助', 'core.def': '防御',
   'range.all': '全体', 'range.one': '单体',
   'dtype.physical': '物理', 'dtype.animal': '动物', 'dtype.arcane': '奥术', 'dtype.dark': '黑暗',
-  'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 级可以转职。',
+  'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 3 级可以转职。',
   'class.bloodknight.name': '血骑士', 'class.bloodknight.desc': '以吸血增加生存为主，攻击会让敌人流血。',
   'class.catknight.name': '猫铠者', 'class.catknight.desc': '全身铠甲的神秘骑士，从铠甲开口射出小猫。提升全队士气与吸猫狂热，猫抓降低敌人攻速，也能让敌人中毒。',
   'class.scholar.name': '学者', 'class.scholar.desc': '用书本轰炸全体敌人，长篇大论能破防、考前猜题必定暴击。同时也是队伍的后勤：速读帮队友加攻速，论文审查、临时抱佛脚会牺牲自己的生命换队友变强；队友危急时触发危机意识，还能多赚金币。',

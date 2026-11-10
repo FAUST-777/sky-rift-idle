@@ -7,7 +7,7 @@ window.G = window.G || {};
 
 G.CONFIG = {
   killsPerFloor: 10,        // 每層打幾隻小怪後出現層主
-  classUnlockLevel: 5,      // 幾等可以轉職
+  classUnlockLevel: 3,      // 幾等可以轉職
   classChangeCost: 500,     // 轉職後再換職業的費用
   maxParty: 2,              // 同時出戰的夥伴數
   inventorySize: 40,
