@@ -550,7 +550,15 @@
     damage(u, amount, color, crit, quiet) {
       if (!u.alive) return;
       let left = amount;
-      if (u.shield > 0) { const a = Math.min(u.shield, left); u.shield -= a; left -= a; }
+      if (u.shield > 0) {
+        const a = Math.min(u.shield, left); u.shield -= a; left -= a;
+        // 艦砲武裝齊射：護盾被打破 → 再生一次相同的護盾，量 +5%→25%（每個護盾只再生一次）
+        if (u.shield <= 0 && this.party(u) && this.aura.shieldReborn && u.shieldBase && !u.shieldReborn && u.alive) {
+          u.shieldReborn = true; u.shield = Math.round(u.shieldBase * (1 + this.aura.shieldReborn)); u.shieldT = u.shieldDurBase || 8;
+          this.glow(u, '#9fd8ff');
+          this.floatText(u.img.x, this.barY(u) - 22, G.t('battle.shieldReborn'), '#9fd8ff', 13, 800);
+        }
+      }
       u.hp -= left;
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
@@ -749,7 +757,11 @@
       if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
-      if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1) * (1 + (this.aura.shieldAmt || 0)))); p.shieldT = 8 * (1 + (this.aura.shieldDur || 0)); this.glow(p, col); });   // 領航員：護盾量、時間 +200%
+      if (e.shield) this.partyAlive().forEach(p => {
+        const amt = Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1) * (1 + (this.aura.shieldAmt || 0)));   // 領航員／博學：護盾量、時間 +200%
+        if (amt >= (p.shield || 0)) { p.shield = amt; p.shieldBase = amt; p.shieldDurBase = 8 * (1 + (this.aura.shieldDur || 0)); p.shieldReborn = false; }
+        p.shieldT = 8 * (1 + (this.aura.shieldDur || 0)); this.glow(p, col);
+      });   // 領航員：護盾量、時間 +200%
       if (e.partyType) this.partyAlive().filter(p => p.st.dmgType === e.partyType.type).forEach(p => e.partyType.fx.forEach(b => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給某系別的隊友
       if (e.synBoost) { this.synBoost = { v: Math.max(e.synBoost.v, this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0), t: e.synBoost.t }; this.computeAura(); }   // 喵喵鼓舞：團隊特效暫時加強
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }

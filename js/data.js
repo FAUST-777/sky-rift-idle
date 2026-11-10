@@ -376,7 +376,7 @@ G.SKILLS = {
     // 王牌砲手（原快速裝填）：船砲間隔 -0.5→-1.5 秒；船砲 15→35% 機率暴擊，暴擊傷害 ×2.5→×3.5
     P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true, partyAlso: { cannonCrit: lin(15, 5), cannonCritDmg: lin(2.5, 0.25) }, rawKeys: ['cannonCrit', 'cannonCritDmg'] }),
     // 艦砲武裝齊射！！（被動）：飛空艇所有部位每 1 階 → 船長自己的技能傷害 +1%→3%、技能冷卻 -0.5%→1%
-    P('cp_ace',       2, lin(0.01, 0.005), 'self', 'shipSkill', { also: { shipCdr: lin(0.005, 0.00125) },
+    P('cp_ace',       2, lin(0.01, 0.005), 'self', 'shipSkill', { also: { shipCdr: lin(0.005, 0.00125) }, partyAlso: { shieldReborn: lin(0.05, 0.05) },   // shieldReborn：隊友護盾被打破時再生一次，量 +5%→25%
       descV: { now: r => lin(0.01, 0.005)(r) * G.shipTotalLv(), cdnow: r => lin(0.005, 0.00125)(r) * G.shipTotalLv() } }),
     P('cp_crew',      1, lin(0.01, 0.005), 'party', 'balloonHp', { descV: { now: r => lin(0.01, 0.005)(r) * G.shipLv('balloon') } }),   // 氣球每 1 階 → 全隊生命
   ],

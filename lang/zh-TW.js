@@ -89,7 +89,7 @@ G.I18N['zh-TW'] = {
   'skill.cp_crew.name': '熱氣球補給',
   'skill.cp_crew.desc': '熱氣球每 1 階，全隊最大生命 +{v}%（目前 +{now}%）',
   'skill.cp_ace.name': '艦砲武裝齊射！！',
-  'skill.cp_ace.desc': '飛空艇所有部位每升 1 階，自己的技能傷害 +{v}%、技能冷卻 -{shipCdr}%（目前技能傷害 +{now}%、冷卻 -{cdnow}%）',
+  'skill.cp_ace.desc': '飛空艇所有部位每升 1 階，自己的技能傷害 +{v}%、技能冷卻 -{shipCdr}%（目前技能傷害 +{now}%、冷卻 -{cdnow}%）。另外全隊的護盾被打破時，會再產生一次相同的護盾，護盾量 +{party_shieldReborn}%（每個護盾一次）',
   'summon.golem': '石魔人！',
   'summon.skeleton': '骷髏弓箭手！',
   'battle.corpseBlast': '屍爆！',
@@ -366,7 +366,7 @@ G.I18N['zh-TW'] = {
   'revive.title': '💀 戰敗', 'revive.wait': '<b>{s}</b>秒後免費復活（退回第 {n} 層）', 'revive.pay': '💎 {cost} 立即原地復活（有 {have}）',
 
   'battle.morale': '🎖️ 貓貓士氣 +{n}%', 'battle.collapse': '收起戰鬥畫面', 'battle.expand': '展開戰鬥畫面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙擊爆頭！！！', 'battle.cover_fire': '掩護射擊！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '閃避', 'battle.cover': '掩護！', 'battle.stun': '暈眩', 'battle.fever': '血之狂熱！', 'battle.bloodRush': '血性加速！', 'battle.snipe': '狙擊爆頭！！！', 'battle.cover_fire': '掩護射擊！', 'battle.shieldReborn': '護盾再生！', 'battle.bossSlam': '巨力重擊！！！！！', 'battle.hpSlam': '肌肉衝擊！！！！！',
 
   // ── Buff ──
   'buff.morale.name': '貓貓士氣', 'buff.morale.desc': '貓鎧者每攻擊一次累積 1 層，每層全隊最終防禦 +1%，最多 +{max}%。目前 +{n}%（戰敗歸零）。另外全隊普攻有 {stun}% 機率暈眩敵人 {stunT} 秒，全隊閃避 +{evade}%。',

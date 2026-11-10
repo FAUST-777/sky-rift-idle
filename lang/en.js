@@ -89,7 +89,7 @@ G.I18N['en'] = {
   'skill.cp_crew.name': 'Balloon Supplies',
   'skill.cp_crew.desc': 'Party max HP +{v}% per balloon level (now +{now}%)',
   'skill.cp_ace.name': 'Full Broadside!!',
-  'skill.cp_ace.desc': 'For every airship part level: your skill damage +{v}% and skill cooldown -{shipCdr}% (now damage +{now}%, cooldown -{cdnow}%)',
+  'skill.cp_ace.desc': 'For every airship part level: your skill damage +{v}% and skill cooldown -{shipCdr}% (now damage +{now}%, cooldown -{cdnow}%). Also when an ally’s shield breaks, it regenerates once with +{party_shieldReborn}% shield',
   'summon.golem': 'Stone Golem!',
   'summon.skeleton': 'Skeleton Archer!',
   'battle.corpseBlast': 'Corpse Explosion!',
@@ -366,7 +366,7 @@ G.I18N['en'] = {
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
   'battle.morale': '🎖️ Kitty Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
-  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bloodRush': 'Blood Rush!', 'battle.snipe': 'Sniper Headshot!!!', 'battle.cover_fire': 'Covering Fire!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
+  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bloodRush': 'Blood Rush!', 'battle.snipe': 'Sniper Headshot!!!', 'battle.cover_fire': 'Covering Fire!', 'battle.shieldReborn': 'Shield Reborn!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
 
   // ── Buffs ──
   'buff.morale.name': 'Kitty Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}% (resets on defeat). Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{evade}%.',
