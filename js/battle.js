@@ -942,7 +942,6 @@
         spd: S.spd, crit: 5, critDmg: 1.5, ranged: false, range: 'one', dmgType: 'dark', missile: S.missile,
       };
       const lr = this.legionRank(); if (lr) st.maxHp = Math.round(st.maxHp * (1 + G.UNDEAD_LEGION.hp(lr)));   // 亡靈軍團：召喚物生命
-      if (kind === 'golem') st.maxHp = Math.round(st.maxHp + owner.st.maxHp * G.GOLEM_OWNER_HP);   // 石魔人：額外 + 主人最大生命 50%
       const unit = this.makeUnit({ side: 'party', kind: 'summon', minion: kind, st, x: 224, texture: 'summon_' + kind, originY: 0.94, scale: 0.85 });
       unit.img.setAlpha(0);
       this.tweens.add({ targets: unit.img, alpha: 1, duration: 300 });
