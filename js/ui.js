@@ -82,17 +82,19 @@
     // 比基礎（沒 buff）高 → 綠色、低 → 紅色
     const cmp = (now, b) => now > b * 1.001 ? 'up' : now < b * 0.999 ? 'down' : '';
     const cell = (k, v, cls = '') => `<div>${t(k)} <b class="${cls}">${v}</b></div>`;
+    // 有上限的數值：超過上限 → 紅字，後面括號標出多了多少（多出來的沒有效果）
+    const capCell = (k, v, over, isOver, cls) => isOver ? `<div>${t(k)} <b class="down">${v} ${t('live.over', { v: over })}</b></div>` : cell(k, v, cls);
     grid.innerHTML = [
       cell('live.hp', `${G.fmt(L.hp)} / ${G.fmt(L.maxHp)}`, u.alive ? '' : 'down'),
       cell('stat.atk', L.atk.toFixed(1), cmp(L.atk, base.atk)),
       cell('stat.def', L.def.toFixed(1), cmp(L.def, base.def)),
       cell('live.spd', L.spd.toFixed(2) + '/s', cmp(L.spd, base.spd)),
-      cell('live.crit', L.crit.toFixed(1) + '%', cmp(L.crit, base.crit)),
+      capCell('live.crit', L.crit.toFixed(1) + '%', (L.raw.crit - L.cap.crit).toFixed(1) + '%', L.raw.crit > L.cap.crit + 0.05, cmp(L.crit, base.crit)),
       cell('live.critDmg', pc(L.critDmg), cmp(L.critDmg, base.critDmg)),
-      cell('live.cdr', pc(L.cdr), L.cdr > 0 ? 'up' : ''),
+      capCell('live.cdr', pc(L.cdr), pc(L.raw.cdr - L.cap.cdr), L.raw.cdr > L.cap.cdr + 0.0005, L.cdr > 0 ? 'up' : ''),
       cell('live.regen', pc(L.regen, 1) + '/s', L.regen > 0 ? 'up' : ''),
       cell('live.lifesteal', pc(L.lifesteal)),
-      cell('live.evade', pc(L.evade)),
+      capCell('live.evade', pc(L.evade), pc(L.raw.evade - L.cap.evade), L.raw.evade > L.cap.evade + 0.0005, ''),
       cell('live.dmg', (L.dmg >= 0 ? '+' : '') + pc(L.dmg), L.dmg > 0 ? 'up' : L.dmg < 0 ? 'down' : ''),
       cell('live.skillDmg', '+' + pc(L.skillDmg)),
       cell('live.dmgReduce', pc(L.dmgReduce)),

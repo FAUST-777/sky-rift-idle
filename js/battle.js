@@ -426,7 +426,9 @@
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
     // 閃避：石魔人上限 G.GOLEM_EVADE_CAP，其他人 G.CONFIG.evadeCap
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(u.minion === 'golem' ? G.GOLEM_EVADE_CAP : G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeCapOf(u) { return u.minion === 'golem' ? G.GOLEM_EVADE_CAP : G.CONFIG.evadeCap; }
+    evadeRaw(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0)); }   // 還沒套上限的閃避   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeOf(u) { return Math.min(this.evadeCapOf(u), this.evadeRaw(u)); }
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
@@ -464,6 +466,9 @@
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0) + this.pactAll('aCritDmg'),   // 死亡契約（召喚物 ≥1）
         cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr')),
+        // 還沒套上限的值（即時數值：超過上限標紅、顯示多出多少）；cap = 上限
+        raw: { crit: this.critOf(u), cdr: (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr'), evade: this.evadeRaw(u) },
+        cap: { crit: u.st.iai ? Infinity : 100, cdr: G.CONFIG.cdrCap, evade: this.evadeCapOf(u) },   // 美式居合：超過 100% 的暴擊率會轉成暴擊傷害，不算浪費
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen') + this.shadowV('darkRegen') + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.feverSum() / 10000,   // 暗影纏繞、咒怨之力、血之狂熱
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),

@@ -275,6 +275,7 @@ G.I18N['zh-TW'] = {
   'live.cdr': '冷卻減免',
   'live.regen': '回復',
   'live.lifesteal': '吸血',
+  'live.over': '（多 {v}）',
   'live.evade': '閃避',
   'live.dmg': '全體傷害',
   'live.skillDmg': '技能傷害',

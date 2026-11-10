@@ -275,6 +275,7 @@ G.I18N['en'] = {
   'live.cdr': 'Cooldown reduction',
   'live.regen': 'Regen',
   'live.lifesteal': 'Lifesteal',
+  'live.over': '(+{v} over cap)',
   'live.evade': 'Evasion',
   'live.dmg': 'Damage',
   'live.skillDmg': 'Skill damage',
