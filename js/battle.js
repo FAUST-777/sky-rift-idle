@@ -420,6 +420,7 @@
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
+      if (crit && opts.critFinalX) dmg *= opts.critFinalX;   // 爆頭！！！：暴擊時最終傷害 ×3
       if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2
 
       // 健身者「健身夥伴」：隊友被打時，分一部分傷害到自己身上
@@ -639,7 +640,7 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });

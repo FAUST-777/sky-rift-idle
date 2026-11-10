@@ -119,7 +119,7 @@ G.I18N['en'] = {
   'skill.dp_gallery.name': 'Gallery', 'skill.dp_gallery.desc': 'Debuffs you apply last {v}% longer; basic attacks slow enemy attack speed by {slow}% for 8s',
 
   'skill.pi_doubletap.name': 'Double Tap', 'skill.pi_doubletap.desc': '2 shots of {v}% damage',
-  'skill.pi_headshot.name': 'Headshot', 'skill.pi_headshot.desc': '{v}% damage to one enemy, +50% crit chance',
+  'skill.pi_headshot.name': 'Headshot!!!', 'skill.pi_headshot.desc': '{v}% damage to one enemy, crit chance +50% then -30% (net +20%); on crit, final damage x3',
   'skill.pi_broadside.name': 'Broadside', 'skill.pi_broadside.desc': 'Fire 5 shots, each dealing {v}% damage; also triggers an extra airship cannon shot with +{cannon}% damage',
   'skill.pi_smoke.name': 'Smoke Bomb', 'skill.pi_smoke.desc': 'Own dodge +{v}% for 6s; party dodge +{party}% for 6s, and other allies instantly heal 2% max HP',
   'skill.pi_plunder.name': 'Plunder', 'skill.pi_plunder.desc': '{v}% damage to one enemy, own ATK +20% for 6s',

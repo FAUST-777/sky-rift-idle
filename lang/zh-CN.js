@@ -119,7 +119,7 @@ G.I18N['zh-CN'] = {
   'skill.dp_gallery.name': '画廊', 'skill.dp_gallery.desc': '施加的减益效果持续时间 +{v}%；普攻让敌人攻速 -{slow}%，8 秒',
 
   'skill.pi_doubletap.name': '双枪连射', 'skill.pi_doubletap.desc': '双枪 2 发，每发 {v}% 伤害',
-  'skill.pi_headshot.name': '爆头', 'skill.pi_headshot.desc': '单体 {v}% 伤害，暴击率 +50%',
+  'skill.pi_headshot.name': '爆头！！！', 'skill.pi_headshot.desc': '单体 {v}% 伤害，暴击率 +50%、再 -30%（合计 +20%）；暴击时最终伤害 ×3',
   'skill.pi_broadside.name': '舷炮齐射', 'skill.pi_broadside.desc': '连开 5 枪，每发 {v}% 伤害；并额外发动一次飞空艇炮击，这发炮击伤害 +{cannon}%',
   'skill.pi_smoke.name': '烟雾弹', 'skill.pi_smoke.desc': '自身闪避 +{v}%，6 秒；另外全队闪避 +{party}%（6 秒），其他队友立刻回复 2% 最大生命',
   'skill.pi_plunder.name': '掠夺', 'skill.pi_plunder.desc': '单体 {v}% 伤害，自身攻击 +20%，6 秒',
