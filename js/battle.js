@@ -638,6 +638,7 @@
       (e.selfDebuff || []).forEach(b => this.addFx(u, b.id, b.v, bt(b)));   // 施放者自己的代價
       if (e.hpCost) { const c = Math.floor(u.hp * e.hpCost); if (c > 0) { u.hp = Math.max(1, u.hp - c); this.floatText(u.img.x, this.barY(u) - 6, '-' + c, '#ff6b6b', 13, 700); } }   // 扣目前生命
       if (e.heal) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.heal)); this.glow(p, col); });
+      if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
       if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1))); p.shieldT = 8; this.glow(p, col); });

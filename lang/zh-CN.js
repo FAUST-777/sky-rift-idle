@@ -121,7 +121,7 @@ G.I18N['zh-CN'] = {
   'skill.pi_doubletap.name': '双枪连射', 'skill.pi_doubletap.desc': '双枪 2 发，每发 {v}% 伤害',
   'skill.pi_headshot.name': '爆头', 'skill.pi_headshot.desc': '单体 {v}% 伤害，暴击率 +50%',
   'skill.pi_broadside.name': '舷炮齐射', 'skill.pi_broadside.desc': '连开 5 枪，每发 {v}% 伤害',
-  'skill.pi_smoke.name': '烟雾弹', 'skill.pi_smoke.desc': '自身闪避 +{v}%，6 秒',
+  'skill.pi_smoke.name': '烟雾弹', 'skill.pi_smoke.desc': '自身闪避 +{v}%，6 秒；另外全队闪避 +{party}%（6 秒），其他队友立刻回复 2% 最大生命',
   'skill.pi_plunder.name': '掠夺', 'skill.pi_plunder.desc': '单体 {v}% 伤害，自身攻击 +20%，6 秒',
   'skill.pi_nimble.name': '身手矫健', 'skill.pi_nimble.desc': '闪避 +{v}%',
   'skill.pi_sharp.name': '神枪手', 'skill.pi_sharp.desc': '暴击率 +{v}%',

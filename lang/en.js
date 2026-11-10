@@ -121,7 +121,7 @@ G.I18N['en'] = {
   'skill.pi_doubletap.name': 'Double Tap', 'skill.pi_doubletap.desc': '2 shots of {v}% damage',
   'skill.pi_headshot.name': 'Headshot', 'skill.pi_headshot.desc': '{v}% damage to one enemy, +50% crit chance',
   'skill.pi_broadside.name': 'Broadside', 'skill.pi_broadside.desc': '5 rapid shots of {v}% damage',
-  'skill.pi_smoke.name': 'Smoke Bomb', 'skill.pi_smoke.desc': 'Own dodge +{v}% for 6s',
+  'skill.pi_smoke.name': 'Smoke Bomb', 'skill.pi_smoke.desc': 'Own dodge +{v}% for 6s; party dodge +{party}% for 6s, and other allies instantly heal 2% max HP',
   'skill.pi_plunder.name': 'Plunder', 'skill.pi_plunder.desc': '{v}% damage to one enemy, own ATK +20% for 6s',
   'skill.pi_nimble.name': 'Nimble', 'skill.pi_nimble.desc': 'Dodge +{v}%',
   'skill.pi_sharp.name': 'Sharpshooter', 'skill.pi_sharp.desc': 'Crit chance +{v}%',

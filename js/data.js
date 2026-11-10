@@ -239,7 +239,9 @@ G.SKILLS = {
     A('pi_doubletap', 0, 5,  lin(1.2, 0.15), v => ({ target: 'one', mult: v, hits: 2 })),
     A('pi_headshot',  0, 9,  lin(3.0, 0.35), v => ({ target: 'one', mult: v, critBonus: 50 })),
     A('pi_broadside', 1, 12, lin(0.5, 0.08), v => ({ target: 'one', mult: v, hits: 5 })),
-    A('pi_smoke',     1, 14, lin(0.3, 0.06), v => ({ target: 'none', self: [{ id: 'evade', v, t: 6 }] })),
+    // 煙霧彈：自己閃避 +30%→54%；另外全隊閃避 +15%→30%（6 秒，跟自己的取高）、其他隊友立刻回 2% 最大生命
+    A('pi_smoke',     1, 14, lin(0.3, 0.06), (v, r) => ({ target: 'none', self: [{ id: 'evade', v, t: 6 }], party: [{ id: 'evade', v: lin(0.15, 0.0375)(r), t: 6 }], healOthers: 0.02 }),
+      { descV: { party: lin(0.15, 0.0375) } }),
     A('pi_plunder',   2, 10, lin(2.0, 0.25), v => ({ target: 'one', mult: v, self: [{ id: 'atkUp', v: 0.2, t: 6 }] })),
     P('pi_nimble',   0, lin(0.06, 0.03), 'self', 'evade'),
     P('pi_sharp',    0, lin(5, 3),       'self', 'crit', { raw: true }),
