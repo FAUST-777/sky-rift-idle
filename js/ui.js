@@ -809,8 +809,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   // 金幣 ⇄ 雲晶 兌換視窗
   function exchangeModal() {
     const S = G.S, R = G.EXCHANGE_RATE;
-    const quick = dir => [1, 10, 100].map(n => `<button class="btn small" data-act="exdo" data-dir="${dir}" data-n="${n}">${G.fmt(n)}💎</button>`).join('')
-      + `<button class="btn small good" data-act="exdo" data-dir="${dir}" data-n="max">${t('ex.max')} (${G.fmt(G.exchangeMax(dir))}💎)</button>`;
+    // 按鈕寫清楚「付出 → 得到」：金幣換雲晶是 💰→💎，雲晶換金幣是 💎→💰
+    const pair = (dir, n) => dir === 'toCrystal' ? `${G.fmt(n * R)}💰 → ${G.fmt(n)}💎` : `${G.fmt(n)}💎 → ${G.fmt(n * R)}💰`;
+    const quick = dir => [1, 10, 100].map(n => `<button class="btn small" data-act="exdo" data-dir="${dir}" data-n="${n}">${pair(dir, n)}</button>`).join('')
+      + `<button class="btn small good" data-act="exdo" data-dir="${dir}" data-n="max">${t('ex.max')}：${pair(dir, G.exchangeMax(dir))}</button>`;
     UI.modal(`<h2>${t('ex.title')}</h2>
       <p class="muted" style="font-size:12px">${t('ex.rate', { r: R })}</p>
       <p><b>💰 ${G.fmt(S.gold)}</b>　<b>💎 ${G.fmt(S.crystal)}</b></p>
@@ -818,10 +820,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${quick('toCrystal')}</div>
       <div class="slot-label">${t('ex.toGold', { r: R })}</div>
       <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${quick('toGold')}</div>
+      <div class="slot-label">${t('ex.custom')}</div>
       <div class="row" style="gap:6px;align-items:center;flex-wrap:wrap">
-        <input id="exN" type="number" min="1" step="1" value="1" style="width:90px">💎
-        <button class="btn small" data-act="exdo" data-dir="toCrystal" data-n="input">${t('ex.buyN')}</button>
-        <button class="btn small" data-act="exdo" data-dir="toGold" data-n="input">${t('ex.sellN')}</button>
+        <input id="exN" type="number" min="1" step="1" value="1" style="width:90px"> 💎
+        <button class="btn small" data-act="exdo" data-dir="toCrystal" data-n="input">💰 → 💎 ${t('ex.buyN')}</button>
+        <button class="btn small" data-act="exdo" data-dir="toGold" data-n="input">💎 → 💰 ${t('ex.sellN')}</button>
       </div>
       <div class="modal-actions"><button class="btn" data-act="close">${t('common.close')}</button></div>`);
   }
