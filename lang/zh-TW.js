@@ -152,7 +152,7 @@ G.I18N['zh-TW'] = {
   'skill.sc_exam.name': '考前猜題', 'skill.sc_exam.desc': '全體 {v}% 傷害，必定暴擊',
   'skill.sc_crisis.name': '危機意識', 'skill.sc_crisis.desc': '任一隊友生命低於 60% 時，自身傷害 +{v}%、防禦 +{v2}%。另外全隊最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '獎學金', 'skill.sc_grant.desc': '全隊金幣獲得 +{v}%',
-  'skill.sc_wisdom.name': '博學', 'skill.sc_wisdom.desc': '攻擊 +{v}%',
+  'skill.sc_wisdom.name': '博學', 'skill.sc_wisdom.desc': '攻擊 +{v}%。另外全隊護盾量 +200%、護盾持續時間 +200%，身上有護盾時防禦 +15%',
   'skill.sc_speed.name': '速讀', 'skill.sc_speed.desc': '其他隊友攻速 +{v}%（自己不吃）',
   'skill.sc_thesis.name': '論文審查', 'skill.sc_thesis.desc': '技能傷害 +{v}%；自身最大生命 {hpPct}%，其他隊友最大生命 +{party_hpPctOthers}%',
 

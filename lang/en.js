@@ -152,7 +152,7 @@ G.I18N['en'] = {
   'skill.sc_exam.name': 'Exam Prediction', 'skill.sc_exam.desc': '{v}% damage to all enemies, always crits',
   'skill.sc_crisis.name': 'Crisis Mode', 'skill.sc_crisis.desc': 'When any ally is below 60% HP: own damage +{v}% and DEF +{v2}%. Also party max HP +{party_hpPct}%',
   'skill.sc_grant.name': 'Scholarship', 'skill.sc_grant.desc': 'Party gold earned +{v}%',
-  'skill.sc_wisdom.name': 'Erudition', 'skill.sc_wisdom.desc': 'ATK +{v}%',
+  'skill.sc_wisdom.name': 'Erudition', 'skill.sc_wisdom.desc': 'ATK +{v}%. Also party shields are 200% stronger and last 200% longer, and allies with a shield get DEF +15%',
   'skill.sc_speed.name': 'Speed Reading', 'skill.sc_speed.desc': 'Other allies attack speed +{v}% (not yourself)',
   'skill.sc_thesis.name': 'Peer Review', 'skill.sc_thesis.desc': 'Skill damage +{v}%; own max HP {hpPct}%, other allies max HP +{party_hpPctOthers}%',
 

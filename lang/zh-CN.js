@@ -152,7 +152,7 @@ G.I18N['zh-CN'] = {
   'skill.sc_exam.name': '考前猜题', 'skill.sc_exam.desc': '全体 {v}% 伤害，必定暴击',
   'skill.sc_crisis.name': '危机意识', 'skill.sc_crisis.desc': '任一队友生命低于 60% 时，自身伤害 +{v}%、防御 +{v2}%。另外全队最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '奖学金', 'skill.sc_grant.desc': '全队金币获得 +{v}%',
-  'skill.sc_wisdom.name': '博学', 'skill.sc_wisdom.desc': '攻击 +{v}%',
+  'skill.sc_wisdom.name': '博学', 'skill.sc_wisdom.desc': '攻击 +{v}%。另外全队护盾量 +200%、护盾持续时间 +200%，身上有护盾时防御 +15%',
   'skill.sc_speed.name': '速读', 'skill.sc_speed.desc': '其他队友攻速 +{v}%（自己不吃）',
   'skill.sc_thesis.name': '论文审查', 'skill.sc_thesis.desc': '技能伤害 +{v}%；自身最大生命 {hpPct}%，其他队友最大生命 +{party_hpPctOthers}%',
 

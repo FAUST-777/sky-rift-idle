@@ -213,7 +213,7 @@ G.SKILLS = {
     A('sc_exam',    2, 12, lin(1.1, 0.18),  v => ({ target: 'all', mult: v, critBonus: 100 })),
     P('sc_crisis',  0, lin(0.1, 0.03),  'special', 'crisis', { v2: lin(0.2, 0.05), partyAlso: { hpPct: lin(0.02, 0.015) } }),   // 另外全隊最大生命 +2%→8%
     P('sc_grant',   0, lin(0.08, 0.05), 'party', 'goldPct'),
-    P('sc_wisdom',  1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('sc_wisdom',  1, lin(0.06, 0.04), 'self', 'atkPct', { partyAlso: { shieldDur: 2, shieldAmt: 2, shieldDef: 0.15 }, rawKeys: ['shieldDur', 'shieldAmt', 'shieldDef'] }),   // 另外全隊護盾量、時間 +200%，有護盾時防禦 +15%（跟領航員取高）
     P('sc_speed',   1, lin(0.06, 0.04), 'party', 'spdPctOthers'),   // 速讀：只給其他隊友攻速，學者自己不吃
     // 論文審查：技能傷害；另外把自己的最大生命 10%→15% 分給其他隊友（自己 -、其他人 +，各隊友都 +）
     P('sc_thesis',  2, lin(0.08, 0.05), 'self', 'skillDmg', { also: { hpPct: r => -lin(0.1, 0.0125)(r) }, partyAlso: { hpPctOthers: lin(0.1, 0.0125) } }),
