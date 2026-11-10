@@ -701,7 +701,7 @@
       if (u.hp <= 0 && u.special.grudge && this.party(u)) {   // 咒怨之力：怨靈代替死靈倒下
         const w = (this.wraiths || []).find(x => x.owner === u);
         if (w) {
-          u.hp = 1;
+          u.hp = u.st.maxHp;   // 替死後生命回滿
           this.wraiths = this.wraiths.filter(x => x !== w);
           this.tweens.add({ targets: w.img, alpha: 0, scale: 1.8, duration: 400, onComplete: () => w.img.destroy() });
           this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.grudgeSave'), '#c99bff', 15, 1000);
