@@ -66,7 +66,7 @@
   const CLASS_HEAD = {
     pirate: { v: 4, color: '#2b2b2b' }, scholar: { v: 5, color: '#24304a' }, darkpainter: { v: 6, color: '#3a2450' },
     druid: { v: 2, color: '#3f6b3a' }, wallbringer: { v: 1, color: '#8a8f99' }, gymgoer: { v: 7, color: '#e04040' },
-    manicurist: { v: 6, color: '#ff8fc8' },
+    manicurist: { v: 6, color: '#ff8fc8' }, necromancer: { v: 2, color: '#2b2238' }, captain: { v: 8, color: '#f2f2f2' },
   };
   // 武器：一律畫職業武器（不管裝備什麼），顏色跟著裝備的武器稀有度
   function classLook(look, tier) {
@@ -154,7 +154,7 @@
 
     // 頭髮 / 頭盔
     const hm = look.helmet;
-    if (!hm || [0, 4, 6, 7].includes(hm.v)) {   // 帽子類露出頭髮；鐵盔/兜帽/全罩/學士帽蓋住
+    if (!hm || [0, 4, 6, 7, 8].includes(hm.v)) {   // 帽子類露出頭髮；鐵盔/兜帽/全罩/學士帽蓋住
       ctx.fillStyle = look.hair;
       ctx.beginPath(); ctx.arc(32, 18, 10, Math.PI * 0.95, Math.PI * 2.05); ctx.fill();
       ctx.fillRect(22, 17, 5, 9);
@@ -194,6 +194,12 @@
       } else if (hm.v === 6) {   // 貝雷帽
         ctx.beginPath(); ctx.ellipse(30, 12, 13, 6, -0.2, 0, Math.PI * 2); ctx.fill();
         ctx.fillRect(31, 4, 2, 4);
+      } else if (hm.v === 8) {   // 船長帽：白色帽頂、深色帽帶、黑帽簷、金色徽章
+        ctx.beginPath(); ctx.ellipse(32, 11, 12.5, 5, -0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(22, 11, 21, 5);
+        ctx.fillStyle = '#1f2f4f'; ctx.fillRect(22, 14, 21, 3);
+        ctx.fillStyle = '#1b1b2a'; ctx.beginPath(); ctx.ellipse(40, 17.5, 8, 2.2, 0.12, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#d4a017'; ctx.beginPath(); ctx.arc(34, 12, 2.2, 0, Math.PI * 2); ctx.fill();
       } else if (hm.v === 7) {   // 運動頭帶
         ctx.fillRect(23, 15, 21, 4);
         ctx.fillRect(21, 16, 3, 8);
@@ -258,6 +264,21 @@
         ctx.fillStyle = '#ff5fae'; ctx.beginPath(); ctx.arc(60, 38 + d * 1.6, 1.9, 0, Math.PI * 2); ctx.fill();
       });
       ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.fillRect(58, 33, 1.5, 1.5);             // 亮晶晶
+    } else if (wp.type === 'scythe') {            // 死靈術師：鐮刀（刀刃顏色跟著武器稀有度）
+      ctx.strokeStyle = '#3a2f2a'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(41, 62); ctx.lineTo(52, 9); ctx.stroke();
+      ctx.fillStyle = shade(wp.color, 60);
+      ctx.beginPath(); ctx.moveTo(53, 10); ctx.quadraticCurveTo(38, -1, 22, 12); ctx.quadraticCurveTo(38, 6, 51, 16); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = shade(wp.color, -20); ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#9dff9d'; ctx.shadowColor = '#7dff9a'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.arc(52, 9, 2, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    } else if (wp.type === 'spyglass') {          // 飛船船長：黃銅望遠鏡（環的顏色跟著武器稀有度）
+      ctx.save(); ctx.translate(42, 49); ctx.rotate(-0.55);
+      ctx.fillStyle = '#b8862b'; rr(ctx, 0, -3, 15, 6, 2); ctx.fill();
+      ctx.fillStyle = '#d9a93c'; rr(ctx, 13, -3.8, 8, 7.6, 2); ctx.fill();
+      ctx.fillStyle = wp.color; ctx.fillRect(4, -3, 2, 6); ctx.fillRect(10, -3, 2, 6);
+      ctx.fillStyle = '#9fd8ff'; ctx.fillRect(20.5, -2.8, 1.5, 5.6);
+      ctx.restore();
     } else if (wp.type === 'dumbbell') {          // 健身者：啞鈴
       ctx.fillStyle = '#555'; ctx.fillRect(39, 49, 10, 3);
       ctx.fillStyle = shade(wp.color, -30); ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
@@ -527,6 +548,28 @@
       ctx.fillStyle = '#5fae4f'; ctx.beginPath(); ctx.moveTo(2, 11); ctx.quadraticCurveTo(14, 1, 26, 11); ctx.quadraticCurveTo(14, 21, 2, 11); ctx.fill();
       ctx.strokeStyle = '#2f6a2a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(3, 11); ctx.lineTo(25, 11); ctx.stroke();
     },
+    skull(ctx) {       // 死靈術師：冒綠火的小骷髏
+      ctx.fillStyle = 'rgba(120,255,140,.45)'; ctx.beginPath(); ctx.ellipse(9, 11, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#e8e4d8'; ctx.beginPath(); ctx.arc(19, 10, 6, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(15.5, 13, 7.5, 4.5);
+      ctx.fillStyle = '#1b1b2a'; ctx.beginPath(); ctx.arc(17.3, 10, 1.6, 0, Math.PI * 2); ctx.arc(21.6, 10, 1.6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(18, 15, 1, 2); ctx.fillRect(20, 15, 1, 2);
+    },
+    arrow(ctx) {       // 骷髏弓箭手：箭
+      ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(3, 11); ctx.lineTo(22, 11); ctx.stroke();
+      ctx.fillStyle = '#ccc'; ctx.beginPath(); ctx.moveTo(21, 7.5); ctx.lineTo(27, 11); ctx.lineTo(21, 14.5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#eee'; ctx.beginPath(); ctx.moveTo(1, 7.5); ctx.lineTo(6, 11); ctx.lineTo(1, 14.5); ctx.closePath(); ctx.fill();
+    },
+    flare(ctx) {       // 飛船船長：奧術信號彈
+      ctx.fillStyle = 'rgba(190,120,255,.4)'; ctx.beginPath(); ctx.ellipse(11, 11, 10, 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#c99bff'; ctx.beginPath(); ctx.arc(19, 11, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(20, 10, 2, 0, Math.PI * 2); ctx.fill();
+    },
+    rocket(ctx) {      // 飛空艇的飛彈
+      ctx.fillStyle = 'rgba(255,170,60,.85)'; ctx.beginPath(); ctx.moveTo(0, 11); ctx.lineTo(7, 7.5); ctx.lineTo(7, 14.5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#d9d9d9'; rr(ctx, 6, 8, 16, 6, 2); ctx.fill();
+      ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.moveTo(21, 8); ctx.lineTo(27, 11); ctx.lineTo(21, 14); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(8, 8); ctx.lineTo(10, 4); ctx.lineTo(13, 8); ctx.closePath(); ctx.moveTo(8, 14); ctx.lineTo(10, 18); ctx.lineTo(13, 14); ctx.closePath(); ctx.fill();
+    },
     dog(ctx) {         // 遛狗者：衝出去咬的小狗
       const c = G.pick(['#c8925a', '#f2e6d0', '#3b3b3b', '#a0522d']);
       ctx.fillStyle = c;
@@ -538,6 +581,42 @@
       ctx.strokeStyle = c; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(5, 11); ctx.lineTo(1, 6); ctx.moveTo(8, 17); ctx.lineTo(6, 21); ctx.moveTo(16, 17); ctx.lineTo(18, 21); ctx.stroke();
     },
+  };
+
+  // ── 死靈術師的召喚物（64×64，面向右）─────────────────────────────────────
+  A.drawSummon = function (ctx, kind) {
+    ctx.fillStyle = 'rgba(0,0,0,.22)';
+    ctx.beginPath(); ctx.ellipse(32, 60, 18, 4, 0, 0, Math.PI * 2); ctx.fill();
+    if (kind === 'golem') {           // 石魔人：方正的石頭身體、青苔、發光的眼睛
+      const c = '#8a8478', d = shade(c, -40), l = shade(c, 30);
+      ctx.fillStyle = d; ctx.fillRect(21, 46, 9, 14); ctx.fillRect(35, 46, 9, 14);
+      rr(ctx, 7, 26, 10, 22, 4); ctx.fill();
+      ctx.fillStyle = c; rr(ctx, 14, 20, 36, 30, 7); ctx.fill();
+      ctx.strokeStyle = d; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(24, 26); ctx.lineTo(28, 34); ctx.lineTo(25, 42); ctx.moveTo(40, 28); ctx.lineTo(37, 36); ctx.stroke();
+      ctx.fillStyle = l; rr(ctx, 47, 25, 11, 23, 4); ctx.fill();
+      ctx.fillStyle = l; rr(ctx, 24, 6, 20, 17, 5); ctx.fill();
+      ctx.fillStyle = '#7dff9a'; ctx.shadowColor = '#7dff9a'; ctx.shadowBlur = 6;
+      ctx.fillRect(35, 12, 3.5, 3); ctx.fillRect(40, 12, 3.5, 3); ctx.shadowBlur = 0;
+      ctx.fillStyle = '#5c8a3a';
+      ctx.beginPath(); ctx.arc(20, 22, 3.5, 0, Math.PI * 2); ctx.arc(26, 7, 3, 0, Math.PI * 2); ctx.arc(46, 40, 2.5, 0, Math.PI * 2); ctx.fill();
+    } else {                          // 骷髏弓箭手：骨頭身體、拿長弓
+      const b = '#e8e4d8', d = '#b9b2a0';
+      ctx.strokeStyle = b; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(30, 44); ctx.lineTo(26, 59); ctx.moveTo(34, 44); ctx.lineTo(38, 59); ctx.stroke();   // 腳
+      ctx.beginPath(); ctx.moveTo(32, 26); ctx.lineTo(32, 45); ctx.stroke();                                           // 脊椎
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(25, 29 + i * 4); ctx.quadraticCurveTo(32, 27 + i * 4, 39, 29 + i * 4); ctx.stroke(); }   // 肋骨
+      ctx.beginPath(); ctx.moveTo(33, 28); ctx.lineTo(44, 36); ctx.moveTo(31, 28); ctx.lineTo(24, 38); ctx.stroke();   // 手
+      ctx.fillStyle = b; ctx.beginPath(); ctx.arc(33, 17, 8.5, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(28, 21, 10, 6);   // 頭
+      ctx.fillStyle = '#1b1b2a'; ctx.beginPath(); ctx.arc(35, 16, 2.2, 0, Math.PI * 2); ctx.arc(40, 16, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff5050'; ctx.fillRect(34.5, 15.5, 1.2, 1.2); ctx.fillRect(39.5, 15.5, 1.2, 1.2);
+      ctx.strokeStyle = d; ctx.lineWidth = 1; ctx.beginPath(); for (let x = 30; x <= 37; x += 2) { ctx.moveTo(x, 23); ctx.lineTo(x, 26); } ctx.stroke();
+      ctx.strokeStyle = '#7a5530'; ctx.lineWidth = 2.5;                                                                  // 弓
+      ctx.beginPath(); ctx.arc(40, 36, 15, -1.2, 1.2); ctx.stroke();
+      ctx.strokeStyle = '#ddd'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(40 + 15 * Math.cos(-1.2), 36 + 15 * Math.sin(-1.2)); ctx.lineTo(40 + 15 * Math.cos(1.2), 36 + 15 * Math.sin(1.2)); ctx.stroke();
+    }
   };
 
   // ── 德魯伊的動物（64×64，面向右）─────────────────────────────────────────

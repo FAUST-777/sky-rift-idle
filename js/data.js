@@ -86,9 +86,11 @@ G.CLASSES = {
   druid:       { core: 'buff', range: 'all', dmgType: 'animal',   color: '#4f8a4a', cape: '#2f5a2c', ranged: true,  mult: { hp: 1.05, atk: 1.0,  def: 1.0 },  missile: 'leaf', weapon: 'axe' },
   dogwalker:   { core: 'buff', range: 'one', dmgType: 'animal',   color: '#b07a3e', cape: '#6b4a24', ranged: false, mult: { hp: 1.1,  atk: 1.15, def: 1.05 }, missile: 'dog', weapon: 'leash' },
   gymgoer:     { core: 'def',  range: 'one', dmgType: 'physical', color: '#e0703a', cape: null,      ranged: false, mult: { hp: 1.6,  atk: 0.95, def: 1.35 }, weapon: 'dumbbell' },
+  necromancer: { core: 'atk',  range: 'one', dmgType: 'dark',     color: '#3a2f4a', cape: '#1a1424', ranged: true,  mult: { hp: 0.95, atk: 1.25, def: 0.9 },  missile: 'skull', weapon: 'scythe' },
+  captain:     { core: 'atk',  range: 'one', dmgType: 'arcane',   color: '#2f4a7a', cape: '#1f2f4f', ranged: true,  mult: { hp: 1.0,  atk: 1.2,  def: 1.0 },  missile: 'flare', weapon: 'spyglass' },
   manicurist:  { core: 'def',  range: 'all', dmgType: 'arcane',   color: '#d9649e', cape: '#7a2f5c', ranged: false, mult: { hp: 1.3,  atk: 0.85, def: 1.45 }, missile: 'nail', weapon: 'claw' },
 };
-G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer', 'manicurist'];
+G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer', 'manicurist', 'necromancer', 'captain'];
 G.CORE_ICON  = { atk: '⚔️', buff: '✨', def: '🛡️' };
 G.DMG_TYPES  = { physical: '#ffffff', animal: '#ffd27a', arcane: '#8fd3ff', dark: '#c99bff' };   // 傷害數字顏色
 G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
@@ -336,6 +338,40 @@ G.SKILLS = {
     P('mc_art',     2, lin(0.15, 0.1),  'self', 'shieldPow', { also: { basicDmg: () => 0.5 }, partyAlso: { reflectCrit: 1, reflectCritBase: 40, reflectCritAdd: 0.25 } }),
   ],
 
+  // 死靈術師：召喚石魔人／骷髏弓箭手（同時只有一隻，站在隊伍最前面），引爆召喚物
+  necromancer: [
+    A('nc_golem',     0, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'golem', power: v } })),
+    A('nc_archer',    0, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
+    A('nc_drain',     1, 8,  lin(1.6, 0.25), v => ({ target: 'one', mult: v, drain: 0.3 })),
+    A('nc_bone',      1, 10, lin(0.8, 0.12), v => ({ target: 'all', mult: v, minionBonus: 0.5 })),   // 召喚物在場時傷害 ×1.5
+    A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
+    P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
+    P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
+    P('nc_undying',   1, lin(0.1, 0.05),  'self', 'minionDeathHeal'),
+    P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
+    P('nc_legion',    2, lin(0.15, 0.05), 'self', 'minionDmg'),
+  ],
+
+  // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
+  //   部位等級 G.shipLv(slot)：沒裝 0，第 1～5 款 = 1～5
+  captain: [
+    A('cp_missile',   0, 9,  lin(0.9, 0.15), v => ({ target: 'all', mult: v * (1 + 0.1 * G.shipLv('engine')), fromShip: true }),
+      { descV: { eng: () => 0.1 * G.shipLv('engine') } }),
+    A('cp_salvo',     0, 8,  lin(0.2, 0.1),  v => ({ target: 'none', cannonShots: { n: 2, bonus: v + 0.1 * G.shipLv('cannon') } }),
+      { descV: { can: () => 0.1 * G.shipLv('cannon') } }),
+    A('cp_overdrive', 1, 16, lin(4, 1),      v => ({ target: 'none', overdrive: v, party: [{ id: 'spdUp', v: 0.1 + 0.02 * G.shipLv('wing'), t: v }] }),
+      { raw: true, descV: { spd: () => 0.1 + 0.02 * G.shipLv('wing') } }),
+    A('cp_repair',    1, 15, lin(0.08, 0.02), v => ({ target: 'none', heal: v + 0.02 * G.shipLv('hull') }),
+      { descV: { hull: () => 0.02 * G.shipLv('hull') } }),
+    A('cp_ram',       2, 14, lin(3, 0.4),    v => ({ target: 'one', mult: v * (1 + 0.2 * G.shipLv('bow')), debuffs: [{ id: 'stun', v: 1, t: 1.5 }] }),
+      { descV: { bow: () => 0.2 * G.shipLv('bow') } }),
+    P('cp_gunner',    0, lin(0.2, 0.1),   'party', 'cannonDmg'),                               // 船砲傷害
+    P('cp_navigator', 0, lin(0.005, 0.0025), 'party', 'shipDmg', { descV: { now: r => lin(0.005, 0.0025)(r) * G.shipTotalLv() } }),   // 每 1 階部位 → 全隊傷害
+    P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true }),               // 船砲間隔 -秒
+    P('cp_crew',      1, lin(0.01, 0.005), 'party', 'balloonHp', { descV: { now: r => lin(0.01, 0.005)(r) * G.shipLv('balloon') } }),   // 氣球每 1 階 → 全隊生命
+    P('cp_ace',       2, lin(15, 5),      'party', 'cannonCrit', { raw: true }),               // 船砲暴擊率（暴擊 ×2.5）
+  ],
+
   // 健身者：幫隊友平均分攤傷害、自己緩緩回血
   gymgoer: [
     A('gy_punch',    0, 6,  lin(1.6, 0.2),   v => ({ target: 'one', mult: v })),
@@ -361,9 +397,14 @@ G.ANIMALS = {
   owl:  { icon: '🦉', aura: 'crit',   stats: { hp: 0.4, atk: 0.5, def: 0.4 }, color: '#a07a50' },
   deer: { icon: '🦌', aura: 'regen',  stats: { hp: 0.7, atk: 0.3, def: 0.7 }, color: '#c08a50' },
 };
+// 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
+G.SUMMONS = {
+  golem:    { icon: '🗿', stats: { hp: 3.0, atk: 0.25, def: 2.0 }, spd: 0.7 },                     // 石魔人：肉盾
+  skeleton: { icon: '💀', stats: { hp: 0.35, atk: 1.6, def: 0.3 }, spd: 1.1, missile: 'arrow' },   // 骷髏弓箭手：高傷害、很脆
+};
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

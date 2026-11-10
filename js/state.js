@@ -214,6 +214,8 @@
   // ── 飛空艇數值 ───────────────────────────────────────────────────────────
   G.shipTier = slot => G.S.ship.eq[slot];
   G.shipVal = slot => { const i = G.shipTier(slot); return i >= 0 ? G.SHIP_PARTS[slot].v[i] : 0; };
+  G.shipLv = slot => (G.S.ship.eq[slot] >= 0 ? G.S.ship.eq[slot] + 1 : 0);   // 部位等級：沒裝 0，第 1～5 款 = 1～5（飛船船長技能用）
+  G.shipTotalLv = () => Object.keys(G.SHIP_PARTS).reduce((a, k) => a + G.shipLv(k), 0);
   G.shipMaxFloor = () => G.SHIP_BASE_FLOORS + G.shipVal('wing') + G.shipVal('engine');
   G.cannonMult = () => G.shipVal('cannon');
   G.homeTier = () => Math.max(0, G.shipTier('hull'));
@@ -233,6 +235,9 @@
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) { add(p.perk.stat, p.perk.v); if (p.perk.extra) aura[p.perk.extra] = 1; } });   // 出戰夥伴的專屬 buff（extra 是開關）
+    // 飛船船長：跟著飛空艇部位等級成長的光環
+    if (aura.shipDmg) add('dmgPct', aura.shipDmg * G.shipTotalLv());
+    if (aura.balloonHp) add('hpPct', aura.balloonHp * G.shipLv('balloon'));
     const synPow = Math.max(aura.synergyPow || 0, synBoost || 0);   // 獸群之心、喵喵鼓舞取高
     G.teamSynergy().active.forEach(a => Object.entries(G.scaleSynergy(a.bonus, synPow)).forEach(([k, v]) => {   // 團隊特效（獸群之心加強）
       if (k === 'cannonInterval') aura[k] = Math.min(aura[k] || G.CANNON_INTERVAL, v);
@@ -246,7 +251,7 @@
   G.othersHpPct = who => G.othersBonus(who, 'hpPctOthers');
 
   // 船砲間隔：團隊特效（取最短）再扣貓哈氣爆甲的 -1 秒，最少 2 秒
-  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0));
+  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0) - (aura.captainCut || 0));
   // 全隊普攻暈眩（貓貓士氣）：出戰成員中最好的那個
   G.partyStun = () => G.partyMembers().map(w => G.passivesOf(w).partyStun).filter(Boolean).sort((a, b) => b.chance - a.chance)[0] || null;
 
@@ -310,7 +315,7 @@
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
       summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),
-      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'), bossSlam: g('bossSlam'), cdr: g('cdr'), bleedHeal: g('bleedHeal'), iai: g('iai'), snipeX: g('snipeX'), bleedCrit: g('bleedCrit'), bleedCritDmg: g('bleedCritDmg'),
+      buffDur: 1 + g('buffDur'), buffPow: 1 + g('buffPow'), shieldPow: 1 + g('shieldPow'), vsPoison: g('vsPoison'), basicDmg: g('basicDmg'), hpSlam: g('hpSlam'), bossSlam: g('bossSlam'), cdr: g('cdr'), bleedHeal: g('bleedHeal'), iai: g('iai'), snipeX: g('snipeX'), bleedCrit: g('bleedCrit'), bleedCritDmg: g('bleedCritDmg'), minionDeathHeal: g('minionDeathHeal'), minionDmg: g('minionDmg'),
     });
     st.maxHp = Math.round(st.maxHp);
     st.atk = +st.atk.toFixed(1);

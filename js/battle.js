@@ -53,6 +53,7 @@
         for (let i = 0; i < MISSILE_VARIANTS; i++) this.tex(`ms_${k}${i}`, 28, 22, ctx => G.ART.MISSILES[k](ctx));
       });
       Object.keys(G.ANIMALS).forEach(k => this.tex('animal_' + k, 64, 64, ctx => G.ART.drawAnimal(ctx, k)));
+      Object.keys(G.SUMMONS).forEach(k => this.tex('summon_' + k, 64, 64, ctx => G.ART.drawSummon(ctx, k)));
 
       // 背景
       this.sky = this.add.graphics();
@@ -178,7 +179,7 @@
     buildParty() {
       this.units.forEach(u => u.img.destroy());
       this.units = [];
-      this.animal = null;
+      this.animal = null; this.minion = null;
       const members = G.partyMembers().map(w => this.memberUnit(w));
       this.hero = members[0];
       // 近戰站前排、遠程站後排
@@ -393,11 +394,11 @@
 
     // 我方打最前面的敵人；敵人：挑釁 > 召喚獸 > 加權隨機（近戰位 3、後排 1，後排偶爾也會被打）
     targetFor(u) {
-      if (u.side === 'party') return this.enemiesAlive()[0];
+      if (u.side === 'party') { const es = this.enemiesAlive(); return u.kind === 'summon' ? G.pick(es) : es[0]; }   // 死靈的召喚物：隨機一隻
       const alive = this.partyAlive();
-      const forced = alive.find(p => p.taunt.t > 0) || alive.find(p => p.kind === 'summon');
+      const forced = alive.find(p => p.taunt.t > 0) || (this.animal && this.animal.unit.alive ? this.animal.unit : null);
       if (forced) return forced;
-      const w = alive.map(p => (p.st.ranged ? 1 : 3));
+      const w = alive.map(p => (p.st.ranged && p.kind !== 'summon' ? 1 : 3));   // 召喚物站最前面，跟前排一樣常被打
       let x = Math.random() * w.reduce((a, b) => a + b, 0);
       for (let i = 0; i < alive.length; i++) { if ((x -= w[i]) < 0) return alive[i]; }
       return alive[0];
@@ -449,7 +450,8 @@
         src.stunHitAt = this.time.now;
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
-      if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
+      if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
+      if (src.st.minionDmg && this.minionAlive() && this.minion.owner === src) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢            // 吸貓狂熱：對中毒敵人
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       const crit = src.st.iai ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
@@ -656,6 +658,9 @@
       if (e.heal && !e.cdCut) return this.partyAlive().some(p => p.hp / p.st.maxHp < 0.8);   // 散步時間：減冷卻為主，順便回血，不用等人受傷
       if (e.selfHeal) return u.hp / u.st.maxHp < 0.75;
       if (e.summon) return !(this.animal && this.animal.unit.alive);
+      if (e.summonMinion) return !this.minionAlive();          // 場上最多一隻
+      if (e.corpseBlast) return this.minionAlive();             // 要有召喚物才能引爆
+      if (e.cannonShots) return G.cannonMult() > 0;             // 沒有船砲就不放
       if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
       return true;
     }
@@ -677,7 +682,8 @@
       if (e.mult && targets.length && this.party(u) && u.kind !== 'summon' && u.st.dmgType === 'physical') this.snipeTick();   // 美式居合：物理技能計數
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
-        if (u.st.missile) targets.forEach((t, i) => { for (let h = 0; h < Math.min(3, hits); h++) this.shoot(u, t, u.st.missile, i * 3 + h); });
+        if (e.fromShip && this.shipImg) targets.forEach((t, i) => this.shipMissile(t, i));
+        else if (u.st.missile) targets.forEach((t, i) => { for (let h = 0; h < Math.min(3, hits); h++) this.shoot(u, t, u.st.missile, i * 3 + h); });
         else this.lunge(u);
         targets.forEach(t => {
           const ring = this.add.circle(t.img.x, t.img.y - 30, 10, Phaser.Display.Color.HexStringToColor(col).color, 0.55).setDepth(45);
@@ -688,18 +694,20 @@
       if (e.refreshDebuffs) targets.forEach(t => Object.values(t.fx).forEach(f => { if (f.t > 0 && f.full) f.t = Math.max(f.t, f.full); }));
       // 傷害（多段用延遲打出）
       let stunHealed = false;
+      const mult = e.mult * (e.minionBonus && this.minionAlive() ? 1 + e.minionBonus : 1);   // 骨刺風暴：召喚物在場時加傷
       const castState = {};   // 同一次施放共用（毒爪暴擊回血只回一次）   // 狗群圍攻：咬到暈眩敵人回血，每次施放只回一次
       for (let h = 0; h < hits; h++) {
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
           const wasAlive = t.alive;
-          this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           if (e.feverOnKill && wasAlive && !t.alive) this.startFever(u, e.feverOnKill);   // 處決擊殺
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
-        if (h === 0) doHit(); else this.time.delayedCall(h * 130, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
+        const delay = (e.fromShip && this.shipImg ? 420 : 0) + h * 130;   // 飛彈飛到才算命中
+        if (delay === 0) doHit(); else this.time.delayedCall(delay, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }
       (e.debuffs || []).forEach(db => targets.forEach(t => { if (this.valid(t)) this.debuff(u, t, db.id, db.v, db.t); }));
       // 增益：德魯伊「野性之絆」延長持續時間、「獸群之心」提高數值
@@ -728,11 +736,52 @@
       if (e.synBoost) { this.synBoost = { v: Math.max(e.synBoost.v, this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0), t: e.synBoost.t }; this.computeAura(); }   // 喵喵鼓舞：團隊特效暫時加強
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
+      if (e.summonMinion) this.summonMinion(u, e.summonMinion.kind, e.summonMinion.power);
+      if (e.corpseBlast && this.minionAlive()) {   // 屍爆：引爆召喚物，打全體（無視防禦）
+        const m = this.minion.unit, dmg = Math.max(1, Math.round(m.st.maxHp * e.corpseBlast));
+        this.floatText(m.img.x, this.barY(m) - 30, G.t('battle.corpseBlast'), '#9dff9d', 16, 1000);
+        const ring = this.add.circle(m.img.x, m.img.y - 30, 14, 0x7dff9a, 0.5).setDepth(45);
+        this.tweens.add({ targets: ring, scale: 8, alpha: 0, duration: 450, onComplete: () => ring.destroy() });
+        this.enemiesAlive().forEach(t => this.damage(t, dmg, '#9dff9d', true, true));
+        this.kill(m);
+        this.checkWaveEnd();
+      }
+      if (e.cannonShots && G.cannonMult() > 0) for (let i = 0; i < e.cannonShots.n; i++) this.time.delayedCall(i * 220, () => this.fireCannon(e.cannonShots.bonus));   // 集中砲火
+      if (e.overdrive) { this.overdrive = { t: e.overdrive }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }   // 引擎超載：船砲間隔減半
       // 速寫：船砲強化一段時間；全隊身上的增益延長
       if (e.sketch) { this.sketch = { t: e.sketch.t, chance: Math.max(e.sketch.chance, this.sketch && this.sketch.t > 0 ? this.sketch.chance : 0) }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }
       if (e.buffExtend) this.partyAlive().forEach(p => BUFF_IDS.forEach(id => { const f = p.fx[id]; if (f && f.t > 0) f.t += e.buffExtend; }));
       if (e.cdCut) this.partyAlive().forEach(p => p.skills.forEach(x => { if (x !== s) x.cd = Math.max(0, x.cd - e.cdCut); }));
       return true;
+    }
+
+    // 死靈術師：召喚物（石魔人／骷髏弓箭手），站在隊伍正前方，場上最多一隻
+    minionAlive() { return !!(this.minion && this.minion.unit.alive); }
+    summonMinion(owner, kind, power) {
+      if (this.minionAlive()) return;
+      const S = G.SUMMONS[kind], sp = power * (owner.st.summonPower || 1);
+      const st = {
+        maxHp: Math.round(owner.st.maxHp * S.stats.hp * sp), atk: owner.st.atk * S.stats.atk * sp, def: owner.st.def * S.stats.def * sp,
+        spd: S.spd, crit: 5, critDmg: 1.5, ranged: false, range: 'one', dmgType: 'dark', missile: S.missile,
+      };
+      const unit = this.makeUnit({ side: 'party', kind: 'summon', minion: kind, st, x: 224, texture: 'summon_' + kind, originY: 0.94, scale: 0.85 });
+      unit.img.setAlpha(0);
+      this.tweens.add({ targets: unit.img, alpha: 1, duration: 300 });
+      this.units.push(unit);
+      this.minion = { kind, unit, owner };
+      this.floatText(224, GROUND - 80, G.t('summon.' + kind), '#c99bff', 15, 900);
+    }
+
+    // 飛船船長：飛空艇發射飛彈（只是動畫，傷害由技能本身結算）
+    shipMissile(t, i) {
+      const sx = this.shipImg.x - 10, sy = this.shipImg.y + 24, tx = t.img.x, ty = t.img.y - 30;
+      const k = this.add.image(sx, sy, `ms_rocket${G.randInt(0, MISSILE_VARIANTS - 1)}`).setDepth(40).setScale(1.1);
+      k.rotation = Math.atan2(ty - sy, tx - sx);
+      this.tweens.add({ targets: k, x: tx, y: ty, duration: 400, delay: i * 40, ease: 'Quad.in', onComplete: () => {
+        k.destroy();
+        const boom = this.add.circle(tx, ty, 8, 0xffa040, 0.8).setDepth(45);
+        this.tweens.add({ targets: boom, scale: 3, alpha: 0, duration: 300, onComplete: () => boom.destroy() });
+      } });
     }
 
     // 德魯伊：召喚動物（同時只有一隻），在場時給全隊光環
@@ -771,6 +820,10 @@
         this.tweens.add({ targets: u.img, alpha: 0, duration: 300, onComplete: () => u.img.destroy() });
         this.units = this.units.filter(x => x !== u);
         if (this.animal && this.animal.unit === u) { this.animal = null; this.computeAura(); }
+        if (this.minion && this.minion.unit === u) {   // 不死之契：召喚物倒下時死靈回血
+          const o = this.minion.owner; this.minion = null;
+          if (o && o.alive && o.st.minionDeathHeal) this.heal(o, Math.max(1, Math.round(o.st.maxHp * o.st.minionDeathHeal)));
+        }
       } else {
         // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
         u.img.setAlpha(0.3).setTint(0x777777);
@@ -958,6 +1011,7 @@
 
     fightTick(dt) {
       if (this.fever && this.fever.t > 0) this.fever.t -= dt;
+      if (this.overdrive && this.overdrive.t > 0) this.overdrive.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
       if (this.cdrBoost && this.cdrBoost.t > 0) this.cdrBoost.t -= dt;
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
@@ -998,7 +1052,8 @@
         this.cannonT -= dt;
         if (this.cannonT <= 0) {
           const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
-          this.cannonT = G.cannonInterval(this.aura) / (sk ? 2 : 1);   // 團隊特效、貓哈氣爆甲可縮短；速寫期間減半
+          const od = this.overdrive && this.overdrive.t > 0;
+          this.cannonT = G.cannonInterval(this.aura) / (sk || od ? 2 : 1);   // 速寫、引擎超載：減半   // 團隊特效、貓哈氣爆甲可縮短；速寫期間減半
           this.fireCannon(0);
         }
       }
@@ -1010,13 +1065,13 @@
       const t = this.enemiesAlive()[0];
       if (!t || !this.hero || !this.shipImg) return;
       const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
-      const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: 0, critDmg: 1 }, fx: {}, special: {}, alive: false };
+      const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: this.aura.cannonCrit || 0, critDmg: 2.5 }, fx: {}, special: {}, alive: false };   // 王牌砲手：船砲可暴擊
       const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, bonus ? 7 : 5, bonus ? 0x7a2f2f : 0x222222).setDepth(40);
       this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
         ball.destroy();
         if (this.valid(t)) {
           const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
-          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus)); this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
+          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus) * (1 + (this.aura.cannonDmg || 0)));   // 砲術長：船砲傷害 this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
           if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
           this.checkWaveEnd();
         }
@@ -1073,6 +1128,7 @@
       });
       if (party.some(u => u.st.iai)) out.push({ id: 'snipeCount', icon: G.FX_ICON.snipeCount, val: `${Math.min(50, this.snipeCount || 0)}/50`, p: { v: Math.min(50, this.snipeCount || 0) } });
       if (this.cdrBoostV()) out.push({ id: 'coverFire', icon: G.FX_ICON.coverFire, val: `${Math.ceil(this.cdrBoost.t)}s`, p: { v: pct(this.cdrBoost.v), s: Math.ceil(this.cdrBoost.t) } });
+      if (this.overdrive && this.overdrive.t > 0) out.push({ id: 'overdrive', icon: G.FX_ICON.overdrive, val: `${Math.ceil(this.overdrive.t)}s`, p: { s: Math.ceil(this.overdrive.t) } });
       if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
