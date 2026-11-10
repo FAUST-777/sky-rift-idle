@@ -281,8 +281,8 @@ G.SKILLS = {
     A('dr_wolf',   0, 16, lin(0.12, 0.03),   (v, r) => ({ target: 'none', party: [{ id: 'atkUp',  v, t: 8 }, { id: 'spdUp', v: WOLF.spd(r), t: 8 }], selfDebuff: [{ id: 'slow', v: WOLF.slow(r), t: 8 }] }),
       { descV: { spd: WOLF.spd, slow: WOLF.slow } }),
     A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
-    // 鹿之靈：全隊每秒回血 6 秒；另外全隊防禦 +5%→37%、反彈最終傷害 ×5（同 6 秒）
-    A('dr_deer',   1, 18, lin(0.01, 0.003),  (v, r) => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }, { id: 'defUp', v: lin(0.05, 0.08)(r), t: 6 }, { id: 'reflectX', v: 4, t: 6 }] }),
+    // 鹿之靈：全隊每秒回血 6 秒；另外全隊防禦 +5%→37%、反彈最終傷害 ×2（同 6 秒）
+    A('dr_deer',   1, 18, lin(0.01, 0.003),  (v, r) => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }, { id: 'defUp', v: lin(0.05, 0.08)(r), t: 6 }, { id: 'reflectX', v: 1, t: 6 }] }),
       { descV: { def: lin(0.05, 0.08) } }),
     // 野性狂暴（原荊棘纏繞）：持續 3/4.5/6/8/10 秒；其他隊友攻速 +55%→88%（物理系 +55%→100%）、每秒回 1% 生命；德魯伊自己攻速 -55%→-80%
     A('dr_thorns', 2, 20, r => [3, 4.5, 6, 8, 10][r - 1], (v, r) => ({ target: 'none',
