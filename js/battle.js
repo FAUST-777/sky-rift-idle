@@ -153,7 +153,7 @@
       return ch.active.filter(Boolean).map(id => {
         const def = G.skillDef(ch.cls, id), r = ch.skills[id];
         // 開場冷卻最多 5 秒，讓每場戰鬥一開始就會有技能出手
-        return def && r && def.type === 'active' ? { def, rank: r, cd: Math.min(5, def.cd * G.rand(0.2, 0.5)) } : null;
+        return def && r && def.type === 'active' ? { def, rank: r, cd: id === 'nc_golem' ? 0.3 : Math.min(5, def.cd * G.rand(0.2, 0.5)) } : null;   // 石魔人開場最先召
       }).filter(Boolean).sort((a, b) => (G.CAST_PRIORITY[a.def.id] ?? 99) - (G.CAST_PRIORITY[b.def.id] ?? 99));   // 同時轉好時，排前面的先放
     }
 
@@ -839,7 +839,15 @@
       if (e.selfHeal) return u.hp / u.st.maxHp < 0.75;
       if (e.summon) return !(this.animal && this.animal.unit.alive);
       if (e.wraith) return !(this.wraiths || []).some(w => w.owner === u);   // 怨靈：每位死靈頭上一隻
-      if (e.summonMinion) return !this.minionAlive();          // 場上最多一隻
+      if (e.summonMinion) {
+        if (this.minionAlive()) return false;                  // 場上最多一隻
+        // 沒有召喚物時優先召石魔人：自己的石魔人技能再 G.GOLEM_WAIT 秒內會好，骷髏先等它
+        if (e.summonMinion.kind !== 'golem') {
+          const g = u.skills.find(s => s.def.id === 'nc_golem');
+          if (g && g.cd <= G.GOLEM_WAIT) return false;
+        }
+        return true;
+      }
       if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
       return true;
     }

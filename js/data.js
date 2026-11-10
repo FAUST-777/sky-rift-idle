@@ -461,6 +461,7 @@ G.DEATH_PACT = {
 //   骷髏弓箭手「箭雨」：敵方全體 200% 傷害，自己攻速 +100% 5 秒，CD 8 秒
 // 技能施放優先順序：同一刻有好幾招都轉好時，數字小的先放（沒列的照技能欄順序排在後面）
 //   死靈：召喚石魔人 > 召喚骷髏弓箭手 > 怨靈召喚 > 其他
+G.GOLEM_WAIT = 3;   // 場上沒召喚物、石魔人技能 3 秒內會好 → 骷髏弓箭手先不召，等石魔人
 G.CAST_PRIORITY = { nc_golem: 0, nc_archer: 1, nc_wraith: 2 };
 G.SUMMON_SKILLS = {
   golem:    { id: 'sm_taunt',  cd: 9, cd0: 0.5, v: () => 0.05, fx: v => ({ target: 'none', taunt: { v, t: 10 } }) },
