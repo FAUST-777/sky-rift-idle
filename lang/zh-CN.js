@@ -197,7 +197,7 @@ G.I18N['zh-CN'] = {
   'skill.wb_provoke.name': '嘲讽', 'skill.wb_provoke.desc': '吸引所有敌人，自身减伤 {v}%，6 秒',
   'skill.wb_bulwark.name': '移动城墙', 'skill.wb_bulwark.desc': '全队受到伤害 -{v}%，6 秒',
   'skill.wb_fortify.name': '坚守', 'skill.wb_fortify.desc': '全队防御 +{v}%，10 秒',
-  'skill.wb_aegis.name': '盾墙！', 'skill.wb_aegis.desc': '架起盾墙 8 秒：自身伤害 -50%，但防御 +{v}%、反弹 +{reflect}% 受到的伤害、每秒恢复 {regen}% 生命',
+  'skill.wb_aegis.name': '盾墙！', 'skill.wb_aegis.desc': '架起盾墙 8 秒：自身伤害 -50%，但防御 +{v}%、反弹 +{reflect}% 受到的伤害、每秒恢复 {regen}% 生命、受到伤害 -50%',
   'skill.wb_cover.name': '掩护', 'skill.wb_cover.desc': '{v}% 概率替队友挡下攻击。自己生命 +{hpPct}%、受到伤害 -{dmgReduce}%；被攻击后获得「城墙上微风」：6 秒内每秒回复 1% 生命',
   'skill.wb_stone.name': '石墙', 'skill.wb_stone.desc': '防御 +{v}%',
   'skill.wb_guardian.name': '守护者', 'skill.wb_guardian.desc': '全队受到伤害 -{v}%',

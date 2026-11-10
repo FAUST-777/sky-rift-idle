@@ -197,7 +197,7 @@ G.I18N['en'] = {
   'skill.wb_provoke.name': 'Provoke', 'skill.wb_provoke.desc': 'Draws all enemies and reduces damage taken by {v}% for 6s',
   'skill.wb_bulwark.name': 'Moving Wall', 'skill.wb_bulwark.desc': 'Party damage taken -{v}% for 6s',
   'skill.wb_fortify.name': 'Hold the Line', 'skill.wb_fortify.desc': 'Party DEF +{v}% for 10s',
-  'skill.wb_aegis.name': 'Shield Wall!', 'skill.wb_aegis.desc': 'Raise a shield wall for 8s: own damage -50%, but DEF +{v}%, reflect +{reflect}% of damage taken, regenerate {regen}% HP per second',
+  'skill.wb_aegis.name': 'Shield Wall!', 'skill.wb_aegis.desc': 'Raise a shield wall for 8s: own damage -50%, but DEF +{v}%, reflect +{reflect}% of damage taken, regenerate {regen}% HP per second, damage taken -50%',
   'skill.wb_cover.name': 'Cover', 'skill.wb_cover.desc': '{v}% chance to take a hit for an ally. Your HP +{hpPct}%, damage taken -{dmgReduce}%; when hit you gain Breeze on the Wall: regen 1% HP/s for 6s',
   'skill.wb_stone.name': 'Stonewall', 'skill.wb_stone.desc': 'DEF +{v}%',
   'skill.wb_guardian.name': 'Guardian', 'skill.wb_guardian.desc': 'Party damage taken -{v}%',

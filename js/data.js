@@ -145,7 +145,7 @@ G.DEFDOWN_STACK_CAP = 30;
 G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施放者攻擊 × 倍率
 
 const CURSE = { def: lin(0.2, 0.0125), slow: lin(0.2, 0.025) };   // 暗黑繪師「詛咒油畫」的附加數值
-const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
+const WALL = { reflect: lin(0.2, 0.075), regen: () => 0.1, dmgReduce: 0.5 };   // 第 135 輪：每秒回血 0.5%→1% 改固定 10%，另加減傷 50%   // 盾牆者「盾牆！」的附加數值
 const CRAM = { hp: lin(0.05, 0.0175), spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
 const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
 const WOLF = { slow: lin(0.25, 0.025), spd: lin(0.1, 0.025) };   // 狼之靈：自己攻速 -25%→-35%、全隊攻速 +10%→20%
@@ -278,7 +278,7 @@ G.SKILLS = {
     A('wb_fortify', 1, 15, lin(0.25, 0.07), v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }] })),
     // 盾牆！（原壁壘護盾）：8 秒內自身輸出 -50%，換防禦 +70%→150%、反彈 +20%→50%、每秒回 0.5%→1% 生命（1→5 級）
     A('wb_aegis',   2, 16, lin(0.7, 0.2), (v, r) => ({ target: 'none', self: [{ id: 'shieldWall', v: 0.5, t: 8 }, { id: 'defUp', v, t: 8 },
-      { id: 'reflectUp', v: WALL.reflect(r), t: 8 }, { id: 'regen', v: WALL.regen(r), t: 8 }] }), { descV: { reflect: WALL.reflect, regen: WALL.regen } }),
+      { id: 'reflectUp', v: WALL.reflect(r), t: 8 }, { id: 'regen', v: WALL.regen(r), t: 8 }, { id: 'dmgReduce', v: WALL.dmgReduce, t: 8 }] }), { descV: { reflect: WALL.reflect, regen: WALL.regen } }),
     // 掩護：機率替隊友擋攻擊；自己生命 +30%→60%、受到傷害 -15%→50%；被攻擊後上「城牆上微風」6 秒每秒回 1%
     P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover', { also: { hpPct: lin(0.3, 0.075), dmgReduce: lin(0.15, 0.0875) } }),
     P('wb_stone',    0, lin(0.1, 0.08),  'self', 'defPct'),

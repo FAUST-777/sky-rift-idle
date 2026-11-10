@@ -197,7 +197,7 @@ G.I18N['zh-TW'] = {
   'skill.wb_provoke.name': '挑釁', 'skill.wb_provoke.desc': '吸引所有敵人，自身減傷 {v}%，6 秒',
   'skill.wb_bulwark.name': '移動城牆', 'skill.wb_bulwark.desc': '全隊受到傷害 -{v}%，6 秒',
   'skill.wb_fortify.name': '堅守', 'skill.wb_fortify.desc': '全隊防禦 +{v}%，10 秒',
-  'skill.wb_aegis.name': '盾牆！', 'skill.wb_aegis.desc': '架起盾牆 8 秒：自身傷害 -50%，但防禦 +{v}%、反彈 +{reflect}% 受到的傷害、每秒回復 {regen}% 生命',
+  'skill.wb_aegis.name': '盾牆！', 'skill.wb_aegis.desc': '架起盾牆 8 秒：自身傷害 -50%，但防禦 +{v}%、反彈 +{reflect}% 受到的傷害、每秒回復 {regen}% 生命、受到傷害 -50%',
   'skill.wb_cover.name': '掩護', 'skill.wb_cover.desc': '{v}% 機率替隊友擋下攻擊。自己生命 +{hpPct}%、受到傷害 -{dmgReduce}%；被攻擊後獲得「城牆上微風」：6 秒內每秒回復 1% 生命',
   'skill.wb_stone.name': '石牆', 'skill.wb_stone.desc': '防禦 +{v}%',
   'skill.wb_guardian.name': '守護者', 'skill.wb_guardian.desc': '全隊受到傷害 -{v}%',
