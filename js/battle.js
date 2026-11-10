@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -488,7 +488,8 @@
           const rc = a.reflectCrit && Math.random() * 100 < (a.reflectCritBase || 0) + this.critOf(target);
           const cm = rc ? target.st.critDmg + (a.critDmg || 0) + (a.reflectCritDmg || 0) + (a.reflectCritAdd || 0) : 1;
           const dm = a.reflectDef ? 1 + this.defOf(target) * a.reflectDef / 100 : 1;   // 倒刺美甲：被打者的防禦轉成反彈增傷（每 1 點防禦 +1%）
-          this.damage(src, Math.max(1, Math.round(dmg * r * cm * dm)), '#ff9ad5', rc, true);
+          const rx = 1 + this.fxv(target, 'reflectX');   // 鹿之靈：反彈最終傷害 ×5
+          this.damage(src, Math.max(1, Math.round(dmg * r * cm * dm * rx)), '#ff9ad5', rc, true);
         }
       }
       // 吸血
