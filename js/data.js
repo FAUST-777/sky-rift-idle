@@ -325,7 +325,7 @@ G.SKILLS = {
     A('mc_topcoat', 1, 15, lin(0.2, 0.05),  v => ({ target: 'none', party: [{ id: 'defUp', v, t: 10 }, { id: 'reflectUp', v: 0.5, t: 10 }] })),   // 另外全隊反彈 +50%
     A('mc_salon',   2, 18, lin(0.45, 0.1),  v => ({ target: 'none', shield: 0.12, party: [{ id: 'reflectUp', v, t: 8 }] })),
     // 倒刺美甲：全隊常駐反彈 10%→30%；並讓全隊反彈可以暴擊（用被打那位隊友的暴擊率、暴擊傷害）
-    P('mc_thorn',   0, lin(0.1, 0.05),  'party', 'reflect', { partyAlso: { reflectCrit: 1 } }),
+    P('mc_thorn',   0, lin(0.1, 0.05),  'party', 'reflect', { partyAlso: { reflectCrit: 1, reflectDef: 1 } }),   // reflectDef：被打者目前防禦每 1 點，反彈傷害 +1%
     P('mc_harden',  0, lin(0.04, 0.02), 'party', 'defPct'),
     P('mc_gelcoat', 1, lin(0.1, 0.07),  'self', 'hpPct'),
     // 鏡面甲：全隊反彈傷害 +20%→68%；反彈暴擊時暴擊傷害再 +50%→100%（要有倒刺美甲讓反彈能暴擊才有用）
