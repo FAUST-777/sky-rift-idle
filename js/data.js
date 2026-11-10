@@ -361,7 +361,8 @@ G.SKILLS = {
     A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
     P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
     P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
-    P('nc_undying',   1, lin(0.1, 0.05),  'self', 'minionDeathHeal'),
+    // 亡靈軍團（原不死之契，id 不變）：數值見 G.UNDEAD_LEGION；v = 召喚物生命
+    P('nc_undying',   1, lin(0.1, 0.1),   'special', 'undeadLegion', { descV: { evade: r => G.UNDEAD_LEGION.evade(r) } }),
     P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
     P('nc_legion',    2, lin(0.15, 0.05), 'self', 'minionDmg'),
     // 死亡契約：數值見 G.DEATH_PACT（v = 每個減益的召喚物回血）
@@ -434,6 +435,12 @@ G.shipSkillBonus = () => {
 //   場上召喚物 ≥1：全隊攻速 aSpd、暴擊率 aCrit（百分點）、暴擊傷害 aCritDmg、閃避 aEvade
 //   場上召喚物 ≥2：召喚物再加防禦 sDef、閃避 sEvade、攻擊 sAtk、暴擊傷害 sCritDmg
 //   場上召喚物 ≥3：全隊（含召喚物）再加攻速 tSpd、閃避 tEvade
+// 死靈「亡靈軍團」（1→5 級，隊上多位取最高；死靈自身閃避看自己的等級）
+//   召喚物（石魔人／骷髏）生命 +hp；召喚物（含怨靈）攻擊 fearChance 機率上恐懼（同死亡纏繞：傷害 -20%、6 秒）
+//   打到有衰老詛咒的敵人：傷害 ×(1 + decayDmg) 且必定暴擊
+//   召喚物倒下 → 屍爆：對敵方全體造成（召喚物最大生命＋主人最大生命）的傷害，無視防禦
+//   場上有召喚物：死靈自己閃避 +evade
+G.UNDEAD_LEGION = { hp: lin(0.1, 0.1), evade: lin(0.1, 0.0125), fearChance: 0.1, decayDmg: 0.5 };
 G.DEATH_PACT = {
   regen: lin(0.01, 0.005), dmg: lin(0.01, 0.01), spd: lin(0.05, 0.0175),
   aSpd: lin(0.4, 0.05), aCrit: lin(10, 4.25), aCritDmg: lin(0.5, 0.175), aEvade: lin(0.1, 0.025),

@@ -338,6 +338,7 @@
     }
 
     // ── 死靈「死亡契約」與召喚物 ──────────────────────────────────────────
+    legionRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.undeadLegion || {}).r || 0)); }
     pactRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.deathPact || {}).r || 0)); }
     summonCount() { return (this.minionAlive() ? 1 : 0) + (this.wraiths || []).length; }
     pactDebuffs() { return Math.max(0, ...this.enemiesAlive().map(e => DEBUFF_IDS.filter(id => this.fxv(e, id)).length)); }
@@ -406,7 +407,7 @@
     critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) + this.pactAll('aCrit') : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
@@ -568,7 +569,9 @@
       if (!stunnedNow && opts.elseDmgPct) dmg *= 1 + opts.elseDmgPct;
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
+      const legionDecay = (opts.wraith || (src.kind === 'summon' && src.minion)) && this.fxv(target, 'decay') && this.legionRank() > 0;   // 亡靈軍團：召喚物打衰老詛咒的敵人
+      if (legionDecay) dmg *= 1 + G.UNDEAD_LEGION.decayDmg;
+      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) || legionDecay ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
       if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
@@ -603,6 +606,7 @@
         }
       }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
+      if ((opts.wraith || (src.kind === 'summon' && src.minion)) && target.alive && this.legionRank() > 0 && Math.random() < G.UNDEAD_LEGION.fearChance * this.procMult(src)) this.debuff(src, target, 'fear', 0.2, 6);   // 亡靈軍團：召喚物攻擊機率上恐懼
 
       // 城牆者「尖刺城牆」反傷
       // 反彈：城牆者「尖刺城牆」（自己）＋ 美甲師全隊反彈光環／buff，「鏡面甲」加成反彈傷害
@@ -904,6 +908,7 @@
         maxHp: Math.round(owner.st.maxHp * S.stats.hp * sp), atk: owner.st.atk * S.stats.atk * sp, def: owner.st.def * S.stats.def * sp,
         spd: S.spd, crit: 5, critDmg: 1.5, ranged: false, range: 'one', dmgType: 'dark', missile: S.missile,
       };
+      const lr = this.legionRank(); if (lr) st.maxHp = Math.round(st.maxHp * (1 + G.UNDEAD_LEGION.hp(lr)));   // 亡靈軍團：召喚物生命
       const unit = this.makeUnit({ side: 'party', kind: 'summon', minion: kind, st, x: 224, texture: 'summon_' + kind, originY: 0.94, scale: 0.85 });
       unit.img.setAlpha(0);
       this.tweens.add({ targets: unit.img, alpha: 1, duration: 300 });
@@ -989,9 +994,17 @@
         this.tweens.add({ targets: u.img, alpha: 0, duration: 300, onComplete: () => u.img.destroy() });
         this.units = this.units.filter(x => x !== u);
         if (this.animal && this.animal.unit === u) { this.animal = null; this.computeAura(); }
-        if (this.minion && this.minion.unit === u) {   // 不死之契：召喚物倒下時，全場有這個被動的死靈都回血（不限誰召喚的）
-          this.minion = null;
-          this.partyAlive().forEach(o => { if (o.kind !== 'summon' && o.st.minionDeathHeal) this.heal(o, Math.max(1, Math.round(o.st.maxHp * o.st.minionDeathHeal))); });
+        if (this.minion && this.minion.unit === u) {   // 召喚物倒下
+          const o = this.minion.owner; this.minion = null;
+          // 亡靈軍團：召喚物倒下 → 屍爆，對敵方全體造成（召喚物＋主人最大生命）的傷害，無視防禦
+          if (this.legionRank() > 0) {
+            const dmg = Math.max(1, Math.round(u.st.maxHp + (o ? o.st.maxHp : 0)));
+            this.floatText(u.img.x, this.barY(u) - 30, G.t('battle.legionBlast'), '#9dff9d', 15, 1000);
+            const ring = this.add.circle(u.img.x, u.img.y - 30, 14, 0x9dff9d, 0.45).setDepth(45);
+            this.tweens.add({ targets: ring, scale: 8, alpha: 0, duration: 450, onComplete: () => ring.destroy() });
+            this.enemiesAlive().forEach(t => this.damage(t, dmg, '#9dff9d', true, true));
+            this.time.delayedCall(0, () => this.checkWaveEnd());
+          }
         }
       } else {
         // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
