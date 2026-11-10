@@ -109,7 +109,7 @@ G.TEAM_SYNERGIES = [
   { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.10, basicLifesteal: 0.005 } } },   // basicLifesteal：普攻命中回復自己最大生命的比例
   { id: 'arcane',   type: 'arcane',   tiers: { 2: { arcaneCrit: 0.5, arcaneCritDmg: 1.0, arcaneDur: 6 }, 3: { arcaneCrit: 0.55, arcaneCritDmg: 1.1, arcaneDur: 12 } } },   // 全隊打怪累積 100 次 → 全隊暴擊率／暴擊傷害提升 N 秒
   // 暗影纏繞：我方對敵人施加減益（新上、刷新、重上都算 1 次）累積 darkNeed 次 → 全隊攻速／冷卻縮短／閃避／每秒回血，持續 darkDur 秒
-  { id: 'dark',     type: 'dark',     tiers: { 2: { darkNeed: 200, darkSpd: 0.5, darkCdr: 0.15, darkEvade: 0.3, darkDur: 6 }, 3: { darkNeed: 100, darkSpd: 0.5, darkCdr: 0.15, darkEvade: 0.35, darkRegen: 0.015, darkDur: 10 } } },
+  { id: 'dark',     type: 'dark',     tiers: { 2: { darkNeed: 200, darkSpd: 0.37, darkCdr: 0.15, darkEvade: 0.3, darkRegen: 0.015, darkDur: 5 }, 3: { darkNeed: 100, darkSpd: 0.37, darkCdr: 0.15, darkEvade: 0.35, darkRegen: 0.03, darkDur: 7 } } },
 ];
 G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 
