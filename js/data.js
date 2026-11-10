@@ -260,7 +260,7 @@ G.SKILLS = {
     P('pi_quick',    1, lin(-0.5, 0.075), 'self', 'evade', { also: { iai: () => 1, snipeX: r => [1, 2, 3, 3.5, 4][r - 1] },
       descV: { snipe: r => [2, 3, 4, 4.5, 5][r - 1] }, rawKeys: ['snipe'] }),
     P('pi_ruthless', 1, lin(0.15, 0.1),  'self', 'critDmg'),
-    P('pi_riposte',  2, lin(1.99, 2),    'special', 'riposte'),   // 閃避反擊：每發 199%→999%
+    P('pi_riposte',  2, lin(1.99, 2),    'special', 'riposte', { partyAlso: { evade: lin(0.04, 0.015) } }),   // 閃避反擊：每發 199%→999%；全隊閃避 +4%→10%
   ],
 
   // 城牆者：幫隊友扛傷、降隊友受傷、全隊防禦

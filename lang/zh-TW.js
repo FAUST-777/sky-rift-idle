@@ -179,7 +179,7 @@ G.I18N['zh-TW'] = {
   'skill.pi_sharp.name': '神槍手', 'skill.pi_sharp.desc': '暴擊率 +{v}%；全隊物理系角色暴擊率 +{party_physCrit}%',
   'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻擊必定暴擊，超過 100% 的暴擊率全部轉成暴擊傷害（每 1% 轉 1%）；閃避 {v}%。全隊物理系隊員的傷害技能每累積 50 次，自己發動「狙擊爆頭！！！」：4 秒內輸出最終傷害 ×{snipe}（發動間隔 5 秒）',
   'skill.pi_ruthless.name': '冷血', 'skill.pi_ruthless.desc': '暴擊傷害 +{v}%',
-  'skill.pi_riposte.name': '閃避反擊', 'skill.pi_riposte.desc': '閃避成功時開槍反擊全體敵人，每發 {v}% 傷害。打到暈眩中的敵人時暴擊傷害 +150%、最終傷害 ×10，並解除牠的暈眩',
+  'skill.pi_riposte.name': '閃避反擊', 'skill.pi_riposte.desc': '閃避成功時開槍反擊全體敵人，每發 {v}% 傷害。打到暈眩中的敵人時暴擊傷害 +150%、最終傷害 ×10，並解除牠的暈眩。另外全隊閃避 +{party_evade}%',
 
   'skill.wb_bash.name': '城牆衝撞', 'skill.wb_bash.desc': '單體 {v}% 傷害',
   'skill.wb_provoke.name': '挑釁', 'skill.wb_provoke.desc': '吸引所有敵人，自身減傷 {v}%，6 秒',

@@ -179,7 +179,7 @@ G.I18N['en'] = {
   'skill.pi_sharp.name': 'Sharpshooter', 'skill.pi_sharp.desc': 'Crit rate +{v}%; physical-type party members crit rate +{party_physCrit}%',
   'skill.pi_quick.name': 'American Iai', 'skill.pi_quick.desc': 'Your attacks always crit; crit rate above 100% converts 1:1 into crit damage. Evasion {v}%. Every 50 damage skills cast by physical-type party members triggers Sniper Headshot!!!: your final damage x{snipe} for 4s (5s interval)',
   'skill.pi_ruthless.name': 'Ruthless', 'skill.pi_ruthless.desc': 'Crit damage +{v}%',
-  'skill.pi_riposte.name': 'Riposte', 'skill.pi_riposte.desc': 'On a successful dodge, shoot back at all enemies for {v}% damage each. Vs stunned enemies: crit damage +150% and final damage x10, then the stun is removed',
+  'skill.pi_riposte.name': 'Riposte', 'skill.pi_riposte.desc': 'On a successful dodge, shoot back at all enemies for {v}% damage each. Vs stunned enemies: crit damage +150% and final damage x10, then the stun is removed. Also party evasion +{party_evade}%',
 
   'skill.wb_bash.name': 'Wall Slam', 'skill.wb_bash.desc': '{v}% damage to one enemy',
   'skill.wb_provoke.name': 'Provoke', 'skill.wb_provoke.desc': 'Draws all enemies and reduces damage taken by {v}% for 6s',
