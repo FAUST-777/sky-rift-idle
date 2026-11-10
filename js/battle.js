@@ -456,7 +456,7 @@
       if (src.st.minionDmg && this.minionAlive() && this.minion.owner === src) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢            // 吸貓狂熱：對中毒敵人
       const stunnedNow = this.fxv(target, 'stun') > 0;
       const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
-      if (stunnedNow && this.fxv(src, 'stunHunter')) { sb.forceCrit = true; sb.dmgPct = (sb.dmgPct || 0) + this.fxv(src, 'stunHunter'); }   // 大爆射一波！之後 6 秒
+      if (stunnedNow && this.fxv(src, 'stunHunter')) { sb.forceCrit = true; sb.breakStun = true; sb.dmgPct = (sb.dmgPct || 0) + this.fxv(src, 'stunHunter'); }   // 大爆射一波！之後 6 秒
       if (sb && sb.dmgPct) dmg *= 1 + sb.dmgPct;
       if (!stunnedNow && opts.elseDmgPct) dmg *= 1 + opts.elseDmgPct;
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
@@ -486,7 +486,7 @@
         }
       }
       const type = this.party(src) ? src.st.dmgType : null;
-      if (opts.breakStun && stunnedNow && target.fx.stun) delete target.fx.stun;   // 解除暈眩
+      if ((opts.breakStun || (sb && sb.breakStun)) && stunnedNow && target.fx.stun) delete target.fx.stun;   // 解除暈眩
       if (this.aura.arcaneCrit && target.side === 'enemy' && (this.party(src) || src.kind === 'cannon')) {   // 奧術共振：累積 100 次
         this.arcaneCount = (this.arcaneCount || 0) + 1;
         if (this.arcaneCount >= 100) {
