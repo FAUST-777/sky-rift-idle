@@ -412,6 +412,26 @@
   G.itemValue = it => Math.round(5 * it.floor * Math.pow(it.rarity + 1, 2));
 
   // ── 背包容量與擴充 ───────────────────────────────────────────────────────
+  G.EXCHANGE_RATE = 10;   // 10 金幣 = 1 雲晶
+  // dir 'toCrystal'：花 n×10 金幣換 n 雲晶；'toGold'：花 n 雲晶換 n×10 金幣
+  G.exchange = function (dir, n) {
+    n = Math.floor(n);
+    if (!(n > 0)) return false;
+    const g = n * G.EXCHANGE_RATE;
+    if (dir === 'toCrystal') {
+      if (G.S.gold < g) { toast('toast.notEnoughGold'); return false; }
+      G.S.gold -= g; G.S.crystal += n;
+      toast('toast.exchanged', { from: `${G.fmt(g)}💰`, to: `${G.fmt(n)}💎` });
+    } else {
+      if (G.S.crystal < n) { toast('toast.notEnoughCrystal'); return false; }
+      G.S.crystal -= n; G.S.gold += g;
+      toast('toast.exchanged', { from: `${G.fmt(n)}💎`, to: `${G.fmt(g)}💰` });
+    }
+    G.save();
+    return true;
+  };
+  G.exchangeMax = dir => dir === 'toCrystal' ? Math.floor(G.S.gold / G.EXCHANGE_RATE) : Math.floor(G.S.crystal);
+
   G.invCap = () => Math.min(G.CONFIG.bagMax, G.CONFIG.inventorySize + (G.S.bagExpands || 0) * G.CONFIG.bagExpandSlots);
   G.canExpandBag = () => G.invCap() < G.CONFIG.bagMax;
   G.expandBag = function () {

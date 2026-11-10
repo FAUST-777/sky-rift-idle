@@ -806,6 +806,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   };
 
   // ── 彈窗 / 提示 ──────────────────────────────────────────────────────────
+  // 金幣 ⇄ 雲晶 兌換視窗
+  function exchangeModal() {
+    const S = G.S, R = G.EXCHANGE_RATE;
+    const quick = dir => [1, 10, 100].map(n => `<button class="btn small" data-act="exdo" data-dir="${dir}" data-n="${n}">${G.fmt(n)}💎</button>`).join('')
+      + `<button class="btn small good" data-act="exdo" data-dir="${dir}" data-n="max">${t('ex.max')} (${G.fmt(G.exchangeMax(dir))}💎)</button>`;
+    UI.modal(`<h2>${t('ex.title')}</h2>
+      <p class="muted" style="font-size:12px">${t('ex.rate', { r: R })}</p>
+      <p><b>💰 ${G.fmt(S.gold)}</b>　<b>💎 ${G.fmt(S.crystal)}</b></p>
+      <div class="slot-label">${t('ex.toCrystal', { r: R })}</div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${quick('toCrystal')}</div>
+      <div class="slot-label">${t('ex.toGold', { r: R })}</div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${quick('toGold')}</div>
+      <div class="row" style="gap:6px;align-items:center;flex-wrap:wrap">
+        <input id="exN" type="number" min="1" step="1" value="1" style="width:90px">💎
+        <button class="btn small" data-act="exdo" data-dir="toCrystal" data-n="input">${t('ex.buyN')}</button>
+        <button class="btn small" data-act="exdo" data-dir="toGold" data-n="input">${t('ex.sellN')}</button>
+      </div>
+      <div class="modal-actions"><button class="btn" data-act="close">${t('common.close')}</button></div>`);
+  }
+
   UI.modal = function (html) { $('modalCard').innerHTML = html; $('modal').hidden = false; };
   UI.close = function () { $('modal').hidden = true; UI.modalKind = null; };
   let toastT;
@@ -833,6 +853,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'close': UI.close(); break;
       case 'prologue': UI.nextPrologue(); break;
       case 'settings': UI.modalKind = 'settings'; settingsModal(); break;
+      case 'exchange': exchangeModal(); break;
+      case 'exdo': {
+        const n = d.n === 'max' ? G.exchangeMax(d.dir) : d.n === 'input' ? +($('exN') || {}).value : +d.n;
+        if (G.exchange(d.dir, n)) exchangeModal();
+        break;
+      }
       case 'lang': G.setLang(d.v); break;
       case 'floor': S.autoAdvance = +d.v > S.floor ? true : S.autoAdvance; G.setFloor(+d.v); UI.refresh(); break;
       case 'auto': S.autoAdvance = el.checked; break;
