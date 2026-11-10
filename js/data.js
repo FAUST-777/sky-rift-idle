@@ -358,12 +358,13 @@ G.SKILLS = {
     //   每次攻擊上「死亡詛咒」6 秒：記錄期間受到的傷害，到期引爆 110%→200%；被刷新時先馬上引爆再重上
     A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: lin(1.1, 0.225)(r), t: 18 } }),
       { descV: { spd: lin(0.5, 0.125), curse: lin(1.1, 0.225) } }),
-    P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
+    P('nc_bond',      1, lin(0.1, 0.05),  'self', 'summonPower'),   // 第 107 輪：跟亡者之力對調到第二階
     // 白骨風暴（原腐朽，id 不變）：見 G.BONE_STORM；v = 中毒強度
     P('nc_rot',       0, lin(1, 0.25),    'special', 'boneStorm'),
     // 亡靈軍團（原不死之契，id 不變）：數值見 G.UNDEAD_LEGION；v = 召喚物生命
     P('nc_undying',   1, lin(0.1, 0.1),   'special', 'undeadLegion', { descV: { evade: r => G.UNDEAD_LEGION.evade(r) } }),
-    P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
+    // 咒怨之力（原亡者之力，id 不變，第一階）：見 G.GRUDGE；v = 闇屬性全隊傷害
+    P('nc_dread',     0, lin(0.1, 0.1675), 'special', 'grudge'),
     // 死亡契約：數值見 G.DEATH_PACT（v = 每個減益的召喚物回血）
     P('nc_pact',      2, lin(0.01, 0.005), 'special', 'deathPact', { descV: Object.fromEntries(Object.entries({
       dmg: 'dmg', spd: 'spd', tSpd: 'tSpd', tEvade: 'tEvade', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),
@@ -441,6 +442,10 @@ G.shipSkillBonus = () => {
 //   場上有召喚物：死靈自己閃避 +evade
 // 死靈「白骨風暴」：裝了的死靈自己、或場上召喚物（含怨靈，隊上取最高等級）每次攻擊（普攻＋技能）→
 //   破防 def、命中下降 blind（敵人 miss 機率）、中毒（強度 poison × 一般中毒），都是 t 秒
+// 死靈「咒怨之力」（隊上取最高等級）：
+//   裝了的死靈要倒下時，頭上的怨靈代替他死（怨靈消失，死靈留 1 點生命）
+//   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
+G.GRUDGE = { regen: 0.01, bleedT: 3 };
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 4;   // 死亡詛咒最多疊幾層
 G.UNDEAD_LEGION = { hp: lin(0.1, 0.1), evade: lin(0.1, 0.0125), fearChance: 0.1, decayDmg: 0.5 };

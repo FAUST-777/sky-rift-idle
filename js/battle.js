@@ -353,6 +353,8 @@
     }
 
     // ── 死靈「死亡契約」與召喚物 ──────────────────────────────────────────
+    grudgeV() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.grudge || {}).v || 0)); }   // 咒怨之力：闇屬性傷害加成（0 = 沒人裝）
+    isDark(u) { return this.party(u) && u.st.dmgType === 'dark'; }
     boneRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.boneStorm || {}).r || 0)); }
     legionRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.undeadLegion || {}).r || 0)); }
     pactRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.deathPact || {}).r || 0)); }
@@ -576,6 +578,7 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
+      if (this.isDark(src)) { const gv = this.grudgeV(); if (gv) dmg *= 1 + gv; }   // 咒怨之力：闇屬性全隊（含召喚物、怨靈）傷害
       if (src.kind === 'summon' && src.minion) dmg *= 1 + this.pactPerDebuff('dmg');   // 死亡契約：召喚物每個減益加傷
       const stunnedNow = this.fxv(target, 'stun') > 0;
       const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
@@ -621,6 +624,7 @@
         }
       }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
+      if (!opts.counter && target.alive && !this.party(target) && this.isDark(src) && this.grudgeV()) this.debuff(src, target, 'bleed', 1, G.GRUDGE.bleedT);   // 咒怨之力：闇屬性每次攻擊上流血
       // 白骨風暴：裝了的死靈自己、或場上召喚物（含怨靈）的攻擊 → 破防、命中下降、中毒
       if (!opts.counter && target.alive && !this.party(target)) {
         const isSummon = opts.wraith || (src.kind === 'summon' && src.minion);
@@ -694,6 +698,16 @@
       if (!this.doomBlasting && u.doomStacks) u.doomStacks.forEach(s => { s.acc += amount; });   // 死亡詛咒：每層都記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
+      if (u.hp <= 0 && u.special.grudge && this.party(u)) {   // 咒怨之力：怨靈代替死靈倒下
+        const w = (this.wraiths || []).find(x => x.owner === u);
+        if (w) {
+          u.hp = 1;
+          this.wraiths = this.wraiths.filter(x => x !== w);
+          this.tweens.add({ targets: w.img, alpha: 0, scale: 1.8, duration: 400, onComplete: () => w.img.destroy() });
+          this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.grudgeSave'), '#c99bff', 15, 1000);
+          return;
+        }
+      }
       if (u.hp <= 0) this.kill(u);
     }
 
@@ -1198,7 +1212,7 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
+        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }
