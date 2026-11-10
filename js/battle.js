@@ -672,14 +672,14 @@
       if (u.side === 'enemy') {
         this.tweens.add({ targets: u.img, alpha: 0, y: u.img.y + 10, duration: 350, onComplete: () => u.img.setVisible(false) });
         this.reward(u);
-      } else if (u.kind === 'hero') {
-        this.defeat();
       } else if (u.kind === 'summon') {
         this.tweens.add({ targets: u.img, alpha: 0, duration: 300, onComplete: () => u.img.destroy() });
         this.units = this.units.filter(x => x !== u);
         if (this.animal && this.animal.unit === u) { this.animal = null; this.computeAura(); }
       } else {
+        // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
         u.img.setAlpha(0.3).setTint(0x777777);
+        if (this.mode !== 'dead' && !this.units.some(x => x.alive && x.kind !== 'summon')) this.defeat();
       }
     }
 
