@@ -150,14 +150,6 @@
           ${S.floor < top ? `<button class="btn small primary" data-act="floor" data-v="${top}">${t('adv.challenge', { n: top })}</button>` : ''}
         </div>
       </div>
-      <div class="card">
-        <h3>${t('stat.power')} <span class="gold">${G.fmt(G.power(st))}</span></h3>
-        <div class="stats">
-          <div>${t('stat.hp')} <b>${G.fmt(st.maxHp)}</b></div><div>${t('stat.atk')} <b>${st.atk}</b></div>
-          <div>${t('stat.def')} <b>${st.def}</b></div><div>${t('stat.spd')} <b>${st.spd}</b></div>
-          <div>${t('stat.crit')} <b>${st.crit}%</b></div><div>${t('adv.partners')} <b>${S.party.length}/${G.CONFIG.maxParty}</b></div>
-        </div>
-      </div>
       <div class="card" id="liveCard">
         <h3>📊 ${t('live.title')} <small>${t('live.hint')}</small></h3>
         <div class="live-who" id="liveWho"></div>
