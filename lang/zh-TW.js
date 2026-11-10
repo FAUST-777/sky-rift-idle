@@ -46,7 +46,7 @@ G.I18N['zh-TW'] = {
   'base.accessory.0': '護身符', 'base.accessory.1': '戒指', 'base.accessory.2': '徽章',
 
   // ── 職業 ──
-  'core.atk': '攻擊', 'core.buff': '輔助', 'core.spc': '特殊', 'core.def': '防禦',
+  'core.atk': '攻擊', 'core.buff': '輔助', 'core.def': '防禦',
   'range.all': '全體', 'range.one': '單體',
   'dtype.physical': '物理', 'dtype.animal': '動物', 'dtype.arcane': '奧術', 'dtype.dark': '黑暗',
   'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 級可以轉職。',

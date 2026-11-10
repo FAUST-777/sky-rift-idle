@@ -46,7 +46,7 @@ G.I18N['zh-CN'] = {
   'base.accessory.0': '护身符', 'base.accessory.1': '戒指', 'base.accessory.2': '徽章',
 
   // ── 职业 ──
-  'core.atk': '攻击', 'core.buff': '辅助', 'core.spc': '特殊', 'core.def': '防御',
+  'core.atk': '攻击', 'core.buff': '辅助', 'core.def': '防御',
   'range.all': '全体', 'range.one': '单体',
   'dtype.physical': '物理', 'dtype.animal': '动物', 'dtype.arcane': '奥术', 'dtype.dark': '黑暗',
   'class.villager.name': '村民', 'class.villager.desc': '平凡的村民。到 5 级可以转职。',

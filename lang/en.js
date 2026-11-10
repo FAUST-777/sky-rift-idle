@@ -46,7 +46,7 @@ G.I18N['en'] = {
   'base.accessory.0': 'Amulet', 'base.accessory.1': 'Ring', 'base.accessory.2': 'Badge',
 
   // ── Classes ──
-  'core.atk': 'Attack', 'core.buff': 'Support', 'core.spc': 'Special', 'core.def': 'Defense',
+  'core.atk': 'Attack', 'core.buff': 'Support', 'core.def': 'Defense',
   'range.all': 'All enemies', 'range.one': 'Single target',
   'dtype.physical': 'Physical', 'dtype.animal': 'Animal', 'dtype.arcane': 'Arcane', 'dtype.dark': 'Dark',
   'class.villager.name': 'Villager', 'class.villager.desc': 'An ordinary villager. Choose a class at Lv 5.',
