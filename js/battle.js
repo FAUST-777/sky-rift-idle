@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
+  const BUFF_IDS = ['breeze', 'atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown', 'fear', 'decay', 'doom'];   // doom 死亡詛咒（怨靈）   // fear 恐懼：傷害下降；decay 衰老詛咒：無法暴擊＋最大生命下降
   const MISSILE_VARIANTS = 4;
 
@@ -469,7 +469,7 @@
         // 還沒套上限的值（即時數值：超過上限標紅、顯示多出多少）；cap = 上限
         raw: { crit: this.critOf(u), cdr: (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr'), evade: this.evadeRaw(u) },
         cap: { crit: u.st.iai ? Infinity : 100, cdr: G.CONFIG.cdrCap, evade: this.evadeCapOf(u) },   // 美式居合：超過 100% 的暴擊率會轉成暴擊傷害，不算浪費
-        regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen') + this.shadowV('darkRegen') + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.feverSum() / 10000,   // 暗影纏繞、咒怨之力、血之狂熱
+        regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen') + this.fxv(u, 'breeze') + this.shadowV('darkRegen') + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.feverSum() / 10000,   // 暗影纏繞、咒怨之力、血之狂熱
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
         dmg: (1 + (a.dmgPct || 0)) * (1 - (curse.dmg || 0)) * (this.isDark(u) ? 1 + this.grudgeV() : 1) - 1,   // 咒怨之力：黑暗系傷害
@@ -638,6 +638,7 @@
         }
       }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
+      if (this.party(target) && !this.party(src) && target.special.cover && target.alive) this.addFx(target, 'breeze', G.WALL_BREEZE.v, G.WALL_BREEZE.t);   // 掩護：被攻擊後「城牆上微風」
       if (!opts.counter && target.alive && !this.party(target) && this.isDark(src) && this.grudgeV()) this.debuff(src, target, 'bleed', 1, G.GRUDGE.bleedT);   // 咒怨之力：闇屬性每次攻擊上流血
       // 白骨風暴：裝了的死靈自己、或場上召喚物（含怨靈）的攻擊 → 破防、命中下降、中毒
       if (!opts.counter && target.alive && !this.party(target)) {
@@ -862,6 +863,7 @@
 
     castSkill(u, s) {
       const d = s.def, v = d.v(s.rank), e = d.fx(v, s.rank);
+      if (d.id === 'wb_bash' && u.st.bashDmg) e.mult *= 1 + u.st.bashDmg;   // 破牆而出：城牆衝撞傷害 +300%
       if (!this.shouldCast(u, e)) return false;
       const col = e.mult ? '#ffd27a' : e.heal || e.selfHeal ? '#7dff9a' : '#9fd8ff';
       this.floatText(u.img.x, this.barY(u) - 22, G.skillName(d.id), col, 15, 900);
@@ -1238,7 +1240,7 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
+        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.fxv(u, 'regen') + this.fxv(u, 'breeze') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }

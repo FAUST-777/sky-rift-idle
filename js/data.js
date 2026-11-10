@@ -279,10 +279,12 @@ G.SKILLS = {
     // 盾牆！（原壁壘護盾）：8 秒內自身輸出 -50%，換防禦 +70%→150%、反彈 +20%→50%、每秒回 0.5%→1% 生命（1→5 級）
     A('wb_aegis',   2, 16, lin(0.7, 0.2), (v, r) => ({ target: 'none', self: [{ id: 'shieldWall', v: 0.5, t: 8 }, { id: 'defUp', v, t: 8 },
       { id: 'reflectUp', v: WALL.reflect(r), t: 8 }, { id: 'regen', v: WALL.regen(r), t: 8 }] }), { descV: { reflect: WALL.reflect, regen: WALL.regen } }),
-    P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover'),
+    // 掩護：機率替隊友擋攻擊；自己生命 +30%→60%、受到傷害 -15%→50%；被攻擊後上「城牆上微風」6 秒每秒回 1%
+    P('wb_cover',    0, lin(0.15, 0.07), 'special', 'cover', { also: { hpPct: lin(0.3, 0.075), dmgReduce: lin(0.15, 0.0875) } }),
     P('wb_stone',    0, lin(0.1, 0.08),  'self', 'defPct'),
     P('wb_guardian', 1, lin(0.04, 0.02), 'party', 'dmgReduce'),
-    P('wb_rampart',  1, lin(0.1, 0.07),  'self', 'hpPct'),
+    // 破牆而出（原城垛，id 不變）：防禦 -99%→-50%、生命 -77%、暴擊率 +10→100、暴擊傷害 +200%→777%、攻速 +100%→350%、城牆衝撞傷害 +300%
+    P('wb_rampart',  1, lin(-0.99, 0.1225), 'self', 'defPct', { also: { hpPct: () => -0.77, crit: lin(10, 22.5), critDmg: lin(2, 1.4425), spdPct: lin(1, 0.625), bashDmg: () => 3 }, descV: { crit: lin(10, 22.5) }, rawKeys: ['crit'] }),
     P('wb_thorns',   2, lin(0.1, 0.06),  'special', 'thorns'),
   ],
 
@@ -450,6 +452,7 @@ G.shipSkillBonus = () => {
 //   （第 129 輪：怨靈替死移到「怨靈召喚」本身）
 //   普攻打恐懼敵人傷害 +vsFear；打衰老詛咒敵人暴擊傷害 +vsDecayCritDmg（可疊加）
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
+G.WALL_BREEZE = { v: 0.01, t: 6 };   // 城牆者「掩護」：被攻擊後「城牆上微風」每秒回 1%，6 秒
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
@@ -481,7 +484,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', shadow: '🌑', shadowCount: '🌑', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', shadow: '🌑', shadowCount: '🌑', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', breeze: '🍃', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', fear: '😱', decay: '🥀', doom: '💀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
