@@ -450,8 +450,8 @@
       const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
       if (ls && src.alive) {
         src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
-        const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友
-        if (bs) this.partyAlive().forEach(p => { if (p !== src && p.kind !== 'summon') this.heal(p, Math.max(1, Math.round(p.st.maxHp * bs)), false); });
+        const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友（每秒最多一次）
+        if (bs && !(this.time.now - (src.bloodShareAt || -1e9) < 1000) && (src.bloodShareAt = this.time.now, true)) this.partyAlive().forEach(p => { if (p !== src && p.kind !== 'summon') this.heal(p, Math.max(1, Math.round(p.st.maxHp * bs)), false); });
       }
       // 鋼鐵陣線：我方普攻命中回復自己最大生命的 0.5%（不是看傷害）
       if (!opts.skill && !opts.counter && this.party(src) && this.aura.basicLifesteal && src.alive && src.st.maxHp) src.hp = Math.min(src.st.maxHp, src.hp + src.st.maxHp * this.aura.basicLifesteal);
