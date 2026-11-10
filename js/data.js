@@ -139,7 +139,7 @@ G.STUN = { taken: 0.15, procMult: 1.5, critMult: 1.5 };   // 每秒傷害 = 施�
 
 const CURSE = { def: lin(0.2, 0.0125), slow: lin(0.2, 0.025) };   // 暗黑繪師「詛咒油畫」的附加數值
 const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
-const CRAM = { spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
+const CRAM = { hp: lin(0.05, 0.0175), spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
 const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
 const WOLF = { slow: lin(0.25, 0.025), spd: lin(0.1, 0.025) };   // 狼之靈：自己攻速 -25%→-35%、全隊攻速 +10%→20%
 const FERAL = { hp: lin(0.1, 0.0375), spd: lin(0.55, 0.0825), phys: lin(0.55, 0.1125), slow: lin(0.55, 0.0625) };   // 野性狂暴：隊友攻速、物理系隊友攻速、自己減攻速
@@ -201,8 +201,8 @@ G.SKILLS = {
     A('sc_tome',    0, 8,  lin(1.4, 0.22),  v => ({ target: 'all', mult: v })),
     A('sc_lecture', 1, 10, lin(0.8, 0.12),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.15, t: 5 }] })),
     // 臨時抱佛腳：扣自己目前生命 25%，其他隊友攻速 +40%→77%，持續 2/3/4/4.5/5 秒；期間學者自己防禦 -30%
-    A('sc_cram',    1, 20, CRAM.spd, (v, r) => ({ target: 'none', hpCost: 0.25, partyOthers: [{ id: 'spdUp', v, t: CRAM.t(r) }], selfDebuff: [{ id: 'defDown', v: 0.3, t: CRAM.t(r) }] }),
-      { descV: { t: CRAM.t }, rawKeys: ['t'] }),
+    A('sc_cram',    1, 20, CRAM.spd, (v, r) => ({ target: 'none', hpCost: 0.25, partyOthers: [{ id: 'spdUp', v, t: CRAM.t(r) }, { id: 'hpUp', v: CRAM.hp(r), t: CRAM.t(r) }], selfDebuff: [{ id: 'defDown', v: 0.3, t: CRAM.t(r) }] }),   // hpUp：其他隊友最大生命 +5%→12%
+      { descV: { t: CRAM.t, hp: CRAM.hp }, rawKeys: ['t'] }),
     A('sc_exam',    2, 12, lin(1.1, 0.18),  v => ({ target: 'all', mult: v, critBonus: 100 })),
     P('sc_crisis',  0, lin(0.1, 0.03),  'special', 'crisis', { v2: lin(0.2, 0.05), partyAlso: { hpPct: lin(0.02, 0.015) } }),   // 另外全隊最大生命 +2%→8%
     P('sc_grant',   0, lin(0.08, 0.05), 'party', 'goldPct'),

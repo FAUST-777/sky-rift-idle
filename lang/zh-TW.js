@@ -99,7 +99,7 @@ G.I18N['zh-TW'] = {
   'skill.sc_barrage.name': '書海', 'skill.sc_barrage.desc': '書本轟炸全體 3 段，每段 {v}% 傷害',
   'skill.sc_tome.name': '百科全書', 'skill.sc_tome.desc': '全體 {v}% 傷害',
   'skill.sc_lecture.name': '長篇大論', 'skill.sc_lecture.desc': '全體 {v}% 傷害，敵人防禦 -15%，5 秒',
-  'skill.sc_cram.name': '臨時抱佛腳', 'skill.sc_cram.desc': '扣除自己目前生命的 25%，其他隊友攻速 +{v}%，持續 {t} 秒；期間自己防禦 -30%',
+  'skill.sc_cram.name': '臨時抱佛腳', 'skill.sc_cram.desc': '扣除自己目前生命的 25%，其他隊友攻速 +{v}%、最大生命 +{hp}%，持續 {t} 秒；期間自己防禦 -30%',
   'skill.sc_exam.name': '考前猜題', 'skill.sc_exam.desc': '全體 {v}% 傷害，必定暴擊',
   'skill.sc_crisis.name': '危機意識', 'skill.sc_crisis.desc': '任一隊友生命低於 60% 時，自身傷害 +{v}%、防禦 +{v2}%。另外全隊最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '獎學金', 'skill.sc_grant.desc': '全隊金幣獲得 +{v}%',

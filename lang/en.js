@@ -99,7 +99,7 @@ G.I18N['en'] = {
   'skill.sc_barrage.name': 'Sea of Books', 'skill.sc_barrage.desc': 'Bombards all enemies 3 times for {v}% damage each',
   'skill.sc_tome.name': 'Encyclopedia', 'skill.sc_tome.desc': '{v}% damage to all enemies',
   'skill.sc_lecture.name': 'Long Lecture', 'skill.sc_lecture.desc': '{v}% damage to all enemies, enemy DEF -15% for 5s',
-  'skill.sc_cram.name': 'Cram Session', 'skill.sc_cram.desc': 'Lose 25% of current HP; other allies get attack speed +{v}% for {t}s. Your DEF -30% meanwhile',
+  'skill.sc_cram.name': 'Cram Session', 'skill.sc_cram.desc': 'Lose 25% of current HP; other allies get attack speed +{v}% and max HP +{hp}% for {t}s. Your DEF -30% meanwhile',
   'skill.sc_exam.name': 'Exam Prediction', 'skill.sc_exam.desc': '{v}% damage to all enemies, always crits',
   'skill.sc_crisis.name': 'Crisis Mode', 'skill.sc_crisis.desc': 'When any ally is below 60% HP: own damage +{v}% and DEF +{v2}%. Also party max HP +{party_hpPct}%',
   'skill.sc_grant.name': 'Scholarship', 'skill.sc_grant.desc': 'Party gold earned +{v}%',

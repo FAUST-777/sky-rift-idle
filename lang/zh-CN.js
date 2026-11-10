@@ -99,7 +99,7 @@ G.I18N['zh-CN'] = {
   'skill.sc_barrage.name': '书海', 'skill.sc_barrage.desc': '书本轰炸全体 3 段，每段 {v}% 伤害',
   'skill.sc_tome.name': '百科全书', 'skill.sc_tome.desc': '全体 {v}% 伤害',
   'skill.sc_lecture.name': '长篇大论', 'skill.sc_lecture.desc': '全体 {v}% 伤害，敌人防御 -15%，5 秒',
-  'skill.sc_cram.name': '临时抱佛脚', 'skill.sc_cram.desc': '扣除自己当前生命的 25%，其他队友攻速 +{v}%，持续 {t} 秒；期间自己防御 -30%',
+  'skill.sc_cram.name': '临时抱佛脚', 'skill.sc_cram.desc': '扣除自己当前生命的 25%，其他队友攻速 +{v}%、最大生命 +{hp}%，持续 {t} 秒；期间自己防御 -30%',
   'skill.sc_exam.name': '考前猜题', 'skill.sc_exam.desc': '全体 {v}% 伤害，必定暴击',
   'skill.sc_crisis.name': '危机意识', 'skill.sc_crisis.desc': '任一队友生命低于 60% 时，自身伤害 +{v}%、防御 +{v2}%。另外全队最大生命 +{party_hpPct}%',
   'skill.sc_grant.name': '奖学金', 'skill.sc_grant.desc': '全队金币获得 +{v}%',
