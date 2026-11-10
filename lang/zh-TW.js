@@ -157,7 +157,7 @@ G.I18N['zh-TW'] = {
   'skill.ck_morale.name': '貓貓士氣', 'skill.ck_morale.desc': '貓鎧者每攻擊一次累積 1 層士氣，每層全隊最終防禦 +1%，最多 +{v}%。另外全隊普攻有 {stun}% 機率使敵人暈眩 {stunT} 秒，全隊閃避 +{party_evade}%',
   'skill.ck_frenzy.name': '吸貓狂熱', 'skill.ck_frenzy.desc': '隊員每次打中敵人自身傷害 +1%，最多 +{v}%，倒下才重算。裝備者自己：閃避 +{evade}%、暴擊傷害 +{critDmg}%、對中毒敵人傷害 +{vsPoison}%。全隊暴擊傷害 +{party_critDmg}%、打暈眩敵人傷害 +{partyStun}%',
   'skill.ck_claws.name': '貓抓印記', 'skill.ck_claws.desc': '普攻貓抓讓敵人攻速 -{v}%，4 秒。全隊普攻有 {party_basicPoison}% 機率使敵人中毒 5 秒',
-  'skill.ck_venom.name': '貓肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒；另有 7% 機率拍暈敵人 {v2} 秒。全隊：打到暈眩中的敵人時，出手的人回復 {party_stunHit}% 最大生命',
+  'skill.ck_venom.name': '貓肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 機率使敵人中毒；另有 6% 機率拍暈敵人 {v2} 秒。全隊：打到暈眩中的敵人時，出手的人回復 {party_stunHit}% 最大生命',
   'skill.ck_plate.name': '貓哈氣爆甲', 'skill.ck_plate.desc': '自身防禦 {v}%、最大生命 {hpPct}%，但攻擊 +{atkPct}%、暴擊傷害 +{critDmg}%、閃避 +{evade}%、技能冷卻 -{cdr}%、攻速 +{spdPct}%。全隊：飛空艇砲擊冷卻 -{party_cannonCut} 秒、攻擊暈眩中的敵人傷害 +{party_vsStun}%',
 
   'skill.sc_barrage.name': '書海', 'skill.sc_barrage.desc': '書本轟炸全體 3 段，每段 {v}% 傷害',

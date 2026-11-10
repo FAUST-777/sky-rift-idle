@@ -197,9 +197,9 @@ G.SKILLS = {
     P('ck_frenzy',  0, lin(5, 2.5),    'special', 'frenzy', { raw: true, descV: { partyStun: CAT_STUN.party }, also: { evade: lin(0.05, 0.0125), critDmg: () => 0.3, vsPoison: lin(0.05, 0.025) }, partyAlso: { critDmg: 0.15 } }),   // 暴擊傷害：自己 +30%、全隊 +15%
     // 貓抓印記：普攻緩速；全隊普攻 5%→8% 機率中毒 5 秒（多人裝不疊加）
     P('ck_claws',   1, lin(0.1, 0.05), 'proc', 'slow',   { fx: 'slow', val: 'v', t: 4, partyAlso: { basicPoison: lin(0.05, 0.0075) } }),
-    // 貓肉球拍打：普攻機率中毒；另外獨立 7% 機率暈眩 1→1.5 秒
+    // 貓肉球拍打：普攻機率中毒；另外獨立 6% 機率暈眩 1→1.5 秒（第 133 輪：7% → 6%）
     P('ck_venom',   1, lin(0.15, 0.08), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5, v2: lin(1, 0.125), v2raw: true,
-      more: [{ fx: 'stun', chance: 0.07, val: 1, t: lin(1, 0.125) }], partyAlso: { stunHit: 0.005 } }),   // 全隊打到暈眩敵人回 0.5% 生命
+      more: [{ fx: 'stun', chance: 0.06, val: 1, t: lin(1, 0.125) }], partyAlso: { stunHit: 0.005 } }),   // 全隊打到暈眩敵人回 0.5% 生命
     // 貓哈氣爆甲：捨防禦換輸出（1→5 級）。防禦 -80%→-50%、生命固定 -40%、攻擊 +37%→77%、暴擊傷害 +66%→77%、閃避 +8%→15%、
     //   自身技能冷卻 -15%→-25%、攻速 +5%→15%
     //   全隊：飛空艇砲擊間隔 -1 秒、打暈眩中的敵人傷害 +50%（隊上有兩隻不疊加，取最大）

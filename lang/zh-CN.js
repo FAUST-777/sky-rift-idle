@@ -157,7 +157,7 @@ G.I18N['zh-CN'] = {
   'skill.ck_morale.name': '猫猫士气', 'skill.ck_morale.desc': '猫铠者每攻击一次累积 1 层士气，每层全队最终防御 +1%，最多 +{v}%。另外全队普攻有 {stun}% 概率使敌人晕眩 {stunT} 秒，全队闪避 +{party_evade}%',
   'skill.ck_frenzy.name': '吸猫狂热', 'skill.ck_frenzy.desc': '队员每次打中敌人自身伤害 +1%，最多 +{v}%，倒下才重算。装备者自己：闪避 +{evade}%、暴击伤害 +{critDmg}%、对中毒敌人伤害 +{vsPoison}%。全队暴击伤害 +{party_critDmg}%、打晕眩敌人伤害 +{partyStun}%',
   'skill.ck_claws.name': '猫抓印记', 'skill.ck_claws.desc': '普攻猫抓让敌人攻速 -{v}%，4 秒。全队普攻有 {party_basicPoison}% 几率使敌人中毒 5 秒',
-  'skill.ck_venom.name': '猫肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒；另有 7% 概率拍晕敌人 {v2} 秒。全队：打到眩晕中的敌人时，出手的人回复 {party_stunHit}% 最大生命',
+  'skill.ck_venom.name': '猫肉球拍打', 'skill.ck_venom.desc': '普攻有 {v}% 概率使敌人中毒；另有 6% 概率拍晕敌人 {v2} 秒。全队：打到眩晕中的敌人时，出手的人回复 {party_stunHit}% 最大生命',
   'skill.ck_plate.name': '猫哈气爆甲', 'skill.ck_plate.desc': '自身防御 {v}%、最大生命 {hpPct}%，但攻击 +{atkPct}%、暴击伤害 +{critDmg}%、闪避 +{evade}%、技能冷却 -{cdr}%、攻速 +{spdPct}%。全队：飞空艇炮击冷却 -{party_cannonCut} 秒、攻击眩晕中的敌人伤害 +{party_vsStun}%',
 
   'skill.sc_barrage.name': '书海', 'skill.sc_barrage.desc': '书本轰炸全体 3 段，每段 {v}% 伤害',
