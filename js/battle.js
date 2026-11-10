@@ -225,6 +225,18 @@
       if (u.alive) u.hp = diff > 0 ? u.hp + diff : Math.max(1, Math.min(u.hp, max));
     }
 
+    // 血之狂熱（處決擊殺）：全隊攻速 +100%；期間全隊暴擊率加總（各自最多 100%，美式居合算 100%）
+    //   → 每 1% = 技能冷卻 -1%（跟其他冷卻縮短一起受上限）、每 100% = 每秒回復 1% 最大生命
+    startFever(u, t) {
+      this.fever = { t };
+      this.partyAlive().forEach(p => { this.addFx(p, 'spdUp', 1, t); this.glow(p, '#ff4d4d'); });
+      this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.fever'), '#ff4d4d', 16, 1100);
+    }
+    feverSum() {
+      if (!(this.fever && this.fever.t > 0)) return 0;
+      return this.partyAlive().filter(p => p.kind !== 'summon').reduce((a, p) => a + (p.st.iai ? 100 : Math.min(100, this.critOf(p))), 0);
+    }
+
     computeAura() {
       const a = G.partyAura(this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0);
       this.units.forEach(u => { u.othersSpd = u.key ? G.othersBonus(u.key, 'spdPctOthers') : 0; u.othersEvade = u.key ? G.othersBonus(u.key, 'evadeOthers') : 0; });   // 每次重算光環時快取，不要每幀算
@@ -298,7 +310,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0),
-        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0)),
+        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -411,10 +423,11 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;            // 吸貓狂熱：對中毒敵人
-      const critChance = (this.critOf(src) + (opts.critBonus || 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
+      const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
+      const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
       const crit = src.st.iai ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
-      if (crit) dmg *= src.st.critDmg + iaiOver + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
+      if (crit) dmg *= src.st.critDmg + iaiOver + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
       if (crit && !opts.skill && !opts.counter && this.party(src) && this.aura.critHeal && src.alive && src.st.maxHp) this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.critHeal)), false);   // 獸群之心：普攻暴擊回血
       dmg *= 50 / (50 + this.defOf(target));
@@ -640,7 +653,9 @@
         const doHit = () => targets.forEach(t => {
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
+          const wasAlive = t.alive;
           this.hit(u, t, e.mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          if (e.feverOnKill && wasAlive && !t.alive) this.startFever(u, e.feverOnKill);   // 處決擊殺
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
@@ -889,12 +904,13 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.st.regen || 0) + (this.aura.regen || 0) + this.fxv(u, 'regen');
+        const r = (u.st.regen || 0) + (this.aura.regen || 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }
 
     fightTick(dt) {
+      if (this.fever && this.fever.t > 0) this.fever.t -= dt;
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
       this.units.forEach(u => this.syncHpBoost(u));   // 野性狂暴到期：最大生命恢復
@@ -918,7 +934,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0))); break; }
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100)); break; }
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }
@@ -1006,6 +1022,7 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      if (this.fever && this.fever.t > 0) { const fs = this.feverSum(); out.push({ id: 'fever', icon: G.FX_ICON.fever, val: `${Math.ceil(this.fever.t)}s`, p: { cdr: Math.round(Math.min(G.CONFIG.cdrCap * 100, fs)), regen: +(fs / 100).toFixed(2), s: Math.ceil(this.fever.t) } }); }
       if (this.synBoost && this.synBoost.t > 0) out.push({ id: 'synBoost', icon: G.FX_ICON.synBoost, val: `${Math.ceil(this.synBoost.t)}s`, p: { v: pct(this.synBoost.v), s: Math.ceil(this.synBoost.t) } });
       if (this.sketch && this.sketch.t > 0) out.push({ id: 'sketch', icon: G.FX_ICON.sketch, val: `${Math.ceil(this.sketch.t)}s`, p: { v: pct(this.sketch.chance), s: Math.ceil(this.sketch.t) } });
       // 貓哈氣爆甲的全隊效果

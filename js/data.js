@@ -160,11 +160,11 @@ G.SKILLS = {
     // 血性狂暴（原嗜血）：自身攻擊 +v，8 秒；期間血騎士每次吸血，其他隊友回復 1%→1.5% 最大生命
     A('bk_bloodlust', 1, 15, lin(0.4, 0.1),  (v, r) => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }, { id: 'bloodShare', v: lin(0.01, 0.00125)(r), t: 8 }] }),
       { descV: { share: lin(0.01, 0.00125) } }),
-    A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1 })),
+    A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1, feverOnKill: 7 })),   // 處決擊殺 → 全隊「血之狂熱」7 秒
     P('bk_drain',      0, lin(0.05, 0.03), 'self', 'lifesteal'),
     P('bk_hemorrhage', 0, lin(0.25, 0.1),  'proc', 'bleed', { fx: 'bleed', chance: 'v', val: 1, t: 4, also: { bleedHeal: lin(0.02, 0) } }),   // bleedHeal：滿血時普攻吸血 50% 機率改補失血最多的隊友 2%
     P('bk_frenzy',     1, lin(5, 3),       'self', 'crit', { raw: true }),
-    P('bk_thirst',     1, lin(0.1, 0.05),  'special', 'vsBleed'),
+    P('bk_thirst',     1, lin(0.1, 0.085), 'special', 'vsBleed', { also: { bleedCrit: lin(0.01, 0.0225), bleedCritDmg: lin(0.1, 0.05) } }),   // 對流血敵人：傷害 +10%→44%、暴擊率 +1%→10%、暴擊傷害 +10%→30%
     P('bk_vitality',   2, lin(0.1, 0.06),  'self', 'hpPct'),
   ],
 
@@ -357,7 +357,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
