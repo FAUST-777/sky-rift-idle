@@ -226,7 +226,7 @@
   G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
-  const AURA_MAX = ['shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
+  const AURA_MAX = ['cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
   G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
@@ -251,7 +251,7 @@
   G.othersHpPct = who => G.othersBonus(who, 'hpPctOthers');
 
   // 船砲間隔：團隊特效（取最短）再扣貓哈氣爆甲的 -1 秒，最少 2 秒
-  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0) - (aura.captainCut || 0));
+  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0) - (aura.captainCut || 0)) * (aura.cannonHalf ? 0.5 : 1);   // 王牌砲手：減半
   // 全隊普攻暈眩（貓貓士氣）：出戰成員中最好的那個
   G.partyStun = () => G.partyMembers().map(w => G.passivesOf(w).partyStun).filter(Boolean).sort((a, b) => b.chance - a.chance)[0] || null;
 

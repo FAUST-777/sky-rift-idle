@@ -359,7 +359,7 @@ G.SKILLS = {
   // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
   //   部位等級 G.shipLv(slot)：沒裝 0，第 1～5 款 = 1～5
   captain: [
-    A('cp_missile',   0, 9,  lin(0.9, 0.15), (v, r) => ({ target: 'all', mult: v * (1 + 0.2 * G.shipLv('cannon')), fromShip: 'missile',
+    A('cp_missile',   0, 5,  lin(0.9, 0.15), (v, r) => ({ target: 'all', mult: v * (1 + 0.2 * G.shipLv('cannon')), fromShip: 'missile',
         debuffs: [{ id: 'critDown', v: lin(10, 2.5)(r), t: 6 }] }),   // 飛彈齊發：船砲每階 +20%；敵人暴擊率 -10→20（百分點）
       { descV: { can: () => 0.2 * G.shipLv('cannon'), cdn: lin(10, 2.5) }, rawKeys: ['cdn'] }),
     A('cp_salvo',     0, 8,  lin(1.0, 0.15), v => ({ target: 'one', mult: v + 0.1 * G.shipLv('cannon'), hits: 2, fromShip: 'cannon' }),   // 集中砲火：看自己的攻擊，船砲每階 +10%
@@ -369,12 +369,11 @@ G.SKILLS = {
     A('cp_repair',    1, 15, lin(0.08, 0.02), v => ({ target: 'none', heal: v + 0.02 * G.shipLv('hull') }),
       { descV: { hull: () => 0.02 * G.shipLv('hull') } }),
     // 核彈！！（原艦首衝撞）：全體；飛空艇每個部位都加成（傷害／暴擊率／暴擊傷害）
-    A('cp_ram',       2, 14, lin(2.0, 0.3),  v => { const b = G.shipSkillBonus(); return { target: 'all', mult: v * (1 + b.dmg), critBonus: b.crit, critDmgBonus: b.critDmg, fromShip: 'nuke' }; },
+    A('cp_ram',       2, 14, lin(3.66, 0.75), v => { const b = G.shipSkillBonus(); return { target: 'all', mult: v * (1 + b.dmg), critBonus: b.crit, critDmgBonus: b.critDmg, fromShip: 'nuke' }; },
       { descV: SHIP_SKILL_DESC }),
     P('cp_gunner',    0, lin(0.2, 0.1),   'party', 'cannonDmg'),                               // 船砲傷害
     P('cp_navigator', 0, lin(0.005, 0.0025), 'party', 'shipDmg', { partyAlso: { shieldDur: 2, shieldAmt: 2, shieldDef: 1 }, rawKeys: ['shieldDur', 'shieldAmt', 'shieldDef'], descV: { now: r => lin(0.005, 0.0025)(r) * G.shipTotalLv() } }),   // 每 1 階部位 → 全隊傷害
-    // 王牌砲手（原快速裝填）：船砲間隔 -0.5→-1.5 秒；船砲 15→35% 機率暴擊，暴擊傷害 ×2.5→×3.5
-    P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true, partyAlso: { cannonCrit: lin(15, 5), cannonCritDmg: lin(2.5, 0.25) }, rawKeys: ['cannonCrit', 'cannonCritDmg'] }),
+        P('cp_quarter',   1, () => 1,         'party', 'cannonHalf', { partyAlso: { cannonCrit: lin(35, 5), cannonCritDmg: lin(3, 0.25) }, rawKeys: ['cannonCrit', 'cannonCritDmg'] }),   // 王牌砲手：船砲間隔減半；暴擊率 35→55%、暴擊 ×3→×4
     // 艦砲武裝齊射！！（被動）：飛空艇所有部位每 1 階 → 船長自己的技能傷害 +1%→3%、技能冷卻 -0.5%→1%
     P('cp_ace',       2, lin(0.01, 0.005), 'self', 'shipSkill', { also: { shipCdr: lin(0.005, 0.00125) }, partyAlso: { shieldReborn: lin(0.05, 0.05) },   // shieldReborn：隊友護盾被打破時再生一次，量 +5%→25%
       descV: { now: r => lin(0.01, 0.005)(r) * G.shipTotalLv(), cdnow: r => lin(0.005, 0.00125)(r) * G.shipTotalLv() } }),
@@ -409,8 +408,8 @@ G.ANIMALS = {
 // 飛船船長「核彈！！」「艦砲武裝齊射！！」：飛空艇每個部位每 1 階的加成
 G.SHIP_SKILL_BONUS = {
   bow: { dmg: 0.15 }, cannon: { dmg: 0.15 }, engine: { dmg: 0.1 },
-  hull: { critDmg: 0.1 }, wing: { critDmg: 0.1 },
-  balloon: { crit: 4 }, charm: { crit: 4 },   // crit 是百分點
+  hull: { critDmg: 0.2 }, wing: { critDmg: 0.2 },
+  balloon: { crit: 8 }, charm: { crit: 8 },   // crit 是百分點
 };
 G.shipSkillBonus = () => {
   const out = { dmg: 0, crit: 0, critDmg: 0 };
