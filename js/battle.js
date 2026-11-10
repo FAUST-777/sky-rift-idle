@@ -11,7 +11,7 @@
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
   const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
-  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown'];
+  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown', 'fear', 'decay'];   // fear 恐懼：傷害下降；decay 衰老詛咒：無法暴擊＋最大生命下降
   const MISSILE_VARIANTS = 4;
 
   class BattleScene extends Phaser.Scene {
@@ -296,6 +296,12 @@
         f.v = Math.max(f.v, val); f.t = Math.min(G.DEFDOWN_STACK_CAP, f.t + dur);
         return;
       }
+      // 衰老詛咒：第一次上時扣最大生命（到期在 fx 倒數那邊還原）
+      if (id === 'decay' && target.alive && !(f && f.t > 0) && !target.decayBase) {
+        target.decayBase = target.st.maxHp;
+        target.st.maxHp = Math.max(1, Math.round(target.st.maxHp * (1 - val)));
+        target.hp = Math.min(target.hp, target.st.maxHp);
+      }
       this.addFx(target, id, val, dur);
     }
 
@@ -446,7 +452,9 @@
       const vsB = this.fxv(target, 'bleed') ? (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0) : 0;
       const vsP = this.fxv(target, 'poison') ? opts.vsPoisonSkill || 0 : 0;
       const vsS = this.fxv(target, 'stun') ? opts.vsStunSkill || 0 : 0;   // 毒爪：對暈眩敵人
-      if (vsB || vsP || vsS) dmg *= 1 + vsB + vsP + vsS;
+      const vsBl = this.fxv(target, 'blind') ? opts.vsBlind || 0 : 0;   // 死亡纏繞：對命中下降的敵人
+      if (vsB || vsP || vsS || vsBl) dmg *= 1 + vsB + vsP + vsS + vsBl;
+      if (this.fxv(src, 'fear')) dmg *= 1 - this.fxv(src, 'fear');   // 恐懼：傷害下降
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
       // 貓肉球拍打：全隊打到暈眩敵人，出手的人回復生命（範圍攻擊同一次出手只回一次）
@@ -463,7 +471,7 @@
       if (!stunnedNow && opts.elseDmgPct) dmg *= 1 + opts.elseDmgPct;
       const bleeding = this.fxv(target, 'bleed') > 0;   // 渴血：對流血敵人暴擊率、暴擊傷害
       const critChance = (this.critOf(src) + (opts.critBonus || 0) + (bleeding ? (src.st.bleedCrit || 0) * 100 : 0)) * (this.fxv(target, 'stun') ? G.STUN.critMult : 1);   // 暈眩更容易被暴擊
-      const crit = src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 美式居合：必定暴擊
+      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
       if (crit) dmg *= src.st.critDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? this.aura.critDmg || 0 : 0) + (opts.critDmgBonus || 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
@@ -727,7 +735,7 @@
           if (!this.valid(t)) return;
           if (e.stunHeal && !stunHealed && u.alive && this.fxv(t, 'stun')) { stunHealed = true; this.heal(u, Math.round(u.st.maxHp * e.stunHeal)); this.glow(u, '#7dff9a'); }
           const wasAlive = t.alive, wasStunned = this.fxv(t, 'stun') > 0;
-          this.hit(u, t, mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, stunBonus: e.stunBonus, elseDmgPct: e.elseDmgPct, breakStun: e.breakStun, drain: e.drain, noFlash: targets.length > 1, nextBonus });
+          this.hit(u, t, mult, { skill: true, critBonus: e.critBonus, vsBleed: e.vsBleed, vsPoisonSkill: e.vsPoisonSkill, vsStunSkill: e.vsStunSkill, vsBlind: e.vsBlind, critDmgBonus: e.critDmgBonus, critFinalX: e.critFinalX, critHealMax: e.critHealMax, castState, stunBonus: e.stunBonus, elseDmgPct: e.elseDmgPct, breakStun: e.breakStun, drain: e.drain, noFlash: targets.length > 1, nextBonus });
           if (e.stunHunter && wasStunned) this.addFx(u, 'stunHunter', e.stunHunter.v, e.stunHunter.t);   // 大爆射一波！
           if (e.feverOnKill && wasAlive && !t.alive) this.startFever(u, e.feverOnKill);   // 處決擊殺
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
@@ -1085,6 +1093,7 @@
         if (!u.alive) return;
         // 狀態倒數
         Object.values(u.fx).forEach(f => { if (f.t > 0) f.t -= dt; });
+        if (u.decayBase && !this.fxv(u, 'decay')) { u.st.maxHp = u.decayBase; delete u.decayBase; }   // 衰老詛咒到期：最大生命還原
         if (u.taunt.t > 0) u.taunt.t -= dt;
         if (u.shieldT > 0 && (u.shieldT -= dt) <= 0) u.shield = 0;
         // 流血 / 中毒：每秒結算，不吃防禦

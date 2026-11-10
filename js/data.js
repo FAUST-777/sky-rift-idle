@@ -346,8 +346,13 @@ G.SKILLS = {
 
   // 死靈術師：召喚石魔人／骷髏弓箭手（同時只有一隻，站在隊伍最前面），引爆召喚物
   necromancer: [
-    A('nc_golem',     0, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'golem', power: v } })),
-    A('nc_archer',    0, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
+    // 死亡纏繞：單體 100%→150%；上「恐懼」（敵人傷害 -20%，6 秒）；對命中下降（blind）的敵人傷害再 +100%→200%
+    A('nc_coil',      0, 6,  lin(1, 0.125),  (v, r) => ({ target: 'one', mult: v, vsBlind: lin(1, 0.25)(r), debuffs: [{ id: 'fear', v: 0.2, t: 6 }] }),
+      { descV: { blind: lin(1, 0.25) } }),
+    // 黑死詛咒：全體 200%→250%；上「衰老詛咒」（敵人無法暴擊、最大生命 -15%，6 秒）
+    A('nc_plague',    0, 10, lin(2, 0.125),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'decay', v: 0.15, t: 6 }] })),
+    A('nc_golem',     1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'golem', power: v } })),
+    A('nc_archer',    1, 16, lin(1, 0.15),   v => ({ target: 'none', summonMinion: { kind: 'skeleton', power: v } })),
     A('nc_drain',     1, 8,  lin(1.6, 0.25), v => ({ target: 'one', mult: v, drain: 0.3 })),
     A('nc_bone',      1, 10, lin(0.8, 0.12), v => ({ target: 'all', mult: v, minionBonus: 0.5 })),   // 召喚物在場時傷害 ×1.5
     A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
@@ -427,7 +432,7 @@ G.SUMMONS = {
 G.FX_ICON = {
   atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
-  stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
+  stun: '💫', fear: '😱', decay: '🥀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
 
 // ── 怪物（名稱：monster.<id>）──────────────────────────────────────────────
