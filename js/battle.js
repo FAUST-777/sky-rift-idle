@@ -463,7 +463,7 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
-      if (src.st.minionDmg && this.minionAlive() && this.minion.owner === src) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢            // 吸貓狂熱：對中毒敵人
+      if (src.st.minionDmg && this.minionAlive()) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢：場上有召喚物就算（不限誰召喚的）            // 吸貓狂熱：對中毒敵人
       const stunnedNow = this.fxv(target, 'stun') > 0;
       const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
       if (stunnedNow && this.fxv(src, 'stunHunter')) { sb.forceCrit = true; sb.breakStun = true; sb.dmgPct = (sb.dmgPct || 0) + this.fxv(src, 'stunHunter'); }   // 大爆射一波！之後 6 秒
@@ -889,9 +889,9 @@
         this.tweens.add({ targets: u.img, alpha: 0, duration: 300, onComplete: () => u.img.destroy() });
         this.units = this.units.filter(x => x !== u);
         if (this.animal && this.animal.unit === u) { this.animal = null; this.computeAura(); }
-        if (this.minion && this.minion.unit === u) {   // 不死之契：召喚物倒下時死靈回血
-          const o = this.minion.owner; this.minion = null;
-          if (o && o.alive && o.st.minionDeathHeal) this.heal(o, Math.max(1, Math.round(o.st.maxHp * o.st.minionDeathHeal)));
+        if (this.minion && this.minion.unit === u) {   // 不死之契：召喚物倒下時，全場有這個被動的死靈都回血（不限誰召喚的）
+          this.minion = null;
+          this.partyAlive().forEach(o => { if (o.kind !== 'summon' && o.st.minionDeathHeal) this.heal(o, Math.max(1, Math.round(o.st.maxHp * o.st.minionDeathHeal))); });
         }
       } else {
         // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
