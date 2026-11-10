@@ -425,7 +425,8 @@
     critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) + this.pactAll('aCrit') : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    // 閃避：石魔人上限 G.GOLEM_EVADE_CAP，其他人 G.CONFIG.evadeCap
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(u.minion === 'golem' ? G.GOLEM_EVADE_CAP : G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
