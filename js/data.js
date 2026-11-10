@@ -250,7 +250,9 @@ G.SKILLS = {
     A('pi_plunder',   2, 10, lin(2.0, 0.25), v => ({ target: 'one', mult: v, self: [{ id: 'atkUp', v: 0.2, t: 6 }] })),
     P('pi_nimble',   0, lin(0.06, 0.03), 'self', 'evade'),
     P('pi_sharp',    0, lin(5, 3),       'self', 'crit', { raw: true, partyAlso: { physCrit: lin(10, 1.5) }, rawKeys: ['physCrit'] }),   // 另外全隊物理系角色暴擊率 +10→16
-    P('pi_quick',    1, () => -0.2,      'self', 'evade', { max: 1, also: { iai: () => 1 } }),   // 美式居合：必定暴擊，溢出暴擊率轉暴擊傷害；閃避 -20%
+    // 美式居合（1→5 級）：必定暴擊，溢出暴擊率轉暴擊傷害；閃避 -50%→-20%；狙擊爆頭！！！最終傷害 ×2/3/4/4.5/5
+    P('pi_quick',    1, lin(-0.5, 0.075), 'self', 'evade', { also: { iai: () => 1, snipeX: r => [1, 2, 3, 3.5, 4][r - 1] },
+      descV: { snipe: r => [2, 3, 4, 4.5, 5][r - 1] }, rawKeys: ['snipe'] }),
     P('pi_ruthless', 1, lin(0.15, 0.1),  'self', 'critDmg'),
     P('pi_riposte',  2, lin(0.6, 0.15),  'special', 'riposte'),
   ],

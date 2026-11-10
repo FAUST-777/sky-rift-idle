@@ -254,7 +254,7 @@
       const now = this.time.now;
       if (this.snipeCount >= 50 && !(this.snipeNext && now < this.snipeNext)) {
         this.snipeCount = 0; this.snipeNext = now + 5000;
-        this.addFx(p, 'snipeX', 9, 4); this.glow(p, '#ffd23f');
+        this.addFx(p, 'snipeX', p.st.snipeX || 1, 4);   // 美式居合等級決定倍率 this.glow(p, '#ffd23f');
         this.floatText(p.img.x, this.barY(p) - 40, G.t('battle.snipe'), '#ffd23f', 17, 1200);
       }
     }

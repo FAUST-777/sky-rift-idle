@@ -125,7 +125,7 @@ G.I18N['zh-CN'] = {
   'skill.pi_plunder.name': '掠夺', 'skill.pi_plunder.desc': '单体 {v}% 伤害，自身攻击 +20%，6 秒',
   'skill.pi_nimble.name': '闪身步！！', 'skill.pi_nimble.desc': '闪避 +{v}%',
   'skill.pi_sharp.name': '神枪手', 'skill.pi_sharp.desc': '暴击率 +{v}%；全队物理系角色暴击率 +{party_physCrit}%',
-  'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻击必定暴击，超过 100% 的暴击率全部转成暴击伤害（每 1% 转 1%）；闪避 {v}%。全队物理系队员的伤害技能每累积 50 次，自己发动「狙击爆头！！！」：4 秒内输出最终伤害 ×10（发动间隔 5 秒）',
+  'skill.pi_quick.name': '美式居合', 'skill.pi_quick.desc': '自己的攻击必定暴击，超过 100% 的暴击率全部转成暴击伤害（每 1% 转 1%）；闪避 {v}%。全队物理系队员的伤害技能每累积 50 次，自己发动「狙击爆头！！！」：4 秒内输出最终伤害 ×{snipe}（发动间隔 5 秒）',
   'skill.pi_ruthless.name': '冷血', 'skill.pi_ruthless.desc': '暴击伤害 +{v}%',
   'skill.pi_riposte.name': '闪避反击', 'skill.pi_riposte.desc': '闪避成功时开枪反击，{v}% 伤害',
 
@@ -328,7 +328,7 @@ G.I18N['zh-CN'] = {
   'buff.fever.name': '血之狂热', 'buff.fever.desc': '全队攻速 +100%、技能冷却 -{cdr}%、每秒回复 {regen}% 最大生命，还剩 {s} 秒',
   'buff.nextExecute.name': '处决蓄势', 'buff.nextExecute.desc': '下一次处决伤害 +{v}%',
   'buff.bloodRush.name': '血性加速', 'buff.bloodRush.desc': '全队技能冷却一律 1 秒，还剩 {s} 秒',
-  'buff.snipeX.name': '狙击爆头！！！', 'buff.snipeX.desc': '输出最终伤害 ×10，还剩 {s} 秒',
+  'buff.snipeX.name': '狙击爆头！！！', 'buff.snipeX.desc': '输出最终伤害 +{v}%，还剩 {s} 秒',
   'buff.snipeCount.name': '狙击准备', 'buff.snipeCount.desc': '全队物理系伤害技能累积 {v}/50 次',
   'buff.coverFire.name': '掩护射击', 'buff.coverFire.desc': '全队技能冷却 -{v}%，还剩 {s} 秒',
   'buff.skillDmg.name': '技能增伤', 'buff.skillDmg.desc': '技能伤害 +{v}%，还剩 {s} 秒',
