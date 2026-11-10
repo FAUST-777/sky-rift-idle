@@ -669,7 +669,7 @@
           const hurt = this.partyAlive().filter(p => p !== src && p.kind !== 'summon' && p.hp < p.st.maxHp).sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0];
           if (hurt && recent.length < 3) { recent.push(now); this.heal(hurt, Math.max(1, Math.round(hurt.st.maxHp * src.st.bleedHeal)), false); this.startBloodRush(src); }
         }
-        src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
+        src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls * this.healMult(src));
         const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友（每秒最多一次）
         // 每秒最多 3 次：記錄最近 1 秒內的觸發時間
         const now = this.time.now, recent = (src.bloodShareAt || []).filter(x => now - x < 1000);
@@ -677,7 +677,7 @@
         if (bs && recent.length < 3 && recent.push(now)) this.partyAlive().forEach(p => { if (p !== src && p.kind !== 'summon') this.heal(p, Math.max(1, Math.round(p.st.maxHp * bs)), false); });
       }
       // 鋼鐵陣線：我方普攻命中回復自己最大生命的 0.5%（不是看傷害）
-      if (!opts.skill && !opts.counter && this.party(src) && this.aura.basicLifesteal && src.alive && src.st.maxHp) src.hp = Math.min(src.st.maxHp, src.hp + src.st.maxHp * this.aura.basicLifesteal);
+      if (!opts.skill && !opts.counter && this.party(src) && this.aura.basicLifesteal && src.alive && src.st.maxHp) src.hp = Math.min(src.st.maxHp, src.hp + src.st.maxHp * this.aura.basicLifesteal * this.healMult(src));
       // 吸貓狂熱累積（隊伍有人裝「吸貓狂熱」被動才有）
       const cap = G.frenzyCap();
       if (cap && !this.party(target) && (src.kind === 'hero' || src.kind === 'partner') && src.frenzy < cap) {
@@ -717,8 +717,10 @@
       if (u.hp <= 0) this.kill(u);
     }
 
+    healMult(u) { return u.minion === 'golem' ? 1 - G.GOLEM_HEAL_CUT : 1; }   // 石魔人：受到的回復 -50%
     heal(u, amount, show = true) {
       if (!u.alive || amount <= 0) return;
+      amount = Math.max(1, Math.round(amount * this.healMult(u)));
       u.hp = Math.min(u.st.maxHp, u.hp + amount);
       if (show) this.floatText(u.img.x, this.barY(u) - 12, '+' + G.fmt(amount), '#7dff9a', 13);
     }
