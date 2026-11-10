@@ -206,7 +206,9 @@ G.SKILLS = {
   // 學者：書海全體攻擊、危機意識、多賺金幣
   scholar: [
     A('sc_barrage', 0, 6,  lin(0.45, 0.08), v => ({ target: 'all', mult: v, hits: 3 })),
-    A('sc_tome',    0, 8,  lin(1.4, 0.22),  v => ({ target: 'all', mult: v })),
+    // 百科全書：全體傷害；施放後 8 秒船砲傷害 +100%→200%，船砲命中 5%→10% 機率解除上升詛咒 4 秒
+    A('sc_tome',    0, 8,  lin(1.4, 0.22),  (v, r) => ({ target: 'all', mult: v, tome: { cannon: lin(1, 0.25)(r), purge: lin(0.05, 0.0125)(r), t: 8 } }),
+      { descV: { cannon: lin(1, 0.25), purge: lin(0.05, 0.0125) } }),
     A('sc_lecture', 1, 10, lin(0.8, 0.12),  v => ({ target: 'all', mult: v, debuffs: [{ id: 'defDown', v: 0.15, t: 5 }] })),
     // 臨時抱佛腳：扣自己目前生命 25%，其他隊友攻速 +40%→77%，持續 2/3/4/4.5/5 秒；期間學者自己防禦 -30%
     A('sc_cram',    1, 20, CRAM.spd, (v, r) => ({ target: 'none', hpCost: 0.25, partyOthers: [{ id: 'spdUp', v, t: CRAM.t(r) }, { id: 'hpUp', v: CRAM.hp(r), t: CRAM.t(r) }], selfDebuff: [{ id: 'defDown', v: 0.3, t: CRAM.t(r) }] }),   // hpUp：其他隊友最大生命 +5%→12%
@@ -423,7 +425,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

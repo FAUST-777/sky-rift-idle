@@ -245,6 +245,7 @@
       if (fresh) this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.bloodRush'), '#ff6b8a', 15, 1000);
     }
     cdrBoostV() { return this.cdrBoost && this.cdrBoost.t > 0 ? this.cdrBoost.v : 0; }
+    curseNow() { return this.curseOff && this.curseOff.t > 0 ? null : this.curse; }   // 上升詛咒（百科全書的船砲可以暫時解除）
     rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
 
     // 美式居合：全隊物理系隊員的傷害技能累積 50 次 → 有美式居合的海盜「狙擊爆頭！！！」4 秒，輸出最終傷害 ×10（發動間隔 5 秒）
@@ -314,7 +315,7 @@
       }
       let d = u.st.def * Math.max(0.1, m);
       if (this.party(u)) d *= this.moraleMult();
-      if (this.party(u) && this.curse && this.curse.def) d *= 1 - this.curse.def;                 // 上升詛咒：防禦下降
+      if (this.party(u) && this.curseNow() && this.curse.def) d *= 1 - this.curse.def;                 // 上升詛咒：防禦下降
       return d;
     }
     takenMult(u) {
@@ -335,7 +336,7 @@
 
     // 即時能力值（冒險頁「即時數值」用）：吃 buff、光環、團隊特效、詛咒，隨戰鬥波動
     liveStats(u) {
-      const a = this.aura, curse = this.curse || {};
+      const a = this.aura, curse = this.curseNow() || {};
       return {
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
@@ -439,7 +440,7 @@
       if (!opts.skill && !opts.counter && src.st.basicDmg) dmg *= 1 + src.st.basicDmg;   // 指尖藝術：普攻傷害
       if (this.fxv(src, 'shieldWall')) dmg *= 1 - this.fxv(src, 'shieldWall');   // 盾牆！期間輸出 -50%
       if (this.party(src) && this.aura.dmgPct) dmg *= 1 + this.aura.dmgPct;
-      if (this.party(src) && this.curse && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
+      if (this.party(src) && this.curseNow() && this.curse.dmg) dmg *= 1 - this.curse.dmg;            // 上升詛咒：傷害下降                    // 飛空艇船首：全隊傷害
       if (this.party(src) && src.frenzy && G.frenzyCap()) dmg *= 1 + Math.min(src.frenzy, G.frenzyCap()) / 100;   // 吸貓狂熱（有人裝被動才生效）
       // 對流血（血騎士、詛咒油畫）、對中毒（詛咒油畫）：同一招兩個都中時相加
       const vsB = this.fxv(target, 'bleed') ? (opts.vsBleed || 0) + ((src.special.vsBleed || {}).v || 0) : 0;
@@ -777,6 +778,7 @@
         this.checkWaveEnd();
       }
       if (e.cannonShots && G.cannonMult() > 0) for (let i = 0; i < e.cannonShots.n; i++) this.time.delayedCall(i * 220, () => this.fireCannon(e.cannonShots.bonus));   // 集中砲火
+      if (e.tome) this.tomeBuff = { cannon: e.tome.cannon, purge: e.tome.purge, t: e.tome.t };   // 百科全書
       if (e.overdrive) { this.overdrive = { t: e.overdrive }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }   // 引擎超載：船砲間隔減半
       // 速寫：船砲強化一段時間；全隊身上的增益延長
       if (e.sketch) { this.sketch = { t: e.sketch.t, chance: Math.max(e.sketch.chance, this.sketch && this.sketch.t > 0 ? this.sketch.chance : 0) }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }
@@ -1070,6 +1072,8 @@
 
     fightTick(dt) {
       if (this.fever && this.fever.t > 0) this.fever.t -= dt;
+      if (this.tomeBuff && this.tomeBuff.t > 0) this.tomeBuff.t -= dt;
+      if (this.curseOff && this.curseOff.t > 0) this.curseOff.t -= dt;
       if (this.arcane && this.arcane.t > 0) this.arcane.t -= dt;
       if (this.overdrive && this.overdrive.t > 0) this.overdrive.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
@@ -1131,7 +1135,8 @@
         ball.destroy();
         if (this.valid(t)) {
           const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
-          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus) * (1 + (this.aura.cannonDmg || 0)));   // 砲術長：船砲傷害 this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
+          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus) * (1 + (this.aura.cannonDmg || 0)) * (1 + (this.tomeBuff && this.tomeBuff.t > 0 ? this.tomeBuff.cannon : 0)));   // 砲術長、百科全書：船砲傷害
+          if (this.tomeBuff && this.tomeBuff.t > 0 && this.curse && Math.random() < this.tomeBuff.purge) { this.curseOff = { t: 4 }; this.floatText(W / 2, 135, G.t('battle.curseOff'), '#ffe27a', 15, 1200); }   // 百科全書：解除上升詛咒 4 秒 this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
           if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
           this.checkWaveEnd();
         }
@@ -1150,7 +1155,9 @@
       const out = [], S = G.S;
       if (!this.hero) return out;
       const pct = v => Math.round(v * 100);
-      if (this.curse) out.push({ id: 'curse', icon: '🌪️', val: G.curseShort(this.curse), p: { text: G.curseText(this.curse), n: G.S.floor } });
+      if (this.curse && !this.curseNow()) out.push({ id: 'curseOff', icon: '✨', val: `${Math.ceil(this.curseOff.t)}s`, p: { s: Math.ceil(this.curseOff.t) } });
+      else if (this.curse) out.push({ id: 'curse', icon: '🌪️', val: G.curseShort(this.curse), p: { text: G.curseText(this.curse), n: G.S.floor } });
+      if (this.tomeBuff && this.tomeBuff.t > 0) out.push({ id: 'tome', icon: G.FX_ICON.tome, val: `${Math.ceil(this.tomeBuff.t)}s`, p: { v: pct(this.tomeBuff.cannon), c: pct(this.tomeBuff.purge), s: Math.ceil(this.tomeBuff.t) } });
       const mc = G.moraleCap();
       // 貓貓士氣：有人裝就顯示（全隊暈眩、閃避不用等疊層）
       if (mc) {
