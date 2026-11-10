@@ -386,8 +386,9 @@ G.SKILLS = {
       { descV: { can: () => 0.1 * G.shipLv('cannon') } }),
     A('cp_overdrive', 1, 16, lin(4, 1),      v => ({ target: 'none', overdrive: v, party: [{ id: 'spdUp', v: 0.1 + 0.02 * G.shipLv('wing'), t: v }] }),
       { raw: true, descV: { spd: () => 0.1 + 0.02 * G.shipLv('wing') } }),
-    A('cp_repair',    1, 15, lin(0.08, 0.02), v => ({ target: 'none', heal: v + 0.02 * G.shipLv('hull') }),
-      { descV: { hull: () => 0.02 * G.shipLv('hull') } }),
+    // 緊急維修：全隊回 4%→7% ＋ 船身每階 1%（最多 5 階）→ 最大 12%（第 137 輪：原本 8%→16% ＋ 每階 2%，最大 26%）
+    A('cp_repair',    1, 15, lin(0.04, 0.0075), v => ({ target: 'none', heal: v + 0.01 * G.shipLv('hull') }),
+      { descV: { hull: () => 0.01 * G.shipLv('hull') } }),
     // 核彈！！（原艦首衝撞）：全體；飛空艇每個部位都加成（傷害／暴擊率／暴擊傷害）
     A('cp_ram',       2, 14, lin(3.66, 0.75), v => { const b = G.shipSkillBonus(); return { target: 'all', mult: v * (1 + b.dmg), critBonus: b.crit, critDmgBonus: b.critDmg, fromShip: 'nuke' }; },
       { descV: SHIP_SKILL_DESC }),

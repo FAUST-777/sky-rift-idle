@@ -81,7 +81,7 @@ G.I18N['en'] = {
   'skill.cp_overdrive.name': 'Engine Overdrive',
   'skill.cp_overdrive.desc': 'For {v}s the cannon fires twice as often and party attack speed +{spd}% (+2% per wing level)',
   'skill.cp_repair.name': 'Emergency Repair',
-  'skill.cp_repair.desc': 'Party heals {v}% max HP, +2% per hull level (now +{hull}%)',
+  'skill.cp_repair.desc': 'Party heals {v}% max HP, +1% per hull level (now +{hull}%)',
   'skill.cp_ram.name': 'Nuke!!',
   'skill.cp_ram.desc': 'Launch a nuke from the airship: {v}% damage to all. Every airship part level adds a bonus: bow and cannon +15% damage, engine +10% damage, hull and wings +20% crit damage, balloon and charm +8% crit rate (now damage +{sdmg}%, crit rate +{scrit}%, crit damage +{scd}%)',
   'skill.cp_gunner.name': 'Master Gunner',

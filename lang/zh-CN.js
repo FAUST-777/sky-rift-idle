@@ -81,7 +81,7 @@ G.I18N['zh-CN'] = {
   'skill.cp_overdrive.name': '引擎超载',
   'skill.cp_overdrive.desc': '{v} 秒内船炮间隔减半，全队攻速 +{spd}%（翅膀每 1 阶 +2%）',
   'skill.cp_repair.name': '紧急维修',
-  'skill.cp_repair.desc': '全队回复 {v}% 最大生命。船身每 1 阶再 +2%（目前 +{hull}%）',
+  'skill.cp_repair.desc': '全队回复 {v}% 最大生命。船身每 1 阶再 +1%（目前 +{hull}%）',
   'skill.cp_ram.name': '核弹！！',
   'skill.cp_ram.desc': '从飞空艇发射一颗核弹，对全体造成 {v}% 伤害。飞空艇每个部位每 1 阶都加成：船首、船炮 +15% 伤害，引擎 +10% 伤害，船身、翅膀 +20% 暴击伤害，热气球、挂饰 +8% 暴击率（目前伤害 +{sdmg}%、暴击率 +{scrit}%、暴击伤害 +{scd}%）',
   'skill.cp_gunner.name': '炮术长',
