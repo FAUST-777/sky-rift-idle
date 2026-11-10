@@ -717,7 +717,7 @@
       if (u.hp <= 0) this.kill(u);
     }
 
-    healMult(u) { return u.minion === 'golem' ? 1 - G.GOLEM_HEAL_CUT : 1; }   // 石魔人：受到的回復 -50%
+    healMult(u) { return u.minion === 'golem' ? 1 - G.GOLEM_HEAL_CUT : 1; }   // 石魔人：受到的回復減少 G.GOLEM_HEAL_CUT
     heal(u, amount, show = true) {
       if (!u.alive || amount <= 0) return;
       amount = Math.max(1, Math.round(amount * this.healMult(u)));
