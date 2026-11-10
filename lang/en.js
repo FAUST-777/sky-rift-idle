@@ -77,7 +77,7 @@ G.I18N['en'] = {
   'skill.bk_slash.name': 'Blood Slash', 'skill.bk_slash.desc': '{v}% damage to one enemy and Bleed for 5s',
   'skill.bk_rend.name': 'Rend', 'skill.bk_rend.desc': '3 slashes of {v}% damage, each causing Bleed',
   'skill.bk_feast.name': 'Blood Feast', 'skill.bk_feast.desc': '{v}% damage to one enemy, healing for all damage dealt',
-  'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile each lifesteal heals other allies for {share}% max HP',
+  'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile lifesteal heals other allies for {share}% max HP (at most once per second)',
   'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if it is bleeding',
   'skill.bk_drain.name': 'Lifedrain', 'skill.bk_drain.desc': 'Heals for {v}% of damage dealt',
   'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause Bleed',
