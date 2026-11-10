@@ -245,7 +245,7 @@
     }
     rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
 
-    // 美式居合：全隊物理系隊員的傷害技能累積 50 次 → 有美式居合的海盜「狙擊爆頭！！！」4 秒，輸出最終傷害 ×5（發動間隔 5 秒）
+    // 美式居合：全隊物理系隊員的傷害技能累積 50 次 → 有美式居合的海盜「狙擊爆頭！！！」4 秒，輸出最終傷害 ×10（發動間隔 5 秒）
     snipeTick() {
       const p = this.partyAlive().find(x => x.st.iai);
       if (!p) return;
@@ -253,7 +253,7 @@
       const now = this.time.now;
       if (this.snipeCount >= 50 && !(this.snipeNext && now < this.snipeNext)) {
         this.snipeCount = 0; this.snipeNext = now + 5000;
-        this.addFx(p, 'snipeX', 4, 4); this.glow(p, '#ffd23f');
+        this.addFx(p, 'snipeX', 9, 4); this.glow(p, '#ffd23f');
         this.floatText(p.img.x, this.barY(p) - 40, G.t('battle.snipe'), '#ffd23f', 17, 1200);
       }
     }
@@ -460,7 +460,7 @@
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
       if (crit && opts.critFinalX) dmg *= opts.critFinalX;   // 爆頭！！！：暴擊時最終傷害 ×3
-      if (this.fxv(src, 'snipeX')) dmg *= 1 + this.fxv(src, 'snipeX');   // 狙擊爆頭！！！：最終傷害 ×5
+      if (this.fxv(src, 'snipeX')) dmg *= 1 + this.fxv(src, 'snipeX');   // 狙擊爆頭！！！：最終傷害 ×10
       if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2
 
       // 健身者「健身夥伴」：隊友被打時，分一部分傷害到自己身上

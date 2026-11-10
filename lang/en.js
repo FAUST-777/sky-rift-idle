@@ -125,7 +125,7 @@ G.I18N['en'] = {
   'skill.pi_plunder.name': 'Plunder', 'skill.pi_plunder.desc': '{v}% damage to one enemy, own ATK +20% for 6s',
   'skill.pi_nimble.name': 'Sidestep!!', 'skill.pi_nimble.desc': 'Dodge +{v}%',
   'skill.pi_sharp.name': 'Sharpshooter', 'skill.pi_sharp.desc': 'Crit rate +{v}%; physical-type party members crit rate +{party_physCrit}%',
-  'skill.pi_quick.name': 'American Iai', 'skill.pi_quick.desc': 'Your attacks always crit; crit rate above 100% converts 1:1 into crit damage. Evasion {v}%. Every 50 damage skills cast by physical-type party members triggers Sniper Headshot!!!: your final damage x5 for 4s (5s interval)',
+  'skill.pi_quick.name': 'American Iai', 'skill.pi_quick.desc': 'Your attacks always crit; crit rate above 100% converts 1:1 into crit damage. Evasion {v}%. Every 50 damage skills cast by physical-type party members triggers Sniper Headshot!!!: your final damage x10 for 4s (5s interval)',
   'skill.pi_ruthless.name': 'Ruthless', 'skill.pi_ruthless.desc': 'Crit damage +{v}%',
   'skill.pi_riposte.name': 'Riposte', 'skill.pi_riposte.desc': 'After dodging, fire back for {v}% damage',
 
@@ -328,7 +328,7 @@ G.I18N['en'] = {
   'buff.fever.name': 'Blood Fever', 'buff.fever.desc': 'Party attack speed +100%, skill cooldown -{cdr}%, heal {regen}% max HP per second, {s}s left',
   'buff.nextExecute.name': 'Execution Primed', 'buff.nextExecute.desc': 'Next Execute deals +{v}% damage',
   'buff.bloodRush.name': 'Blood Rush', 'buff.bloodRush.desc': 'All party skill cooldowns are 1s, {s}s left',
-  'buff.snipeX.name': 'Sniper Headshot!!!', 'buff.snipeX.desc': 'Final damage x5, {s}s left',
+  'buff.snipeX.name': 'Sniper Headshot!!!', 'buff.snipeX.desc': 'Final damage x10, {s}s left',
   'buff.snipeCount.name': 'Sniper Ready', 'buff.snipeCount.desc': 'Physical damage skills: {v}/50',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
