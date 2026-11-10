@@ -232,6 +232,19 @@
       this.partyAlive().forEach(p => { this.addFx(p, 'spdUp', 1, t); this.glow(p, '#ff4d4d'); });
       this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.fever'), '#ff4d4d', 16, 1100);
     }
+    // 血性加速（出血補到隊友時）：4 秒內全隊技能冷卻一律變成 1 秒（正在冷卻的也立刻縮到最多 1 秒）
+    //   觸發間隔 7 秒（從上一次觸發開始算）
+    startBloodRush(u) {
+      const now = this.time.now;
+      if (this.bloodRushNext && now < this.bloodRushNext) return;
+      this.bloodRushNext = now + 7000;
+      const fresh = true;
+      this.bloodRush = { t: 4 };
+      this.units.forEach(p => { if (p.alive && p.skills) p.skills.forEach(s => { s.cd = Math.min(s.cd, 1); }); });
+      if (fresh) this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.bloodRush'), '#ff6b8a', 15, 1000);
+    }
+    rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
+
     feverSum() {
       if (!(this.fever && this.fever.t > 0)) return 0;
       return this.partyAlive().filter(p => p.kind !== 'summon').reduce((a, p) => a + (p.st.iai ? 100 : Math.min(100, this.critOf(p))), 0);
@@ -470,7 +483,7 @@
           const now = this.time.now, recent = (src.bleedHealAt || []).filter(x => now - x < 1000);
           src.bleedHealAt = recent;
           const hurt = this.partyAlive().filter(p => p !== src && p.kind !== 'summon' && p.hp < p.st.maxHp).sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0];
-          if (hurt && recent.length < 3) { recent.push(now); this.heal(hurt, Math.max(1, Math.round(hurt.st.maxHp * src.st.bleedHeal)), false); }
+          if (hurt && recent.length < 3) { recent.push(now); this.heal(hurt, Math.max(1, Math.round(hurt.st.maxHp * src.st.bleedHeal)), false); this.startBloodRush(src); }
         }
         src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
         const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友（每秒最多一次）
@@ -913,6 +926,7 @@
 
     fightTick(dt) {
       if (this.fever && this.fever.t > 0) this.fever.t -= dt;
+      if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
       this.units.forEach(u => this.syncHpBoost(u));   // 野性狂暴到期：最大生命恢復
@@ -936,7 +950,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100)); break; }
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + this.feverSum() / 100)); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }
@@ -1024,6 +1038,7 @@
         const shown = id === 'critUp' ? Math.round(v) : id === 'regen' ? +(v * 100).toFixed(1) : pct(v);
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
+      if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });
       if (this.fever && this.fever.t > 0) { const fs = this.feverSum(); out.push({ id: 'fever', icon: G.FX_ICON.fever, val: `${Math.ceil(this.fever.t)}s`, p: { cdr: Math.round(Math.min(G.CONFIG.cdrCap * 100, fs)), regen: +(fs / 100).toFixed(2), s: Math.ceil(this.fever.t) } }); }

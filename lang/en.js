@@ -80,7 +80,7 @@ G.I18N['en'] = {
   'skill.bk_bloodlust.name': 'Blood Rage', 'skill.bk_bloodlust.desc': 'Own ATK +{v}% for 8s; meanwhile lifesteal heals other allies for {share}% max HP (up to 3 times per second)',
   'skill.bk_execute.name': 'Execute', 'skill.bk_execute.desc': '{v}% damage to one enemy, doubled if the target is bleeding. Killing with Execute grants the party Blood Fever for 7s: attack speed +100%, and the party total crit rate (max 100% each, American Iai counts as 100%) reduces skill cooldowns (1% each) and heals per second (1% max HP per 100%)',
   'skill.bk_drain.name': 'Lifedrain', 'skill.bk_drain.desc': 'Heals for {v}% of damage dealt',
-  'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause bleeding. When your basic attack lifesteals at full HP, 50% chance to heal the most injured ally (by %) for {bleedHeal}% of their max HP (up to 3 times per second)',
+  'skill.bk_hemorrhage.name': 'Hemorrhage', 'skill.bk_hemorrhage.desc': 'Basic attacks have a {v}% chance to cause bleeding. When your basic attack lifesteals at full HP, 50% chance to heal the most injured ally (by %) for {bleedHeal}% of their max HP (up to 3 times per second) and grant the party Blood Rush for 4s: all skill cooldowns become 1s (at most once every 7s)',
   'skill.bk_frenzy.name': 'Frenzy', 'skill.bk_frenzy.desc': 'Crit chance +{v}%',
   'skill.bk_thirst.name': 'Bloodthirst', 'skill.bk_thirst.desc': 'Vs bleeding enemies: damage +{v}%, crit rate +{bleedCrit}%, crit damage +{bleedCritDmg}%',
   'skill.bk_vitality.name': 'Blood Vitality', 'skill.bk_vitality.desc': 'HP +{v}%',
@@ -305,7 +305,7 @@ G.I18N['en'] = {
   'revive.title': '💀 Defeated', 'revive.wait': 'Free revive in<b>{s}s</b>(back to Floor {n})', 'revive.pay': '💎 {cost} Revive here now (you have {have})',
 
   'battle.morale': '🎖️ Kitty Morale +{n}%', 'battle.collapse': 'Hide battle view', 'battle.expand': 'Show battle view',
-  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
+  'battle.deadShort': '💀 {s}s', 'battle.dodge': 'Dodge', 'battle.cover': 'Cover!', 'battle.stun': 'Stun', 'battle.fever': 'Blood Fever!', 'battle.bloodRush': 'Blood Rush!', 'battle.bossSlam': 'Power Smash!!!!!', 'battle.hpSlam': 'Muscle Slam!!!!!',
 
   // ── Buffs ──
   'buff.morale.name': 'Kitty Morale', 'buff.morale.desc': 'Each Cat Knight attack adds 1 stack; each stack gives the party +1% final DEF, up to +{max}%. Currently +{n}% (resets on defeat). Also, party basic attacks have a {stun}% chance to stun for {stunT}s, and party evasion +{evade}%.',
@@ -327,6 +327,7 @@ G.I18N['en'] = {
   'buff.bloodShare.name': 'Blood Rage', 'buff.bloodShare.desc': 'Lifesteal heals other allies {v}% max HP, {s}s left',
   'buff.fever.name': 'Blood Fever', 'buff.fever.desc': 'Party attack speed +100%, skill cooldown -{cdr}%, heal {regen}% max HP per second, {s}s left',
   'buff.nextExecute.name': 'Execution Primed', 'buff.nextExecute.desc': 'Next Execute deals +{v}% damage',
+  'buff.bloodRush.name': 'Blood Rush', 'buff.bloodRush.desc': 'All party skill cooldowns are 1s, {s}s left',
   'buff.skillDmg.name': 'Skill Power', 'buff.skillDmg.desc': 'Skill damage +{v}%, {s}s left',
   'buff.regen.name': 'Regeneration', 'buff.regen.desc': 'Regenerates {v}% HP per second, {s}s left',
   'buff.nextSkill.name': 'Next Skill Up', 'buff.nextSkill.desc': 'Next attack skill deals +{v}% damage ({s}s left)',

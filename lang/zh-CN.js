@@ -80,7 +80,7 @@ G.I18N['zh-CN'] = {
   'skill.bk_bloodlust.name': '血性狂暴', 'skill.bk_bloodlust.desc': '自身攻击 +{v}%，8 秒；期间吸血时，其他队友回复 {share}% 最大生命（每秒最多 3 次）',
   'skill.bk_execute.name': '处决', 'skill.bk_execute.desc': '单体 {v}% 伤害，目标流血中时伤害翻倍。用处决击杀敌人时，全队进入「血之狂热」7 秒：攻速 +100%，并依全队暴击率加总（每人最多 100%，美式居合算 100%）降低技能冷却（每 1% = -1%）、每秒回复生命（每 100% = 1% 最大生命）',
   'skill.bk_drain.name': '吸血', 'skill.bk_drain.desc': '伤害的 {v}% 转为生命',
-  'skill.bk_hemorrhage.name': '出血', 'skill.bk_hemorrhage.desc': '普攻有 {v}% 概率造成流血。普攻吸血时如果自己是满血，有 50% 概率改为帮失血比例最高的队友回复 {bleedHeal}% 最大生命（每秒最多 3 次）',
+  'skill.bk_hemorrhage.name': '出血', 'skill.bk_hemorrhage.desc': '普攻有 {v}% 概率造成流血。普攻吸血时如果自己是满血，有 50% 概率改为帮失血比例最高的队友回复 {bleedHeal}% 最大生命（每秒最多 3 次），并让全队进入「血性加速」4 秒：全队技能冷却一律变成 1 秒（每 7 秒最多触发一次）',
   'skill.bk_frenzy.name': '狂怒', 'skill.bk_frenzy.desc': '暴击率 +{v}%',
   'skill.bk_thirst.name': '渴血', 'skill.bk_thirst.desc': '对流血中的敌人伤害 +{v}%、暴击率 +{bleedCrit}%、暴击伤害 +{bleedCritDmg}%',
   'skill.bk_vitality.name': '血之活力', 'skill.bk_vitality.desc': '生命 +{v}%',
@@ -305,7 +305,7 @@ G.I18N['zh-CN'] = {
   'revive.title': '💀 战败', 'revive.wait': '<b>{s}</b>秒后免费复活（退回第 {n} 层）', 'revive.pay': '💎 {cost} 立即原地复活（有 {have}）',
 
   'battle.morale': '🎖️ 猫猫士气 +{n}%', 'battle.collapse': '收起战斗画面', 'battle.expand': '展开战斗画面',
-  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.fever': '血之狂热！', 'battle.bossSlam': '巨力重击！！！！！', 'battle.hpSlam': '肌肉冲击！！！！！',
+  'battle.deadShort': '💀 {s}秒', 'battle.dodge': '闪避', 'battle.cover': '掩护！', 'battle.stun': '晕眩', 'battle.fever': '血之狂热！', 'battle.bloodRush': '血性加速！', 'battle.bossSlam': '巨力重击！！！！！', 'battle.hpSlam': '肌肉冲击！！！！！',
 
   // ── Buff ──
   'buff.morale.name': '猫猫士气', 'buff.morale.desc': '猫铠者每攻击一次累积 1 层，每层全队最终防御 +1%，最多 +{max}%。当前 +{n}%（战败归零）。另外全队普攻有 {stun}% 概率晕眩敌人 {stunT} 秒，全队闪避 +{evade}%。',
@@ -327,6 +327,7 @@ G.I18N['zh-CN'] = {
   'buff.bloodShare.name': '血性狂暴', 'buff.bloodShare.desc': '吸血时其他队友回复 {v}% 最大生命，还剩 {s} 秒',
   'buff.fever.name': '血之狂热', 'buff.fever.desc': '全队攻速 +100%、技能冷却 -{cdr}%、每秒回复 {regen}% 最大生命，还剩 {s} 秒',
   'buff.nextExecute.name': '处决蓄势', 'buff.nextExecute.desc': '下一次处决伤害 +{v}%',
+  'buff.bloodRush.name': '血性加速', 'buff.bloodRush.desc': '全队技能冷却一律 1 秒，还剩 {s} 秒',
   'buff.skillDmg.name': '技能增伤', 'buff.skillDmg.desc': '技能伤害 +{v}%，还剩 {s} 秒',
   'buff.regen.name': '持续恢复', 'buff.regen.desc': '每秒恢复 {v}% 生命，还剩 {s} 秒',
   'buff.nextSkill.name': '下次技能强化', 'buff.nextSkill.desc': '下一次攻击技能伤害 +{v}%（还剩 {s} 秒）',
