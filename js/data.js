@@ -19,7 +19,7 @@ G.CONFIG = {
   moralePerAttack: 1,       // 士氣：貓鎧者每攻擊一次（普攻或攻擊技能）+1 層，每層全隊最終防禦 +1%
   frenzyPerHit: 1,          // 吸貓狂熱：每次打中敵人自身傷害 +1%
   crisisHp: 0.6,            // 學者「危機意識」：任一隊友生命低於 60% 觸發
-  evadeCap: 0.8,            // 閃避率上限（原本 60%）
+  evadeCap: 0.9,            // 閃避率上限（原本 60% → 80% → 90%）
   cdrCap: 0.8,              // 技能冷卻縮短上限（原本 50%）
 
   // 背包擴充
@@ -108,7 +108,8 @@ G.TEAM_SYNERGIES = [
   { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.25 },      3: { cdr: 0.35 } } },
   { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.10, basicLifesteal: 0.005 } } },   // basicLifesteal：普攻命中回復自己最大生命的比例
   { id: 'arcane',   type: 'arcane',   tiers: { 2: { arcaneCrit: 0.5, arcaneCritDmg: 1.0, arcaneDur: 6 }, 3: { arcaneCrit: 0.55, arcaneCritDmg: 1.1, arcaneDur: 12 } } },   // 全隊打怪累積 100 次 → 全隊暴擊率／暴擊傷害提升 N 秒
-  { id: 'dark',     type: 'dark',     tiers: { 2: { cdr: 0.1, procRate: 0.05 }, 3: { cdr: 0.1, procRate: 0.1 } } },
+  // 暗影纏繞：我方對敵人施加減益（新上、刷新、重上都算 1 次）累積 darkNeed 次 → 全隊攻速／冷卻縮短／閃避／每秒回血，持續 darkDur 秒
+  { id: 'dark',     type: 'dark',     tiers: { 2: { darkNeed: 200, darkSpd: 0.5, darkCdr: 0.15, darkEvade: 0.3, darkDur: 6 }, 3: { darkNeed: 100, darkSpd: 0.5, darkCdr: 0.15, darkEvade: 0.35, darkRegen: 0.015, darkDur: 10 } } },
 ];
 G.CANNON_INTERVAL = 6;   // 船砲預設每幾秒一發
 
@@ -365,7 +366,7 @@ G.SKILLS = {
     P('nc_legion',    2, lin(0.15, 0.05), 'self', 'minionDmg'),
     // 死亡契約：數值見 G.DEATH_PACT（v = 每個減益的召喚物回血）
     P('nc_pact',      2, lin(0.01, 0.005), 'special', 'deathPact', { descV: Object.fromEntries(Object.entries({
-      dmg: 'dmg', spd: 'spd', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),
+      dmg: 'dmg', spd: 'spd', tSpd: 'tSpd', tEvade: 'tEvade', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),
   ],
 
   // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
@@ -432,10 +433,12 @@ G.shipSkillBonus = () => {
 //   每個減益（取減益最多的那隻敵人）：召喚物每秒回 regen、傷害 +dmg、攻速 +spd
 //   場上召喚物 ≥1：全隊攻速 aSpd、暴擊率 aCrit（百分點）、暴擊傷害 aCritDmg、閃避 aEvade
 //   場上召喚物 ≥2：召喚物再加防禦 sDef、閃避 sEvade、攻擊 sAtk、暴擊傷害 sCritDmg
+//   場上召喚物 ≥3：全隊（含召喚物）再加攻速 tSpd、閃避 tEvade
 G.DEATH_PACT = {
   regen: lin(0.01, 0.005), dmg: lin(0.01, 0.01), spd: lin(0.05, 0.0175),
   aSpd: lin(0.4, 0.05), aCrit: lin(10, 4.25), aCritDmg: lin(0.5, 0.175), aEvade: lin(0.1, 0.025),
   sDef: lin(0.1, 0.225), sEvade: lin(0.2, 0.0375), sAtk: lin(0.18, 0.08), sCritDmg: lin(1, 0.5),
+  tSpd: lin(0.5, 0.125), tEvade: () => 0.5,   // 場上召喚物 ≥3：全隊（含召喚物）攻速、閃避
 };
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
@@ -444,7 +447,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', shadow: '🌑', shadowCount: '🌑', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', fear: '😱', decay: '🥀', doom: '💀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

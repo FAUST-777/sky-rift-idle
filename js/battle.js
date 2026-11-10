@@ -288,6 +288,7 @@
     }
     // 對敵人上 debuff（持續時間吃施放者的「畫廊」加成；流血/中毒換算成每秒傷害）
     debuff(src, target, id, v, t) {
+      if (this.party(src) && !this.party(target) && target.alive) this.shadowTick();   // 暗影纏繞：每次施加減益都算 1 次
       const dur = t * ((src.st.debuffDur || 1) + (this.party(src) ? this.aura.debuffDur || 0 : 0));   // 黑暗系團隊特效
       if (id === 'stun' && target.alive && !this.fxv(target, 'stun')) this.floatText(target.img.x, this.barY(target) - 12, G.t('battle.stun'), '#ffe066', 12);
       const val = (id === 'bleed' || id === 'poison') ? this.atkOf(src) * G.DOT[id] * v : v;
@@ -323,6 +324,19 @@
       this.doomBlasting = false;
     }
 
+    // ── 團隊特效「暗影纏繞」：累積施加減益次數 → 全隊增益 ──────────────────
+    shadowOn() { return !!(this.shadow && this.shadow.t > 0); }
+    shadowV(k) { return this.shadowOn() ? this.aura[k] || 0 : 0; }
+    shadowTick() {
+      const need = this.aura.darkNeed;
+      if (!need) return;
+      this.shadowCount = (this.shadowCount || 0) + 1;
+      if (this.shadowCount < need) return;
+      this.shadowCount = 0; this.shadow = { t: this.aura.darkDur || 6 };
+      this.partyAlive().forEach(p => this.glow(p, '#c99bff'));
+      if (this.hero) this.floatText(this.hero.img.x, this.barY(this.hero) - 40, G.t('battle.shadow'), '#c99bff', 16, 1100);
+    }
+
     // ── 死靈「死亡契約」與召喚物 ──────────────────────────────────────────
     pactRank() { return Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.deathPact || {}).r || 0)); }
     summonCount() { return (this.minionAlive() ? 1 : 0) + (this.wraiths || []).length; }
@@ -334,6 +348,7 @@
       return G.DEATH_PACT[k](r);
     }
     pactAll(k) { return this.pactV(k, 1); }                                   // 全隊（召喚物 ≥1）
+    pactTriple(k) { return this.pactV(k, 3); }                                // 全隊含召喚物（召喚物 ≥3）
     pactSummon(k) { return this.pactV(k, 2); }                                // 召喚物（召喚物 ≥2）
     pactPerDebuff(k) { return this.pactV(k) * this.pactDebuffs(); }           // 召喚物：每個減益
 
@@ -387,11 +402,11 @@
 
     party(u) { return u.side === 'party'; }
     atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0) + (u.kind === 'summon' && u.minion ? this.pactSummon('sAtk') : 0)); }   // 死亡契約：召喚物攻擊
-    spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) + this.pactAll('aSpd') + (u.kind === 'summon' && u.minion ? this.pactPerDebuff('spd') : 0) : 0) - this.fxv(u, 'slow'))); }   // 死亡契約：全隊攻速、召喚物每個減益攻速   // othersSpd：野性之絆（德魯伊自己不吃）
+    spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) + this.pactAll('aSpd') + this.pactTriple('tSpd') + this.shadowV('darkSpd') + (u.kind === 'summon' && u.minion ? this.pactPerDebuff('spd') : 0) : 0) - this.fxv(u, 'slow'))); }   // 死亡契約：全隊攻速、召喚物每個減益攻速   // othersSpd：野性之絆（德魯伊自己不吃）
     critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) + this.pactAll('aCrit') : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
-    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
@@ -428,7 +443,7 @@
         hp: Math.max(0, Math.round(u.hp)), maxHp: u.st.maxHp,
         atk: this.atkOf(u), def: this.defOf(u), spd: this.spdOf(u),
         crit: Math.min(100, this.critOf(u)), critDmg: u.st.critDmg + (a.critDmg || 0) + (this.arcaneOn() ? a.arcaneCritDmg || 0 : 0),
-        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV()),
+        cdr: Math.min(G.CONFIG.cdrCap, (a.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr')),
         regen: (u.st.regen || 0) + (a.regen || 0) + this.fxv(u, 'regen'),
         lifesteal: u.st.lifesteal || 0,
         evade: this.evadeOf(u),
@@ -1159,7 +1174,7 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
+        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + this.fxv(u, 'regen') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }
@@ -1169,6 +1184,7 @@
       if (this.tomeBuff && this.tomeBuff.t > 0) this.tomeBuff.t -= dt;
       if (this.curseOff && this.curseOff.t > 0) this.curseOff.t -= dt;
       if (this.arcane && this.arcane.t > 0) this.arcane.t -= dt;
+      if (this.shadow && this.shadow.t > 0) this.shadow.t -= dt;
       if (this.overdrive && this.overdrive.t > 0) this.overdrive.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
       if (this.cdrBoost && this.cdrBoost.t > 0) this.cdrBoost.t -= dt;
@@ -1197,7 +1213,7 @@
         for (const s of u.skills) {
           s.cd -= dt;
           if (s.cd <= 0 && this.enemiesAlive().length) {
-            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV())); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
+            if (this.castSkill(u, s)) { s.cd = s.def.cd * (1 - Math.min(G.CONFIG.cdrCap, (this.aura.cdr || 0) + (u.st.cdr || 0) + (u.st.shipCdr || 0) * G.shipTotalLv() + this.feverSum() / 100 + this.cdrBoostV() + this.shadowV('darkCdr'))); if (this.rushOn()) s.cd = Math.min(s.cd, 1); break; }   // 血性加速：冷卻最多 1 秒
             s.cd = 0.5;   // 條件不符（沒人受傷等），晚點再試
           }
         }
@@ -1295,6 +1311,8 @@
       if (this.overdrive && this.overdrive.t > 0) out.push({ id: 'overdrive', icon: G.FX_ICON.overdrive, val: `${Math.ceil(this.overdrive.t)}s`, p: { s: Math.ceil(this.overdrive.t) } });
       if (this.arcaneOn()) out.push({ id: 'arcane', icon: G.FX_ICON.arcane, val: `${Math.ceil(this.arcane.t)}s`, p: { c: Math.round((this.aura.arcaneCrit || 0) * 100), d: Math.round((this.aura.arcaneCritDmg || 0) * 100), s: Math.ceil(this.arcane.t) } });
       else if (this.aura.arcaneCrit) out.push({ id: 'arcaneCount', icon: G.FX_ICON.arcaneCount, val: `${this.arcaneCount || 0}/100`, p: { v: this.arcaneCount || 0 } });
+      if (this.shadowOn()) out.push({ id: 'shadow', icon: G.FX_ICON.shadow, val: `${Math.ceil(this.shadow.t)}s`, p: { s: Math.ceil(this.shadow.t), spd: pct(this.aura.darkSpd || 0), cdr: pct(this.aura.darkCdr || 0), ev: pct(this.aura.darkEvade || 0), rg: +((this.aura.darkRegen || 0) * 100).toFixed(1) } });
+      else if (this.aura.darkNeed) out.push({ id: 'shadowCount', icon: G.FX_ICON.shadowCount, val: `${this.shadowCount || 0}/${this.aura.darkNeed}`, p: { v: this.shadowCount || 0, n: this.aura.darkNeed } });
       if (this.rushOn()) out.push({ id: 'bloodRush', icon: G.FX_ICON.bloodRush, val: `${Math.ceil(this.bloodRush.t)}s`, p: { s: Math.ceil(this.bloodRush.t) } });
       const nx = party.find(u => this.fxv(u, 'nextExecute'));
       if (nx) out.push({ id: 'nextExecute', icon: G.FX_ICON.nextExecute, val: `+${pct(nx.fx.nextExecute.v)}%`, p: { v: pct(nx.fx.nextExecute.v) } });

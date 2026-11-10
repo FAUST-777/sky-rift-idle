@@ -425,7 +425,7 @@
   function synBonusText(bonus, pow) {
     const show = v => Math.round(v * 1000) / 10;
     return Object.entries(bonus).map(([k, v]) => {
-      if (k === 'cannonInterval' || k === 'arcaneDur') return t('syn.b.' + k, { v });
+      if (k === 'cannonInterval' || k === 'arcaneDur' || k === 'darkNeed' || k === 'darkDur') return t('syn.b.' + k, { v });
       if (!pow) return t('syn.b.' + k, { v: show(v) });
       const up = show(v * (1 + pow)), add = Math.round((up - show(v)) * 10) / 10;
       return t('syn.b.' + k, { v: up }) + (add ? ` <span class="gold">(+${add})</span>` : '');

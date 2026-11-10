@@ -258,7 +258,7 @@
   // 團隊特效：看出戰成員的傷害系別組合
   // 回傳 { members: [{ who, type }], counts: { type: n }, active: [{ id, n?, bonus }] }
   // 獸群之心：團隊特效數值 ×(1+pow)；船砲間隔是秒數（越小越好），不放大
-  G.scaleSynergy = (bonus, pow) => pow ? Object.fromEntries(Object.entries(bonus).map(([k, v]) => [k, k === 'cannonInterval' || k === 'arcaneDur' ? v : v * (1 + pow)])) : bonus;
+  G.scaleSynergy = (bonus, pow) => pow ? Object.fromEntries(Object.entries(bonus).map(([k, v]) => [k, k === 'cannonInterval' || k === 'arcaneDur' || k === 'darkNeed' || k === 'darkDur' ? v : v * (1 + pow)])) : bonus;
   G.synergyPow = () => Math.max(0, ...G.partyMembers().map(w => G.passivesOf(w).party.synergyPow || 0));
   G.teamSynergy = function () {
     const members = G.partyMembers().map(who => ({ who, type: G.CLASSES[G.charOf(who).cls].dmgType }));
