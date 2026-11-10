@@ -578,6 +578,11 @@
       if (this.fxv(src, 'fear')) dmg *= 1 - this.fxv(src, 'fear');   // 恐懼：傷害下降
       if (src.special.crisis && this.crisisOn()) dmg *= 1 + src.special.crisis.v;               // 學者危機意識
       if (this.party(src) && this.aura.vsStun && this.fxv(target, 'stun')) dmg *= 1 + this.aura.vsStun;   // 貓哈氣爆甲：打暈眩敵人
+      if (this.party(src) && this.fxv(target, 'stun')) {
+        if (src.special.morale) dmg *= 1 + G.CAT_STUN.self(src.special.morale.r);   // 貓貓士氣：裝的人自己打暈眩敵人
+        const fr = Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.frenzy || {}).r || 0));
+        if (fr) dmg *= 1 + G.CAT_STUN.party(fr);   // 吸貓狂熱：全隊打暈眩敵人（取最高）
+      }
       // 貓肉球拍打：全隊打到暈眩敵人，出手的人回復生命（範圍攻擊同一次出手只回一次）
       if (this.party(src) && this.aura.stunHit && this.fxv(target, 'stun') && src.alive && src.st.maxHp && src.stunHitAt !== this.time.now) {
         src.stunHitAt = this.time.now;
