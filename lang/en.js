@@ -55,7 +55,7 @@ G.I18N['en'] = {
   'skill.nc_plague.name': 'Black Death Curse',
   'skill.nc_plague.desc': '{v}% damage to all enemies and inflicts Curse of Decay: they cannot crit and lose 15% max HP for 6s',
   'skill.nc_golem.name': 'Summon Stone Golem',
-  'skill.nc_golem.desc': 'Summon a Stone Golem in front of the party ({v}% stats): very high HP, very low ATK, attacks a random enemy. Evasion capped at 20%, healing received -90%. Uses Taunt (9s CD): all enemies attack only it and it takes 50% less damage for 10s. Only one summon at a time, shared by the whole party (first caster wins); while one is out this skill stays ready and replaces it the moment it dies',
+  'skill.nc_golem.desc': 'Summon a Stone Golem in front of the party ({v}% stats): very high HP, very low ATK, attacks a random enemy. Evasion capped at 20%, healing received -90%. Uses Taunt (9s CD): all enemies attack only it and it takes 5% less damage for 10s. Only one summon at a time, shared by the whole party (first caster wins); while one is out this skill stays ready and replaces it the moment it dies',
   'skill.nc_archer.name': 'Summon Skeleton Archer',
   'skill.nc_archer.desc': 'Summon a Skeleton Archer in front of the party ({v}% stats): high ATK but fragile, shoots a random enemy. Uses Arrow Rain (8s CD): 200% damage to all enemies and +100% attack speed for 5s. Only one summon at a time, shared by the whole party (first caster wins); while one is out this skill stays ready and replaces it the moment it dies',
   'skill.nc_wraith.name': 'Wraith Call',
