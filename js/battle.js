@@ -10,7 +10,7 @@
   const W = 480, H = 300, GROUND = 238;
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp'];
+  const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
   const MISSILE_VARIANTS = 4;
 
@@ -448,7 +448,11 @@
       }
       // 吸血
       const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
-      if (ls && src.alive) src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
+      if (ls && src.alive) {
+        src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
+        const bs = this.fxv(src, 'bloodShare');   // 血性狂暴：吸血時分給其他隊友
+        if (bs) this.partyAlive().forEach(p => { if (p !== src && p.kind !== 'summon') this.heal(p, Math.max(1, Math.round(p.st.maxHp * bs)), false); });
+      }
       // 鋼鐵陣線：我方普攻命中回復自己最大生命的 0.5%（不是看傷害）
       if (!opts.skill && !opts.counter && this.party(src) && this.aura.basicLifesteal && src.alive && src.st.maxHp) src.hp = Math.min(src.st.maxHp, src.hp + src.st.maxHp * this.aura.basicLifesteal);
       // 吸貓狂熱累積（隊伍有人裝「吸貓狂熱」被動才有）

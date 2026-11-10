@@ -157,7 +157,9 @@ G.SKILLS = {
     A('bk_slash',     0, 5,  lin(2.2, 0.25), v => ({ target: 'one', mult: v, debuffs: [{ id: 'bleed', v: 1, t: 5 }] })),
     A('bk_rend',      0, 8,  lin(0.9, 0.12), v => ({ target: 'one', mult: v, hits: 3, debuffs: [{ id: 'bleed', v: 1, t: 6 }] })),
     A('bk_feast',     1, 10, lin(1.8, 0.25), v => ({ target: 'one', mult: v, drain: 1 })),
-    A('bk_bloodlust', 1, 15, lin(0.4, 0.1),  v => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }] })),
+    // 血性狂暴（原嗜血）：自身攻擊 +v，8 秒；期間血騎士每次吸血，其他隊友回復 1%→1.5% 最大生命
+    A('bk_bloodlust', 1, 15, lin(0.4, 0.1),  (v, r) => ({ target: 'none', self: [{ id: 'atkUp', v, t: 8 }, { id: 'bloodShare', v: lin(0.01, 0.00125)(r), t: 8 }] }),
+      { descV: { share: lin(0.01, 0.00125) } }),
     A('bk_execute',   2, 12, lin(2.5, 0.3),  v => ({ target: 'one', mult: v, vsBleed: 1 })),
     P('bk_drain',      0, lin(0.05, 0.03), 'self', 'lifesteal'),
     P('bk_hemorrhage', 0, lin(0.25, 0.1),  'proc', 'bleed', { fx: 'bleed', chance: 'v', val: 1, t: 4 }),
@@ -355,7 +357,7 @@ G.ANIMALS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
