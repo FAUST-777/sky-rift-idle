@@ -358,13 +358,11 @@ G.SKILLS = {
     //   每次攻擊上「死亡詛咒」6 秒：記錄期間受到的傷害，到期引爆 110%→200%；被刷新時先馬上引爆再重上
     A('nc_wraith',    2, 20, lin(0.8, 0.1),  (v, r) => ({ target: 'none', wraith: { atk: v, spd: lin(0.5, 0.125)(r), curse: lin(1.1, 0.225)(r), t: 18 } }),
       { descV: { spd: lin(0.5, 0.125), curse: lin(1.1, 0.225) } }),
-    A('nc_blast',     2, 18, lin(0.5, 0.15), v => ({ target: 'none', corpseBlast: v })),               // 屍爆：召喚物最大生命 × v 打全體
     P('nc_bond',      0, lin(0.1, 0.05),  'self', 'summonPower'),
     P('nc_rot',       0, lin(0.15, 0.05), 'proc', 'poison', { fx: 'poison', chance: 'v', val: 1, t: 5 }),
     // 亡靈軍團（原不死之契，id 不變）：數值見 G.UNDEAD_LEGION；v = 召喚物生命
     P('nc_undying',   1, lin(0.1, 0.1),   'special', 'undeadLegion', { descV: { evade: r => G.UNDEAD_LEGION.evade(r) } }),
     P('nc_dread',     1, lin(0.06, 0.04), 'self', 'atkPct'),
-    P('nc_legion',    2, lin(0.15, 0.05), 'self', 'minionDmg'),
     // 死亡契約：數值見 G.DEATH_PACT（v = 每個減益的召喚物回血）
     P('nc_pact',      2, lin(0.01, 0.005), 'special', 'deathPact', { descV: Object.fromEntries(Object.entries({
       dmg: 'dmg', spd: 'spd', tSpd: 'tSpd', tEvade: 'tEvade', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),

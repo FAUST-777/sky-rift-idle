@@ -561,7 +561,6 @@
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
       if (src.kind === 'summon' && src.minion) dmg *= 1 + this.pactPerDebuff('dmg');   // 死亡契約：召喚物每個減益加傷
-      if (src.st.minionDmg && this.minionAlive()) dmg *= 1 + src.st.minionDmg;   // 亡靈軍勢：場上有召喚物就算（不限誰召喚的）            // 吸貓狂熱：對中毒敵人
       const stunnedNow = this.fxv(target, 'stun') > 0;
       const sb = stunnedNow ? Object.assign({}, opts.stunBonus) : null;   // 打到暈眩敵人的額外效果
       if (stunnedNow && this.fxv(src, 'stunHunter')) { sb.forceCrit = true; sb.breakStun = true; sb.dmgPct = (sb.dmgPct || 0) + this.fxv(src, 'stunHunter'); }   // 大爆射一波！之後 6 秒
@@ -797,7 +796,6 @@
       if (e.summon) return !(this.animal && this.animal.unit.alive);
       if (e.wraith) return !(this.wraiths || []).some(w => w.owner === u);   // 怨靈：每位死靈頭上一隻
       if (e.summonMinion) return !this.minionAlive();          // 場上最多一隻
-      if (e.corpseBlast) return this.minionAlive();             // 要有召喚物才能引爆
       if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
       return true;
     }
@@ -880,15 +878,6 @@
       if (e.summon) this.summonAnimal(u, e.summon, e.aura);
       if (e.summonMinion) this.summonMinion(u, e.summonMinion.kind, e.summonMinion.power);
       if (e.wraith) this.summonWraith(u, e.wraith);
-      if (e.corpseBlast && this.minionAlive()) {   // 屍爆：引爆召喚物，打全體（無視防禦）
-        const m = this.minion.unit, dmg = Math.max(1, Math.round(m.st.maxHp * e.corpseBlast));
-        this.floatText(m.img.x, this.barY(m) - 30, G.t('battle.corpseBlast'), '#9dff9d', 16, 1000);
-        const ring = this.add.circle(m.img.x, m.img.y - 30, 14, 0x7dff9a, 0.5).setDepth(45);
-        this.tweens.add({ targets: ring, scale: 8, alpha: 0, duration: 450, onComplete: () => ring.destroy() });
-        this.enemiesAlive().forEach(t => this.damage(t, dmg, '#9dff9d', true, true));
-        this.kill(m);
-        this.checkWaveEnd();
-      }
       if (e.cannonShots && G.cannonMult() > 0) for (let i = 0; i < e.cannonShots.n; i++) this.time.delayedCall(i * 220, () => this.fireCannon(e.cannonShots.bonus));   // 集中砲火
       if (e.tome) this.tomeBuff = { cannon: e.tome.cannon, purge: e.tome.purge, t: e.tome.t };   // 百科全書
       if (e.overdrive) { this.overdrive = { t: e.overdrive }; this.cannonT = Math.min(this.cannonT, G.cannonInterval(this.aura) / 2); }   // 引擎超載：船砲間隔減半
