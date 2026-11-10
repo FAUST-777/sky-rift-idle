@@ -144,7 +144,7 @@ G.I18N['zh-TW'] = {
   'skill.dr_wolf.name': '狼之靈', 'skill.dr_wolf.desc': '全隊攻擊 +{v}%、攻速 +{spd}%，8 秒；期間自己攻速 -{slow}%',
   'skill.dr_owl.name': '貓頭鷹之靈', 'skill.dr_owl.desc': '全隊暴擊率 +{v}%，8 秒',
   'skill.dr_deer.name': '鹿之靈', 'skill.dr_deer.desc': '全隊每秒回復 {v}% 生命，6 秒',
-  'skill.dr_thorns.name': '野性狂暴', 'skill.dr_thorns.desc': '其他隊友攻速 +55%、每秒回復 1% 最大生命，持續 {v} 秒；期間自己攻速 -55%',
+  'skill.dr_thorns.name': '野性狂暴', 'skill.dr_thorns.desc': '其他隊友攻速 +{spd}%（物理系隊友 +{phys}%）、每秒回復 1% 最大生命，持續 {v} 秒；期間自己攻速 -{slow}%',
   'skill.dr_bond.name': '野性之絆', 'skill.dr_bond.desc': '自己施放的增益持續時間 +{v}%；其他隊友最大生命 +{party_hpPctOthers}%、攻速 +{party_spdPctOthers}%',
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全隊生命 +{v}%',
   'skill.dr_spirit.name': '自然之靈', 'skill.dr_spirit.desc': '全隊每秒回復 {v}% 生命；其他隊友最大生命 +{party_hpPctOthers}%',

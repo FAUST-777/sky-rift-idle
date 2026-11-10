@@ -142,6 +142,7 @@ const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾�
 const CRAM = { spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
 const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
 const WOLF = { slow: lin(0.25, 0.025), spd: lin(0.1, 0.025) };   // 狼之靈：自己攻速 -25%→-35%、全隊攻速 +10%→20%
+const FERAL = { spd: lin(0.55, 0.0825), phys: lin(0.55, 0.1125), slow: lin(0.55, 0.0625) };   // 野性狂暴：隊友攻速、物理系隊友攻速、自己減攻速
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -272,9 +273,11 @@ G.SKILLS = {
       { descV: { spd: WOLF.spd, slow: WOLF.slow } }),
     A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
     A('dr_deer',   1, 18, lin(0.01, 0.003),  v => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }] })),
-    // 野性狂暴（原荊棘纏繞）：持續 3/3.5/4/5/6 秒，其他隊友攻速 +55%、每秒回 1% 生命；德魯伊自己攻速 -55%
-    A('dr_thorns', 2, 20, r => [3, 3.5, 4, 5, 6][r - 1], v => ({ target: 'none',
-      partyOthers: [{ id: 'spdUp', v: 0.55, t: v }, { id: 'regen', v: 0.01, t: v }], selfDebuff: [{ id: 'slow', v: 0.55, t: v }] }), { raw: true }),
+    // 野性狂暴（原荊棘纏繞）：持續 3/4.5/6/8/10 秒；其他隊友攻速 +55%→88%（物理系 +55%→100%）、每秒回 1% 生命；德魯伊自己攻速 -55%→-80%
+    A('dr_thorns', 2, 20, r => [3, 4.5, 6, 8, 10][r - 1], (v, r) => ({ target: 'none',
+      partyOthers: [{ id: 'spdUp', v: FERAL.spd(r), t: v }, { id: 'regen', v: 0.01, t: v }],
+      partyOthersType: { type: 'physical', fx: [{ id: 'spdUp', v: FERAL.phys(r), t: v }] },
+      selfDebuff: [{ id: 'slow', v: FERAL.slow(r), t: v }] }), { raw: true, descV: { spd: FERAL.spd, phys: FERAL.phys, slow: FERAL.slow } }),
     P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur', { partyAlso: { hpPctOthers: lin(0.05, 0.0125), spdPctOthers: lin(0.01, 0.0125) } }),   // 自己施放的增益持續時間 +v；其他隊友最大生命 +5%→10%、攻速 +1%→6%
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
     P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen', { partyAlso: { hpPctOthers: lin(0.05, 0.0125) } }),   // 另外其他隊友最大生命 +5%→10%
