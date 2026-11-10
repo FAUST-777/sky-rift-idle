@@ -11,7 +11,7 @@
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
   const BUFF_IDS = ['atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
-  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison'];
+  const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown'];
   const MISSILE_VARIANTS = 4;
 
   class BattleScene extends Phaser.Scene {
@@ -153,7 +153,7 @@
       return ch.active.filter(Boolean).map(id => {
         const def = G.skillDef(ch.cls, id), r = ch.skills[id];
         // 開場冷卻最多 5 秒，讓每場戰鬥一開始就會有技能出手
-        return def && r ? { def, rank: r, cd: Math.min(5, def.cd * G.rand(0.2, 0.5)) } : null;
+        return def && r && def.type === 'active' ? { def, rank: r, cd: Math.min(5, def.cd * G.rand(0.2, 0.5)) } : null;
       }).filter(Boolean);
     }
 
@@ -301,7 +301,7 @@
     party(u) { return u.side === 'party'; }
     atkOf(u)  { return u.st.atk * (1 + this.fxv(u, 'atkUp') + (this.party(u) ? this.aura.atkPct || 0 : 0)); }
     spdOf(u)  { return Math.max(0.25, u.st.spd * (1 + this.fxv(u, 'spdUp') + (this.party(u) ? (this.aura.spdPct || 0) + (u.othersSpd || 0) : 0) - this.fxv(u, 'slow'))); }   // othersSpd：野性之絆（德魯伊自己不吃）
-    critOf(u) { return (u.st.crit + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
+    critOf(u) { return Math.max(0, u.st.crit - this.fxv(u, 'critDown') + this.fxv(u, 'critUp') + (this.party(u) ? (this.aura.crit || 0) + (u.st.dmgType === 'physical' ? this.aura.physCrit || 0 : 0) + (this.arcaneOn() ? (this.aura.arcaneCrit || 0) * 100 : 0) : 0)) * this.procMult(u); }   // physCrit：神槍手給物理系；奧術共振
     arcaneOn() { return !!(this.arcane && this.arcane.t > 0); }   // physCrit：神槍手給物理系
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
     evadeOf(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, Math.min(G.CONFIG.evadeCap, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) : 0))); }   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
@@ -678,7 +678,6 @@
       if (e.summon) return !(this.animal && this.animal.unit.alive);
       if (e.summonMinion) return !this.minionAlive();          // 場上最多一隻
       if (e.corpseBlast) return this.minionAlive();             // 要有召喚物才能引爆
-      if (e.cannonShots) return G.cannonMult() > 0;             // 沒有船砲就不放
       if (e.partyOthers) return this.partyAlive().some(p => p !== u);   // 沒有其他隊友就不放（不白扣血）
       return true;
     }
@@ -700,7 +699,7 @@
       if (e.mult && targets.length && this.party(u) && u.kind !== 'summon' && u.st.dmgType === 'physical') this.snipeTick();   // 美式居合：物理技能計數
       // 視覺：有投射物的職業射一輪，近戰撲上去
       if (targets.length) {
-        if (e.fromShip && this.shipImg) targets.forEach((t, i) => this.shipMissile(t, i));
+        if (e.fromShip && this.shipImg) this.shipVolley(e.fromShip, targets, hits);
         else if (u.st.missile) targets.forEach((t, i) => { for (let h = 0; h < Math.min(3, hits); h++) this.shoot(u, t, u.st.missile, i * 3 + h); });
         else this.lunge(u);
         targets.forEach(t => {
@@ -725,7 +724,7 @@
           const ss = this.fxv(u, 'stunSkill');   // 乖狗狗：動物系技能命中機率暈眩
           if (ss && this.valid(t) && Math.random() < ss * this.procMult(u) * (this.fxv(t, 'stun') ? G.STUN.procMult : 1)) this.debuff(u, t, 'stun', 1, 1.5);
         });
-        const delay = (e.fromShip && this.shipImg ? 420 : 0) + h * 130;   // 飛彈飛到才算命中
+        const delay = (e.fromShip && this.shipImg ? ({ cannon: 400, nuke: 620, barrage: 460 }[e.fromShip] || 420) : 0) + h * 130;   // 飛彈飛到才算命中
         if (delay === 0) doHit(); else this.time.delayedCall(delay, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }
       (e.debuffs || []).forEach(db => targets.forEach(t => { if (this.valid(t)) this.debuff(u, t, db.id, db.v, db.t); }));
@@ -791,10 +790,39 @@
       this.floatText(224, GROUND - 80, G.t('summon.' + kind), '#c99bff', 15, 900);
     }
 
+    // 飛船船長：飛空艇的各種發射動畫（傷害由技能本身結算）
+    shipVolley(kind, targets, hits) {
+      const sx = this.shipImg.x - 10, sy = this.shipImg.y + 24;
+      const ball = (t, color, r, dy, delay) => {
+        const b = this.add.circle(sx, sy + dy, r, color).setDepth(40);
+        this.tweens.add({ targets: b, x: t.img.x, y: t.img.y - 30 + dy, duration: 380, delay, ease: 'Quad.in', onComplete: () => b.destroy() });
+      };
+      if (kind === 'cannon') {                 // 集中砲火：一發一發砲彈
+        for (let h = 0; h < hits; h++) ball(targets[0], 0x222222, 6, 0, h * 130);
+      } else if (kind === 'nuke') {            // 核彈：一顆大飛彈落在敵人中間，大爆炸
+        const cx = targets.reduce((a, t) => a + t.img.x, 0) / targets.length, cy = GROUND - 30;
+        const k = this.add.image(sx, sy, 'ms_rocket0').setDepth(40).setScale(2.6);
+        k.rotation = Math.atan2(cy - sy, cx - sx);
+        this.tweens.add({ targets: k, x: cx, y: cy, duration: 600, ease: 'Quad.in', onComplete: () => {
+          k.destroy();
+          const boom = this.add.circle(cx, cy, 14, 0xffa040, 0.9).setDepth(45), flash = this.add.circle(cx, cy, 10, 0xffffff, 0.9).setDepth(46);
+          this.tweens.add({ targets: boom, scale: 9, alpha: 0, duration: 650, onComplete: () => boom.destroy() });
+          this.tweens.add({ targets: flash, scale: 5, alpha: 0, duration: 300, onComplete: () => flash.destroy() });
+          this.cameras.main.shake(250, 0.01);
+          this.floatText(cx, cy - 50, G.t('battle.nuke'), '#ffb36b', 18, 1000);
+        } });
+      } else if (kind === 'barrage') {         // 艦砲武裝齊射：一大堆小飛彈＋三顆並排藍色砲彈
+        targets.forEach((t, i) => { for (let n = 0; n < 3; n++) this.shipMissile(t, i * 3 + n, 0.7); });
+        [-12, 0, 12].forEach(dy => ball(targets[0], 0x4aa8ff, 6, dy, 60));
+      } else {                                 // 飛彈齊發
+        targets.forEach((t, i) => this.shipMissile(t, i));
+      }
+    }
+
     // 飛船船長：飛空艇發射飛彈（只是動畫，傷害由技能本身結算）
-    shipMissile(t, i) {
+    shipMissile(t, i, scale = 1.1) {
       const sx = this.shipImg.x - 10, sy = this.shipImg.y + 24, tx = t.img.x, ty = t.img.y - 30;
-      const k = this.add.image(sx, sy, `ms_rocket${G.randInt(0, MISSILE_VARIANTS - 1)}`).setDepth(40).setScale(1.1);
+      const k = this.add.image(sx, sy + G.rand(-6, 6), `ms_rocket${G.randInt(0, MISSILE_VARIANTS - 1)}`).setDepth(40).setScale(scale);
       k.rotation = Math.atan2(ty - sy, tx - sx);
       this.tweens.add({ targets: k, x: tx, y: ty, duration: 400, delay: i * 40, ease: 'Quad.in', onComplete: () => {
         k.destroy();
@@ -1085,7 +1113,7 @@
       const t = this.enemiesAlive()[0];
       if (!t || !this.hero || !this.shipImg) return;
       const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
-      const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: this.aura.cannonCrit || 0, critDmg: 2.5 }, fx: {}, special: {}, alive: false };   // 王牌砲手：船砲可暴擊
+      const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: this.aura.cannonCrit || 0, critDmg: this.aura.cannonCritDmg || 2.5 }, fx: {}, special: {}, alive: false };   // 王牌砲手：船砲可暴擊
       const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, bonus ? 7 : 5, bonus ? 0x7a2f2f : 0x222222).setDepth(40);
       this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
         ball.destroy();

@@ -146,6 +146,7 @@ const CRAM = { hp: lin(0.05, 0.0175), spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4
 const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
 const WOLF = { slow: lin(0.25, 0.025), spd: lin(0.1, 0.025) };   // 狼之靈：自己攻速 -25%→-35%、全隊攻速 +10%→20%
 const FERAL = { hp: lin(0.1, 0.0375), spd: lin(0.55, 0.0825), phys: lin(0.55, 0.1125), slow: lin(0.55, 0.0625) };   // 野性狂暴：隊友攻速、物理系隊友攻速、自己減攻速
+const SHIP_SKILL_DESC = { sdmg: () => G.shipSkillBonus().dmg, scrit: () => G.shipSkillBonus().crit / 100, scd: () => G.shipSkillBonus().critDmg };   // 船長大招說明用（目前加成）
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -358,21 +359,26 @@ G.SKILLS = {
   // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
   //   部位等級 G.shipLv(slot)：沒裝 0，第 1～5 款 = 1～5
   captain: [
-    A('cp_missile',   0, 9,  lin(0.9, 0.15), v => ({ target: 'all', mult: v * (1 + 0.1 * G.shipLv('engine')), fromShip: true }),
-      { descV: { eng: () => 0.1 * G.shipLv('engine') } }),
-    A('cp_salvo',     0, 8,  lin(0.2, 0.1),  v => ({ target: 'none', cannonShots: { n: 2, bonus: v + 0.1 * G.shipLv('cannon') } }),
+    A('cp_missile',   0, 9,  lin(0.9, 0.15), (v, r) => ({ target: 'all', mult: v * (1 + 0.2 * G.shipLv('cannon')), fromShip: 'missile',
+        debuffs: [{ id: 'critDown', v: lin(10, 2.5)(r), t: 6 }] }),   // 飛彈齊發：船砲每階 +20%；敵人暴擊率 -10→20（百分點）
+      { descV: { can: () => 0.2 * G.shipLv('cannon'), cdn: lin(10, 2.5) }, rawKeys: ['cdn'] }),
+    A('cp_salvo',     0, 8,  lin(1.0, 0.15), v => ({ target: 'one', mult: v + 0.1 * G.shipLv('cannon'), hits: 2, fromShip: 'cannon' }),   // 集中砲火：看自己的攻擊，船砲每階 +10%
       { descV: { can: () => 0.1 * G.shipLv('cannon') } }),
     A('cp_overdrive', 1, 16, lin(4, 1),      v => ({ target: 'none', overdrive: v, party: [{ id: 'spdUp', v: 0.1 + 0.02 * G.shipLv('wing'), t: v }] }),
       { raw: true, descV: { spd: () => 0.1 + 0.02 * G.shipLv('wing') } }),
     A('cp_repair',    1, 15, lin(0.08, 0.02), v => ({ target: 'none', heal: v + 0.02 * G.shipLv('hull') }),
       { descV: { hull: () => 0.02 * G.shipLv('hull') } }),
-    A('cp_ram',       2, 14, lin(3, 0.4),    v => ({ target: 'one', mult: v * (1 + 0.2 * G.shipLv('bow')), debuffs: [{ id: 'stun', v: 1, t: 1.5 }] }),
-      { descV: { bow: () => 0.2 * G.shipLv('bow') } }),
+    // 核彈！！（原艦首衝撞）：全體；飛空艇每個部位都加成（傷害／暴擊率／暴擊傷害）
+    A('cp_ram',       2, 14, lin(2.0, 0.3),  v => { const b = G.shipSkillBonus(); return { target: 'all', mult: v * (1 + b.dmg), critBonus: b.crit, critDmgBonus: b.critDmg, fromShip: 'nuke' }; },
+      { descV: SHIP_SKILL_DESC }),
+    // 艦砲武裝齊射！！（原王牌砲手，改成主動）：全體；部位加成同核彈
+    A('cp_ace',       2, 16, lin(1.1, 0.2),  v => { const b = G.shipSkillBonus(); return { target: 'all', mult: v * (1 + b.dmg), critBonus: b.crit, critDmgBonus: b.critDmg, fromShip: 'barrage' }; },
+      { descV: SHIP_SKILL_DESC }),
     P('cp_gunner',    0, lin(0.2, 0.1),   'party', 'cannonDmg'),                               // 船砲傷害
     P('cp_navigator', 0, lin(0.005, 0.0025), 'party', 'shipDmg', { partyAlso: { shieldDur: 2, shieldAmt: 2, shieldDef: 1 }, rawKeys: ['shieldDur', 'shieldAmt', 'shieldDef'], descV: { now: r => lin(0.005, 0.0025)(r) * G.shipTotalLv() } }),   // 每 1 階部位 → 全隊傷害
-    P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true }),               // 船砲間隔 -秒
+    // 王牌砲手（原快速裝填）：船砲間隔 -0.5→-1.5 秒；船砲 15→35% 機率暴擊，暴擊傷害 ×2.5→×3.5
+    P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true, partyAlso: { cannonCrit: lin(15, 5), cannonCritDmg: lin(2.5, 0.25) }, rawKeys: ['cannonCrit', 'cannonCritDmg'] }),
     P('cp_crew',      1, lin(0.01, 0.005), 'party', 'balloonHp', { descV: { now: r => lin(0.01, 0.005)(r) * G.shipLv('balloon') } }),   // 氣球每 1 階 → 全隊生命
-    P('cp_ace',       2, lin(15, 5),      'party', 'cannonCrit', { raw: true }),               // 船砲暴擊率（暴擊 ×2.5）
   ],
 
   // 健身者：幫隊友平均分攤傷害、自己緩緩回血
@@ -400,6 +406,17 @@ G.ANIMALS = {
   owl:  { icon: '🦉', aura: 'crit',   stats: { hp: 0.4, atk: 0.5, def: 0.4 }, color: '#a07a50' },
   deer: { icon: '🦌', aura: 'regen',  stats: { hp: 0.7, atk: 0.3, def: 0.7 }, color: '#c08a50' },
 };
+// 飛船船長「核彈！！」「艦砲武裝齊射！！」：飛空艇每個部位每 1 階的加成
+G.SHIP_SKILL_BONUS = {
+  bow: { dmg: 0.15 }, cannon: { dmg: 0.15 }, engine: { dmg: 0.1 },
+  hull: { critDmg: 0.1 }, wing: { critDmg: 0.1 },
+  balloon: { crit: 4 }, charm: { crit: 4 },   // crit 是百分點
+};
+G.shipSkillBonus = () => {
+  const out = { dmg: 0, crit: 0, critDmg: 0 };
+  Object.entries(G.SHIP_SKILL_BONUS).forEach(([slot, b]) => Object.entries(b).forEach(([k, v]) => { out[k] += v * G.shipLv(slot); }));
+  return out;
+};
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
   golem:    { icon: '🗿', stats: { hp: 3.0, atk: 0.25, def: 2.0 }, spd: 0.7 },                     // 石魔人：肉盾
@@ -407,7 +424,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };

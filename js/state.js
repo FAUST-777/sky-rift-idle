@@ -193,7 +193,7 @@
     const ch = chOverride || G.charOf(who), out = { self: {}, party: {}, proc: [], special: {} };
     ch.passive.forEach(id => {
       const sk = id && G.skillDef(ch.cls, id), r = id && ch.skills[id];
-      if (!sk || !r) return;
+      if (!sk || !r || sk.type !== 'passive') return;
       const v = sk.v(r);
       if (sk.p === 'proc') out.proc.push({ fx: sk.fx, chance: sk.chance === 'v' ? v : 1, val: sk.val === 'v' ? v : sk.val, t: sk.t,
         // 附帶減益：字串 = 跟主效果一起觸發（狗狗狂吼）；物件 = 自己獨立擲機率（貓肉球拍打的暈眩）
@@ -226,7 +226,7 @@
   G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
-  const AURA_MAX = ['shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
+  const AURA_MAX = ['cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
   G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
