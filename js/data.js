@@ -79,7 +79,7 @@ G.CLASSES = {
   villager:    { core: 'atk',  range: 'one', dmgType: 'physical', color: '#8b6f47', cape: null,      ranged: false, mult: { hp: 1,    atk: 1,    def: 1 }, weapon: 'pitchfork' },
   bloodknight: { core: 'atk',  range: 'one', dmgType: 'physical', color: '#c0392b', cape: '#8b1a1a', ranged: false, mult: { hp: 1.15, atk: 1.35, def: 0.95 }, weapon: 'dualsword' },
   catknight:   { core: 'buff', range: 'all', dmgType: 'animal',   color: '#9aa3ad', cape: '#d98a3a', ranged: false, mult: { hp: 1.25, atk: 1.0,  def: 1.25 }, missile: 'cat', weapon: 'longsword' },
-  scholar:     { core: 'atk',  range: 'all', dmgType: 'arcane',   color: '#3f6fb5', cape: '#24477a', ranged: true,  mult: { hp: 0.9,  atk: 1.3,  def: 0.85 }, missile: 'book', weapon: 'openbook' },
+  scholar:     { core: 'buff', range: 'all', dmgType: 'arcane',   color: '#3f6fb5', cape: '#24477a', ranged: true,  mult: { hp: 0.9,  atk: 1.3,  def: 0.85 }, missile: 'book', weapon: 'openbook' },
   darkpainter: { core: 'spc',  range: 'all', dmgType: 'dark',     color: '#5b3d7a', cape: '#2a1a3d', ranged: true,  mult: { hp: 0.95, atk: 1.1,  def: 0.9 },  missile: 'paint', weapon: 'brush' },
   pirate:      { core: 'atk',  range: 'one', dmgType: 'physical', color: '#7a2f2f', cape: '#2b2b2b', ranged: true,  mult: { hp: 1.0,  atk: 1.4,  def: 0.85 }, missile: 'bullet', shots: 2, weapon: 'pistol' },
   wallbringer: { core: 'def',  range: 'one', dmgType: 'physical', color: '#8a8f99', cape: '#4a5560', ranged: false, mult: { hp: 1.5,  atk: 0.8,  def: 1.7 },  weapon: 'tower' },
