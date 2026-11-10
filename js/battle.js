@@ -447,7 +447,7 @@
         }
       }
       // 吸血
-      const ls = (src.st.lifesteal || 0) + (opts.drain || 0);
+      const ls = (src.st.lifesteal || 0) + (opts.drain || 0) + (!opts.skill && !opts.counter && this.party(src) ? this.aura.basicLifesteal || 0 : 0);   // basicLifesteal：鋼鐵陣線普攻吸血
       if (ls && src.alive) src.hp = Math.min(src.st.maxHp, src.hp + dmg * ls);
       // 吸貓狂熱累積（隊伍有人裝「吸貓狂熱」被動才有）
       const cap = G.frenzyCap();

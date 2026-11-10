@@ -423,7 +423,7 @@
 
   // ── 團隊特效：目前組合＋生效效果；全部特效表收在折疊區（展開狀態記在 UI，重繪不會自己收起）──
   function synBonusText(bonus) {
-    return Object.entries(bonus).map(([k, v]) => t('syn.b.' + k, { v: k === 'cannonInterval' ? v : Math.round(v * 100) })).join(t('syn.sep'));
+    return Object.entries(bonus).map(([k, v]) => t('syn.b.' + k, { v: k === 'cannonInterval' ? v : Math.round(v * 1000) / 10 })).join(t('syn.sep'));
   }
   function dtypeTag(type) {
     return `<span class="ctag" style="color:${G.DMG_TYPES[type]}">${t('dtype.' + type)}</span>`;

@@ -98,12 +98,12 @@ G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 //   mix   = 三人系別各不相同且剛好是這三種
 //   type  = 同系別人數達到 tiers 的門檻（取最高的一階）
 // bonus 欄位：spdPct 攻速  cdr 冷卻縮短  dmgPct 全體傷害  debuffDur 我方施加的減益持續時間
-//   critDmg 暴擊傷害（加在倍率上）  hpPct 生命  defPct 防禦  cannonInterval 船砲間隔秒數（取最短）
+//   critDmg 暴擊傷害（加在倍率上）  hpPct 生命  defPct 防禦  cannonInterval 船砲間隔秒數（取最短）  basicLifesteal 普攻吸血
 G.TEAM_SYNERGIES = [
   { id: 'wildhunt', mix: ['animal', 'physical', 'dark'],   bonus: { spdPct: 0.18, cannonInterval: 5 } },
   { id: 'triad',    mix: ['animal', 'physical', 'arcane'], bonus: { critDmg: 0.10, hpPct: 0.15, defPct: 0.01 } },
   { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.25 },      3: { cdr: 0.35 } } },
-  { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.16 } } },
+  { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.10, basicLifesteal: 0.005 } } },   // basicLifesteal：普攻吸血
   { id: 'arcane',   type: 'arcane',   tiers: { 2: { dmgPct: 0.15 },   3: { dmgPct: 0.27 } } },
   { id: 'dark',     type: 'dark',     tiers: { 2: { debuffDur: 0.2 }, 3: { debuffDur: 0.4 } } },
 ];
