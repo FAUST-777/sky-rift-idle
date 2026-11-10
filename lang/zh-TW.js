@@ -114,7 +114,7 @@ G.I18N['zh-TW'] = {
   'skill.dp_masterpiece.name': '傑作', 'skill.dp_masterpiece.desc': '全隊攻擊 +{v}%、攻速 +15%，10 秒',
   'skill.dp_ink.name': '暗影墨水', 'skill.dp_ink.desc': '普攻使敵人命中 -{v}%，3 秒',
   'skill.dp_corrode.name': '腐蝕顏料', 'skill.dp_corrode.desc': '普攻使敵人防禦 -{v}%，4 秒。全隊：飛空艇砲擊對破防中的敵人傷害 +{party_cannonVsDefDown}%',
-  'skill.dp_tempo.name': '筆觸節奏', 'skill.dp_tempo.desc': '全隊攻速 +{v}%；全隊對暈眩的敵人暴擊傷害 +{party_stunCritDmg}%',
+  'skill.dp_tempo.name': '筆觸節奏', 'skill.dp_tempo.desc': '全隊攻速 +{v}%；全隊對暈眩的敵人暴擊傷害 +{party_stunCritDmg}%，而且全隊技能打暈眩的敵人時最終傷害 ×5',
   'skill.dp_darkart.name': '黑暗藝術', 'skill.dp_darkart.desc': '攻擊 +{v}%',
   'skill.dp_gallery.name': '畫廊', 'skill.dp_gallery.desc': '施加的減益效果持續時間 +{v}%；普攻讓敵人攻速 -{slow}%，8 秒',
 

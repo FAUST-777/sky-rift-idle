@@ -460,6 +460,7 @@
       dmg *= 50 / (50 + this.defOf(target));
       dmg *= this.takenMult(target);
       dmg = Math.max(1, Math.round(dmg * G.rand(0.92, 1.08)));
+      if (opts.skill && this.party(src) && this.aura.stunSkillX && this.fxv(target, 'stun')) dmg *= 1 + this.aura.stunSkillX;   // 筆觸節奏：技能打暈眩敵人最終傷害 ×5
       if (crit && opts.critFinalX) dmg *= opts.critFinalX;   // 爆頭！！！：暴擊時最終傷害 ×3
       if (this.fxv(src, 'snipeX')) dmg *= 1 + this.fxv(src, 'snipeX');   // 狙擊爆頭！！！：最終傷害 ×10
       if (opts.skill && this.party(src) && this.aura.animalSkillX && src.st.dmgType === 'animal') dmg *= 1 + this.aura.animalSkillX;   // 牽繩節奏：動物系技能最終傷害 ×2

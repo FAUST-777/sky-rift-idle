@@ -114,7 +114,7 @@ G.I18N['zh-CN'] = {
   'skill.dp_masterpiece.name': '杰作', 'skill.dp_masterpiece.desc': '全队攻击 +{v}%、攻速 +15%，10 秒',
   'skill.dp_ink.name': '暗影墨水', 'skill.dp_ink.desc': '普攻使敌人命中 -{v}%，3 秒',
   'skill.dp_corrode.name': '腐蚀颜料', 'skill.dp_corrode.desc': '普攻使敌人防御 -{v}%，4 秒。全队：飞空艇炮击对破防中的敌人伤害 +{party_cannonVsDefDown}%',
-  'skill.dp_tempo.name': '笔触节奏', 'skill.dp_tempo.desc': '全队攻速 +{v}%；全队对眩晕的敌人暴击伤害 +{party_stunCritDmg}%',
+  'skill.dp_tempo.name': '笔触节奏', 'skill.dp_tempo.desc': '全队攻速 +{v}%；全队对眩晕的敌人暴击伤害 +{party_stunCritDmg}%，而且全队技能打眩晕的敌人时最终伤害 ×5',
   'skill.dp_darkart.name': '黑暗艺术', 'skill.dp_darkart.desc': '攻击 +{v}%',
   'skill.dp_gallery.name': '画廊', 'skill.dp_gallery.desc': '施加的减益效果持续时间 +{v}%；普攻让敌人攻速 -{slow}%，8 秒',
 
