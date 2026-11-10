@@ -421,8 +421,15 @@
   }
 
   // ── 團隊特效：目前組合＋生效效果；全部特效表收在折疊區（展開狀態記在 UI，重繪不會自己收起）──
-  function synBonusText(bonus) {
-    return Object.entries(bonus).map(([k, v]) => t('syn.b.' + k, { v: k === 'cannonInterval' ? v : Math.round(v * 1000) / 10 })).join(t('syn.sep'));
+  // pow：獸群之心（等）的加強比例；有的話顯示加強後的數值，後面用 (+x) 標出多加了多少
+  function synBonusText(bonus, pow) {
+    const show = v => Math.round(v * 1000) / 10;
+    return Object.entries(bonus).map(([k, v]) => {
+      if (k === 'cannonInterval') return t('syn.b.' + k, { v });
+      if (!pow) return t('syn.b.' + k, { v: show(v) });
+      const up = show(v * (1 + pow)), add = Math.round((up - show(v)) * 10) / 10;
+      return t('syn.b.' + k, { v: up }) + (add ? ` <span class="gold">(+${add})</span>` : '');
+    }).join(t('syn.sep'));
   }
   function dtypeTag(type) {
     return `<span class="ctag" style="color:${G.DMG_TYPES[type]}">${t('dtype.' + type)}</span>`;
@@ -432,7 +439,7 @@
     const lineup = syn.members.map(m => `<span class="syn-mem">${esc(G.whoName(m.who))} ${dtypeTag(m.type)}</span>`).join('');
     const active = syn.active.map(a => `<div class="syn-on"><b>✦ ${t(`syn.${a.id}.name`)}</b>
         <span class="muted">${a.n ? t('syn.cond.type', { type: t('dtype.' + G.TEAM_SYNERGIES.find(x => x.id === a.id).type), n: a.n }) : ''}</span>
-        <div>${synBonusText(G.scaleSynergy(a.bonus, G.synergyPow()))}${G.synergyPow() ? ` <span class="tag perk">${t('syn.herd', { v: Math.round(G.synergyPow() * 100) })}</span>` : ''}</div></div>`).join('');
+        <div>${synBonusText(a.bonus, G.synergyPow())}${G.synergyPow() ? ` <span class="tag perk">${t('syn.herd', { v: Math.round(G.synergyPow() * 100) })}</span>` : ''}</div></div>`).join('');
     const rows = G.TEAM_SYNERGIES.map(sy => {
       const on = syn.active.find(a => a.id === sy.id);
       if (sy.mix) {
