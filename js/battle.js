@@ -309,6 +309,7 @@
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
       if (this.party(u)) {
         m += this.aura.defPct || 0;
+        if (u.shield > 0 && this.aura.shieldDef) m += this.aura.shieldDef;   // 領航員：有護盾時防禦 +100%
         if (u.special.crisis && this.crisisOn()) m += u.special.crisis.v2;   // 學者危機意識
       }
       let d = u.st.def * Math.max(0.1, m);
@@ -749,7 +750,7 @@
       if (e.healOthers) this.partyAlive().filter(p => p !== u && p.kind !== 'summon').forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healOthers)); this.glow(p, '#7dff9a'); });   // 煙霧彈：其他隊友回血
       if (e.selfHeal) { this.heal(u, Math.round(u.st.maxHp * e.selfHeal)); this.glow(u, col); }
       // 護盾：美甲師「指尖藝術」加厚；不會蓋掉比較厚的舊盾
-      if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1))); p.shieldT = 8; this.glow(p, col); });
+      if (e.shield) this.partyAlive().forEach(p => { p.shield = Math.max(p.shield || 0, Math.round(p.st.maxHp * e.shield * (u.st.shieldPow || 1) * (1 + (this.aura.shieldAmt || 0)))); p.shieldT = 8 * (1 + (this.aura.shieldDur || 0)); this.glow(p, col); });   // 領航員：護盾量、時間 +200%
       if (e.partyType) this.partyAlive().filter(p => p.st.dmgType === e.partyType.type).forEach(p => e.partyType.fx.forEach(b => { this.addFx(p, b.id, bv(b), bt(b)); this.glow(p, col); }));   // 只給某系別的隊友
       if (e.synBoost) { this.synBoost = { v: Math.max(e.synBoost.v, this.synBoost && this.synBoost.t > 0 ? this.synBoost.v : 0), t: e.synBoost.t }; this.computeAura(); }   // 喵喵鼓舞：團隊特效暫時加強
       if (e.taunt) { u.taunt = { v: e.taunt.v, t: e.taunt.t }; this.glow(u, '#ffd23f'); }

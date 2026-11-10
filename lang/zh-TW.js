@@ -83,7 +83,7 @@ G.I18N['zh-TW'] = {
   'skill.cp_gunner.name': '砲術長',
   'skill.cp_gunner.desc': '飛空艇船砲傷害 +{v}%',
   'skill.cp_navigator.name': '領航員',
-  'skill.cp_navigator.desc': '飛空艇所有部位每 1 階，全隊傷害 +{v}%（目前 +{now}%）',
+  'skill.cp_navigator.desc': '飛空艇所有部位每 1 階，全隊傷害 +{v}%（目前 +{now}%）。另外全隊護盾量 +200%、護盾持續時間 +200%，身上有護盾時防禦 +100%',
   'skill.cp_quarter.name': '快速裝填',
   'skill.cp_quarter.desc': '船砲間隔 -{v} 秒',
   'skill.cp_crew.name': '熱氣球補給',

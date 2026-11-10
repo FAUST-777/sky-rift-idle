@@ -83,7 +83,7 @@ G.I18N['en'] = {
   'skill.cp_gunner.name': 'Master Gunner',
   'skill.cp_gunner.desc': 'Airship cannon damage +{v}%',
   'skill.cp_navigator.name': 'Navigator',
-  'skill.cp_navigator.desc': 'Party damage +{v}% per airship part level (now +{now}%)',
+  'skill.cp_navigator.desc': 'Party damage +{v}% per airship part level (now +{now}%). Also party shields are 200% stronger and last 200% longer, and allies with a shield get DEF +100%',
   'skill.cp_quarter.name': 'Quick Reload',
   'skill.cp_quarter.desc': 'Cannon interval -{v}s',
   'skill.cp_crew.name': 'Balloon Supplies',

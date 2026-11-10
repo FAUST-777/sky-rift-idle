@@ -259,7 +259,7 @@ G.SKILLS = {
     P('pi_quick',    1, lin(-0.5, 0.075), 'self', 'evade', { also: { iai: () => 1, snipeX: r => [1, 2, 3, 3.5, 4][r - 1] },
       descV: { snipe: r => [2, 3, 4, 4.5, 5][r - 1] }, rawKeys: ['snipe'] }),
     P('pi_ruthless', 1, lin(0.15, 0.1),  'self', 'critDmg'),
-    P('pi_riposte',  2, lin(0.6, 0.15),  'special', 'riposte'),
+    P('pi_riposte',  2, lin(1.99, 2),    'special', 'riposte'),   // 閃避反擊：每發 199%→999%
   ],
 
   // 城牆者：幫隊友扛傷、降隊友受傷、全隊防禦
@@ -369,7 +369,7 @@ G.SKILLS = {
     A('cp_ram',       2, 14, lin(3, 0.4),    v => ({ target: 'one', mult: v * (1 + 0.2 * G.shipLv('bow')), debuffs: [{ id: 'stun', v: 1, t: 1.5 }] }),
       { descV: { bow: () => 0.2 * G.shipLv('bow') } }),
     P('cp_gunner',    0, lin(0.2, 0.1),   'party', 'cannonDmg'),                               // 船砲傷害
-    P('cp_navigator', 0, lin(0.005, 0.0025), 'party', 'shipDmg', { descV: { now: r => lin(0.005, 0.0025)(r) * G.shipTotalLv() } }),   // 每 1 階部位 → 全隊傷害
+    P('cp_navigator', 0, lin(0.005, 0.0025), 'party', 'shipDmg', { partyAlso: { shieldDur: 2, shieldAmt: 2, shieldDef: 1 }, rawKeys: ['shieldDur', 'shieldAmt', 'shieldDef'], descV: { now: r => lin(0.005, 0.0025)(r) * G.shipTotalLv() } }),   // 每 1 階部位 → 全隊傷害
     P('cp_quarter',   1, lin(0.5, 0.25),  'party', 'captainCut', { raw: true }),               // 船砲間隔 -秒
     P('cp_crew',      1, lin(0.01, 0.005), 'party', 'balloonHp', { descV: { now: r => lin(0.01, 0.005)(r) * G.shipLv('balloon') } }),   // 氣球每 1 階 → 全隊生命
     P('cp_ace',       2, lin(15, 5),      'party', 'cannonCrit', { raw: true }),               // 船砲暴擊率（暴擊 ×2.5）
