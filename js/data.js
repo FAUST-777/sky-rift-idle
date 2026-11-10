@@ -141,6 +141,7 @@ const CURSE = { def: lin(0.2, 0.0125), slow: lin(0.2, 0.025) };   // 暗黑繪�
 const WALL = { reflect: lin(0.2, 0.075), regen: lin(0.005, 0.00125) };   // 盾牆者「盾牆！」的附加數值
 const CRAM = { spd: lin(0.4, 0.0925), t: r => [2, 3, 4, 4.5, 5][r - 1] };   // 臨時抱佛腳：隊友攻速、持續秒數
 const RALLY = { syn: lin(0.1, 0.025), animal: lin(0.07, 0.02) };   // 喵喵鼓舞：團隊特效加強、動物系技能傷害
+const WOLF = { slow: lin(0.25, 0.025), spd: lin(0.1, 0.025) };   // 狼之靈：自己攻速 -25%→-35%、全隊攻速 +10%→20%
 const WALK = { heal: lin(0.1, 0.0125), evade: lin(0.1, 0.0125), next: lin(0.1, 0.025) };   // 遛狗者散步時間的附加數值
 const A = (id, tier, cd, v, fx, extra) => Object.assign({ id, type: 'active', tier, max: 5, cd, v, fx }, extra);
 const P = (id, tier, v, p, key, extra) => Object.assign({ id, type: 'passive', tier, max: 5, v, p, key }, extra);
@@ -267,13 +268,14 @@ G.SKILLS = {
   //   持續 8 秒／冷卻 16 秒 ≈ 50% 覆蓋率；滿級野性之絆 +30% 持續 → 約 65%
   druid: [
     A('dr_bear',   0, 16, lin(0.15, 0.04),   v => ({ target: 'none', party: [{ id: 'defUp',  v, t: 8 }] })),
-    A('dr_wolf',   0, 16, lin(0.12, 0.03),   v => ({ target: 'none', party: [{ id: 'atkUp',  v, t: 8 }] })),
+    A('dr_wolf',   0, 16, lin(0.12, 0.03),   (v, r) => ({ target: 'none', party: [{ id: 'atkUp',  v, t: 8 }, { id: 'spdUp', v: WOLF.spd(r), t: 8 }], selfDebuff: [{ id: 'slow', v: WOLF.slow(r), t: 8 }] }),
+      { descV: { spd: WOLF.spd, slow: WOLF.slow } }),
     A('dr_owl',    1, 16, lin(6, 1.5),       v => ({ target: 'none', party: [{ id: 'critUp', v, t: 8 }] }), { raw: true }),
     A('dr_deer',   1, 18, lin(0.01, 0.003),  v => ({ target: 'none', party: [{ id: 'regen',  v, t: 6 }] })),
     A('dr_thorns', 2, 9,  lin(0.9, 0.15),    v => ({ target: 'all', mult: v, debuffs: [{ id: 'slow', v: 0.15, t: 4 }] })),
     P('dr_bond',   0, lin(0.1, 0.05),    'self', 'buffDur', { partyAlso: { hpPctOthers: lin(0.05, 0.0125), spdPctOthers: lin(0.01, 0.0125) } }),   // 自己施放的增益持續時間 +v；其他隊友最大生命 +5%→10%、攻速 +1%→6%
     P('dr_grove',  0, lin(0.04, 0.02),   'party', 'hpPct'),
-    P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen'),
+    P('dr_spirit', 1, lin(0.003, 0.0015), 'party', 'regen', { partyAlso: { hpPctOthers: lin(0.05, 0.0125) } }),   // 另外其他隊友最大生命 +5%→10%
     P('dr_wild',   1, lin(0.06, 0.04),   'self', 'atkPct'),
     P('dr_herd',   2, lin(0.1, 0.025),   'party', 'synergyPow', { partyAlso: { critHeal: 0.002 } }),   // 團隊特效數值 +10%→20%（相對）；全隊普攻暴擊回 0.2% 生命
   ],

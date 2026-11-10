@@ -141,13 +141,13 @@ G.I18N['en'] = {
   'skill.wb_thorns.name': 'Spiked Wall', 'skill.wb_thorns.desc': 'Reflects {v}% of damage taken',
 
   'skill.dr_bear.name': 'Bear Spirit', 'skill.dr_bear.desc': 'Party DEF +{v}% for 8s',
-  'skill.dr_wolf.name': 'Wolf Spirit', 'skill.dr_wolf.desc': 'Party ATK +{v}% for 8s',
+  'skill.dr_wolf.name': 'Wolf Spirit', 'skill.dr_wolf.desc': 'Party ATK +{v}% and attack speed +{spd}% for 8s; your own attack speed -{slow}% meanwhile',
   'skill.dr_owl.name': 'Owl Spirit', 'skill.dr_owl.desc': 'Party crit chance +{v}% for 8s',
   'skill.dr_deer.name': 'Deer Spirit', 'skill.dr_deer.desc': 'Party regenerates {v}% HP per second for 6s',
   'skill.dr_thorns.name': 'Thorn Snare', 'skill.dr_thorns.desc': '{v}% damage to all enemies, their attack speed -15% for 4s',
   'skill.dr_bond.name': 'Wild Bond', 'skill.dr_bond.desc': 'Buffs you cast last {v}% longer; other allies get max HP +{party_hpPctOthers}% and attack speed +{party_spdPctOthers}%',
   'skill.dr_grove.name': 'Grove Blessing', 'skill.dr_grove.desc': 'Party HP +{v}%',
-  'skill.dr_spirit.name': 'Nature Spirit', 'skill.dr_spirit.desc': 'Party regenerates {v}% HP per second',
+  'skill.dr_spirit.name': 'Nature Spirit', 'skill.dr_spirit.desc': 'Party regenerates {v}% HP per second; other allies max HP +{party_hpPctOthers}%',
   'skill.dr_wild.name': 'Wildness', 'skill.dr_wild.desc': 'ATK +{v}%',
   'skill.dr_herd.name': 'Heart of the Herd', 'skill.dr_herd.desc': 'Team synergy bonuses are {v}% stronger; party basic-attack crits heal the attacker for {party_critHeal}% max HP',
 

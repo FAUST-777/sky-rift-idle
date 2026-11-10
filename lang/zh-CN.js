@@ -141,13 +141,13 @@ G.I18N['zh-CN'] = {
   'skill.wb_thorns.name': '尖刺城墙', 'skill.wb_thorns.desc': '反弹受到伤害的 {v}%',
 
   'skill.dr_bear.name': '熊之灵', 'skill.dr_bear.desc': '全队防御 +{v}%，8 秒',
-  'skill.dr_wolf.name': '狼之灵', 'skill.dr_wolf.desc': '全队攻击 +{v}%，8 秒',
+  'skill.dr_wolf.name': '狼之灵', 'skill.dr_wolf.desc': '全队攻击 +{v}%、攻速 +{spd}%，8 秒；期间自己攻速 -{slow}%',
   'skill.dr_owl.name': '猫头鹰之灵', 'skill.dr_owl.desc': '全队暴击率 +{v}%，8 秒',
   'skill.dr_deer.name': '鹿之灵', 'skill.dr_deer.desc': '全队每秒恢复 {v}% 生命，6 秒',
   'skill.dr_thorns.name': '荆棘缠绕', 'skill.dr_thorns.desc': '全体 {v}% 伤害，敌人攻速 -15%，4 秒',
   'skill.dr_bond.name': '野性之绊', 'skill.dr_bond.desc': '自己施放的增益持续时间 +{v}%；其他队友最大生命 +{party_hpPctOthers}%、攻速 +{party_spdPctOthers}%',
   'skill.dr_grove.name': '林地祝福', 'skill.dr_grove.desc': '全队生命 +{v}%',
-  'skill.dr_spirit.name': '自然之灵', 'skill.dr_spirit.desc': '全队每秒恢复 {v}% 生命',
+  'skill.dr_spirit.name': '自然之灵', 'skill.dr_spirit.desc': '全队每秒回复 {v}% 生命；其他队友最大生命 +{party_hpPctOthers}%',
   'skill.dr_wild.name': '野性', 'skill.dr_wild.desc': '攻击 +{v}%',
   'skill.dr_herd.name': '兽群之心', 'skill.dr_herd.desc': '全队团队特效的数值 +{v}%；全队普攻暴击时，出手的人回复 {party_critHeal}% 最大生命',
 
