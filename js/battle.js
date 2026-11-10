@@ -487,7 +487,7 @@
           const a = this.aura;
           const rc = a.reflectCrit && Math.random() * 100 < (a.reflectCritBase || 0) + this.critOf(target);
           const cm = rc ? target.st.critDmg + (a.critDmg || 0) + (a.reflectCritDmg || 0) + (a.reflectCritAdd || 0) : 1;
-          const dm = a.reflectDef ? 1 + this.defOf(target) * a.reflectDef / 100 : 1;   // 倒刺美甲：被打者的防禦轉成反彈增傷（每 1 點防禦 +1%）
+          const dm = a.reflectDef ? 1 + this.defOf(target) * a.reflectDef / 100 : 1;   // 倒刺美甲：被打者的防禦轉成反彈增傷（每 1 點防禦 +0.34%）
           const rx = 1 + this.fxv(target, 'reflectX');   // 鹿之靈：反彈最終傷害 ×5
           this.damage(src, Math.max(1, Math.round(dmg * r * cm * dm * rx)), '#ff9ad5', rc, true);
         }

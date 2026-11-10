@@ -178,7 +178,7 @@ G.I18N['en'] = {
   'skill.mc_spikes.name': 'Crystal Spikes', 'skill.mc_spikes.desc': 'Party reflect +{v}% for 8s',
   'skill.mc_topcoat.name': 'Top Coat', 'skill.mc_topcoat.desc': 'Party DEF +{v}% and reflect +50% for 10s',
   'skill.mc_salon.name': 'Luxury Salon', 'skill.mc_salon.desc': 'Party reflect +{v}% for 8s and a shield worth 12% max HP',
-  'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party permanently reflects {v}% of damage taken, and reflects can crit (using the hit ally’s crit rate and crit damage). The hit ally’s DEF also boosts the reflect: +1% reflect damage per point of DEF',
+  'skill.mc_thorn.name': 'Barbed Nails', 'skill.mc_thorn.desc': 'Party permanently reflects {v}% of damage taken, and reflects can crit (using the hit ally’s crit rate and crit damage). The hit ally’s DEF also boosts the reflect: +0.34% reflect damage per point of DEF',
   'skill.mc_harden.name': 'Hardener', 'skill.mc_harden.desc': 'Party DEF +{v}%',
   'skill.mc_gelcoat.name': 'Gel Care', 'skill.mc_gelcoat.desc': 'HP +{v}%',
   'skill.mc_mirror.name': 'Mirror Finish', 'skill.mc_mirror.desc': 'Party reflect damage +{v}%; reflect crits deal +{party_reflectCritDmg}% extra crit damage',
