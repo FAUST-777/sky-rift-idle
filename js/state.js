@@ -419,11 +419,11 @@
     return 0;
   };
 
-  G.makeItem = function (floor, boss) {
-    const slot = G.pick(G.SLOTS);
+  G.makeItem = function (floor, boss, force = {}) {   // force：指定 { slot, rarity }（測試用）
+    const slot = force.slot || G.pick(G.SLOTS);
     const bases = G.ITEM_BASES[slot];
     const baseIdx = G.randInt(0, bases.length - 1);
-    const rarity = G.rollRarity(boss, floor);
+    const rarity = force.rarity !== undefined ? force.rarity : G.rollRarity(boss, floor);
     const R = G.RARITY[rarity];
     const scale = (1 + (floor - 1) * 0.22) * R.mult;
     const stats = {};

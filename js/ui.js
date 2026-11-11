@@ -947,7 +947,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'exchange': exchangeModal(); break;
       case 'secret': {   // 神秘模式：測試用密碼
         const inp = $('secretCode'), code = inp ? inp.value.trim() : '';
-        if (code === '7777777') { S.gold += 25000000; S.crystal += 9999; G.save(); UI.toast(t('toast.secretOk')); }
+        if (code === '666666') {   // 15 件天櫻裝備：最高層的等級，5 個部位各 3 件（不受背包上限限制）
+          const f = Math.max(1, S.maxFloor);
+          for (let i = 0; i < 15; i++) S.inventory.push(G.makeItem(f, false, { slot: G.SLOTS[i % G.SLOTS.length], rarity: G.PINK }));
+          G.save(); G.emit('inventory'); UI.toast(t('toast.secretPink', { n: 15, f }));
+        } else if (code === '878787') {   // 6 種船艙寵物各一隻，機制隨機
+          G.HOME_PETS.forEach(k => S.hpets.push({ uid: S.uid++, kind: k.id, perk: G.pick(G.PET_PERKS).id }));
+          G.save(); G.emit('home'); UI.toast(t('toast.secretPets', { n: G.HOME_PETS.length }));
+        } else if (code === '7777777') { S.gold += 25000000; S.crystal += 9999; G.save(); UI.toast(t('toast.secretOk')); }
         else UI.toast(t('toast.secretBad'));
         if (inp) inp.value = '';
         break;

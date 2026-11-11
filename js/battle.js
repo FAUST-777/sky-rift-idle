@@ -68,6 +68,10 @@
       // 主背景圖（紫暮裂空）：有圖就蓋掉程式畫的漸層天空、浮島、遠雲，只留近雲飄動
       this.bgImg = this.textures.exists('bg_main') ? this.add.image(0, 0, 'bg_main').setOrigin(0).setDisplaySize(W, H).setDepth(-3) : null;
       if (this.bgImg) { this.cloudFar.setVisible(false); this.cloudNear.setAlpha(0.3); }
+      // 自製視差圖層：遠山慢、地板快（圖存 2 倍解析度，tileScale 0.5 顯示）
+      this.mountains = this.textures.exists('bg_mount') ? this.add.tileSprite(0, 165, W, 58, 'bg_mount').setOrigin(0).setTileScale(0.5).setDepth(-2.5) : null;
+      this.floorImg = this.textures.exists('bg_floor');
+      if (this.floorImg) this.ground.setTexture('bg_floor').setTileScale(0.5).setPosition(0, GROUND - 21).setSize(W, H - GROUND + 21);
       this.drawShip();
       this.applyFloorTheme();
 
@@ -96,7 +100,7 @@
       const groundTop = ['#eef7ff', '#e4ecff', '#e3d9ff', '#b9a6e8', '#6d58a8'][tier];
       const groundBot = ['#a9c7e0', '#97acd6', '#9d8fd0', '#7a62b8', '#3c2c70'][tier];
       this.tex('groundTex', 128, H - GROUND + 6, (ctx, w, h) => G.ART.drawGround(ctx, w, h, groundTop, groundBot));
-      this.ground.setTexture('groundTex');
+      if (!this.floorImg) this.ground.setTexture('groundTex');
       const islandColor = ['#b9d7ee', '#a6bde6', '#ab9fe0', '#7b66bf', '#3f2f78'][tier];
       this.tex('islands', 512, 160, (ctx, w, h) => G.ART.drawIslands(ctx, w, h, islandColor));
       if (!this.islandsLayer) this.islandsLayer = this.add.tileSprite(0, 40, W, 160, 'islands').setOrigin(0).setDepth(-1);
@@ -1216,7 +1220,8 @@
       const walking = this.mode === 'walk' || this.mode === 'enter';
       const speed = 70 * this.travelSpeed();
       if (walking) {
-        this.ground.tilePositionX += speed * dt;
+        this.ground.tilePositionX += speed * dt * (this.floorImg ? 2 : 1);   // tileScale 0.5 → 位移要 ×2 才跟角色步伐一致
+        if (this.mountains) this.mountains.tilePositionX += speed * 0.15 * 2 * dt;   // 遠山：地板的 15%
         this.cloudNear.tilePositionX += speed * 0.5 * dt;
         this.cloudFar.tilePositionX += speed * 0.2 * dt;
         if (this.islandsLayer) this.islandsLayer.tilePositionX += speed * 0.1 * dt;

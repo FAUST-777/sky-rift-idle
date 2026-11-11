@@ -522,6 +522,8 @@ G.I18N['zh-CN'] = {
   'settings.secretPh': '请输入密码',
   'settings.secretOk': '确认',
   'toast.secretOk': '神秘力量降临！获得 25M 金币＋9999 云晶',
+  'toast.secretPink': '🌸 获得 {n} 件第 {f} 层天樱装备！',
+  'toast.secretPets': '🐾 获得 {n} 只船舱宠物！',
   'toast.secretBad': '密码错误',
   'toast.notEnoughGold': '金币不够', 'toast.notEnoughCrystal': '云晶不够', 'toast.bought': '买了 {name}，到家园点空格摆放',
   'toast.capReached': '飞空艇只能到第 {n} 层，升级「侧面稳定翼」或「引擎」才能继续往上', 'toast.reviveNeed': '云晶不够，需要 {n} 💎',

@@ -522,6 +522,8 @@ G.I18N['en'] = {
   'settings.secretPh': 'Enter password',
   'settings.secretOk': 'OK',
   'toast.secretOk': 'Mysterious power! +25M gold and +9999 crystals',
+  'toast.secretPink': '🌸 Got {n} floor-{f} Sakura items!',
+  'toast.secretPets': '🐾 Got {n} cabin pets!',
   'toast.secretBad': 'Wrong password',
   'toast.notEnoughGold': 'Not enough gold', 'toast.notEnoughCrystal': 'Not enough Cloud Crystals', 'toast.bought': 'Bought {name}. Place it in your Home',
   'toast.capReached': 'Your airship only reaches Floor {n}. Upgrade the Side Stabilizers or Engine to go higher', 'toast.reviveNeed': 'Not enough Cloud Crystals. Need {n} 💎',
