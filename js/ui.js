@@ -751,7 +751,7 @@
       const tag = el.querySelector('.hpet-tag'), pk = perkOf(p.perk);
       let txt = pk.icon, cls = '';
       if (own[p.perk] !== uid) { txt = t('home.petDupShort'); cls = 'dup'; }
-      else if (p.perk === 'revive' && (G.petReviveAt || 0) > now) txt = `💫 ${Math.ceil((G.petReviveAt - now) / 1000)}s`;
+      else if (p.perk === 'revive' && (G.petReviveAt || 0) > now) txt = `💀 ${Math.ceil((G.petReviveAt - now) / 1000)}s`;
       if (tag.textContent !== txt) tag.textContent = txt;
       tag.className = 'hpet-tag ' + cls;
     });

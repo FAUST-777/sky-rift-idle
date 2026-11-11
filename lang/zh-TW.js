@@ -160,7 +160,7 @@ G.I18N['zh-TW'] = {
   'log.petGet': '🐾 撿到寵物「{name}」（{perk}）！放進船艙就會生效',
   'toast.petGet': '🐾 撿到寵物：{name}！',
   'toast.petFull': '船艙最多放 {n} 隻寵物',
-  'battle.petRevive': '💫 寵物復活！',
+  'battle.petRevive': '💀 寵物復活！',
   'buff.petRevive.name': '寵物復活冷卻',
   'buff.petRevive.desc': '寵物的復活還要 {s} 秒才能再用',
   'hpet.collie': '邊境牧羊犬',

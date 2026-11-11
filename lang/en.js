@@ -160,7 +160,7 @@ G.I18N['en'] = {
   'log.petGet': '🐾 Found a pet: {name} ({perk})! Put it in the cabin to activate',
   'toast.petGet': '🐾 New pet: {name}!',
   'toast.petFull': 'The cabin holds up to {n} pets',
-  'battle.petRevive': '💫 Pet revive!',
+  'battle.petRevive': '💀 Pet revive!',
   'buff.petRevive.name': 'Pet Revive Cooldown',
   'buff.petRevive.desc': 'Pet revive ready in {s}s',
   'hpet.collie': 'Border Collie',
