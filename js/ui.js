@@ -710,13 +710,16 @@
       </div>`;
     };
     const inCabin = eq.map(u => G.hpet(u)).filter(Boolean).map(p => row(p, true)).join('');
-    const stored = S.hpets.filter(p => !eq.includes(p.uid)).map(p => row(p, false)).join('');
+    // 倉庫：像裝備背包一樣並排小格，同品種排在一起（再依機制排），點開才看詳細
+    const order = id => G.HOME_PETS.findIndex(k => k.id === id), porder = id => G.PET_PERKS.findIndex(k => k.id === id);
+    const stored = S.hpets.filter(p => !eq.includes(p.uid)).sort((a, b) => order(a.kind) - order(b.kind) || porder(a.perk) - porder(b.perk))
+      .map(p => `<button class="item hpet-tile" data-act="hpetinfo" data-id="${p.uid}">${petSprite(G.hpetKind(p.kind), 'still')}<span class="hpet-perk">${perkOf(p.perk).icon}</span><small>${t(`hpet.${p.kind}`)}</small></button>`).join('');
     return `<div class="card">
       <h3>🐾 ${t('home.hpets')} <small>${t('home.hpetsInfo', { n: eq.length, cap: G.PET_SLOTS })}</small></h3>
       <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t('home.hpetsHelp')}</p>
       ${inCabin || `<p class="muted" style="font-size:12px">${t('home.hpetsEmpty')}</p>`}
       <div class="slot-label" style="margin-top:8px">${t('home.hpetStore', { n: S.hpets.length - eq.length })}</div>
-      ${stored || `<p class="muted" style="font-size:12px">${t('home.hpetStoreEmpty')}</p>`}
+      ${stored ? `<div class="inv">${stored}</div>` : `<p class="muted" style="font-size:12px">${t('home.hpetStoreEmpty')}</p>`}
     </div>`;
   }
 
@@ -1042,6 +1045,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'homebg': G.setHomeBg(+d.v); break;
       case 'hpeteq': G.equipPet(+d.id); break;
       case 'hpetun': G.unequipPet(+d.id); break;
+      case 'hpetinfo': {   // 倉庫寵物詳細：放進船艙／賣出
+        const p = G.hpet(+d.id); if (!p) break;
+        const k = G.hpetKind(p.kind), pk = perkOf(p.perk);
+        UI.modal(`<div class="row" style="gap:12px;align-items:center"><div style="width:96px;flex:none">${petSprite(k, 'still')}</div>
+            <div><h2 style="margin:0">${t(`hpet.${p.kind}`)}</h2><span class="muted" style="font-size:12px">${t(`hpetMove.${k.move}`)}</span></div></div>
+          <p><b class="gold">${pk.icon} ${t(`hperk.${p.perk}`)}</b><br><span class="muted" style="font-size:13px">${t(`hperk.${p.perk}.desc`)}</span></p>
+          <div class="modal-actions"><button class="btn" data-act="close">${t('common.close')}</button>
+            <button class="btn danger" data-act="hpetrel" data-id="${p.uid}">${t('home.relBtn', { n: G.HPET_SELL })}</button>
+            <button class="btn good" data-act="hpeteq2" data-id="${p.uid}">${t('home.petIn')}</button></div>`);
+        break;
+      }
+      case 'hpeteq2': UI.close(); G.equipPet(+d.id); break;
       case 'hpetrel': {
         const p = G.hpet(+d.id); if (!p) break;
         UI.modal(`<h2>${t('home.relTitle')}</h2><p>${t('home.relBody', { name: t(`hpet.${p.kind}`), perk: t(`hperk.${p.perk}`), n: G.HPET_SELL })}</p>

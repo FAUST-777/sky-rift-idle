@@ -314,3 +314,8 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
   #toast { bottom: 24px; }
   #modal .modal-card { max-width: 440px; }
 }
+
+/* 寵物倉庫小格 */
+.hpet-tile { border-color: var(--line); justify-content: flex-end; gap: 2px; overflow: hidden; }
+.hpet-tile .hpet-spr { width: 82%; }
+.hpet-perk { position: absolute; top: 2px; right: 3px; font-size: 12px; line-height: 1; }
