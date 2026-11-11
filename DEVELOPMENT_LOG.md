@@ -2623,3 +2623,18 @@
 **做法**：遠山 y 165 → 171（往下 6px），山腳直接接到草邊。
 
 **驗證**（無頭 Chrome 前後截圖）：原本山腳與草地間有一條藍線；調整後沒有。無錯誤。
+
+## 第 142 輪（2026-11-11）：取名用注音選字按 Enter 會直接送出（先不上線）
+
+**問題**：初始化取名時用注音輸入法，選完字按 Enter 是要確認選字，遊戲卻連名字一起送出。
+
+**原因**：全域 keydown 只判斷 `e.key === 'Enter'` 就呼叫 `submitName()`，沒有排除輸入法組字中的 Enter。
+
+**做法**（`ui.js`）：Enter 送出前略過三種情況：
+- `e.isComposing`（Chrome／Edge 選字中）
+- `e.keyCode === 229`（部分瀏覽器選字中）
+- `compositionend` 之後 100ms 內的 Enter（Safari 會先結束組字再送 Enter）
+
+送出按鈕不受影響；沒在選字時按 Enter 仍可送出。
+
+**驗證**（無頭 Chrome 模擬事件）：isComposing／keyCode 229／剛 compositionend 的 Enter → 名稱視窗都還在；之後正常 Enter → 送出。無錯誤。

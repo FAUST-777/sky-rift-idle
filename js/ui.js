@@ -1143,8 +1143,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       if (e.target.id === 'nameInput') UI.nameCount && UI.nameCount();
       if (e.target.id === 'friendInput') UI.friendDraft = e.target.value;
     });
+    // 注音／倉頡等輸入法：選字時按的 Enter 只是確認選字，不能送出名稱
+    //   Chrome 選字中 isComposing = true（keyCode 229）；Safari 會先結束組字再送 Enter，所以剛結束組字的那一下也略過
+    let composeEndAt = 0;
+    document.addEventListener('compositionend', () => { composeEndAt = Date.now(); });
     document.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
+      if (e.isComposing || e.keyCode === 229 || Date.now() - composeEndAt < 100) return;
       if (e.target.id === 'nameInput') submitName();
     });
     G.on('ship', () => UI.refresh(['ship', 'home', 'adventure']));
