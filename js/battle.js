@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 (function () {
   const W = 480, H = 300, GROUND = 238;
+  const RES = Math.min(3, Math.max(2, Math.round(window.devicePixelRatio || 1)));   // 戰鬥畫布解析度倍數（座標仍是 480×300）
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
   const BUFF_IDS = ['breeze', 'atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
@@ -36,6 +37,9 @@
     }
 
     create() {
+      this.cameras.main.setZoom(RES).centerOn(W / 2, H / 2);
+      const addText = this.add.text.bind(this.add);
+      this.add.text = (...a) => addText(...a).setResolution(RES);   // 文字跟著畫布解析度，放大才不會糊
       this.texVer = 0;
       this.units = [];
       this.enemies = [];
@@ -716,7 +720,12 @@
       u.hp -= left;
       if (!this.doomBlasting && u.doomStacks) u.doomStacks.forEach(s => { s.acc += amount; });   // 死亡詛咒：每層都記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
-      if (!quiet) this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true });
+      // 受擊閃一下：先停掉上一次的閃爍再從 1 開始，不然連續被打會停在半透明
+      if (!quiet && u.alive) {
+        if (u.flashTw) u.flashTw.stop();
+        u.img.setAlpha(1);
+        u.flashTw = this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true, onComplete: () => { u.flashTw = null; if (u.alive) u.img.setAlpha(1); } });
+      }
       if (u.hp <= 0 && this.party(u) && this.wraiths && this.wraiths.length) {   // 怨靈召喚：頭上的怨靈代替死靈倒下，生命回滿
         const w = (this.wraiths || []).find(x => x.owner === u);
         if (w) {
@@ -1041,6 +1050,7 @@
     }
 
     kill(u) {
+      if (u.flashTw) { u.flashTw.stop(); u.flashTw = null; }
       u.alive = false;
       u.hp = 0;
       u.fx = {};
@@ -1454,7 +1464,7 @@
     G.game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'battle',
-      width: W, height: H,
+      width: W * RES, height: H * RES,
       backgroundColor: '#9fd8ff',
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
       render: { antialias: true },

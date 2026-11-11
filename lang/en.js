@@ -161,6 +161,8 @@ G.I18N['en'] = {
   'battle.petRevive': '💫 Pet revive!',
   'buff.petRevive.name': 'Pet Revive Cooldown',
   'buff.petRevive.desc': 'Pet revive ready in {s}s',
+  'hpet.collie': 'Border Collie',
+  'hpet.jellyShroom': 'Moon Jelly · Mushroom Cap',
   'core.atk': 'Attack', 'core.buff': 'Support', 'core.def': 'Defense',
   'range.all': 'All enemies', 'range.one': 'Single target',
   'dtype.physical': 'Physical', 'dtype.animal': 'Animal', 'dtype.arcane': 'Arcane', 'dtype.dark': 'Dark',

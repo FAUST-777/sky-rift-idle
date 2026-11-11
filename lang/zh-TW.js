@@ -161,6 +161,8 @@ G.I18N['zh-TW'] = {
   'battle.petRevive': '💫 寵物復活！',
   'buff.petRevive.name': '寵物復活冷卻',
   'buff.petRevive.desc': '寵物的復活還要 {s} 秒才能再用',
+  'hpet.collie': '邊境牧羊犬',
+  'hpet.jellyShroom': '月光水母・菇傘',
   'core.atk': '攻擊', 'core.buff': '輔助', 'core.def': '防禦',
   'range.all': '全體', 'range.one': '單體',
   'dtype.physical': '物理', 'dtype.animal': '動物', 'dtype.arcane': '奧術', 'dtype.dark': '黑暗',

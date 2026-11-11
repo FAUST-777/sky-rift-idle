@@ -729,7 +729,7 @@
     scene.querySelectorAll('.hpet').forEach(el => {
       const uid = +el.dataset.hpet, p = G.hpet(uid); if (!p) return;
       const k = G.hpetKind(p.kind), fly = k.move === 'float';
-      const area = fly ? { x0: 8, x1: 92, y0: 22, y1: 60 } : { x0: 6, x1: 94, y0: 70, y1: 96 };
+      const area = fly ? { x0: 6, x1: 94, y0: 16, y1: 80 } : { x0: 6, x1: 94, y0: 85, y1: 98 };   // 陸生：床底以下的地板；水母：大半個房間
       let s = petPos[uid];
       if (!s) s = petPos[uid] = { x: G.rand(area.x0, area.x1), y: G.rand(area.y0, area.y1), tx: 0, ty: 0, wait: G.rand(0, 2), dir: 1, ph: Math.random() * 6 };
       if (s.wait > 0) { s.wait -= dt; if (s.wait <= 0) { s.tx = G.rand(area.x0, area.x1); s.ty = G.rand(area.y0, area.y1); } }
@@ -773,8 +773,8 @@
     const rows = G.NETS.map((n, i) => {
       const own = net.owned.includes(i), using = net.eq === i;
       const price = [n.gold ? `${G.fmt(n.gold)}💰` : '', n.crystal ? `${n.crystal}💎` : ''].filter(Boolean).join(' ');
-      const btn = using ? `<button class="btn small on" disabled>${t('ship.using')}</button>`
-        : own ? `<button class="btn small good" data-act="neteq" data-i="${i}">${t('ship.equip')}</button>`
+      const btn = using ? `<button class="btn small ship-using" disabled>${t('ship.using')}</button>`
+        : own ? `<button class="btn small ship-equip" data-act="neteq" data-i="${i}">${t('ship.equip')}</button>`
         : `<button class="btn small primary" data-act="netbuy" data-i="${i}">${price}</button>`;
       return `<div class="model ${using ? 'using' : ''}"><span class="tier">${n.icon}</span>
         <div class="grow"><b>${t(`net.${n.id}`)}</b><div class="muted" style="font-size:11px">${t('net.rate', { p: Math.round(n.rate * 100) })}</div></div>${btn}</div>`;
