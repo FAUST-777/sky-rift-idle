@@ -1505,9 +1505,13 @@
       // 貓哈氣爆甲的全隊效果
       if (this.aura.vsStun || this.aura.cannonCut) out.push({ id: 'hiss', icon: G.FX_ICON.hiss, val: `+${pct(this.aura.vsStun || 0)}%`, p: { v: pct(this.aura.vsStun || 0), cut: this.aura.cannonCut || 0 } });
       const sh = party.reduce((a, u) => a + (u.shield || 0), 0);
-      if (sh > 0) out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh) } });
+      if (sh > 0) {   // 護盾剩餘秒數：多人時間不同就顯示範圍（最快～最久）
+        const ts = party.filter(u => u.shield > 0 && u.shieldT > 0).map(u => Math.ceil(u.shieldT));
+        const lo = Math.min(...ts), hi = Math.max(...ts);
+        out.push({ id: 'shield', icon: G.FX_ICON.shield, val: G.fmt(sh), p: { v: G.fmt(sh), s: !ts.length ? '?' : lo === hi ? hi : `${lo}～${hi}` } });
+      }
       const taunter = party.find(u => u.taunt.t > 0);
-      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: taunter.minion ? G.t('minion.' + taunter.minion) : G.whoName(taunter.key) } });
+      if (taunter) out.push({ id: 'taunt', icon: G.FX_ICON.taunt, val: `${Math.ceil(taunter.taunt.t)}s`, p: { name: taunter.minion ? G.t('minion.' + taunter.minion) : G.whoName(taunter.key), s: Math.ceil(taunter.taunt.t) } });
       // 敵人 debuff 不放這裡，改顯示在每隻敵人腳下（drawDebuffLabel）
       return out;
     }
