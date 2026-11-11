@@ -687,7 +687,7 @@
       const f = G.FURNITURE.find(z => z.id === id);
       return `<button class="chip ${UI.placing === id ? 'on' : ''}" data-act="pick" data-id="${id}">${furnIcon(f, 'sm')} ${t(`furniture.${id}`)} ×${n}</button>`;
     }).join('');
-    const shop = G.FURNITURE.map(f => `<button data-act="buy" data-id="${f.id}"><b>${furnIcon(f, 'shop')}</b>${t(`furniture.${f.id}`)}${f.collect ? ` <span class="tag passive">${t('home.collect')}</span>` : ''}<br>
+    const shop = G.FURNITURE.map(f => `<button data-act="buy" data-id="${f.id}"><b>${furnIcon(f, 'shop')}</b>${t(`furniture.${f.id}`)}<br>
       <small class="muted">${f.cur === 'gold' ? G.fmt(f.price) + '💰' : f.price + '💎'}・${t('home.comfortPlus', { n: f.comfort })}</small></button>`).join('');
 
     return `

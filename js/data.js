@@ -622,19 +622,11 @@ G.SHIP_PAINTS = ['#b5523b', '#3b6fb5', '#3b8f5a', '#7a4bb5', '#d4a017', '#3a3a3a
 // ── 家具與收藏品（名稱：furniture.<id>）────────────────────────────────────
 // comfort = 舒適度（每 1 點 = 離線收益 +1%）；船艙固定 8 格，所以數值是舊版（最多 36 格）的 4.5 倍；cur = 用金幣(gold)或雲晶(crystal)買
 G.DECOR_COMFORT = 30;   // 圖片家具的舒適度（全部一樣）
+// 第 155 輪刪掉的舊家具：讀檔時收掉並照原價退錢 [價格, 幣別]
+G.OLD_FURNITURE = { plant: [60, 'gold'], barrel: [80, 'gold'], lamp: [90, 'gold'], chair: [100, 'gold'], bed: [150, 'gold'], rug: [180, 'gold'],
+  shelf: [260, 'gold'], globe: [500, 'gold'], compass: [10, 'crystal'], egg: [25, 'crystal'], star: [40, 'crystal'] };
 G.FURNITURE = [
-  { id: 'plant',   icon: '🌿', price: 60,  cur: 'gold',    comfort: 5 },
-  { id: 'barrel',  icon: '🛢️', price: 80,  cur: 'gold',    comfort: 5 },
-  { id: 'lamp',    icon: '🏮', price: 90,  cur: 'gold',    comfort: 5 },
-  { id: 'chair',   icon: '🪑', price: 100, cur: 'gold',    comfort: 5 },
-  { id: 'bed',     icon: '🛏️', price: 150, cur: 'gold',    comfort: 9 },
-  { id: 'rug',     icon: '🧶', price: 180, cur: 'gold',    comfort: 9 },
-  { id: 'shelf',   icon: '📚', price: 260, cur: 'gold',    comfort: 14 },
-  { id: 'globe',   icon: '🌐', price: 500, cur: 'gold',    comfort: 23 },
-  { id: 'compass', icon: '🧭', price: 10,  cur: 'crystal', comfort: 27, collect: true },
-  { id: 'egg',     icon: '🥚', price: 25,  cur: 'crystal', comfort: 45, collect: true },
-  { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 68, collect: true },
-  // 第 154 輪新增：圖片家具（assets/furniture/<id>.webp），舒適度一律 G.DECOR_COMFORT，價格依造型高低
+  // 圖片家具（第 154 輪，assets/furniture/<id>.webp），舒適度一律 G.DECOR_COMFORT，價格依造型高低；第 155 輪刪掉舊的 emoji 家具
   { id: 'typewriter', img: true, price: 3000, cur: 'gold', comfort: G.DECOR_COMFORT },
   { id: 'octopus', img: true, price: 3500, cur: 'gold', comfort: G.DECOR_COMFORT },
   { id: 'cake', img: true, price: 4000, cur: 'gold', comfort: G.DECOR_COMFORT },

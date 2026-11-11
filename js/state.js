@@ -172,6 +172,10 @@
       delete S.home[k];
     });
     S.hpetEq = (S.hpetEq || []).filter(u => S.hpets.some(p => p.uid === u)).slice(0, G.PET_SLOTS);
+    // 第 155 輪：舊家具刪除 → 擺著的、倉庫裡的都收掉，照原價退金幣／雲晶
+    const refund = id => { const o = G.OLD_FURNITURE[id]; if (!o) return; if (o[1] === 'gold') S.gold += o[0]; else S.crystal += o[0]; };
+    Object.keys(S.home).forEach(k => { if (!G.FURNITURE.some(f => f.id === S.home[k])) { refund(S.home[k]); delete S.home[k]; } });
+    Object.keys(S.furniture).forEach(id => { if (!G.FURNITURE.some(f => f.id === id)) { for (let i = 0; i < (S.furniture[id] || 0); i++) refund(id); delete S.furniture[id]; } });
   }
 
   // 重置中就不要再存檔（不然頁面重新整理前的自動存檔會把剛刪掉的存檔寫回去）
