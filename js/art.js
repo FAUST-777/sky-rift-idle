@@ -279,6 +279,11 @@
       ctx.fillStyle = wp.color; ctx.fillRect(4, -3, 2, 6); ctx.fillRect(10, -3, 2, 6);
       ctx.fillStyle = '#9fd8ff'; ctx.fillRect(20.5, -2.8, 1.5, 5.6);
       ctx.restore();
+    } else if (wp.type === 'briefcase') {         // 對沖基金經理人：公事包（扣環顏色跟著武器稀有度）
+      ctx.fillStyle = '#2a1d14'; ctx.fillRect(41, 47, 3, 4); ctx.fillRect(48, 47, 3, 4); ctx.fillRect(41, 46, 10, 2);   // 提把
+      ctx.fillStyle = '#5a3a22'; rr(ctx, 36, 50, 20, 13, 2); ctx.fill();
+      ctx.fillStyle = '#3e2716'; ctx.fillRect(36, 55, 20, 1.5);
+      ctx.fillStyle = wp.color; ctx.fillRect(44.5, 53.5, 3, 4);
     } else if (wp.type === 'dumbbell') {          // 健身者：啞鈴
       ctx.fillStyle = '#555'; ctx.fillRect(39, 49, 10, 3);
       ctx.fillStyle = shade(wp.color, -30); ctx.fillRect(37, 45, 4, 11); ctx.fillRect(47, 45, 4, 11);
@@ -563,6 +568,12 @@
       ctx.fillStyle = 'rgba(190,120,255,.4)'; ctx.beginPath(); ctx.ellipse(11, 11, 10, 4, 0, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#c99bff'; ctx.beginPath(); ctx.arc(19, 11, 5, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(20, 10, 2, 0, Math.PI * 2); ctx.fill();
+    },
+    coin(ctx) {        // 對沖基金經理人：金幣（$ 記號）
+      ctx.fillStyle = 'rgba(255,215,90,.35)'; ctx.beginPath(); ctx.ellipse(10, 11, 9, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#d9a520'; ctx.beginPath(); ctx.arc(18, 11, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffe27a'; ctx.beginPath(); ctx.arc(18, 11, 4.6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#9a6d00'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('$', 18, 11.5);
     },
     rocket(ctx) {      // 飛空艇的飛彈
       ctx.fillStyle = 'rgba(255,170,60,.85)'; ctx.beginPath(); ctx.moveTo(0, 11); ctx.lineTo(7, 7.5); ctx.lineTo(7, 14.5); ctx.closePath(); ctx.fill();

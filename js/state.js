@@ -260,7 +260,7 @@
   };
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
-  const AURA_MAX = ['cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
+  const AURA_MAX = ['qeRegen', 'tariff', 'wolfSkill', 'wolfHalf', 'cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
   G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
@@ -285,7 +285,7 @@
   G.othersHpPct = who => G.othersBonus(who, 'hpPctOthers');
 
   // 船砲間隔：團隊特效（取最短）再扣貓哈氣爆甲的 -1 秒，最少 2 秒
-  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0) - (aura.captainCut || 0)) * (aura.cannonHalf ? 0.5 : 1);   // 王牌砲手：減半
+  G.cannonInterval = (aura = G.partyAura()) => Math.max(2, (aura.cannonInterval || G.CANNON_INTERVAL) - (aura.cannonCut || 0) - (aura.captainCut || 0)) * (aura.cannonHalf ? 0.5 : 1) * (aura.wolfHalf ? 0.5 : 1);   // 王牌砲手、華爾街之狼：各自減半
   // 全隊普攻暈眩（貓貓士氣）：出戰成員中最好的那個
   G.partyStun = () => G.partyMembers().map(w => G.passivesOf(w).partyStun).filter(Boolean).sort((a, b) => b.chance - a.chance)[0] || null;
 
@@ -346,6 +346,12 @@
     st.spd   *= 1 + g('spdPct');
     st.crit  += g('crit');
     st.critDmg += g('critDmg');
+    // 內線交易：記住原本最大生命（護盾用），生命鎖 1、防禦歸零、基礎攻擊 ×2→3
+    if (g('insider')) {
+      const r = g('insider');
+      st.insiderHp = st.maxHp; st.insider = r;
+      st.maxHp = 1; st.def = 0; st.atk *= G.INSIDER.atk(r);
+    }
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),
       summonPower: 1 + g('summonPower'), debuffDur: 1 + g('debuffDur'), animalAura: 1 + g('animalAura'),

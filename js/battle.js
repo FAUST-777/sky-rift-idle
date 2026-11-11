@@ -11,7 +11,7 @@
   const RES = Math.min(3, Math.max(2, Math.round(window.devicePixelRatio || 1)));   // 戰鬥畫布解析度倍數（座標仍是 480×300）
   const PARTY_X = [178, 132, 86, 40];
   const ENEMY_X = [305, 355, 405];
-  const BUFF_IDS = ['breeze', 'atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
+  const BUFF_IDS = ['qe', 'tariff', 'breeze', 'atkUp', 'spdUp', 'defUp', 'dmgReduce', 'critUp', 'evade', 'skillDmg', 'regen', 'reflectUp', 'nextSkill', 'shieldWall', 'stunSkill', 'animalSkill', 'hpUp', 'bloodShare', 'snipeX', 'reflectX', 'stunHunter'];
   const DEBUFF_IDS = ['stun', 'defDown', 'slow', 'blind', 'bleed', 'poison', 'critDown', 'fear', 'decay', 'doom'];   // doom 死亡詛咒（怨靈）   // fear 恐懼：傷害下降；decay 衰老詛咒：無法暴擊＋最大生命下降
   const MISSILE_VARIANTS = 4;
 
@@ -81,6 +81,10 @@
 
       this.bars = this.add.graphics().setDepth(75);   // 在浮動文字上面，血條不會被數字蓋住
       this.tweens.add({ targets: this.shipImg, y: 66, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      // 華爾街之狼：第二艘飛空艇（原本的左邊，外觀同步），有人裝才顯示
+      this.shipImg2 = this.add.image(G.WOLF_SHIP_X, 62, '__DEFAULT').setScale(0.25).setVisible(false).setDepth(-1);
+      this.tweens.add({ targets: this.shipImg2, y: 70, duration: 2500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      if (this.shipTex) this.shipImg2.setTexture(this.shipTex);
 
       this.buildParty();
 
@@ -112,6 +116,7 @@
       if (this.bgImg) { this.sky.setVisible(false); this.islandsLayer.setVisible(false); }
       this.sky.setDepth(-2);
       this.shipImg.setDepth(-1);
+      if (this.shipImg2) this.shipImg2.setDepth(-1);
       // 上升詛咒：進到有詛咒的樓層時提示
       this.curse = G.curseFor(f);
       if (this.curse && this.cursedFloor !== f) {
@@ -124,7 +129,8 @@
       const key = 'ship_' + (++this.texVer);
       this.tex(key, 480, 360, (ctx, w, h) => G.ART.drawShip(ctx, G.shipLook(), w, h));   // 2 倍解析度，顯示時縮成 0.25（跟原本 240×180 × 0.5 一樣大）
       const old = this.shipImg.texture.key;
-      this.shipImg.setTexture(key);
+      this.shipImg.setTexture(key); this.shipTex = key;
+      if (this.shipImg2) this.shipImg2.setTexture(key);
       if (old.startsWith('ship_')) this.textures.remove(old);
     }
 
@@ -253,7 +259,43 @@
       this.units.forEach(p => { if (p.alive && p.skills) p.skills.forEach(s => { s.cd = Math.min(s.cd, 1); }); });
       if (fresh) this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.bloodRush'), '#ff6b8a', 15, 1000);
     }
-    cdrBoostV() { return this.cdrBoost && this.cdrBoost.t > 0 ? this.cdrBoost.v : 0; }
+    // ── 對沖基金經理人 ───────────────────────────────────────────────────
+    // 我方有人被敵人打中：量化寬鬆（熊市）、川普關稅（期權交易）有間隔；期權交易的人自己上護盾（每下都刷新，取大）
+    hedgeOnHit(target) {
+      const a = this.aura, now = this.time.now;
+      if (a.qeRegen && now >= (this.qeNext || 0)) {
+        this.qeNext = now + G.HF_QE.gap * 1000;
+        this.partyAlive().forEach(p => { this.addFx(p, 'qe', a.qeRegen, G.HF_QE.t); this.glow(p, '#7dff9a'); });
+        this.floatText(target.img.x, this.barY(target) - 40, G.t('battle.qe'), '#7dff9a', 13, 1000);
+      }
+      if (a.tariff && now >= (this.tariffNext || 0)) {
+        this.tariffNext = now + G.HF_TARIFF.gap * 1000;
+        this.partyAlive().forEach(p => { this.addFx(p, 'tariff', G.HF_TARIFF.v, G.HF_TARIFF.t); this.glow(p, '#ffd76a'); });
+        this.floatText(target.img.x, this.barY(target) - 52, G.t('battle.tariff'), '#ffd76a', 13, 1000);
+      }
+      const base = target.st.insiderHp || target.st.maxHp;   // 內線交易的人生命鎖 1，用原本的最大生命算
+      this.partyAlive().forEach(o => {
+        const op = o.special.options;
+        if (!op || o.kind === 'summon') return;
+        const amt = Math.round(base * op.v);
+        if (amt > (o.shield || 0)) { o.shield = amt; o.shieldBase = amt; }
+        o.shieldT = Math.max(o.shieldT || 0, G.HF_OPTIONS_T);
+      });
+    }
+    // 內線交易：每 G.INSIDER.every 秒生成護盾（開打第一下就有）
+    insiderTick(dt) {
+      this.partyAlive().forEach(u => {
+        if (!u.st.insider) return;
+        u.insiderT = (u.insiderT == null ? G.INSIDER.every : u.insiderT) + dt;
+        if (u.insiderT < G.INSIDER.every) return;
+        u.insiderT = 0;
+        const amt = Math.round(u.st.insiderHp * G.INSIDER.shield(u.st.insider));
+        if (amt > (u.shield || 0)) { u.shield = amt; u.shieldBase = amt; }
+        u.shieldT = Math.max(u.shieldT || 0, G.INSIDER.dur(u.st.insider));
+        this.glow(u, '#9fd8ff');
+      });
+    }
+    cdrBoostV() { return (this.cdrBoost && this.cdrBoost.t > 0 ? this.cdrBoost.v : 0) + (this.hfCdr && this.hfCdr.t > 0 ? this.hfCdr.v : 0); }   // 舷砲齊射＋對沖基金（做空、套利）
     curseNow() { return this.curseOff && this.curseOff.t > 0 ? null : this.curse; }   // 上升詛咒（百科全書的船砲可以暫時解除）
     rushOn() { return !!(this.bloodRush && this.bloodRush.t > 0); }
 
@@ -283,6 +325,7 @@
         a[k] = (a[k] || 0) + this.animal.v;
       }
       this.aura = a;
+      if (this.shipImg2) this.shipImg2.setVisible(!!a.wolfSkill);   // 華爾街之狼
       this.pStun = G.partyStun();   // 貓貓士氣：全隊普攻暈眩
     }
 
@@ -435,7 +478,7 @@
     procMult(u) { return this.party(u) ? 1 + (this.aura.procRate || 0) : 1; }   // 觸發率（浪浪園區所長米菈的專屬 buff）
     // 閃避：石魔人上限 G.GOLEM_EVADE_CAP，其他人 G.CONFIG.evadeCap
     evadeCapOf(u) { return u.minion === 'golem' ? G.GOLEM_EVADE_CAP : G.CONFIG.evadeCap; }
-    evadeRaw(u) { return this.fxv(u, 'stun') ? 0 : Math.max(0, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0)); }   // 還沒套上限的閃避   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
+    evadeRaw(u) { return this.fxv(u, 'stun') || u.st.insider ? 0 : Math.max(0, (u.st.evade || 0) + this.fxv(u, 'evade') + (this.party(u) ? (this.aura.evade || 0) + (u.othersEvade || 0) + this.pactAll('aEvade') + this.pactTriple('tEvade') + (u.special.undeadLegion && this.summonCount() ? G.UNDEAD_LEGION.evade(u.special.undeadLegion.r) : 0) + this.shadowV('darkEvade') + (u.kind === 'summon' && u.minion ? this.pactSummon('sEvade') : 0) : 0)); }   // 還沒套上限的閃避   // othersEvade：訓犬師、狗蹭蹭（遛狗者自己不吃）   // 暈眩無法閃避
     evadeOf(u) { return Math.min(this.evadeCapOf(u), this.evadeRaw(u)); }
     defOf(u) {
       let m = 1 + this.fxv(u, 'defUp') - this.fxv(u, 'defDown');
@@ -454,6 +497,7 @@
       let m = (1 - (u.st.dmgReduce || 0)) * (1 - this.fxv(u, 'dmgReduce'));
       if (this.party(u)) m *= 1 - (this.aura.dmgReduce || 0);
       if (u.taunt.t > 0) m *= 1 - u.taunt.v;
+      if (this.fxv(u, 'tariff')) m *= 1 - this.fxv(u, 'tariff');   // 川普關稅
       if (this.fxv(u, 'stun')) m *= 1 + G.STUN.taken;   // 暈眩受到傷害 +15%
       return Math.max(0.1, m);
     }
@@ -596,6 +640,7 @@
         this.heal(src, Math.max(1, Math.round(src.st.maxHp * this.aura.stunHit)));
       }
       if (this.fxv(target, 'poison') && src.st.vsPoison) dmg *= 1 + src.st.vsPoison;
+      if (src.st.insider) dmg *= (1 + G.INSIDER.dmg(src.st.insider)) * (1 + G.INSIDER.per(src.st.insider) * DEBUFF_IDS.filter(id => this.fxv(target, id)).length);   // 內線交易：傷害＋敵人每個減益加傷
       if (this.isDark(src)) { const gv = this.grudgeV(); if (gv) dmg *= 1 + gv; }   // 咒怨之力：闇屬性全隊（含召喚物、怨靈）傷害
       if (src.kind === 'summon' && src.minion) dmg *= 1 + this.pactPerDebuff('dmg');   // 死亡契約：召喚物每個減益加傷
       const stunnedNow = this.fxv(target, 'stun') > 0;
@@ -611,7 +656,7 @@
       const grudgeCritDmg = grudgeOn && this.fxv(target, 'decay') ? G.GRUDGE.vsDecayCritDmg : 0;
       const legionDecay = (opts.wraith || (src.kind === 'summon' && src.minion)) && this.fxv(target, 'decay') && this.legionRank() > 0;   // 亡靈軍團：召喚物打衰老詛咒的敵人
       if (legionDecay) dmg *= 1 + G.UNDEAD_LEGION.decayDmg;
-      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) || legionDecay ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
+      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) || legionDecay || src.st.insider ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
       if (crit) dmg *= src.st.critDmg + grudgeCritDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
@@ -646,6 +691,7 @@
         }
       }
       this.damage(target, mine, this.party(target) ? '#ff7070' : crit ? '#ffd23f' : G.DMG_TYPES[type] || '#fff', crit, opts.noFlash);
+      if (this.party(target) && !this.party(src)) this.hedgeOnHit(target);   // 對沖基金：量化寬鬆、期權護盾、川普關稅
       if (this.party(target) && !this.party(src) && target.special.cover && target.alive) this.addFx(target, 'breeze', G.WALL_BREEZE.v, G.WALL_BREEZE.t);   // 掩護：被攻擊後「城牆上微風」
       if (!opts.counter && target.alive && !this.party(target) && this.isDark(src) && this.grudgeV()) this.debuff(src, target, 'bleed', 1, G.GRUDGE.bleedT);   // 咒怨之力：闇屬性每次攻擊上流血
       // 白骨風暴：裝了的死靈自己、或場上召喚物（含怨靈）的攻擊 → 破防、命中下降、中毒
@@ -890,6 +936,9 @@
       if (nextBonus) delete u.fx.nextSkill;
       const exB = e.useNextExecute && targets.length ? this.fxv(u, 'nextExecute') : 0;   // 撕裂：下一次處決加傷害
       if (exB) { delete u.fx.nextExecute; nextBonus += exB; }
+      // 槓桿做多：出手前看目標身上有沒有流血、中毒
+      const longBleed = e.hfLong && targets.some(t => this.fxv(t, 'bleed')), longPoison = e.hfLong && targets.some(t => this.fxv(t, 'poison'));
+      if (e.fromShip && e.mult && this.aura.wolfSkill) e.mult *= 2 * (1 + this.aura.wolfSkill);   // 華爾街之狼：飛船技能傷害 ×2、再 +20%→87%
       if (e.mult && targets.length) this.gainMorale(u);
       if (e.mult && targets.length && this.party(u) && u.kind !== 'summon' && u.st.dmgType === 'physical') this.snipeTick();   // 美式居合：物理技能計數
       // 視覺：有投射物的職業射一輪，近戰撲上去
@@ -923,6 +972,36 @@
         if (delay === 0) doHit(); else this.time.delayedCall(delay, () => { if (u.alive) { doHit(); this.checkWaveEnd(); } });
       }
       (e.debuffs || []).forEach(db => targets.forEach(t => { if (this.valid(t)) this.debuff(u, t, db.id, db.v, db.t); }));
+      // 對沖基金：槓桿做多／做空／套利
+      if (e.hfLong) {
+        if (longBleed) this.partyAlive().forEach(p => { this.addFx(p, 'spdUp', e.hfLong.spd, 10); this.addFx(p, 'regen', 0.01, 10); this.glow(p, '#7dff9a'); });
+        if (longPoison) this.partyAlive().forEach(p => { this.addFx(p, 'defUp', e.hfLong.def, 10); this.addFx(p, 'skillDmg', e.hfLong.sk, 10); this.glow(p, '#9fd8ff'); });
+      }
+      if (e.hfShort) {   // 依序判斷：失明 → 恐懼、破防 → 衰老；之後有恐懼 → 技能傷害、有衰老 → 技能冷卻（可連鎖）
+        let sk = false, cd = false;
+        targets.forEach(t => {
+          if (!this.valid(t)) return;
+          if (this.fxv(t, 'blind')) this.debuff(u, t, 'fear', 0.2, 6);
+          if (this.fxv(t, 'defDown')) this.debuff(u, t, 'decay', 0.15, 6);
+          if (this.fxv(t, 'fear')) sk = true;
+          if (this.fxv(t, 'decay')) cd = true;
+        });
+        if (sk) this.partyAlive().forEach(p => this.addFx(p, 'skillDmg', e.hfShort.sk, 6));
+        if (cd) this.hfCdr = { v: Math.max(e.hfShort.cdr, this.hfCdr && this.hfCdr.t > 0 ? this.hfCdr.v : 0), t: 6 };
+      }
+      if (e.hfArb) {   // 數學模型套利：花金幣
+        const A = e.hfArb;
+        if (G.S.gold >= A.cost) {
+          G.S.gold -= A.cost;
+          this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.arbOk', { n: G.fmt(A.cost) }), '#ffd76a', 14, 1100);
+          this.partyAlive().forEach(p => { this.addFx(p, 'skillDmg', A.sk, 10); this.addFx(p, 'regen', A.regen, 10); this.glow(p, '#ffd76a'); });
+          this.hfCdr = { v: Math.max(A.cdr, this.hfCdr && this.hfCdr.t > 0 ? this.hfCdr.v : 0), t: 10 };
+        } else {
+          this.floatText(u.img.x, this.barY(u) - 40, G.t('battle.arbPoor'), '#ff9a9a', 14, 1100);
+          this.partyAlive().forEach(p => { this.addFx(p, 'regen', A.poor, 5); this.glow(p, '#7dff9a'); });
+        }
+      }
+      if (e.healAll) this.partyAlive().forEach(p => { this.heal(p, Math.round(p.st.maxHp * e.healAll)); this.glow(p, '#7dff9a'); });   // 不像 heal 要有人受傷才放
       // 增益：德魯伊「野性之絆」延長持續時間、「獸群之心」提高數值
       const bv = b => b.v * (u.st.buffPow || 1), bt = b => b.t * (u.st.buffDur || 1);
       (e.self || []).forEach(b => { this.addFx(u, b.id, bv(b), bt(b)); this.glow(u, col); });
@@ -986,8 +1065,9 @@
     }
 
     // 飛船船長：飛空艇的各種發射動畫（傷害由技能本身結算）
-    shipVolley(kind, targets, hits) {
-      const sx = this.shipImg.x - 10, sy = this.shipImg.y + 24;
+    shipVolley(kind, targets, hits, from = this.shipImg) {
+      if (from === this.shipImg && this.aura.wolfSkill && this.shipImg2) this.shipVolley(kind, targets, hits, this.shipImg2);   // 華爾街之狼：兩艘都播動畫
+      const sx = from.x - 10, sy = from.y + 24;
       const ball = (t, color, r, dy, delay) => {
         const b = this.add.circle(sx, sy + dy, r, color).setDepth(40);
         this.tweens.add({ targets: b, x: t.img.x, y: t.img.y - 30 + dy, duration: 380, delay, ease: 'Quad.in', onComplete: () => b.destroy() });
@@ -1007,16 +1087,16 @@
           this.floatText(cx, cy - 50, G.t('battle.nuke'), '#ffb36b', 18, 1000);
         } });
       } else if (kind === 'barrage') {         // 艦砲武裝齊射：一大堆小飛彈＋三顆並排藍色砲彈
-        targets.forEach((t, i) => { for (let n = 0; n < 3; n++) this.shipMissile(t, i * 3 + n, 0.7); });
+        targets.forEach((t, i) => { for (let n = 0; n < 3; n++) this.shipMissile(t, i * 3 + n, 0.7, from); });
         [-12, 0, 12].forEach(dy => ball(targets[0], 0x4aa8ff, 6, dy, 60));
       } else {                                 // 飛彈齊發
-        targets.forEach((t, i) => this.shipMissile(t, i));
+        targets.forEach((t, i) => this.shipMissile(t, i, 1.1, from));
       }
     }
 
     // 飛船船長：飛空艇發射飛彈（只是動畫，傷害由技能本身結算）
-    shipMissile(t, i, scale = 1.1) {
-      const sx = this.shipImg.x - 10, sy = this.shipImg.y + 24, tx = t.img.x, ty = t.img.y - 30;
+    shipMissile(t, i, scale = 1.1, from = this.shipImg) {
+      const sx = from.x - 10, sy = from.y + 24, tx = t.img.x, ty = t.img.y - 30;
       const k = this.add.image(sx, sy + G.rand(-6, 6), `ms_rocket${G.randInt(0, MISSILE_VARIANTS - 1)}`).setDepth(40).setScale(scale);
       k.rotation = Math.atan2(ty - sy, tx - sx);
       this.tweens.add({ targets: k, x: tx, y: ty, duration: 400, delay: i * 40, ease: 'Quad.in', onComplete: () => {
@@ -1267,7 +1347,7 @@
         u.regenAcc = (u.regenAcc || 0) + dt;
         if (u.regenAcc < 1) return;
         u.regenAcc -= 1;
-        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.fxv(u, 'regen') + this.fxv(u, 'breeze') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
+        const r = (u.kind === 'summon' && u.minion ? this.pactPerDebuff('regen') : 0) + (u.st.regen || 0) + (this.aura.regen || 0) + (this.party(u) ? this.shadowV('darkRegen') : 0) + (this.isDark(u) && this.grudgeV() ? G.GRUDGE.regen : 0) + this.fxv(u, 'regen') + this.fxv(u, 'breeze') + this.fxv(u, 'qe') + (this.party(u) && u.kind !== 'summon' ? this.feverSum() / 10000 : 0);   // 血之狂熱回血
         if (r > 0 && u.hp < u.st.maxHp) this.heal(u, Math.max(1, Math.round(u.st.maxHp * r)), false);
       });
     }
@@ -1281,6 +1361,7 @@
       if (this.overdrive && this.overdrive.t > 0) this.overdrive.t -= dt;
       if (this.bloodRush && this.bloodRush.t > 0) this.bloodRush.t -= dt;
       if (this.cdrBoost && this.cdrBoost.t > 0) this.cdrBoost.t -= dt;
+      if (this.hfCdr && this.hfCdr.t > 0) this.hfCdr.t -= dt;
       if (this.synBoost && this.synBoost.t > 0) { this.synBoost.t -= dt; if (this.synBoost.t <= 0) this.computeAura(); }   // 喵喵鼓舞到期，團隊特效恢復
       const all = [...this.units, ...this.enemies];
       this.units.forEach(u => this.syncHpBoost(u));   // 野性狂暴到期：最大生命恢復
@@ -1316,6 +1397,7 @@
       });
       this.regenTick(dt);
       this.wraithTick(dt);
+      this.insiderTick(dt);
 
       // 船砲支援
       if (this.mode === 'fight' && G.cannonMult() > 0 && this.enemiesAlive().length) {
@@ -1337,11 +1419,15 @@
       const sk = this.sketch && this.sketch.t > 0 ? this.sketch : null;
       const src = { kind: 'cannon', side: 'cannon', st: { atk: this.hero.st.atk, crit: this.aura.cannonCrit || 0, critDmg: this.aura.cannonCritDmg || 2.5 }, fx: {}, special: {}, alive: false };   // 王牌砲手：船砲可暴擊
       const ball = this.add.circle(this.shipImg.x - 20, this.shipImg.y + 30, bonus ? 7 : 5, bonus ? 0x7a2f2f : 0x222222).setDepth(40);
+      if (this.aura.wolfSkill && this.shipImg2) {   // 華爾街之狼：第二艘也開砲（動畫；傷害已 ×2）
+        const b2 = this.add.circle(this.shipImg2.x - 20, this.shipImg2.y + 30, bonus ? 7 : 5, bonus ? 0x7a2f2f : 0x222222).setDepth(40);
+        this.tweens.add({ targets: b2, x: t.img.x, y: t.img.y - 34, duration: 440, ease: 'Quad.in', onComplete: () => b2.destroy() });
+      }
       this.tweens.add({ targets: ball, x: t.img.x, y: t.img.y - 30, duration: 380, ease: 'Quad.in', onComplete: () => {
         ball.destroy();
         if (this.valid(t)) {
           const cvd = this.aura.cannonVsDefDown && this.fxv(t, 'defDown') ? 1 + this.aura.cannonVsDefDown : 1;   // 腐蝕顏料：砲擊打破防中的敵人
-          this.hit(src, t, G.cannonMult() * cvd * (1 + bonus) * (1 + (this.aura.cannonDmg || 0)) * (1 + (this.tomeBuff && this.tomeBuff.t > 0 ? this.tomeBuff.cannon : 0)));   // 砲術長、百科全書：船砲傷害
+          this.hit(src, t, (this.aura.wolfSkill ? 2 : 1) * G.cannonMult() * cvd * (1 + bonus) * (1 + (this.aura.cannonDmg || 0)) * (1 + (this.tomeBuff && this.tomeBuff.t > 0 ? this.tomeBuff.cannon : 0)));   // 砲術長、百科全書：船砲傷害
           if (this.tomeBuff && this.tomeBuff.t > 0 && this.curse && Math.random() < this.tomeBuff.purge) { this.curseOff = { t: 4 }; this.floatText(W / 2, 135, G.t('battle.curseOff'), '#ffe27a', 15, 1200); }   // 百科全書：解除上升詛咒 4 秒 this.floatText(t.img.x, this.barY(t) - 24, G.t('battle.cannon'), '#ffb36b', 13);
           if (sk && Math.random() < sk.chance) this.enemiesAlive().forEach(x => this.debuff(src, x, 'stun', 1, 1.5));   // 速寫：砲擊暈眩全體
           this.checkWaveEnd();
@@ -1401,7 +1487,8 @@
         out.push({ id, icon: G.FX_ICON[id], val: `${s}s`, p: { v: shown, s } });
       });
       if (party.some(u => u.st.iai)) out.push({ id: 'snipeCount', icon: G.FX_ICON.snipeCount, val: `${Math.min(50, this.snipeCount || 0)}/50`, p: { v: Math.min(50, this.snipeCount || 0) } });
-      if (this.cdrBoostV()) out.push({ id: 'coverFire', icon: G.FX_ICON.coverFire, val: `${Math.ceil(this.cdrBoost.t)}s`, p: { v: pct(this.cdrBoost.v), s: Math.ceil(this.cdrBoost.t) } });
+      if (this.hfCdr && this.hfCdr.t > 0) out.push({ id: 'hfCdr', icon: G.FX_ICON.hfCdr, val: `${Math.ceil(this.hfCdr.t)}s`, p: { v: pct(this.hfCdr.v), s: Math.ceil(this.hfCdr.t) } });
+      if (this.cdrBoost && this.cdrBoost.t > 0) out.push({ id: 'coverFire', icon: G.FX_ICON.coverFire, val: `${Math.ceil(this.cdrBoost.t)}s`, p: { v: pct(this.cdrBoost.v), s: Math.ceil(this.cdrBoost.t) } });
       if (this.overdrive && this.overdrive.t > 0) out.push({ id: 'overdrive', icon: G.FX_ICON.overdrive, val: `${Math.ceil(this.overdrive.t)}s`, p: { s: Math.ceil(this.overdrive.t) } });
       if (this.arcaneOn()) out.push({ id: 'arcane', icon: G.FX_ICON.arcane, val: `${Math.ceil(this.arcane.t)}s`, p: { c: Math.round((this.aura.arcaneCrit || 0) * 100), d: Math.round((this.aura.arcaneCritDmg || 0) * 100), s: Math.ceil(this.arcane.t) } });
       else if (this.aura.arcaneCrit) out.push({ id: 'arcaneCount', icon: G.FX_ICON.arcaneCount, val: `${this.arcaneCount || 0}/100`, p: { v: this.arcaneCount || 0 } });

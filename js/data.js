@@ -89,9 +89,10 @@ G.CLASSES = {
   gymgoer:     { core: 'def',  range: 'one', dmgType: 'physical', color: '#e0703a', cape: null,      ranged: false, mult: { hp: 1.6,  atk: 0.95, def: 1.35 }, weapon: 'dumbbell' },
   necromancer: { core: 'atk',  range: 'one', dmgType: 'dark',     color: '#3a2f4a', cape: '#1a1424', ranged: true,  mult: { hp: 0.95, atk: 1.25, def: 0.9 },  missile: 'skull', weapon: 'scythe' },
   captain:     { core: 'atk',  range: 'one', dmgType: 'arcane',   color: '#2f4a7a', cape: '#1f2f4f', ranged: true,  mult: { hp: 1.0,  atk: 1.2,  def: 1.0 },  missile: 'flare', weapon: 'spyglass' },
+  hedgefund:   { core: 'def',  range: 'all', dmgType: 'dark',     color: '#4a6fa5', cape: null,      ranged: true,  mult: { hp: 1.3,  atk: 0.95, def: 1.5 },  missile: 'coin', weapon: 'briefcase' },   // 對沖基金經理人
   manicurist:  { core: 'def',  range: 'all', dmgType: 'arcane',   color: '#d9649e', cape: '#7a2f5c', ranged: false, mult: { hp: 1.3,  atk: 0.85, def: 1.45 }, missile: 'nail', weapon: 'claw' },
 };
-G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer', 'manicurist', 'necromancer', 'captain'];
+G.CLASS_ORDER = ['bloodknight', 'catknight', 'scholar', 'darkpainter', 'pirate', 'wallbringer', 'druid', 'dogwalker', 'gymgoer', 'manicurist', 'necromancer', 'captain', 'hedgefund'];
 G.CORE_ICON  = { atk: '⚔️', buff: '✨', def: '🛡️' };
 G.DMG_TYPES  = { physical: '#ffffff', animal: '#ffd27a', arcane: '#8fd3ff', dark: '#c99bff' };   // 傷害數字顏色
 G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
@@ -377,6 +378,37 @@ G.SKILLS = {
       dmg: 'dmg', spd: 'spd', tSpd: 'tSpd', tEvade: 'tEvade', aSpd: 'aSpd', aCrit: 'aCrit', aCritDmg: 'aCritDmg', aEvade: 'aEvade', sDef: 'sDef', sEvade: 'sEvade', sAtk: 'sAtk', sCritDmg: 'sCritDmg' }).map(([k]) => [k, r => G.DEATH_PACT[k](r)])), rawKeys: ['aCrit'] }),
   ],
 
+  // 對沖基金經理人（Def／全體／黑暗）：華爾街的黑魔法防禦策略。強制船砲發射、全隊護盾與減傷、做多做空看敵人狀態加 buff、
+  //   內線交易（生命鎖 1、定時大護盾、超高輸出）、華爾街之狼（第二艘飛空艇，飛船傷害 ×2）
+  hedgefund: [
+    // 研究基本面：5 秒挑釁＋自身減傷 30%→44%、防禦 +20%→55%、每秒回 2%；強制船砲發射 1→5 次
+    A('hf_research', 0, 8, lin(0.3, 0.035), (v, r) => ({ target: 'none', taunt: { v, t: 5 }, self: [{ id: 'defUp', v: lin(0.2, 0.0875)(r), t: 5 }, { id: 'regen', v: 0.02, t: 5 }], cannonShots: { n: r, bonus: 0 } }),
+      { descV: { def: lin(0.2, 0.0875), n: r => r }, rawKeys: ['n'] }),
+    // 模型回測：全體 20%→200%；強制船砲發射 1→5 次
+    A('hf_backtest', 0, 5, lin(0.2, 0.45), (v, r) => ({ target: 'all', mult: v, cannonShots: { n: r, bonus: 0 } }), { descV: { n: r => r }, rawKeys: ['n'] }),
+    // 槓桿做多：單體 20%→900%；打到流血 → 全隊攻速＋每秒回 1%（10 秒）；打到中毒 → 全隊防禦＋技能傷害（10 秒）；自己防禦 +90%→150%（10 秒）；全隊回 4%→8%
+    A('hf_long', 1, 10, lin(0.2, 2.2), (v, r) => ({ target: 'one', mult: v, healAll: lin(0.04, 0.01)(r), self: [{ id: 'defUp', v: lin(0.9, 0.15)(r), t: 10 }],
+        hfLong: { spd: lin(0.4, 0.15)(r), def: lin(0.7, 0.075)(r), sk: lin(0.1, 0.225)(r) } }),
+      { descV: { spd: lin(0.4, 0.15), def: lin(0.7, 0.075), sk: lin(0.1, 0.225), self: lin(0.9, 0.15), heal: lin(0.04, 0.01) } }),
+    // 槓桿做空：全體 20%→200%；失明 → 上恐懼、破防 → 上衰老（6 秒）；恐懼 → 全隊技能傷害、衰老 → 全隊技能冷卻縮短（6 秒）；依序判斷，可連鎖
+    A('hf_short', 1, 8, lin(0.2, 0.45), (v, r) => ({ target: 'all', mult: v, hfShort: { sk: lin(0.87, 0.1075)(r), cdr: lin(0.3, 0.035)(r) } }),
+      { descV: { sk: lin(0.87, 0.1075), cdr: lin(0.3, 0.035) } }),
+    // 數學模型套利：花 1000 金幣 → 10 秒全隊技能傷害、技能冷卻縮短、每秒回血；錢不夠 → 5 秒每秒回血
+    A('hf_arb', 2, 14, lin(0.5, 0.375), (v, r) => ({ target: 'none', hfArb: { cost: G.HF_ARB_COST, sk: v, cdr: lin(0.5, 0.025)(r), regen: lin(0.25, 0.0625)(r), poor: lin(0.05, 0.0375)(r) } }),
+      { descV: { cost: () => G.HF_ARB_COST, cdr: lin(0.5, 0.025), regen: lin(0.25, 0.0625), poor: lin(0.05, 0.0375) }, rawKeys: ['cost'] }),
+    // 熊市：全隊受到傷害 -2%→10%；隊伍有人被打 → 「量化寬鬆」全隊每秒回 2%→5%，13 秒（間隔 15 秒）
+    P('hf_bear',    0, lin(0.02, 0.02),  'party', 'dmgReduce', { partyAlso: { qeRegen: lin(0.02, 0.0075) } }),
+    // 牛市：自己生命 +10%→30%；全隊金幣 +10%→25%
+    P('hf_bull',    0, lin(0.1, 0.05),   'self', 'hpPct', { partyAlso: { goldPct: lin(0.1, 0.0375) } }),
+    // 期權交易：隊伍有人被打 → 自己上護盾，量 = 被打的人最大生命 × 90%→300%；全隊防禦 +10%→30%；「川普關稅」全隊受到傷害 -15%，4 秒（間隔 12 秒）
+    P('hf_options', 1, lin(0.9, 0.525),  'special', 'options', { partyAlso: { defPct: lin(0.1, 0.05), tariff: 1 } }),
+    // 內線交易：防禦歸零、生命鎖 1、無法閃避；每 5 秒生成「原本最大生命 200%→500%」護盾（10→15 秒）；攻擊 ×2→3、必定暴擊……（數值見 G.INSIDER）
+    P('hf_insider', 1, lin(2, 0.25),     'special', 'insider', { raw: true, also: { insider: r => r, critDmg: lin(2, 1.9975), spdPct: lin(1, 0.5), skillDmg: lin(1.5, 0.25) },
+      descV: { shield: r => G.INSIDER.shield(r), dur: r => G.INSIDER.dur(r), dmg: r => G.INSIDER.dmg(r), per: r => G.INSIDER.per(r) }, rawKeys: ['dur'] }),
+    // 華爾街之狼：戰場上多一台飛空艇（在原本的左邊、外觀同步）；飛船造成的傷害 ×2（含船長技能）、船砲間隔減半；飛船技能傷害再 +20%→87%
+    P('hf_wolf',    2, lin(0.2, 0.1675), 'party', 'wolfSkill', { partyAlso: { wolfHalf: 1 } }),
+  ],
+
   // 飛船船長：技能跟著飛空艇各部位的等級變強；強化船砲；從飛空艇發射飛彈
   //   部位等級 G.shipLv(slot)：沒裝 0，第 1～5 款 = 1～5
   captain: [
@@ -456,6 +488,14 @@ G.shipSkillBonus = () => {
 //   全隊闇屬性角色（含召喚物）：每秒回 regen 生命、傷害 +v（10%→77%）、每次攻擊上流血 bleedT 秒
 G.BREAKOUT_BASH_CD = 3;   // 城牆者「破牆而出」：塔盾衝鋒冷卻 6 → 3 秒、改打全體
 G.WALL_BREEZE = { v: 0.01, t: 6 };   // 城牆者「掩護」：被攻擊後「城牆上微風」每秒回 1%，6 秒
+// 對沖基金經理人
+G.WOLF_SHIP_X = 285;                         // 華爾街之狼第二艘飛空艇的 x（原本那艘在 405）
+G.HF_ARB_COST = 1000;                       // 數學模型套利：花費金幣
+G.HF_QE = { t: 13, gap: 15 };               // 熊市「量化寬鬆」：持續、間隔秒數
+G.HF_TARIFF = { v: 0.15, t: 4, gap: 12 };   // 期權交易「川普關稅」：全隊受到傷害 -15%
+G.HF_OPTIONS_T = 5;                         // 期權交易護盾持續秒數
+// 內線交易：shield = 原本最大生命倍率、dur = 護盾秒數、every = 每幾秒生成、atk = 基礎攻擊倍率、dmg = 傷害、per = 敵人每個減益加傷
+G.INSIDER = { every: 5, shield: lin(2, 0.75), dur: lin(10, 1.25), atk: lin(2, 0.25), dmg: lin(0.1, 2.225), per: lin(0.07, 0.0075) };
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
@@ -487,7 +527,7 @@ G.SUMMONS = {
 };
 // 狀態圖示
 G.FX_ICON = {
-  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', shadow: '🌑', shadowCount: '🌑', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', breeze: '🍃', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
+  atkUp: '⚔️', spdUp: '💨', defUp: '🛡️', dmgReduce: '🧱', critUp: '🎯', evade: '🌀', skillDmg: '✨', animalSkill: '🐾', tome: '📚', critDown: '🥴', arcane: '🔮', arcaneCount: '🔮', qe: '💵', tariff: '📜', hfCdr: '📈', shadow: '🌑', shadowCount: '🌑', stunHunter: '🔫', overdrive: '⚙️', reflectX: '🦌', coverFire: '🏴‍☠️', snipeX: '💥', snipeCount: '🎯', bloodRush: '⏩', nextExecute: '🪓', fever: '🔥', bloodShare: '❣️', hpUp: '❤️', synBoost: '📣', regen: '💚', breeze: '🍃', reflectUp: '💅', nextSkill: '🦴', shieldWall: '🏰', stunSkill: '💫', sketch: '🎨', hiss: '😾',
   shield: '🔰', taunt: '😤', morale: '🎖️', frenzy: '🐾',
   stun: '💫', fear: '😱', decay: '🥀', doom: '💀', defDown: '💔', slow: '🐌', blind: '🌫️', bleed: '🩸', poison: '☠️',
 };
