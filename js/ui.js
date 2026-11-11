@@ -732,7 +732,7 @@
     scene.querySelectorAll('.hpet').forEach(el => {
       const uid = +el.dataset.hpet, p = G.hpet(uid); if (!p) return;
       const k = G.hpetKind(p.kind), fly = k.move === 'float';
-      const area = fly ? { x0: 6, x1: 94, y0: 16, y1: 80 } : { x0: 6, x1: 94, y0: 85, y1: 98 };   // 陸生：床底以下的地板；水母：大半個房間
+      const area = fly ? { x0: 10, x1: 90, y0: 32, y1: 80 } : { x0: 10, x1: 90, y0: 85, y1: 98 };   // 寵物放大後留邊，水母頭頂不超出天花板   // 陸生：床底以下的地板；水母：大半個房間
       let s = petPos[uid];
       if (!s) s = petPos[uid] = { x: G.rand(area.x0, area.x1), y: G.rand(area.y0, area.y1), tx: 0, ty: 0, wait: G.rand(0, 2), dir: 1, ph: Math.random() * 6 };
       if (s.wait > 0) { s.wait -= dt; if (s.wait <= 0) { s.tx = G.rand(area.x0, area.x1); s.ty = G.rand(area.y0, area.y1); } }

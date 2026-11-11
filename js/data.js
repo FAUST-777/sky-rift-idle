@@ -605,18 +605,18 @@ G.HOME_BGS = [
 G.HOME_SLOTS = 8;
 
 // ── 船艙寵物（名稱：hpet.<id>）：打怪隨機掉落，放進船艙（最多 5 隻）才生效 ──
-// move：walk 在地板走 / float 在空中漂浮；w = 顯示寬度（船艙寬的 %）；fw/fh = 動畫每格尺寸（3 格）
+// move：walk 在地板走 / float 在空中漂浮；w = 顯示寬度（船艙寬的 %，第 103 輪整體放大 1.8 倍）；fw/fh = 動畫每格尺寸（3 格）
 G.HOME_PETS = [
-  { id: 'shiba',     move: 'walk',  w: 14, speed: 7, fw: 205, fh: 139 },
-  { id: 'blackdog',  move: 'walk',  w: 14, speed: 8, fw: 210, fh: 147 },
-  { id: 'collie',    move: 'walk',  w: 14, speed: 8, fw: 212, fh: 127 },
-  { id: 'jack',      move: 'walk',  w: 12, speed: 9, fw: 224, fh: 142 },
-  { id: 'komodo',    move: 'walk',  w: 18, speed: 3, fw: 228, fh: 59 },
-  { id: 'robot',     move: 'walk',  w: 10, speed: 4, fw: 191, fh: 90 },
-  { id: 'jellyMoon', move: 'float', w: 11, speed: 2, fw: 207, fh: 138 },
-  { id: 'jellySail', move: 'float', w: 11, speed: 2, fw: 230, fh: 219 },
-  { id: 'jellyShroom', move: 'float', w: 12, speed: 2, fw: 220, fh: 178 },
-  { id: 'jellyMountain', move: 'float', w: 12, speed: 2, fw: 220, fh: 211 },
+  { id: 'shiba',     move: 'walk',  w: 25, speed: 7, fw: 205, fh: 139 },
+  { id: 'blackdog',  move: 'walk',  w: 25, speed: 8, fw: 210, fh: 147 },
+  { id: 'collie',    move: 'walk',  w: 25, speed: 8, fw: 212, fh: 127 },
+  { id: 'jack',      move: 'walk',  w: 22, speed: 9, fw: 224, fh: 142 },
+  { id: 'komodo',    move: 'walk',  w: 32, speed: 3, fw: 228, fh: 59 },
+  { id: 'robot',     move: 'walk',  w: 18, speed: 4, fw: 191, fh: 90 },
+  { id: 'jellyMoon', move: 'float', w: 20, speed: 2, fw: 207, fh: 138 },
+  { id: 'jellySail', move: 'float', w: 20, speed: 2, fw: 230, fh: 219 },
+  { id: 'jellyShroom', move: 'float', w: 22, speed: 2, fw: 220, fh: 178 },
+  { id: 'jellyMountain', move: 'float', w: 22, speed: 2, fw: 220, fh: 211 },
 ];
 // 寵物特殊機制（跟品種分開隨機）。同一種機制放兩隻只有先放的那隻有效
 G.PET_PERKS = [
