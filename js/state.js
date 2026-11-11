@@ -30,15 +30,20 @@
     if (first) ch.active[0] = first.id;
   }
 
-  // 飛空艇：eq = 每個部位裝著第幾款（-1 = 沒裝），owned = 買過的款式
+  // 飛空艇：eq = 每個部位裝著第幾款（-1 = 沒裝，決定數值），owned = 買過的款式，
+  //   look = 每個部位顯示哪一款外觀（第 143 輪紙娃娃：買過的款式都能選，跟 eq 分開；-1 = 不顯示）
   function newShip() {
-    const eq = {}, owned = {};
-    G.SHIP_SLOTS.forEach(s => { const free = G.SHIP_PARTS[s].free; eq[s] = free ? 0 : -1; owned[s] = free ? [0] : []; });
-    return { paint: 0, eq, owned };
+    const eq = {}, owned = {}, look = {};
+    G.SHIP_SLOTS.forEach(s => { const free = G.SHIP_PARTS[s].free; eq[s] = free ? 0 : -1; owned[s] = free ? [0] : []; look[s] = eq[s]; });
+    return { paint: 0, eq, owned, look };
   }
   // 舊版飛行船（每個零件是「等級」）→ 新版款式；照舊氣囊能到的層數送穩定翼/引擎，不會改版後爬不上去
   function migrateShip(old) {
-    if (!old || old.eq) return Object.assign(newShip(), old || {});
+    if (!old || old.eq) {
+      const ship = Object.assign(newShip(), old || {});
+      if (!old || !old.look) ship.look = Object.assign({}, ship.eq);   // 舊存檔：外觀先照目前裝的款式
+      return ship;
+    }
     const ship = newShip(), give = (slot, tier) => {
       if (tier < 0) return;
       tier = Math.min(4, tier);
@@ -237,7 +242,22 @@
   // 給全隊的加成：熱氣球生命、船身防禦、船首傷害、船底掛飾金幣
   G.shipBonus = () => ({ hpPct: G.shipVal('balloon'), defPct: G.shipVal('hull'), dmgPct: G.shipVal('bow'), goldPct: G.shipVal('charm') });
   // 飛空艇外觀（每個部位裝的款式，-1 = 沒裝）
-  G.shipLook = () => Object.assign({ paint: G.S.ship.paint }, G.S.ship.eq);
+  // 外觀：選過的款式（要有買過）；沒選過就跟裝備一樣
+  G.shipLook = () => {
+    const sh = G.S.ship, out = { paint: sh.paint };
+    G.SHIP_SLOTS.forEach(s => {
+      const l = sh.look ? sh.look[s] : undefined;
+      out[s] = l === -1 && !G.SHIP_PARTS[s].free ? -1 : l != null && sh.owned[s].includes(l) ? l : sh.eq[s];
+    });
+    return out;
+  };
+  // 換外觀：i = 買過的款式；-1 = 不顯示（熱氣球、船身不能拿掉）
+  G.setShipLook = function (slot, i) {
+    const sh = G.S.ship;
+    if (i === -1 ? G.SHIP_PARTS[slot].free : !sh.owned[slot].includes(i)) return;
+    sh.look = sh.look || {}; sh.look[slot] = i;
+    G.emit('ship');
+  };
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
   const AURA_MAX = ['cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
@@ -670,6 +690,8 @@
     if (G.S.gold < c.gold || G.S.crystal < c.crystal) return toast('toast.needShip', { gold: G.fmt(c.gold), crystal: c.crystal });
     G.S.gold -= c.gold; G.S.crystal -= c.crystal;
     sh.owned[slot].push(i);
+    sh.look = sh.look || {};
+    if (sh.look[slot] == null || sh.look[slot] < 0) sh.look[slot] = i;   // 這個部位原本沒外觀 → 直接換上；已經有外觀就保留（升級只多一款可選）
     G.addLog('log.shipBuy', { name: { k: `part.${slot}.${i}` } }, '#9fe39f');
     G.equipShipPart(slot, i);
   };

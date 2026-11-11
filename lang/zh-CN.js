@@ -401,6 +401,7 @@ G.I18N['zh-CN'] = {
   'partner.mira.name': '浪浪园区所长-米菈', 'partner.mira.bio': '收留了一整群流浪猫狗，上来是想找一块更大的地盖园区。',
 
   // ── 飞空艇 ──
+  'ship.look': '飞空艇外观', 'ship.lookHelp': '每个部位可以换成任何买过的款式，只改外观，不影响数值；升级零件只是多一款可以选。', 'ship.lookNone': '还没买过', 'ship.lookHide': '不显示',
   'ship.help': '打造优秀强韧的飞空艇，才能往天空破洞的高层冒险。每个部位有 5 款，买过的款式可以随时切换；<b>侧面稳定翼和引擎</b>决定能爬到第几层。', 'ship.paint': '涂装', 'ship.free': '免费',
   'ship.using': '使用中', 'ship.equip': '装上', 'ship.none': '未安装',
   'ship.sum.hp': '全队生命', 'ship.sum.def': '全队防御', 'ship.sum.dmg': '全队伤害',

@@ -401,6 +401,7 @@ G.I18N['en'] = {
   'partner.mira.name': 'Mira, Stray Shelter Director', 'partner.mira.bio': 'Takes in every stray cat and dog. Came up looking for more land to build a bigger shelter.',
 
   // ── Airship ──
+  'ship.look': 'Airship Look', 'ship.lookHelp': 'Each part can show any style you have bought. Looks only; stats are unaffected. Upgrading a part just adds another style to pick.', 'ship.lookNone': 'Not bought yet', 'ship.lookHide': 'Hide',
   'ship.help': 'Build a strong, sturdy airship to climb ever higher into the rift. Each part comes in 5 models, and you can switch between owned models anytime. <b>Side Stabilizers and the Engine</b> decide how high you can climb.', 'ship.paint': 'Paint', 'ship.free': 'Free',
   'ship.using': 'In use', 'ship.equip': 'Equip', 'ship.none': 'None',
   'ship.sum.hp': 'Party HP', 'ship.sum.def': 'Party DEF', 'ship.sum.dmg': 'Party damage',

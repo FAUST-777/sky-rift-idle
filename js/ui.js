@@ -644,10 +644,23 @@
       <div class="card"><canvas class="ship-view" id="shipSlot"></canvas>
         <p class="muted" style="font-size:12px;margin:8px 0 10px">${t('ship.help')}</p>
         <div class="stats">${summary}</div></div>
-      ${slots}
-      <div class="card"><h3>${t('ship.paint')}</h3>
-        <div class="swatches">${G.SHIP_PAINTS.map((c, i) => `<button class="swatch ${sh.paint === i ? 'on' : ''}" style="background:${c}" data-act="paint" data-v="${i}"></button>`).join('')}</div>
-      </div>`;
+      ${renderShipLook()}
+      ${slots}`;
+  }
+
+  // 外觀（紙娃娃）：每個部位從買過的款式挑一個顯示，跟裝備數值分開
+  function renderShipLook() {
+    const sh = G.S.ship, look = G.shipLook();
+    const rows = G.SHIP_SLOTS.map(slot => {
+      const P = G.SHIP_PARTS[slot], owned = [...sh.owned[slot]].sort((a, b) => a - b);
+      const chips = owned.map(i => `<button class="look-chip ${look[slot] === i ? 'on' : ''}" data-act="shiplook" data-slot="${slot}" data-i="${i}" title="${t(`part.${slot}.${i}`)}">
+          <i class="look-thumb sp-${slot}${i}"></i><small>${['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'][i]}</small></button>`).join('');
+      const hide = P.free ? '' : `<button class="look-chip ${look[slot] === -1 ? 'on' : ''}" data-act="shiplook" data-slot="${slot}" data-i="-1"><i class="look-thumb none">✕</i><small>${t('ship.lookHide')}</small></button>`;
+      return `<div class="look-row"><div class="look-name">${P.icon} ${t(`part.${slot}.name`)}</div>
+        <div class="look-chips">${chips ? chips + hide : `<span class="muted" style="font-size:12px">${t('ship.lookNone')}</span>`}</div></div>`;
+    }).join('');
+    return `<div class="card"><h3>🎨 ${t('ship.look')}</h3>
+      <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t('ship.lookHelp')}</p>${rows}</div>`;
   }
 
   // ── 分頁：家園（飛空艇內部）─────────────────────────────────────────────
@@ -1039,7 +1052,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'skreset2': UI.close(); G.resetSkillPoints(d.id); break;
       case 'shipbuy': G.buyShipPart(d.slot, +d.i); break;
       case 'shipeq': G.equipShipPart(d.slot, +d.i); break;
-      case 'paint': G.setShipPaint(+d.v); break;
+      case 'shiplook': G.setShipLook(d.slot, +d.i); break;
       case 'buy': G.buyFurniture(d.id); break;
       case 'pick': UI.placing = UI.placing === d.id ? null : d.id; UI.refresh(); break;
       case 'homebg': G.setHomeBg(+d.v); break;

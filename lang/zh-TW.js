@@ -401,6 +401,7 @@ G.I18N['zh-TW'] = {
   'partner.mira.name': '浪浪園區所長-米菈', 'partner.mira.bio': '收留了一整群浪貓浪狗，上來是想找一塊更大的地蓋園區。',
 
   // ── 飛空艇 ──
+  'ship.look': '飛空艇外觀', 'ship.lookHelp': '每個部位可以換成任何買過的款式，只改外觀，不影響數值；升級零件只是多一款可以選。', 'ship.lookNone': '還沒買過', 'ship.lookHide': '不顯示',
   'ship.help': '打造優秀強韌的飛空艇，才能往天空破洞的高層冒險。每個部位有 5 款，買過的款式可以隨時切換；<b>側面穩定翼和引擎</b>決定能爬到第幾層。', 'ship.paint': '塗裝', 'ship.free': '免費',
   'ship.using': '使用中', 'ship.equip': '裝上', 'ship.none': '未安裝',
   'ship.sum.hp': '全隊生命', 'ship.sum.def': '全隊防禦', 'ship.sum.dmg': '全隊傷害',

@@ -198,6 +198,15 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .model .tier { width: 22px; text-align: center; color: var(--gold); font-weight: 700; }
 .model .btn { min-width: 78px; }
 .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+/* 飛空艇外觀（紙娃娃） */
+.look-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #2c2448; }
+.look-row:first-of-type { border-top: 0; }
+.look-name { width: 62px; flex: none; font-size: 12px; line-height: 1.25; }
+.look-chips { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+.look-chip { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 48px; padding: 3px 1px 2px; border-radius: 8px; border: 2px solid #3a3160; background: #1a1530; color: inherit; cursor: pointer; }
+.look-chip.on { border-color: #2ec4b6; background: #12322f; }
+.look-chip small { font-size: 10px; line-height: 1; opacity: .8; }
+.look-thumb { display: block; width: 42px; height: 28px; background: center / contain no-repeat; font-style: normal; text-align: center; line-height: 28px; color: #8a7fb5; }
 .swatch { width: 34px; height: 34px; border-radius: 50%; border: 3px solid transparent; padding: 0; }
 .swatch.on { border-color: #fff; }
 

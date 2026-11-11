@@ -64,7 +64,7 @@
       ['clouds', 'clouds2'].forEach((k, i) => this.tex(k, 256, 128, (ctx, w, h) => G.ART.drawClouds(ctx, w, h, i ? 0.85 : 0.45)));
       this.islandsLayer = null;
       // 飛空艇放右上（左上角留給 buff 圖示）
-      this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.5);
+      this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.25);
       this.shipImg.setInteractive({ useHandCursor: true }).on('pointerdown', () => G.UI && G.UI.shipTip && G.UI.shipTip());   // 點飛空艇 → 提示可爬層數
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
@@ -122,7 +122,7 @@
 
     drawShip() {
       const key = 'ship_' + (++this.texVer);
-      this.tex(key, 240, 180, (ctx, w, h) => G.ART.drawShip(ctx, G.shipLook(), w, h));
+      this.tex(key, 480, 360, (ctx, w, h) => G.ART.drawShip(ctx, G.shipLook(), w, h));   // 2 倍解析度，顯示時縮成 0.25（跟原本 240×180 × 0.5 一樣大）
       const old = this.shipImg.texture.key;
       this.shipImg.setTexture(key);
       if (old.startsWith('ship_')) this.textures.remove(old);
