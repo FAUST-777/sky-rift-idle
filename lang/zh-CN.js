@@ -202,7 +202,7 @@ G.I18N['zh-CN'] = {
   'skill.hf_options.name': '期权交易',
   'skill.hf_options.desc': '队伍有人被攻击时，自己获得护盾：被打的人最大生命 × {v}%（5 秒，取较大的）。全队防御 +{party_defPct}%。队伍有人被攻击时触发「川普关税」：全队受到伤害 -15%，持续 4 秒（间隔 12 秒）',
   'skill.hf_insider.name': '内线交易',
-  'skill.hf_insider.desc': '防御归零、生命锁定 1、无法闪避；每 5 秒生成原本最大生命 {shield}% 的护盾（持续 {dur} 秒）。基础攻击 ×{v}、伤害 +{dmg}%、必定暴击、暴击伤害 +{critDmg}%，敌人身上每个减益再 +{per}% 伤害；攻速 +{spdPct}%、技能伤害 +{skillDmg}%',
+  'skill.hf_insider.desc': '防御归零、无法闪避；每 5 秒发动一次：扣掉目前生命的 99%，并生成最大生命 {shield}% 的护盾（持续 {dur} 秒）。基础攻击 ×{v}、伤害 +{dmg}%、必定暴击、暴击伤害 +{critDmg}%，敌人身上每个减益再 +{per}% 伤害；攻速 +{spdPct}%、技能伤害 +{skillDmg}%',
   'skill.hf_wolf.name': '华尔街之狼',
   'skill.hf_wolf.desc': '赚太多钱直接再买一艘飞船啦！飞空艇造成的伤害 ×2（含船炮与船长的飞船技能），船炮间隔减半；飞船技能伤害再 +{v}%',
   'buff.qe.name': '量化宽松',

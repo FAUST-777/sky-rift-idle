@@ -346,11 +346,11 @@
     st.spd   *= 1 + g('spdPct');
     st.crit  += g('crit');
     st.critDmg += g('critDmg');
-    // 內線交易：記住原本最大生命（護盾用），生命鎖 1、防禦歸零、基礎攻擊 ×2→3
+    // 內線交易：防禦歸零、基礎攻擊 ×2→3（第 148 輪：取消生命鎖 1，改成每次生成護盾時扣目前生命 99%）
     if (g('insider')) {
       const r = g('insider');
-      st.insiderHp = st.maxHp; st.insider = r;
-      st.maxHp = 1; st.def = 0; st.atk *= G.INSIDER.atk(r);
+      st.insider = r;
+      st.def = 0; st.atk *= G.INSIDER.atk(r);
     }
     Object.assign(st, {
       evade: g('evade'), lifesteal: g('lifesteal'), skillDmg: g('skillDmg'), regen: g('regen'), dmgReduce: g('dmgReduce'),

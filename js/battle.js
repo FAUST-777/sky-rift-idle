@@ -273,7 +273,7 @@
         this.partyAlive().forEach(p => { this.addFx(p, 'tariff', G.HF_TARIFF.v, G.HF_TARIFF.t); this.glow(p, '#ffd76a'); });
         this.floatText(target.img.x, this.barY(target) - 52, G.t('battle.tariff'), '#ffd76a', 13, 1000);
       }
-      const base = target.st.insiderHp || target.st.maxHp;   // 內線交易的人生命鎖 1，用原本的最大生命算
+      const base = target.st.maxHp;
       this.partyAlive().forEach(o => {
         const op = o.special.options;
         if (!op || o.kind === 'summon') return;
@@ -282,14 +282,15 @@
         o.shieldT = Math.max(o.shieldT || 0, G.HF_OPTIONS_T);
       });
     }
-    // 內線交易：每 G.INSIDER.every 秒生成護盾（開打第一下就有）
+    // 內線交易：每 G.INSIDER.every 秒扣目前生命 99%、生成護盾（開打第一下就有）
     insiderTick(dt) {
       this.partyAlive().forEach(u => {
         if (!u.st.insider) return;
         u.insiderT = (u.insiderT == null ? G.INSIDER.every : u.insiderT) + dt;
         if (u.insiderT < G.INSIDER.every) return;
         u.insiderT = 0;
-        const amt = Math.round(u.st.insiderHp * G.INSIDER.shield(u.st.insider));
+        u.hp = Math.max(1, Math.round(u.hp * (1 - G.INSIDER.hpCut)));   // 施放時扣目前生命 99%
+        const amt = Math.round(u.st.maxHp * G.INSIDER.shield(u.st.insider));
         if (amt > (u.shield || 0)) { u.shield = amt; u.shieldBase = amt; }
         u.shieldT = Math.max(u.shieldT || 0, G.INSIDER.dur(u.st.insider));
         this.glow(u, '#9fd8ff');
@@ -1517,7 +1518,7 @@
         if (!u.alive || !u.img.visible) return;
         const w = u.boss ? 70 : 38, x = u.img.x - w / 2, y = this.barY(u);
         g.fillStyle(0x000000, 0.55).fillRect(x - 1, y - 1, w + 2, 6);
-        const barMax = u.st.insiderHp || u.st.maxHp;   // 內線交易：生命鎖 1，血條用原本的最大生命當分母，才看得出只剩 1
+        const barMax = u.st.maxHp;
         const p = Math.max(0, u.hp / barMax);
         g.fillStyle(this.party(u) ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, u.hp > 0 ? Math.max(1, w * p) : 0, 4);   // 還活著至少留 1px
         if (u.shield > 0) g.fillStyle(0x9fd8ff, 0.9).fillRect(x, y - 3, w * Math.min(1, u.shield / barMax), 2);
