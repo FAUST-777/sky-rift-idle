@@ -202,7 +202,7 @@ G.I18N['en'] = {
   'skill.hf_options.name': 'Options Trading',
   'skill.hf_options.desc': 'When anyone in the party is attacked, you gain a shield equal to {v}% of their max HP (5s, keeps the larger). Party DEF +{party_defPct}%. Being attacked also triggers Trump Tariff: party damage taken -15% for 4s (12s cooldown)',
   'skill.hf_insider.name': 'Insider Trading',
-  'skill.hf_insider.desc': 'DEF set to 0, cannot evade. Every 5s: lose 99% of your current HP and gain a shield of {shield}% of your max HP (lasts {dur}s). Base ATK ×{v}, damage +{dmg}%, always crit, crit damage +{critDmg}%, +{per}% damage per debuff on the enemy; attack speed +{spdPct}%, skill damage +{skillDmg}%',
+  'skill.hf_insider.desc': 'DEF set to 0, cannot evade, healing received -33%. Every 5s: lose 99% of your current HP and gain a shield of {shield}% of your max HP (lasts {dur}s). Base ATK ×{v}, damage +{dmg}%, always crit, crit damage +{critDmg}%, +{per}% damage per debuff on the enemy; attack speed +{spdPct}%, skill damage +{skillDmg}%',
   'skill.hf_wolf.name': 'The Wolf of Wall Street',
   'skill.hf_wolf.desc': 'Made so much money you just bought another airship! Airship damage ×2 (cannon and captain ship skills), cannon interval halved; ship skill damage +{v}% more',
   'buff.qe.name': 'Quantitative Easing',

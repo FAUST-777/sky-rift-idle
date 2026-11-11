@@ -495,8 +495,8 @@ G.HF_ARB_COST = 1000;                       // 數學模型套利：花費金幣
 G.HF_QE = { t: 13, gap: 15 };               // 熊市「量化寬鬆」：持續、間隔秒數
 G.HF_TARIFF = { v: 0.15, t: 4, gap: 12 };   // 期權交易「川普關稅」：全隊受到傷害 -15%
 G.HF_OPTIONS_T = 5;                         // 期權交易護盾持續秒數
-// 內線交易：hpCut = 每次生成護盾時扣掉目前生命的比例、shield = 最大生命倍率（300%→777%）、dur = 護盾秒數、every = 每幾秒生成、atk = 基礎攻擊倍率、dmg = 傷害、per = 敵人每個減益加傷
-G.INSIDER = { every: 5, hpCut: 0.99, shield: lin(3, 1.1925), dur: lin(10, 1.25), atk: lin(2, 0.25), dmg: lin(0.1, 2.225), per: lin(0.07, 0.0075) };
+// 內線交易：hpCut = 每次生成護盾時扣掉目前生命的比例、healCut = 受到的回復減少（第 150 輪）、shield = 最大生命倍率（300%→777%）、dur = 護盾秒數、every = 每幾秒生成、atk = 基礎攻擊倍率、dmg = 傷害、per = 敵人每個減益加傷
+G.INSIDER = { every: 5, hpCut: 0.99, healCut: 0.33, shield: lin(3, 1.1925), dur: lin(10, 1.25), atk: lin(2, 0.25), dmg: lin(0.1, 2.225), per: lin(0.07, 0.0075) };
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
