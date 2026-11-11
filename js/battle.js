@@ -1517,9 +1517,10 @@
         if (!u.alive || !u.img.visible) return;
         const w = u.boss ? 70 : 38, x = u.img.x - w / 2, y = this.barY(u);
         g.fillStyle(0x000000, 0.55).fillRect(x - 1, y - 1, w + 2, 6);
-        const p = Math.max(0, u.hp / u.st.maxHp);
-        g.fillStyle(this.party(u) ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, w * p, 4);
-        if (u.shield > 0) g.fillStyle(0x9fd8ff, 0.9).fillRect(x, y - 3, w * Math.min(1, u.shield / u.st.maxHp), 2);
+        const barMax = u.st.insiderHp || u.st.maxHp;   // 內線交易：生命鎖 1，血條用原本的最大生命當分母，才看得出只剩 1
+        const p = Math.max(0, u.hp / barMax);
+        g.fillStyle(this.party(u) ? (u.kind === 'summon' ? 0x5bf0a0 : 0x56d364) : 0xe5534b, 1).fillRect(x, y, u.hp > 0 ? Math.max(1, w * p) : 0, 4);   // 還活著至少留 1px
+        if (u.shield > 0) g.fillStyle(0x9fd8ff, 0.9).fillRect(x, y - 3, w * Math.min(1, u.shield / barMax), 2);
         if (u.taunt.t > 0) g.lineStyle(1, 0xffd23f, 1).strokeRect(x - 1, y - 1, w + 2, 6);
       });
       this.enemies.forEach(u => this.drawDebuffLabel(u));
