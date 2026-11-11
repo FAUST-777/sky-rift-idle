@@ -107,6 +107,7 @@ G.BASIC_MULT = { one: 1.0, all: 0.55 };   // 普攻倍率：全體每下較弱
 G.TEAM_SYNERGIES = [
   { id: 'wildhunt', mix: ['animal', 'physical', 'dark'],   bonus: { spdPct: 0.18, cannonInterval: 5 } },
   { id: 'triad',    mix: ['animal', 'physical', 'arcane'], bonus: { critDmg: 0.10, hpPct: 0.15, defPct: 0.01 } },
+  { id: 'hex',      mix: ['arcane', 'dark', 'animal'],     bonus: { skillDmg: 1.87, shieldAmt: 0.25 } },   // 秘咒獸魂：全隊技能傷害 +187%、技能護盾量 +25%
   { id: 'animal',   type: 'animal',   tiers: { 2: { cdr: 0.25 },      3: { cdr: 0.35 } } },
   { id: 'physical', type: 'physical', tiers: { 2: { spdPct: 0.07 },   3: { spdPct: 0.10, basicLifesteal: 0.005 } } },   // basicLifesteal：普攻命中回復自己最大生命的比例
   { id: 'arcane',   type: 'arcane',   tiers: { 2: { arcaneCrit: 0.5, arcaneCritDmg: 1.0, arcaneDur: 6 }, 3: { arcaneCrit: 0.55, arcaneCritDmg: 1.1, arcaneDur: 12 } } },   // 全隊打怪累積 100 次 → 全隊暴擊率／暴擊傷害提升 N 秒
