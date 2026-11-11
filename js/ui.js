@@ -667,11 +667,13 @@
   // 船艙 = 背景圖＋8 個擺設格＋走來走去的寵物
   const petSprite = (k, cls = '') => `<i class="hpet-spr ${cls}" style="background-image:url(assets/pets/${k.id}.png);aspect-ratio:${k.fw}/${k.fh}"></i>`;
   const perkOf = id => G.PET_PERKS.find(p => p.id === id);
+  // 家具圖示：有圖片的用圖片，舊家具用 emoji
+  const furnIcon = (f, cls = '') => f.img ? `<img class="furn-img ${cls}" src="assets/furniture/${f.id}.webp" alt="" loading="lazy">` : f.icon;
   function renderHome() {
     const S = G.S, petCap = G.petCap(), bg = G.homeBg();
     const slots = bg.slots.map(([x, y, w, h], i) => {
       const key = 's' + i, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
-      return `<button class="hslot ${f ? 'has' : ''} ${UI.placing && !id ? 'placing' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="hslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? f.icon : ''}</button>`;
+      return `<button class="hslot ${f ? 'has' : ''} ${UI.placing && !id ? 'placing' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="hslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? furnIcon(f) : ''}</button>`;
     }).join('');
     const pets = S.hpetEq.map(u => G.hpet(u)).filter(Boolean).map(p => {
       const k = G.hpetKind(p.kind);
@@ -683,9 +685,9 @@
       : `<span class="chip locked">🔒 ${t(`homeBg.${b.id}`)}</span>`).join('');
     const stock = Object.entries(S.furniture).filter(([, n]) => n > 0).map(([id, n]) => {
       const f = G.FURNITURE.find(z => z.id === id);
-      return `<button class="chip ${UI.placing === id ? 'on' : ''}" data-act="pick" data-id="${id}">${f.icon} ${t(`furniture.${id}`)} ×${n}</button>`;
+      return `<button class="chip ${UI.placing === id ? 'on' : ''}" data-act="pick" data-id="${id}">${furnIcon(f, 'sm')} ${t(`furniture.${id}`)} ×${n}</button>`;
     }).join('');
-    const shop = G.FURNITURE.map(f => `<button data-act="buy" data-id="${f.id}"><b>${f.icon}</b>${t(`furniture.${f.id}`)}${f.collect ? ` <span class="tag passive">${t('home.collect')}</span>` : ''}<br>
+    const shop = G.FURNITURE.map(f => `<button data-act="buy" data-id="${f.id}"><b>${furnIcon(f, 'shop')}</b>${t(`furniture.${f.id}`)}${f.collect ? ` <span class="tag passive">${t('home.collect')}</span>` : ''}<br>
       <small class="muted">${f.cur === 'gold' ? G.fmt(f.price) + '💰' : f.price + '💎'}・${t('home.comfortPlus', { n: f.comfort })}</small></button>`).join('');
 
     return `

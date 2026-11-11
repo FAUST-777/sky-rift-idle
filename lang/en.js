@@ -169,6 +169,7 @@ G.I18N['en'] = {
   'hpet.collie': 'Border Collie',
   'hpet.jellyShroom': 'Moon Jelly · Mushroom Cap',
   'hpet.jack': 'Jack Russell Terrier',
+  'hpet.unicorn': 'Pegasus Unicorn',
   'hpet.jellyMountain': 'Mountain Spirit Jelly',
   'core.atk': 'Attack', 'core.buff': 'Support', 'core.def': 'Defense',
   'range.all': 'All enemies', 'range.one': 'Single target',
@@ -470,6 +471,7 @@ G.I18N['en'] = {
   'home.pets': 'Captured Monsters', 'home.petsInfo': '{n}/{cap} · Each gives a small bonus',
   
   'home.noPets': 'No monsters captured yet', 'home.pickFirst': 'Pick furniture from Storage first',
+  'furniture.typewriter': 'Mech Typewriter', 'furniture.octopus': 'Pink Octopus Plush', 'furniture.cake': 'Rainbow Birthday Cake', 'furniture.coffeeTech': 'Tech Coffee Set', 'furniture.paradise': 'Bird of Paradise', 'furniture.plantGreen': 'Chomper Plant', 'furniture.bonsai': 'Lucky Cat Bonsai', 'furniture.blackCat': 'Sleeping Black Cat', 'furniture.laptop': 'Trading Laptop', 'furniture.chips': 'Casino Chips', 'furniture.hula': 'Hula Dancers', 'furniture.moneyStack': 'Cash & Coin Stand', 'furniture.steamChest': 'Steam Treasure Chest', 'furniture.goldPistol': 'Golden Pistol', 'furniture.trophy': 'Golden Trophy', 'furniture.plantBlue': 'Porcelain Chomper', 'furniture.spiritLantern': 'Spirit Lantern', 'furniture.techOrb': 'Energy Core', 'furniture.holoGlobe': 'Starlight Globe', 'furniture.garuda': 'Garuda Carving', 'furniture.dancerStatue': 'Dancer Statue', 'furniture.skullCrown': 'Skull King Crown', 'furniture.dragonJade': 'Jade Dragon Statue', 'furniture.dragonLava': 'Lava Dragon Statue', 'furniture.unicornStatue': 'Pegasus Statue',
   'furniture.plant': 'Potted Plant', 'furniture.barrel': 'Barrel', 'furniture.lamp': 'Lantern', 'furniture.chair': 'Wooden Chair', 'furniture.bed': 'Hammock',
   'furniture.rug': 'Woven Rug', 'furniture.shelf': 'Bookshelf', 'furniture.globe': 'Sky Orrery', 'furniture.compass': 'Ancient Compass',
   'furniture.egg': 'Dragon Egg', 'furniture.star': 'Stardust Jar',

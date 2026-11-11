@@ -169,6 +169,7 @@ G.I18N['zh-CN'] = {
   'hpet.collie': '边境牧羊犬',
   'hpet.jellyShroom': '月光水母・菇伞',
   'hpet.jack': '杰克罗素犬',
+  'hpet.unicorn': '天马独角兽',
   'hpet.jellyMountain': '山神水母',
   'core.atk': '攻击', 'core.buff': '辅助', 'core.def': '防御',
   'range.all': '全体', 'range.one': '单体',
@@ -470,6 +471,7 @@ G.I18N['zh-CN'] = {
   'home.pets': '捕获的怪物', 'home.petsInfo': '{n}/{cap}・每只带一个小增益',
   
   'home.noPets': '还没有捕获任何怪物', 'home.pickFirst': '先在「仓库」选一件家具',
+  'furniture.typewriter': '机械打字机', 'furniture.octopus': '粉红章鱼抱枕', 'furniture.cake': '彩虹生日蛋糕', 'furniture.coffeeTech': '科技咖啡组', 'furniture.paradise': '天堂鸟盆栽', 'furniture.plantGreen': '食人花盆栽', 'furniture.bonsai': '招财猫盆景', 'furniture.blackCat': '酣睡黑猫', 'furniture.laptop': '看盘笔电', 'furniture.chips': '赌场筹码', 'furniture.hula': '草裙舞娃娃', 'furniture.moneyStack': '钞票金币台', 'furniture.steamChest': '蒸汽宝箱', 'furniture.goldPistol': '黄金沙漠之鹰', 'furniture.trophy': '金像奖杯', 'furniture.plantBlue': '青花食人花', 'furniture.spiritLantern': '镇魂宫灯', 'furniture.techOrb': '能量核心仪', 'furniture.holoGlobe': '星辉地球仪', 'furniture.garuda': '迦楼罗木雕', 'furniture.dancerStatue': '舞神石像', 'furniture.skullCrown': '骷髅王冠', 'furniture.dragonJade': '翠鳞龙像', 'furniture.dragonLava': '熔岩龙像', 'furniture.unicornStatue': '天马独角兽像',
   'furniture.plant': '盆栽', 'furniture.barrel': '酒桶', 'furniture.lamp': '风灯', 'furniture.chair': '木椅', 'furniture.bed': '吊床',
   'furniture.rug': '织毯', 'furniture.shelf': '书柜', 'furniture.globe': '天空仪', 'furniture.compass': '古代罗盘',
   'furniture.egg': '龙蛋', 'furniture.star': '星砂瓶',

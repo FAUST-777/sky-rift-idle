@@ -621,6 +621,7 @@ G.SHIP_PAINTS = ['#b5523b', '#3b6fb5', '#3b8f5a', '#7a4bb5', '#d4a017', '#3a3a3a
 
 // ── 家具與收藏品（名稱：furniture.<id>）────────────────────────────────────
 // comfort = 舒適度（每 1 點 = 離線收益 +1%）；船艙固定 8 格，所以數值是舊版（最多 36 格）的 4.5 倍；cur = 用金幣(gold)或雲晶(crystal)買
+G.DECOR_COMFORT = 30;   // 圖片家具的舒適度（全部一樣）
 G.FURNITURE = [
   { id: 'plant',   icon: '🌿', price: 60,  cur: 'gold',    comfort: 5 },
   { id: 'barrel',  icon: '🛢️', price: 80,  cur: 'gold',    comfort: 5 },
@@ -633,6 +634,32 @@ G.FURNITURE = [
   { id: 'compass', icon: '🧭', price: 10,  cur: 'crystal', comfort: 27, collect: true },
   { id: 'egg',     icon: '🥚', price: 25,  cur: 'crystal', comfort: 45, collect: true },
   { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 68, collect: true },
+  // 第 154 輪新增：圖片家具（assets/furniture/<id>.webp），舒適度一律 G.DECOR_COMFORT，價格依造型高低
+  { id: 'typewriter', img: true, price: 3000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'octopus', img: true, price: 3500, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'cake', img: true, price: 4000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'coffeeTech', img: true, price: 4500, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'paradise', img: true, price: 5000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'plantGreen', img: true, price: 5500, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'bonsai', img: true, price: 6000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'blackCat', img: true, price: 6500, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'laptop', img: true, price: 8000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'chips', img: true, price: 9000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'hula', img: true, price: 10000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'moneyStack', img: true, price: 12000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'steamChest', img: true, price: 15000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'goldPistol', img: true, price: 18000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'trophy', img: true, price: 20000, cur: 'gold', comfort: G.DECOR_COMFORT },
+  { id: 'plantBlue', img: true, price: 30, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'spiritLantern', img: true, price: 40, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'techOrb', img: true, price: 50, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'holoGlobe', img: true, price: 60, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'garuda', img: true, price: 70, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'dancerStatue', img: true, price: 80, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'skullCrown', img: true, price: 90, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'dragonJade', img: true, price: 100, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'dragonLava', img: true, price: 120, cur: 'crystal', comfort: G.DECOR_COMFORT },
+  { id: 'unicornStatue', img: true, price: 150, cur: 'crystal', comfort: G.DECOR_COMFORT },
 ];
 
 // ── 船艙背景（升級船身解鎖，可自由切換）：slots = 8 個擺設格 [左%, 上%, 寬%, 高%] ──
@@ -658,6 +685,7 @@ G.HOME_PETS = [
   { id: 'jellySail', move: 'float', w: 20, speed: 2, fw: 230, fh: 219 },
   { id: 'jellyShroom', move: 'float', w: 22, speed: 2, fw: 220, fh: 178 },
   { id: 'jellyMountain', move: 'float', w: 22, speed: 2, fw: 220, fh: 211 },
+  { id: 'unicorn',   move: 'walk',  w: 30, speed: 7, fw: 230, fh: 168 },   // 第 154 輪：天馬獨角獸
 ];
 // 寵物特殊機制（跟品種分開隨機）。同一種機制放兩隻只有先放的那隻有效
 G.PET_PERKS = [
