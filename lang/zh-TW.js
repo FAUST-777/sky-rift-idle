@@ -163,6 +163,8 @@ G.I18N['zh-TW'] = {
   'buff.petRevive.desc': '寵物的復活還要 {s} 秒才能再用',
   'hpet.collie': '邊境牧羊犬',
   'hpet.jellyShroom': '月光水母・菇傘',
+  'hpet.jack': '傑克羅素犬',
+  'hpet.jellyMountain': '山神水母',
   'core.atk': '攻擊', 'core.buff': '輔助', 'core.def': '防禦',
   'range.all': '全體', 'range.one': '單體',
   'dtype.physical': '物理', 'dtype.animal': '動物', 'dtype.arcane': '奧術', 'dtype.dark': '黑暗',

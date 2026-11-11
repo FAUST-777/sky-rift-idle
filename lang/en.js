@@ -163,6 +163,8 @@ G.I18N['en'] = {
   'buff.petRevive.desc': 'Pet revive ready in {s}s',
   'hpet.collie': 'Border Collie',
   'hpet.jellyShroom': 'Moon Jelly · Mushroom Cap',
+  'hpet.jack': 'Jack Russell Terrier',
+  'hpet.jellyMountain': 'Mountain Spirit Jelly',
   'core.atk': 'Attack', 'core.buff': 'Support', 'core.def': 'Defense',
   'range.all': 'All enemies', 'range.one': 'Single target',
   'dtype.physical': 'Physical', 'dtype.animal': 'Animal', 'dtype.arcane': 'Arcane', 'dtype.dark': 'Dark',

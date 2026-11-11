@@ -615,6 +615,8 @@ G.HOME_PETS = [
   { id: 'jellySail', move: 'float', w: 11, speed: 2, fw: 230, fh: 219 },
   { id: 'collie',    move: 'walk',  w: 14, speed: 8, fw: 212, fh: 127 },
   { id: 'jellyShroom', move: 'float', w: 12, speed: 2, fw: 220, fh: 178 },
+  { id: 'jack',      move: 'walk',  w: 12, speed: 9, fw: 224, fh: 142 },
+  { id: 'jellyMountain', move: 'float', w: 12, speed: 2, fw: 220, fh: 211 },
 ];
 // 寵物特殊機制（跟品種分開隨機）。同一種機制放兩隻只有先放的那隻有效
 G.PET_PERKS = [
