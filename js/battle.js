@@ -73,7 +73,7 @@
       this.bgImg = this.textures.exists('bg_main') ? this.add.image(0, 0, 'bg_main').setOrigin(0).setDisplaySize(W, H).setDepth(-3) : null;
       if (this.bgImg) { this.cloudFar.setVisible(false); this.cloudNear.setAlpha(0.3); }
       // 自製視差圖層：遠山慢、地板快（圖存 2 倍解析度，tileScale 0.5 顯示）
-      this.mountains = this.textures.exists('bg_mount') ? this.add.tileSprite(0, 165, W, 58, 'bg_mount').setOrigin(0).setTileScale(0.5).setDepth(-2.5) : null;
+      this.mountains = this.textures.exists('bg_mount') ? this.add.tileSprite(0, 171, W, 58, 'bg_mount').setOrigin(0).setTileScale(0.5).setDepth(-2.5) : null;
       this.floorImg = this.textures.exists('bg_floor');
       if (this.floorImg) this.ground.setTexture('bg_floor').setTileScale(0.5).setPosition(0, GROUND - 21).setSize(W, H - GROUND + 21);
       this.drawShip();
