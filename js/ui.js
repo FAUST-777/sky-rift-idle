@@ -236,6 +236,7 @@
           </div>
         </div>
         <div class="slots">${slots}</div>
+        ${pinkSetHtml(G.pinkCount(who))}
       </div>
       <div class="card">
         <h3>${t('hero.class')} <small>${G.clsName(cls)}</small></h3>
@@ -269,6 +270,7 @@
       <h2 style="color:${G.RARITY[it.rarity].color}">${itemIcon(it)} ${esc(G.itemName(it))}</h2>
       <div class="muted" style="font-size:12px;margin-bottom:10px">${t('item.meta', { rarity: G.rarityName(it.rarity), slot: G.slotName(it.slot), floor: it.floor })}</div>
       <div class="stats" style="grid-template-columns:1fr">${rows}</div>
+      ${it.rarity === G.PINK ? pinkSetHtml(G.pinkCount(who), true) : ''}
       ${cur ? `<p class="muted" style="font-size:12px">${t('item.compare', { name: esc(G.itemName(cur)) })}</p>` : ''}
       <div class="modal-actions">
         <button class="btn" data-act="close">${t('common.close')}</button>
@@ -602,7 +604,7 @@
   // 每款的效果文字
   function partEffect(slot, i) {
     const v = G.SHIP_PARTS[slot].v[i], pct = Math.round(v * 100);
-    if (slot === 'hull') { const s = G.homeSize(i); return t('part.hull.desc', { v: pct, w: s.w, h: s.h }); }
+    if (slot === 'hull') return t('part.hull.desc', { v: pct, bg: t(`homeBg.${G.HOME_BGS[Math.min(i, G.HOME_BGS.length - 1)].id}`) });
     if (slot === 'wing' || slot === 'engine') return t(`part.${slot}.desc`, { v });
     if (slot === 'cannon') return t('part.cannon.desc', { v: pct, n: G.fmt(Math.round(G.heroStats().atk * v)) });   // 基礎傷害 = 主角攻擊 × 倍率
     return t(`part.${slot}.desc`, { v: pct });
@@ -649,13 +651,23 @@
   }
 
   // ── 分頁：家園（飛空艇內部）─────────────────────────────────────────────
+  // 船艙 = 背景圖＋8 個擺設格＋走來走去的寵物
+  const petSprite = (k, cls = '') => `<i class="hpet-spr ${cls}" style="background-image:url(assets/pets/${k.id}.png);aspect-ratio:${k.fw}/${k.fh}"></i>`;
+  const perkOf = id => G.PET_PERKS.find(p => p.id === id);
   function renderHome() {
-    const S = G.S, { w, h } = G.homeSize(G.homeTier()), petCap = G.petCap();
-    let cells = '';
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const key = `${x},${y}`, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
-      cells += `<button class="cell ${UI.placing && !id ? 'placing' : ''}" data-act="cell" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? f.icon : ''}</button>`;
-    }
+    const S = G.S, petCap = G.petCap(), bg = G.homeBg();
+    const slots = bg.slots.map(([x, y, w, h], i) => {
+      const key = 's' + i, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
+      return `<button class="hslot ${f ? 'has' : ''} ${UI.placing && !id ? 'placing' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="hslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? f.icon : ''}</button>`;
+    }).join('');
+    const pets = S.hpetEq.map(u => G.hpet(u)).filter(Boolean).map(p => {
+      const k = G.hpetKind(p.kind);
+      const s0 = petPos[p.uid];   // 重畫時接著原本的位置，沒有就等 petTick 擺好再顯示
+      return `<div class="hpet ${k.move}" data-hpet="${p.uid}" style="width:${k.w}%;${s0 ? `left:${s0.x}%;top:${s0.y}%` : 'visibility:hidden'}">${petSprite(k)}<span class="hpet-tag"></span></div>`;
+    }).join('');
+    const bgs = G.HOME_BGS.map((b, i) => i < G.homeBgCount()
+      ? `<button class="chip ${G.homeBg() === b ? 'on' : ''}" data-act="homebg" data-v="${i}">${t(`homeBg.${b.id}`)}</button>`
+      : `<span class="chip locked">🔒 ${t(`homeBg.${b.id}`)}</span>`).join('');
     const stock = Object.entries(S.furniture).filter(([, n]) => n > 0).map(([id, n]) => {
       const f = G.FURNITURE.find(z => z.id === id);
       return `<button class="chip ${UI.placing === id ? 'on' : ''}" data-act="pick" data-id="${id}">${f.icon} ${t(`furniture.${id}`)} ×${n}</button>`;
@@ -666,9 +678,12 @@
     return `
       <div class="card">
         <h3>${t('home.title')} <small>${t('home.comfort', { c: G.comfort() })}</small></h3>
-        <div class="home-grid" style="grid-template-columns:repeat(${w},1fr)">${cells}</div>
-        <p class="muted" style="font-size:12px;margin:8px 0 0">${UI.placing ? t('home.placingHint') : t('home.hint')}${t('home.hullHint')}</p>
+        <div class="home-scene" id="homeScene"><img src="${bg.img}" alt="">${slots}${pets}</div>
+        <p class="muted" style="font-size:12px;margin:8px 0 6px">${UI.placing ? t('home.placingHint') : t('home.hint')}</p>
+        <div class="chips">${bgs}</div>
+        <p class="muted" style="font-size:11px;margin:6px 0 0">${t('home.bgHint')}</p>
       </div>
+      ${renderHomePets()}
       <div class="card"><h3>${t('home.storage')}</h3><div class="chips">${stock || `<span class="muted">${t('home.storageEmpty')}</span>`}</div></div>
       <div class="card"><h3>${t('home.shop')}</h3><div class="shop">${shop}</div></div>
       ${renderNets()}
@@ -679,6 +694,73 @@
       ${renderDex()}`;
   }
 
+  // 船艙寵物清單：放在船艙的（生效）＋倉庫
+  function renderHomePets() {
+    const S = G.S, eq = S.hpetEq;
+    const row = (p, on) => {
+      const k = G.hpetKind(p.kind), pk = perkOf(p.perk), dead = on && !G.petActive(p.uid);
+      return `<div class="hpet-row ${on ? 'on' : ''}">
+        <div class="hpet-ico">${petSprite(k, 'still')}</div>
+        <div class="grow"><b>${t(`hpet.${p.kind}`)}</b> <span class="muted" style="font-size:11px">${t(`hpetMove.${k.move}`)}</span>
+          <div style="font-size:12px" class="${dead ? 'bad' : 'gold'}">${pk.icon} ${t(`hperk.${p.perk}`)}${dead ? `（${t('home.petDup')}）` : ''}</div>
+          <div class="muted" style="font-size:11px">${t(`hperk.${p.perk}.desc`)}</div></div>
+        ${on ? `<button class="btn small" data-act="hpetun" data-id="${p.uid}">${t('home.petOut')}</button>`
+             : `<button class="btn small good" data-act="hpeteq" data-id="${p.uid}">${t('home.petIn')}</button>
+                <button class="btn small danger" data-act="hpetrel" data-id="${p.uid}">✕</button>`}
+      </div>`;
+    };
+    const inCabin = eq.map(u => G.hpet(u)).filter(Boolean).map(p => row(p, true)).join('');
+    const stored = S.hpets.filter(p => !eq.includes(p.uid)).map(p => row(p, false)).join('');
+    return `<div class="card">
+      <h3>🐾 ${t('home.hpets')} <small>${t('home.hpetsInfo', { n: eq.length, cap: G.PET_SLOTS })}</small></h3>
+      <p class="muted" style="font-size:12px;margin:-4px 0 8px">${t('home.hpetsHelp')}</p>
+      ${inCabin || `<p class="muted" style="font-size:12px">${t('home.hpetsEmpty')}</p>`}
+      <div class="slot-label" style="margin-top:8px">${t('home.hpetStore', { n: S.hpets.length - eq.length })}</div>
+      ${stored || `<p class="muted" style="font-size:12px">${t('home.hpetStoreEmpty')}</p>`}
+    </div>`;
+  }
+
+  // 寵物在船艙裡移動：陸生在地板～床的高度走動，水母在空中漂浮
+  const petPos = {};
+  function petTick() {
+    const scene = document.getElementById('homeScene');
+    if (!scene) return;
+    const now = Date.now(), dt = 0.08, own = G.petPerkOwners();
+    scene.querySelectorAll('.hpet').forEach(el => {
+      const uid = +el.dataset.hpet, p = G.hpet(uid); if (!p) return;
+      const k = G.hpetKind(p.kind), fly = k.move === 'float';
+      const area = fly ? { x0: 8, x1: 92, y0: 22, y1: 60 } : { x0: 6, x1: 94, y0: 70, y1: 96 };
+      let s = petPos[uid];
+      if (!s) s = petPos[uid] = { x: G.rand(area.x0, area.x1), y: G.rand(area.y0, area.y1), tx: 0, ty: 0, wait: G.rand(0, 2), dir: 1, ph: Math.random() * 6 };
+      if (s.wait > 0) { s.wait -= dt; if (s.wait <= 0) { s.tx = G.rand(area.x0, area.x1); s.ty = G.rand(area.y0, area.y1); } }
+      else {
+        const dx = s.tx - s.x, dy = (s.ty - s.y) * 1.3, d = Math.hypot(dx, dy), step = k.speed * dt;
+        if (d <= step) { s.x = s.tx; s.y = s.ty; s.wait = fly ? G.rand(0.5, 2) : G.rand(1, 4); }
+        else { s.x += dx / d * step; s.y += dy / d * step / 1.3; if (Math.abs(dx) > 0.3) s.dir = dx > 0 ? 1 : -1; }
+      }
+      s.ph += dt;
+      const bob = fly ? Math.sin(s.ph * 1.6) * 1.5 : 0;
+      el.style.left = s.x + '%'; el.style.top = (s.y + bob) + '%'; el.style.visibility = '';
+      el.style.zIndex = 10 + Math.round(s.y);
+      el.classList.toggle('flip', s.dir < 0);
+      el.classList.toggle('idle', !fly && s.wait > 0);
+      // 頭上：機制圖示、復活冷卻、重複失效
+      const tag = el.querySelector('.hpet-tag'), pk = perkOf(p.perk);
+      let txt = pk.icon, cls = '';
+      if (own[p.perk] !== uid) { txt = t('home.petDupShort'); cls = 'dup'; }
+      else if (p.perk === 'revive' && (G.petReviveAt || 0) > now) txt = `💫 ${Math.ceil((G.petReviveAt - now) / 1000)}s`;
+      if (tag.textContent !== txt) tag.textContent = txt;
+      tag.className = 'hpet-tag ' + cls;
+    });
+  }
+  setInterval(petTick, 80);
+
+  // 天櫻套裝說明：達成的件數亮起來
+  function pinkSetHtml(n, always) {
+    if (!n && !always) return '';
+    const rows = G.PINK_SET.map(s => `<div class="${n >= s.n ? 'gold' : 'muted'}">${t('pink.need', { n: s.n })}：${t(`pink.${s.n}`)}</div>`).join('');
+    return `<div class="pink-set"><b style="color:${G.RARITY[G.PINK].color}">🌸 ${t('pink.title')}（${n}/5）</b>${rows}</div>`;
+  }
   const petBonusText = p => {
     if (!p.bonus) return '';
     const v = p.bonus.stat === 'crit' ? p.bonus.v : Math.round(p.bonus.v * 100);
@@ -950,7 +1032,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'paint': G.setShipPaint(+d.v); break;
       case 'buy': G.buyFurniture(d.id); break;
       case 'pick': UI.placing = UI.placing === d.id ? null : d.id; UI.refresh(); break;
-      case 'cell':
+      case 'homebg': G.setHomeBg(+d.v); break;
+      case 'hpeteq': G.equipPet(+d.id); break;
+      case 'hpetun': G.unequipPet(+d.id); break;
+      case 'hpetrel': {
+        const p = G.hpet(+d.id); if (!p) break;
+        UI.modal(`<h2>${t('home.relTitle')}</h2><p>${t('home.relBody', { name: t(`hpet.${p.kind}`), perk: t(`hperk.${p.perk}`) })}</p>
+          <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn danger" data-act="hpetrel2" data-id="${p.uid}">${t('home.relOk')}</button></div>`);
+        break;
+      }
+      case 'hpetrel2': UI.close(); G.releasePet(+d.id); break;
+      case 'hslot':
         if (S.home[d.k]) G.removeFurniture(d.k);
         else if (UI.placing) { G.placeFurniture(d.k, UI.placing); if (!S.furniture[UI.placing]) UI.placing = null; UI.refresh(); }
         else UI.toast(t('home.pickFirst'));

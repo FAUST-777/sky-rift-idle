@@ -274,3 +274,43 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .btn.ship-using, .btn.ship-using:disabled { background: #b8323f; border-color: #e0606b; color: #fff; font-weight: 700; opacity: 1; }
 .btn.ship-equip { background: #bfe6ff; border-color: #8fd0ff; color: #0b2a40; font-weight: 700; }
 .cannon-base { font-size: 12px; margin: -2px 0 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 179, 107, .1); color: #ffcf9e; }
+
+/* ── 船艙（背景圖＋8 格擺設＋寵物）──────────────────── */
+.home-scene { position: relative; width: 100%; aspect-ratio: 1437 / 1094; border-radius: 12px; overflow: hidden; border: 3px solid #4a2f1a; background: #2a1d14; }
+.home-scene > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.hslot { position: absolute; z-index: 5; padding: 0; border-radius: 6px; border: 2px solid rgba(255,255,255,.45); background: rgba(255,255,255,.10);
+  display: flex; align-items: center; justify-content: center; font-size: clamp(16px, 5.5vw, 34px); line-height: 1; }
+.hslot.has { border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.04); }
+.hslot.placing { border-color: var(--gold); background: rgba(255,215,106,.22); }
+.hpet { position: absolute; transform: translate(-50%, -100%); pointer-events: none; }
+.hpet-spr { display: block; width: 100%; background-size: 300% 100%; background-repeat: no-repeat; animation: hpetWalk .5s step-end infinite; }
+.hpet.float .hpet-spr { animation-duration: .9s; }
+.hpet.idle .hpet-spr { animation-play-state: paused; }
+.hpet.flip .hpet-spr { transform: scaleX(-1); }
+.hpet-spr.still { animation: none; background-position: 0 0; }
+@keyframes hpetWalk { 0% { background-position: 0 0; } 33.33% { background-position: 50% 0; } 66.66% { background-position: 100% 0; } }
+.hpet-tag { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; line-height: 1; padding: 2px 5px;
+  border-radius: 8px; background: rgba(15,10,30,.7); color: #fff; }
+.hpet-tag.dup { background: rgba(140,30,40,.85); }
+.hpet-row { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-top: 1px solid #2c2448; }
+.hpet-row.on { background: rgba(255,158,232,.07); border-radius: 8px; }
+.hpet-ico { width: 54px; flex: none; }
+.chip.locked { opacity: .5; }
+.bad { color: var(--bad); }
+.pink-set { margin-top: 10px; padding: 8px 10px; border: 1px solid #ff7ad9; border-radius: 10px; background: rgba(255,122,217,.07); font-size: 12px; line-height: 1.7; }
+
+/* ── 桌機：左邊控制面板、右邊戰鬥畫面（視窗變窄自動回到手機版）────── */
+@media (min-width: 900px) {
+  #app { max-width: 1600px; display: grid; grid-template-columns: minmax(380px, 34%) 1fr; grid-template-rows: auto 1fr auto;
+    grid-template-areas: "hud hud" "panel battle" "tabs battle"; }
+  #hud { grid-area: hud; }
+  #panel { grid-area: panel; min-height: 0; border-right: 1px solid var(--line); }
+  #tabs { grid-area: tabs; border-right: 1px solid var(--line); }
+  #battleWrap { grid-area: battle; align-self: center; justify-self: center; width: 100%; max-width: calc((100dvh - 110px) * 1.6); padding: 0 12px; }
+  #battleWrap.collapsed #battleBox { height: auto; aspect-ratio: 480 / 300; }
+  #battleWrap.collapsed #battle { position: static; }
+  #collapseBtn { display: none; }
+  #floorBar { border-radius: 0 0 10px 10px; }
+  #toast { bottom: 24px; }
+  #modal .modal-card { max-width: 440px; }
+}

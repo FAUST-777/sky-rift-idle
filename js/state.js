@@ -78,7 +78,10 @@
       ship: newShip(),
       introVer: 0,           // 看過的開場對話版本（G.INTRO_VER 改版時會再看一次）
       furniture: {},         // id -> 持有數量（未擺放）
-      home: {},              // "x,y" -> furniture id
+      home: {},              // 擺設格 "s0"～"s7" -> furniture id
+      homeBg: 0,             // 船艙背景（G.HOME_BGS）
+      hpets: [],             // 船艙寵物 { uid, kind, perk }
+      hpetEq: [],            // 放在船艙裡的寵物 uid（最多 G.PET_SLOTS 隻）
       pets: [],              // { id(怪物), shape, color, bonus: { stat, v } }
       autoSell: [false, false, false, false],   // 撿到就賣：普通／優良／稀有／史詩（傳說不賣）
       log: [],               // { k, p, color }
@@ -99,6 +102,7 @@
       migrateToI18n(G.S);
       migrateSkills(G.S);
       migrateCapture(G.S, s);
+      migrateHome(G.S);
       if (!Array.isArray(s.autoSell)) G.S.autoSell = [!!s.autoSellCommon, false, false, false];   // 舊版只有「自動賣普通」
       delete G.S.autoSellCommon;
     } else {
@@ -153,6 +157,16 @@
     S.pets.forEach(p => { if (!p.bonus) p.bonus = G.pick(G.PET_BONUSES); if (p.id) G.dexMark(p.id, 'caught', S); });
     // 已經打過的層：該層怪物算「已發現」
     for (let f = 1; f < S.maxFloor; f++) G.monsterTier(f).forEach(m => G.dexMark(m.id, 'seen', S));
+  }
+
+  // 船艙改成背景圖 8 格（第 97 輪）：舊的格子座標 "x,y" 上的家具全部收回倉庫
+  function migrateHome(S) {
+    Object.keys(S.home).forEach(k => {
+      if (/^s[0-7]$/.test(k)) return;
+      S.furniture[S.home[k]] = (S.furniture[S.home[k]] || 0) + 1;
+      delete S.home[k];
+    });
+    S.hpetEq = (S.hpetEq || []).filter(u => S.hpets.some(p => p.uid === u)).slice(0, G.PET_SLOTS);
   }
 
   // 重置中就不要再存檔（不然頁面重新整理前的自動存檔會把剛刪掉的存檔寫回去）
@@ -327,7 +341,16 @@
   };
   G.charStats = function (who) {
     if (who === G.MERC) return G.snapStats(G.S.merc.snap);   // 好友：照他上傳的底子，套「目前版本」的被動
-    return G.applySelf(G.bareStats(who), G.passivesOf(who).self, G.charOf(who).cls);
+    const ps = Object.assign({}, G.passivesOf(who).self);
+    Object.entries(G.pinkSetBonus(G.pinkCount(who))).forEach(([k, v]) => { ps[k] = (ps[k] || 0) + v; });   // 天櫻套裝
+    return G.applySelf(G.bareStats(who), ps, G.charOf(who).cls);
+  };
+  // 天櫻套裝：身上幾件粉紅裝備 → 累加達到件數的效果
+  G.pinkCount = who => G.SLOTS.filter(s => { const it = G.gearOf(who)[s]; return it && it.rarity === G.PINK; }).length;
+  G.pinkSetBonus = n => {
+    const out = {};
+    G.PINK_SET.forEach(t => { if (n >= t.n) Object.entries(t.b).forEach(([k, v]) => { out[k] = (out[k] || 0) + v; }); });
+    return out;
   };
 
   // 好友快照 → 戰鬥數值
@@ -383,11 +406,12 @@
   };
 
   // 金幣倍率：捕獲的怪物、飛空艇船底掛飾、學者「獎學金」等全隊光環
-  G.goldMult = () => 1 + (G.partyAura().goldPct || 0);
+  G.goldMult = () => (1 + (G.partyAura().goldPct || 0)) * (G.petPerk('gold') ? 1.1 : 1);   // 寵物「金幣 +10%」
 
   // ── 裝備產生 ─────────────────────────────────────────────────────────────
-  G.rollRarity = function (boss) {
-    const w = G.RARITY.map((r, i) => r.weight * (boss && i >= 2 ? 6 : 1));
+  G.rollRarity = function (boss, floor = 1) {
+    const epic = G.petPerk('epic') ? 1.1 : 1;   // 寵物「紫色以上 +10%」
+    const w = G.RARITY.map((r, i) => (i === G.PINK ? G.pinkDropWeight(floor) : r.weight) * (boss && i >= 2 ? 6 : 1) * (i >= 3 ? epic : 1));
     if (boss) w[0] = 0;
     const total = w.reduce((a, b) => a + b, 0);
     let x = Math.random() * total;
@@ -399,7 +423,7 @@
     const slot = G.pick(G.SLOTS);
     const bases = G.ITEM_BASES[slot];
     const baseIdx = G.randInt(0, bases.length - 1);
-    const rarity = G.rollRarity(boss);
+    const rarity = G.rollRarity(boss, floor);
     const R = G.RARITY[rarity];
     const scale = (1 + (floor - 1) * 0.22) * R.mult;
     const stats = {};
@@ -653,7 +677,6 @@
     const sh = G.S.ship;
     if (!sh.owned[slot].includes(i)) return;
     sh.eq[slot] = i;
-    if (slot === 'hull') trimHome();
     G.emit('ship'); G.emit('stats'); G.emit('party');
   };
 
@@ -685,20 +708,51 @@
     G.emit('home');
   };
 
-  function trimHome() {
-    const { w, h } = G.homeSize(G.homeTier());
-    Object.keys(G.S.home).forEach(k => {
-      const [x, y] = k.split(',').map(Number);
-      if (x >= w || y >= h) G.removeFurniture(k);
-    });
-  }
+  // 船艙背景：船身買過最高第幾款，就解鎖到第幾張
+  G.homeBgCount = () => Math.min(G.HOME_BGS.length, 1 + Math.max(0, G.shipTier('hull'), ...G.S.ship.owned.hull));
+  G.homeBg = () => G.HOME_BGS[Math.min(G.S.homeBg || 0, G.homeBgCount() - 1)];
+  G.setHomeBg = function (i) { if (i < G.homeBgCount()) { G.S.homeBg = i; G.emit('home'); } };
+
+  // ── 船艙寵物 ─────────────────────────────────────────────────────────────
+  G.hpet = uid => G.S.hpets.find(p => p.uid === uid);
+  G.hpetKind = id => G.HOME_PETS.find(k => k.id === id);
+  // 生效中的機制：perk -> 第一隻放進船艙、有這個機制的寵物 uid；後面重複的失效
+  G.petPerkOwners = function () {
+    const own = {};
+    G.S.hpetEq.forEach(u => { const p = G.hpet(u); if (p && !own[p.perk]) own[p.perk] = u; });
+    return own;
+  };
+  G.petPerk = perk => !!(G.S && G.S.hpetEq && G.petPerkOwners()[perk]);
+  G.petActive = uid => { const p = G.hpet(uid); return !!p && G.petPerkOwners()[p.perk] === uid; };
+  G.rollPet = function (floor, boss) {
+    if (Math.random() >= G.petDropChance(floor, boss)) return null;
+    const p = { uid: G.S.uid++, kind: G.pick(G.HOME_PETS).id, perk: G.pick(G.PET_PERKS).id };
+    G.S.hpets.push(p);
+    G.addLog('log.petGet', { name: { k: `hpet.${p.kind}` }, perk: { k: `hperk.${p.perk}` } }, '#ff9ee8');
+    G.emit('toast', t('toast.petGet', { name: t(`hpet.${p.kind}`) }));
+    G.emit('home');
+    return p;
+  };
+  G.equipPet = function (uid) {
+    const eq = G.S.hpetEq;
+    if (eq.includes(uid) || !G.hpet(uid)) return;
+    if (eq.length >= G.PET_SLOTS) return toast('toast.petFull', { n: G.PET_SLOTS });
+    eq.push(uid); G.save(); G.emit('home'); G.emit('stats');
+  };
+  G.unequipPet = function (uid) {
+    G.S.hpetEq = G.S.hpetEq.filter(u => u !== uid); G.save(); G.emit('home'); G.emit('stats');
+  };
+  G.releasePet = function (uid) {
+    G.unequipPet(uid);
+    G.S.hpets = G.S.hpets.filter(p => p.uid !== uid); G.save(); G.emit('home');
+  };
 
   G.comfort = function () {
     return Object.values(G.S.home).reduce((a, id) => a + (G.FURNITURE.find(f => f.id === id)?.comfort || 0), 0);
   };
 
   // ── 捕獸網（裝備型）─────────────────────────────────────────────────────
-  G.captureChance = () => (G.S.net.eq >= 0 ? G.NETS[G.S.net.eq].rate : 0);
+  G.captureChance = () => (G.S.net.eq >= 0 ? G.NETS[G.S.net.eq].rate * (G.petPerk('net') ? 1.25 : 1) : 0);   // 寵物「補獸網 +25%」
   G.buyNet = function (i) {
     const n = G.NETS[i], net = G.S.net;
     if (net.owned.includes(i)) return G.equipNet(i);

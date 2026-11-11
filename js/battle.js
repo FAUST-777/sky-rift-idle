@@ -1062,6 +1062,14 @@
           }
         }
       } else {
+        // 船艙寵物「復活」：立刻滿血站起來（每 60 秒一次）
+        if (G.petPerk('revive') && Date.now() >= (G.petReviveAt || 0)) {
+          G.petReviveAt = Date.now() + G.PET_REVIVE_CD * 1000;
+          u.alive = true; u.hp = u.st.maxHp;
+          this.glow(u, '#ff9ee8');
+          this.floatText(u.img.x, u.img.y - 60, G.t('battle.petRevive'), '#ff9ee8', 15, 1200);
+          return;
+        }
         // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
         u.img.setAlpha(0.3).setTint(0x777777);
         if (this.mode !== 'dead' && !this.units.some(x => x.alive && x.kind !== 'summon')) this.defeat();
@@ -1093,6 +1101,8 @@
         G.capture(u);
         this.floatText(u.img.x, u.img.y - 50, '🕸️', '#ffffff', 20, 900);
       }
+      // 船艙寵物：隨機掉落（越高層越容易，層主更高）
+      if (G.rollPet(f, u.boss)) this.floatText(u.img.x, u.img.y - 70, '🐾', '#ff9ee8', 22, 1200);
       if (!u.boss) S.kills++;
       else this.bossCleared();
     }
@@ -1338,6 +1348,7 @@
       const pct = v => Math.round(v * 100);
       if (this.curse && !this.curseNow()) out.push({ id: 'curseOff', icon: '✨', val: `${Math.ceil(this.curseOff.t)}s`, p: { s: Math.ceil(this.curseOff.t) } });
       else if (this.curse) out.push({ id: 'curse', icon: '🌪️', val: G.curseShort(this.curse), p: { text: G.curseText(this.curse), n: G.S.floor } });
+      if (G.petPerk('revive') && (G.petReviveAt || 0) > Date.now()) { const s = Math.ceil((G.petReviveAt - Date.now()) / 1000); out.push({ id: 'petRevive', icon: '💫', val: `${s}s`, p: { s } }); }
       if (this.tomeBuff && this.tomeBuff.t > 0) out.push({ id: 'tome', icon: G.FX_ICON.tome, val: `${Math.ceil(this.tomeBuff.t)}s`, p: { v: pct(this.tomeBuff.cannon), c: pct(this.tomeBuff.purge), s: Math.ceil(this.tomeBuff.t) } });
       const mc = G.moraleCap();
       // 貓貓士氣：有人裝就顯示（全隊暈眩、閃避不用等疊層）

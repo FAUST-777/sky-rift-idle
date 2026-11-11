@@ -45,6 +45,7 @@ G.RARITY = [
   { color: '#4aa3ff', mult: 1.7, affix: 1, weight: 10 },
   { color: '#b36bff', mult: 2.3, affix: 2, weight: 3.5 },
   { color: '#ff9a2e', mult: 3.2, affix: 3, weight: 0.5 },
+  { color: '#ff7ad9', mult: 4.2, affix: 3, weight: 0 },   // 粉紅「天櫻」：第 30 層起才會掉，有套裝效果（G.PINK_SET）
 ];
 
 // ── 裝備部位（名稱：slot.<id>）─────────────────────────────────────────────
@@ -544,7 +545,7 @@ G.PARTNERS = [
   { id: 'mira', floor: 14, hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15, extra: 'defDownStack' } },   // extra：破防持續時間可累加
 ];
 G.partnerRecruitCost = p => 80 * p.floor;
-G.partnerLevelCost = lv => Math.round(25 * Math.pow(1.3, lv - 1));   // 原本 50 起跳，-50%
+G.partnerLevelCost = lv => Math.round(25 * Math.pow(1.3, lv - 1) * (G.petPerk && G.petPerk('plevel') ? 0.85 : 1));   // 寵物「夥伴升級 -15%」   // 原本 50 起跳，-50%
 
 // ── 飛空艇（部位名稱：part.<id>.name；款式名稱：part.<id>.<0~4>）───────────
 // 每個部位 5 款，越後面越強、外觀也不同；買過的款式可以自由切換
@@ -575,24 +576,66 @@ G.shipPartCost = (slot, i) => {
   const c = G.SHIP_COST[i];
   return { gold: Math.round(c.gold * P.costMult), crystal: Math.round(c.crystal * P.costMult) };
 };
-G.homeSize = tier => [{ w: 4, h: 3 }, { w: 5, h: 3 }, { w: 5, h: 4 }, { w: 6, h: 5 }, { w: 6, h: 6 }][Math.max(0, Math.min(4, tier))];
 G.SHIP_PAINTS = ['#b5523b', '#3b6fb5', '#3b8f5a', '#7a4bb5', '#d4a017', '#3a3a3a'];
 
 // ── 家具與收藏品（名稱：furniture.<id>）────────────────────────────────────
-// comfort = 舒適度（每 1 點 = 離線收益 +1%）；cur = 用金幣(gold)或雲晶(crystal)買
+// comfort = 舒適度（每 1 點 = 離線收益 +1%）；船艙固定 8 格，所以數值是舊版（最多 36 格）的 4.5 倍；cur = 用金幣(gold)或雲晶(crystal)買
 G.FURNITURE = [
-  { id: 'plant',   icon: '🌿', price: 60,  cur: 'gold',    comfort: 1 },
-  { id: 'barrel',  icon: '🛢️', price: 80,  cur: 'gold',    comfort: 1 },
-  { id: 'lamp',    icon: '🏮', price: 90,  cur: 'gold',    comfort: 1 },
-  { id: 'chair',   icon: '🪑', price: 100, cur: 'gold',    comfort: 1 },
-  { id: 'bed',     icon: '🛏️', price: 150, cur: 'gold',    comfort: 2 },
-  { id: 'rug',     icon: '🧶', price: 180, cur: 'gold',    comfort: 2 },
-  { id: 'shelf',   icon: '📚', price: 260, cur: 'gold',    comfort: 3 },
-  { id: 'globe',   icon: '🌐', price: 500, cur: 'gold',    comfort: 5 },
-  { id: 'compass', icon: '🧭', price: 10,  cur: 'crystal', comfort: 6, collect: true },
-  { id: 'egg',     icon: '🥚', price: 25,  cur: 'crystal', comfort: 10, collect: true },
-  { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 15, collect: true },
+  { id: 'plant',   icon: '🌿', price: 60,  cur: 'gold',    comfort: 5 },
+  { id: 'barrel',  icon: '🛢️', price: 80,  cur: 'gold',    comfort: 5 },
+  { id: 'lamp',    icon: '🏮', price: 90,  cur: 'gold',    comfort: 5 },
+  { id: 'chair',   icon: '🪑', price: 100, cur: 'gold',    comfort: 5 },
+  { id: 'bed',     icon: '🛏️', price: 150, cur: 'gold',    comfort: 9 },
+  { id: 'rug',     icon: '🧶', price: 180, cur: 'gold',    comfort: 9 },
+  { id: 'shelf',   icon: '📚', price: 260, cur: 'gold',    comfort: 14 },
+  { id: 'globe',   icon: '🌐', price: 500, cur: 'gold',    comfort: 23 },
+  { id: 'compass', icon: '🧭', price: 10,  cur: 'crystal', comfort: 27, collect: true },
+  { id: 'egg',     icon: '🥚', price: 25,  cur: 'crystal', comfort: 45, collect: true },
+  { id: 'star',    icon: '✨', price: 40,  cur: 'crystal', comfort: 68, collect: true },
 ];
+
+// ── 船艙背景（升級船身解鎖，可自由切換）：slots = 8 個擺設格 [左%, 上%, 寬%, 高%] ──
+G.HOME_BGS = [
+  { id: 'wood',   img: 'assets/home/home1.jpg', slots: [[83.65, 11.51, 10.02, 13.15], [21.92, 26.48, 10.02, 13.15], [21.92, 40.46, 10.02, 13.15], [78.64, 46.03, 10.02, 13.15], [89.63, 46.03, 10.02, 13.15], [0.84, 56.53, 10.02, 13.15], [41.54, 60.09, 10.02, 13.15], [52.4, 60.09, 10.02, 13.15]] },
+  { id: 'royal',  img: 'assets/home/home2.jpg', slots: [[83.65, 11.51, 10.02, 13.15], [21.92, 26.48, 10.02, 13.15], [21.92, 40.46, 10.02, 13.15], [78.64, 46.03, 10.02, 13.15], [89.63, 46.03, 10.02, 13.15], [0.84, 56.53, 10.02, 13.15], [41.54, 60.09, 10.02, 13.15], [52.4, 60.09, 10.02, 13.15]] },
+  { id: 'tropic', img: 'assets/home/home3.jpg', slots: [[82.75, 11.52, 10.01, 13.16], [21.07, 26.51, 10.01, 13.16], [21.07, 40.49, 10.01, 13.16], [77.75, 46.07, 10.01, 13.16], [88.73, 46.07, 10.01, 13.16], [0.0, 56.58, 10.01, 13.16], [40.68, 60.15, 10.01, 13.16], [51.53, 60.15, 10.01, 13.16]] },
+  { id: 'scifi',  img: 'assets/home/home4.jpg', slots: [[83.65, 11.51, 10.02, 13.15], [21.92, 26.48, 10.02, 13.15], [21.92, 40.46, 10.02, 13.15], [78.64, 46.03, 10.02, 13.15], [89.63, 46.03, 10.02, 13.15], [0.84, 56.53, 10.02, 13.15], [41.54, 60.09, 10.02, 13.15], [52.4, 60.09, 10.02, 13.15]] },
+  { id: 'steam',  img: 'assets/home/home5.jpg', slots: [[82.75, 11.52, 10.01, 13.16], [21.07, 26.51, 10.01, 13.16], [21.07, 40.49, 10.01, 13.16], [77.75, 46.07, 10.01, 13.16], [88.73, 46.07, 10.01, 13.16], [0.0, 56.58, 10.01, 13.16], [40.68, 60.15, 10.01, 13.16], [51.53, 60.15, 10.01, 13.16]] },
+];
+G.HOME_SLOTS = 8;
+
+// ── 船艙寵物（名稱：hpet.<id>）：打怪隨機掉落，放進船艙（最多 5 隻）才生效 ──
+// move：walk 在地板走 / float 在空中漂浮；w = 顯示寬度（船艙寬的 %）；fw/fh = 動畫每格尺寸（3 格）
+G.HOME_PETS = [
+  { id: 'shiba',     move: 'walk',  w: 14, speed: 7, fw: 205, fh: 139 },
+  { id: 'blackdog',  move: 'walk',  w: 14, speed: 8, fw: 210, fh: 147 },
+  { id: 'komodo',    move: 'walk',  w: 18, speed: 3, fw: 228, fh: 59 },
+  { id: 'robot',     move: 'walk',  w: 10, speed: 4, fw: 191, fh: 90 },
+  { id: 'jellyMoon', move: 'float', w: 11, speed: 2, fw: 207, fh: 138 },
+  { id: 'jellySail', move: 'float', w: 11, speed: 2, fw: 230, fh: 219 },
+];
+// 寵物特殊機制（跟品種分開隨機）。同一種機制放兩隻只有先放的那隻有效
+G.PET_PERKS = [
+  { id: 'revive', icon: '💫' },   // 有角色倒下立刻復活（每 60 秒一次）
+  { id: 'gold',   icon: '💰' },   // 金幣 +10%
+  { id: 'net',    icon: '🕸️' },   // 捕獸網捕獲率 ×1.25
+  { id: 'plevel', icon: '📈' },   // 夥伴升級花費 -15%
+  { id: 'epic',   icon: '💜' },   // 紫色以上裝備掉落率 +10%
+];
+G.PET_SLOTS = 5;
+G.PET_REVIVE_CD = 60;
+// 掉落率：每層 +0.01%（第 1 層 0.21%、第 70 層 0.9%）；層主 ×10
+G.petDropChance = (floor, boss) => (0.002 + floor * 0.0001) * (boss ? 10 : 1);
+
+// ── 粉紅「天櫻」套裝：任意部位都算，穿越多件效果越多（2 件起）──────────
+G.PINK = 5;
+G.PINK_SET = [
+  { n: 2, b: { hpPct: 0.12 } },
+  { n: 3, b: { defPct: 0.12, regen: 0.005 } },
+  { n: 4, b: { evade: 0.06 } },
+  { n: 5, b: { dmgReduce: 0.08 } },
+];
+G.pinkDropWeight = floor => floor >= 30 ? 0.1 + (floor - 30) * 0.008 : 0;   // 第 30 層 0.1 → 第 70 層 0.42（層主 ×6）
 
 // ── 上升詛咒：越往上越常出現，降低全隊傷害或防禦 ─────────────────────────
 // 每一層的詛咒是固定的（用層數算出來），不會每次進去都不同
@@ -611,9 +654,9 @@ G.curseFor = f => {
 G.NETS = [
   { id: 'spider',  icon: '🕸️', rate: 0.06, gold: 300,    crystal: 0 },
   { id: 'fishing', icon: '🎣', rate: 0.07, gold: 2000,   crystal: 0 },
-  { id: 'wire',    icon: '⛓️', rate: 0.12, gold: 8000,   crystal: 10 },
-  { id: 'money',   icon: '💰', rate: 0.17, gold: 30000,  crystal: 40 },
-  { id: 'mystery', icon: '🔮', rate: 0.25, gold: 100000, crystal: 120 },
+  { id: 'wire',    icon: '⛓️', rate: 0.12, gold: 8000,   crystal: 0 },
+  { id: 'money',   icon: '💰', rate: 0.17, gold: 30000,  crystal: 0 },
+  { id: 'mystery', icon: '🔮', rate: 0.25, gold: 100000, crystal: 0 },
 ];
 
 // ── 怪物圖鑑：打倒層主登錄該層怪物、捕獲再點亮一次，各領一次雲晶 ─────────
