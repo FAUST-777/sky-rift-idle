@@ -2764,3 +2764,14 @@
 - 三語說明補「還剩 {s} 秒」。
 
 **驗證**（無頭 Chrome）：護盾 500、剩 6.2 秒 → 「全隊護盾還能吸收 500 點傷害，還剩 7 秒」；挑釁剩 4.5 秒 → 「主角 正在吸引所有敵人，還剩 5 秒」。無錯誤。
+
+## 第 153 輪（2026-11-12）：上版＋關掉 dev 的 Vercel 自動部署
+
+**上版**：第 140～152 輪（加上另一台電腦的第 98～105 輪）合併進 `main` 並 push，Vercel 正式站與 GitHub Pages 都更新到 `c4ff547`。
+
+**發現**：之前以為 Vercel 沒接 GitHub（repo 沒有 webhook、GitHub 部署紀錄只有 github-pages），其實 Vercel 是用帳號層級的 GitHub App 連的：推 `dev` 會自動建預覽部署（`git-dev`）、推 `main` 會自動正式部署（`git-main`），都會算進每天 100 次額度。這段期間每次推 `dev` 都用了一次。
+
+**做法**：
+- 新增 `vercel.json`：`git.deploymentEnabled.dev = false` → 推 `dev` 不再部署。
+- 上版流程改成「合併進 `main` 並 push」就好，Vercel 自動部署；不用再手動 `vercel --prod`（會重複部署）。
+- `CLAUDE.md` 的同步與上版規則同步更新。
