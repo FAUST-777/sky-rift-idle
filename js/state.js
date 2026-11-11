@@ -260,7 +260,7 @@
   };
 
   // 全隊光環 = 出戰中所有人的 party 被動加總 ＋ 飛空艇加成
-  const AURA_MAX = ['qeRegen', 'tariff', 'wolfSkill', 'wolfHalf', 'cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
+  const AURA_MAX = ['noEnemyCrit', 'qeRegen', 'tariff', 'wolfSkill', 'wolfHalf', 'cannonHalf', 'shieldReborn', 'cannonCrit', 'cannonCritDmg', 'shieldDur', 'shieldAmt', 'shieldDef', 'stunSkillX', 'reflectDef', 'physCrit', 'cannonCut', 'vsStun', 'synergyPow', 'critHeal', 'animalSkillX', 'stunHit', 'cannonVsDefDown', 'stunCritDmg', 'basicPoison', 'reflectCrit', 'reflectCritDmg', 'reflectCritBase', 'reflectCritAdd'];
   G.partyAura = function (synBoost) {
     const aura = {};
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };

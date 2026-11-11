@@ -196,7 +196,7 @@ G.I18N['zh-CN'] = {
   'skill.hf_arb.name': '数学模型套利',
   'skill.hf_arb.desc': '花费 {cost} 金币：10 秒内全队技能伤害 +{v}%、技能冷却 -{cdr}%、每秒回复 {regen}% 生命。金币不够时：全队每秒回复 {poor}% 生命，持续 5 秒',
   'skill.hf_bear.name': '熊市',
-  'skill.hf_bear.desc': '全队受到伤害 -{v}%。队伍有人被攻击时触发「量化宽松」：全队每秒回复 {party_qeRegen}% 生命，持续 13 秒（间隔 15 秒）',
+  'skill.hf_bear.desc': '全队受到伤害 -{v}%，敌人永远不会暴击。队伍有人被攻击时触发「量化宽松」：全队每秒回复 {party_qeRegen}% 生命，持续 13 秒（间隔 15 秒）',
   'skill.hf_bull.name': '牛市',
   'skill.hf_bull.desc': '自己最大生命 +{v}%，全队金币获得 +{party_goldPct}%',
   'skill.hf_options.name': '期权交易',

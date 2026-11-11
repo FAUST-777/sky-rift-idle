@@ -398,7 +398,7 @@ G.SKILLS = {
     A('hf_arb', 2, 14, lin(0.5, 0.375), (v, r) => ({ target: 'none', hfArb: { cost: G.HF_ARB_COST, sk: v, cdr: lin(0.5, 0.025)(r), regen: lin(0.25, 0.0625)(r), poor: lin(0.05, 0.0375)(r) } }),
       { descV: { cost: () => G.HF_ARB_COST, cdr: lin(0.5, 0.025), regen: lin(0.25, 0.0625), poor: lin(0.05, 0.0375) }, rawKeys: ['cost'] }),
     // 熊市：全隊受到傷害 -2%→10%；隊伍有人被打 → 「量化寬鬆」全隊每秒回 2%→5%，13 秒（間隔 15 秒）
-    P('hf_bear',    0, lin(0.02, 0.02),  'party', 'dmgReduce', { partyAlso: { qeRegen: lin(0.02, 0.0075) } }),
+    P('hf_bear',    0, lin(0.02, 0.02),  'party', 'dmgReduce', { partyAlso: { qeRegen: lin(0.02, 0.0075), noEnemyCrit: 1 } }),   // 第 149 輪：敵人永遠不會暴擊
     // 牛市：自己生命 +10%→30%；全隊金幣 +10%→25%
     P('hf_bull',    0, lin(0.1, 0.05),   'self', 'hpPct', { partyAlso: { goldPct: lin(0.1, 0.0375) } }),
     // 期權交易：隊伍有人被打 → 自己上護盾，量 = 被打的人最大生命 × 90%→300%；全隊防禦 +10%→30%；「川普關稅」全隊受到傷害 -15%，4 秒（間隔 12 秒）

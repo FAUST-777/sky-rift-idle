@@ -196,7 +196,7 @@ G.I18N['en'] = {
   'skill.hf_arb.name': 'Quant Arbitrage',
   'skill.hf_arb.desc': 'Spend {cost} gold: for 10s, party skill damage +{v}%, skill cooldown -{cdr}%, regen {regen}% HP/s. Not enough gold: party regen {poor}% HP/s for 5s',
   'skill.hf_bear.name': 'Bear Market',
-  'skill.hf_bear.desc': 'Party damage taken -{v}%. When anyone in the party is attacked, triggers Quantitative Easing: party regen {party_qeRegen}% HP/s for 13s (15s cooldown)',
+  'skill.hf_bear.desc': 'Party damage taken -{v}%, and enemies can never crit. When anyone in the party is attacked, triggers Quantitative Easing: party regen {party_qeRegen}% HP/s for 13s (15s cooldown)',
   'skill.hf_bull.name': 'Bull Market',
   'skill.hf_bull.desc': 'Your max HP +{v}%, party gold gain +{party_goldPct}%',
   'skill.hf_options.name': 'Options Trading',

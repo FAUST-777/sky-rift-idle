@@ -657,7 +657,8 @@
       const grudgeCritDmg = grudgeOn && this.fxv(target, 'decay') ? G.GRUDGE.vsDecayCritDmg : 0;
       const legionDecay = (opts.wraith || (src.kind === 'summon' && src.minion)) && this.fxv(target, 'decay') && this.legionRank() > 0;   // 亡靈軍團：召喚物打衰老詛咒的敵人
       if (legionDecay) dmg *= 1 + G.UNDEAD_LEGION.decayDmg;
-      const crit = this.fxv(src, 'decay') ? false : src.st.iai || (sb && sb.forceCrit) || legionDecay || src.st.insider ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
+      const crit = this.fxv(src, 'decay') || (src.side === 'enemy' && this.aura.noEnemyCrit) ? false :   // 衰老詛咒、熊市：敵人無法暴擊
+        src.st.iai || (sb && sb.forceCrit) || legionDecay || src.st.insider ? true : Math.random() * 100 < critChance;   // 衰老詛咒：無法暴擊   // 美式居合：必定暴擊
       const iaiOver = src.st.iai ? Math.max(0, critChance - 100) / 100 : 0;   // 超過 100% 的暴擊率 1:1 轉成暴擊傷害
       if (crit) dmg *= src.st.critDmg + grudgeCritDmg + iaiOver + (sb && sb.critDmg || 0) + (this.party(src) && this.arcaneOn() ? this.aura.arcaneCritDmg || 0 : 0) + (bleeding ? src.st.bleedCritDmg || 0 : 0) + (this.party(src) ? (this.aura.critDmg || 0) + this.pactAll('aCritDmg') : 0) + (opts.critDmgBonus || 0) + (src.kind === 'summon' && src.minion ? this.pactSummon('sCritDmg') : 0)
         + (this.party(src) && this.aura.stunCritDmg && this.fxv(target, 'stun') ? this.aura.stunCritDmg : 0);   // 筆觸節奏：對暈眩敵人暴擊傷害   // 團隊特效：暴擊傷害；狗群圍攻：技能自帶暴擊傷害
