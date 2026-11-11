@@ -706,7 +706,7 @@
           <div class="muted" style="font-size:11px">${t(`hperk.${p.perk}.desc`)}</div></div>
         ${on ? `<button class="btn small" data-act="hpetun" data-id="${p.uid}">${t('home.petOut')}</button>`
              : `<button class="btn small good" data-act="hpeteq" data-id="${p.uid}">${t('home.petIn')}</button>
-                <button class="btn small danger" data-act="hpetrel" data-id="${p.uid}">✕</button>`}
+                <button class="btn small danger" data-act="hpetrel" data-id="${p.uid}">${t('home.relBtn', { n: G.HPET_SELL })}</button>`}
       </div>`;
     };
     const inCabin = eq.map(u => G.hpet(u)).filter(Boolean).map(p => row(p, true)).join('');
@@ -1044,8 +1044,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'hpetun': G.unequipPet(+d.id); break;
       case 'hpetrel': {
         const p = G.hpet(+d.id); if (!p) break;
-        UI.modal(`<h2>${t('home.relTitle')}</h2><p>${t('home.relBody', { name: t(`hpet.${p.kind}`), perk: t(`hperk.${p.perk}`) })}</p>
-          <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn danger" data-act="hpetrel2" data-id="${p.uid}">${t('home.relOk')}</button></div>`);
+        UI.modal(`<h2>${t('home.relTitle')}</h2><p>${t('home.relBody', { name: t(`hpet.${p.kind}`), perk: t(`hperk.${p.perk}`), n: G.HPET_SELL })}</p>
+          <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn danger" data-act="hpetrel2" data-id="${p.uid}">${t('home.relOk', { n: G.HPET_SELL })}</button></div>`);
         break;
       }
       case 'hpetrel2': UI.close(); G.releasePet(+d.id); break;

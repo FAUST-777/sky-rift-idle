@@ -742,8 +742,12 @@
   G.unequipPet = function (uid) {
     G.S.hpetEq = G.S.hpetEq.filter(u => u !== uid); G.save(); G.emit('home'); G.emit('stats');
   };
+  G.HPET_SELL = 30;   // 賣掉船艙寵物換雲晶
   G.releasePet = function (uid) {
+    if (!G.hpet(uid)) return;
     G.unequipPet(uid);
+    G.S.crystal += G.HPET_SELL;
+    toast('toast.hpetSold', { n: G.HPET_SELL });
     G.S.hpets = G.S.hpets.filter(p => p.uid !== uid); G.save(); G.emit('home');
   };
 
