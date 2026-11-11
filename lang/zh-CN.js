@@ -204,7 +204,7 @@ G.I18N['zh-CN'] = {
   'skill.hf_insider.name': '内线交易',
   'skill.hf_insider.desc': '防御归零、生命锁定 1、无法闪避；每 5 秒生成原本最大生命 {shield}% 的护盾（持续 {dur} 秒）。基础攻击 ×{v}、伤害 +{dmg}%、必定暴击、暴击伤害 +{critDmg}%，敌人身上每个减益再 +{per}% 伤害；攻速 +{spdPct}%、技能伤害 +{skillDmg}%',
   'skill.hf_wolf.name': '华尔街之狼',
-  'skill.hf_wolf.desc': '战场上多一台飞空艇（在原本那台左边，外观相同，一起播放攻击动画）。飞空艇造成的伤害 ×2（含船炮与船长的飞船技能），船炮间隔减半；飞船技能伤害再 +{v}%',
+  'skill.hf_wolf.desc': '赚太多钱直接再买一艘飞船啦！飞空艇造成的伤害 ×2（含船炮与船长的飞船技能），船炮间隔减半；飞船技能伤害再 +{v}%',
   'buff.qe.name': '量化宽松',
   'buff.qe.desc': '每秒回复 {v}% 生命，还剩 {s} 秒',
   'buff.tariff.name': '川普关税',

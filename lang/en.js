@@ -204,7 +204,7 @@ G.I18N['en'] = {
   'skill.hf_insider.name': 'Insider Trading',
   'skill.hf_insider.desc': 'DEF set to 0, HP locked at 1, cannot evade; every 5s gain a shield of {shield}% of your original max HP (lasts {dur}s). Base ATK ×{v}, damage +{dmg}%, always crit, crit damage +{critDmg}%, +{per}% damage per debuff on the enemy; attack speed +{spdPct}%, skill damage +{skillDmg}%',
   'skill.hf_wolf.name': 'The Wolf of Wall Street',
-  'skill.hf_wolf.desc': 'A second airship joins the battle (left of the first, same look, plays the same attack animations). Airship damage ×2 (cannon and captain ship skills), cannon interval halved; ship skill damage +{v}% more',
+  'skill.hf_wolf.desc': 'Made so much money you just bought another airship! Airship damage ×2 (cannon and captain ship skills), cannon interval halved; ship skill damage +{v}% more',
   'buff.qe.name': 'Quantitative Easing',
   'buff.qe.desc': 'Regen {v}% HP/s, {s}s left',
   'buff.tariff.name': 'Trump Tariff',
