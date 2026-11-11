@@ -604,7 +604,7 @@ G.HOME_BGS = [
 ];
 G.HOME_SLOTS = 8;
 
-// ── 船艙寵物（名稱：hpet.<id>）：打怪隨機掉落，放進船艙（最多 5 隻）才生效 ──
+// ── 船艙寵物（名稱：hpet.<id>）：打怪隨機掉落，放進船艙（最多 G.PET_SLOTS 隻）才生效 ──
 // move：walk 在地板走 / float 在空中漂浮；w = 顯示寬度（船艙寬的 %，第 103 輪整體放大 1.8 倍）；fw/fh = 動畫每格尺寸（3 格）
 G.HOME_PETS = [
   { id: 'shiba',     move: 'walk',  w: 25, speed: 7, fw: 205, fh: 139 },
@@ -625,8 +625,13 @@ G.PET_PERKS = [
   { id: 'net',    icon: '🕸️' },   // 捕獸網捕獲率 ×1.25
   { id: 'plevel', icon: '📈' },   // 夥伴升級花費 -15%
   { id: 'epic',   icon: '💜' },   // 紫色以上裝備掉落率 +10%
+  { id: 'xp',     icon: '📘' },   // 主角經驗值 +12%（第 140 輪）
 ];
-G.PET_SLOTS = 5;
+G.PET_SLOTS = 6;   // 船艙寵物上限（第 140 輪：5 → 6，剛好每種機制各一隻）
+G.PET_XP = 0.12;   // 寵物「經驗 +12%」
+// 層主送寵物：擁有的寵物（船艙＋倉庫）少於 BOSS_PET_UNDER 隻時，擊敗層主 BOSS_PET_CHANCE 機率送一隻
+G.BOSS_PET_UNDER = 6;
+G.BOSS_PET_CHANCE = 0.87;
 G.PET_REVIVE_CD = 60;
 // 掉落率：每層 +0.01%（第 1 層 0.21%、第 70 層 0.9%）；層主 ×10
 G.petDropChance = (floor, boss) => (0.002 + floor * 0.0001) * (boss ? 10 : 1);

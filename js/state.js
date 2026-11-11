@@ -388,9 +388,10 @@
   G.power = st => Math.round(st.atk * st.spd * (1 + st.crit / 100 * (st.critDmg - 1)) * (st.range === 'all' ? 5 : 4) + st.maxHp * 0.3 + st.def * 3);
 
   // ── 等級與經驗 ───────────────────────────────────────────────────────────
+  G.xpMult = () => 1 + (G.petPerk('xp') ? G.PET_XP : 0);   // 寵物「經驗 +12%」
   G.gainXp = function (xp) {
     const h = G.S.hero;
-    h.xp += xp;
+    h.xp += Math.round(xp * G.xpMult());
     let up = false;
     while (h.xp >= G.xpToLevel(h.level)) {
       h.xp -= G.xpToLevel(h.level);
@@ -733,6 +734,20 @@
     G.emit('home');
     return p;
   };
+  // 層主送寵物（第 140 輪）：擁有的寵物少於 G.BOSS_PET_UNDER 隻 → 擊敗層主 G.BOSS_PET_CHANCE 機率送一隻
+  //   品種優先挑還沒有的；機制優先挑還沒有的；都收集齊了才完全隨機
+  G.bossPetGift = function () {
+    const S = G.S;
+    if (S.hpets.length >= G.BOSS_PET_UNDER || Math.random() >= G.BOSS_PET_CHANCE) return null;
+    const hasKind = new Set(S.hpets.map(p => p.kind)), hasPerk = new Set(S.hpets.map(p => p.perk));
+    const kinds = G.HOME_PETS.filter(k => !hasKind.has(k.id)), perks = G.PET_PERKS.filter(k => !hasPerk.has(k.id));
+    const p = { uid: S.uid++, kind: G.pick(kinds.length ? kinds : G.HOME_PETS).id, perk: G.pick(perks.length ? perks : G.PET_PERKS).id };
+    S.hpets.push(p);
+    G.addLog('log.bossPet', { name: { k: `hpet.${p.kind}` }, perk: { k: `hperk.${p.perk}` } }, '#ff9ee8');
+    G.emit('toast', t('toast.petGet', { name: t(`hpet.${p.kind}`) }));
+    G.emit('home');
+    return p;
+  };
   G.equipPet = function (uid) {
     const eq = G.S.hpetEq;
     if (eq.includes(uid) || !G.hpet(uid)) return;
@@ -836,6 +851,6 @@
     const xp   = Math.round(r.xp * killsPerMin * mins * bonus * 0.5);
     G.S.gold += gold;
     G.gainXp(xp);
-    return { mins: Math.round(mins), gold, xp, bonus: G.comfort() };
+    return { mins: Math.round(mins), gold, xp: Math.round(xp * G.xpMult()), bonus: G.comfort() };
   };
 })();

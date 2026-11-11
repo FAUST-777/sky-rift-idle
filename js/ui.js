@@ -702,7 +702,7 @@
       return `<div class="hpet-row ${on ? 'on' : ''}">
         <div class="hpet-ico">${petSprite(k, 'still')}</div>
         <div class="grow"><b>${t(`hpet.${p.kind}`)}</b> <span class="muted" style="font-size:11px">${t(`hpetMove.${k.move}`)}</span>
-          <div style="font-size:12px" class="${dead ? 'bad' : 'gold'}">${pk.icon} ${t(`hperk.${p.perk}`)}${dead ? `（${t('home.petDup')}）` : ''}</div>
+          <div style="font-size:12px" class="${dead ? 'pet-dup' : 'gold'}">${dead ? `<s>${pk.icon} ${t(`hperk.${p.perk}`)}</s> <span class="dup-badge">${t('home.petDup')}</span>` : `${pk.icon} ${t(`hperk.${p.perk}`)}`}</div>
           <div class="muted" style="font-size:11px">${t(`hperk.${p.perk}.desc`)}</div></div>
         ${on ? `<button class="btn small" data-act="hpetun" data-id="${p.uid}">${t('home.petOut')}</button>`
              : `<button class="btn small good" data-act="hpeteq" data-id="${p.uid}">${t('home.petIn')}</button>
