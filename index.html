@@ -10,6 +10,20 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- 開場動畫：全白 → 慢慢變黑 → 白色 LOGO → 進入遊戲（每次載入都跑，點一下可跳過） -->
+<div id="splash" aria-hidden="true"><img src="assets/logo_w.png" alt="DOGGOD"></div>
+<script>
+(function () {
+  var el = document.getElementById('splash'), done = false;
+  function end() {
+    if (done) return; done = true;
+    el.classList.add('out');
+    setTimeout(function () { el.remove(); }, 700);
+  }
+  setTimeout(end, 4200);
+  el.addEventListener('click', end);
+})();
+</script>
 <div id="app">
   <header id="hud">
     <div class="hud-left">
