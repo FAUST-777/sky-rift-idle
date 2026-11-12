@@ -14,6 +14,7 @@
     return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
   }
   A.shade = shade;
+  A.GEAR_COLORS = null;   // 下面定義後補上
 
   function rr(ctx, x, y, w, h, r) {
     ctx.beginPath();
@@ -32,6 +33,7 @@
     ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx - ux * 4, hy - uy * 4); ctx.stroke();
   }
+  A.rr = rr; A.blade = blade;
   // 燧發槍：握把在 (x,y)
   function gun(ctx, color, x, y) {
     ctx.fillStyle = '#5a3a1e'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.lineTo(x + 1, y + 7); ctx.lineTo(x + 4, y + 1); ctx.fill();
@@ -39,7 +41,7 @@
   }
 
   // 稀有度對應的裝備顏色（紙娃娃用）
-  const GEAR_COLORS = ['#8d8478', '#4f9d57', '#3f7fd0', '#8a4fd0', '#e0a030', '#f06ccb'];   // 最後一個 = 天櫻粉紅
+  const GEAR_COLORS = A.GEAR_COLORS = ['#8d8478', '#4f9d57', '#3f7fd0', '#8a4fd0', '#e0a030', '#f06ccb'];   // 最後一個 = 天櫻粉紅
 
   // ── 人物外觀資料：由職業 + 裝備組成 ──────────────────────────────────────
   // 把裝備欄轉成外觀；沒穿的部位用 fallback（夥伴的職業預設裝扮）
@@ -90,40 +92,9 @@
     return classLook(look, tier);
   };
 
-  // ── 紙娃娃：64×80 一格，面向右，分層畫 ───────────────────────────────────
-  // 圖層順序：影子 → 披風 → 腿/靴 → 後手 → 身體/鎧甲 → 頭/頭髮/頭盔 → 前手 → 武器
-  A.drawHumanoid = function (ctx, look, ox = 0, oy = 0, s = 1) {
-    ctx.save();
-    ctx.translate(ox, oy); ctx.scale(s, s);
+  // 身體＋鎧甲＋飾品（標準座標：身體 x 23～43、y 31～58）；紙娃娃與骨架動畫共用
+  A.drawTorsoGear = function (ctx, look) {
     const cls = G.CLASSES[look.cls] || G.CLASSES.villager;
-
-    // 影子
-    ctx.fillStyle = 'rgba(0,0,0,.25)';
-    ctx.beginPath(); ctx.ellipse(32, 76, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
-
-    // 披風（職業色）
-    if (cls.cape) {
-      ctx.fillStyle = shade(cls.cape, -20);
-      ctx.beginPath(); ctx.moveTo(25, 31); ctx.lineTo(15, 66); ctx.lineTo(36, 64); ctx.lineTo(38, 31); ctx.closePath(); ctx.fill();
-    }
-
-    // 腿
-    ctx.fillStyle = '#4b3a2a';
-    ctx.fillRect(26, 56, 6, 14); ctx.fillRect(34, 56, 6, 14);
-    // 靴子
-    const bc = look.boots ? look.boots.color : '#4a3424';
-    ctx.fillStyle = shade(bc, -15);
-    rr(ctx, 25, 66, 8, 8, 2); ctx.fill();
-    rr(ctx, 33, 66, 10, 8, 2); ctx.fill();
-    if (look.boots && look.boots.v === 1) { ctx.fillStyle = shade(bc, 40); ctx.fillRect(25, 65, 8, 2); ctx.fillRect(33, 65, 10, 2); }
-
-    // 後手
-    ctx.fillStyle = look.armor ? shade(look.armor.color, -30) : '#7a6040';
-    rr(ctx, 21, 34, 6, 17, 3); ctx.fill();
-    const wp = look.weapon || { type: 'pitchfork', color: GEAR_COLORS[0] };
-    ctx.lineCap = 'round';
-
-    // 身體 / 鎧甲
     const tc = look.armor ? look.armor.color : cls.color === '#f1e3a6' ? '#e9e1c4' : '#8b6f47';
     ctx.fillStyle = tc;
     rr(ctx, 23, 31, 20, 27, 5); ctx.fill();
@@ -146,6 +117,9 @@
       ctx.beginPath(); ctx.arc(33, 39, 2.5, 0, Math.PI * 2); ctx.fill();
     }
 
+  };
+  // 頭＋頭髮＋頭盔（標準座標：頭中心 (33, 21)）；紙娃娃與骨架動畫共用
+  A.drawHeadGear = function (ctx, look) {
     // 頭
     ctx.fillStyle = look.skin;
     ctx.beginPath(); ctx.arc(33, 21, 10, 0, Math.PI * 2); ctx.fill();
@@ -210,6 +184,44 @@
         ctx.fillStyle = '#2a1d14'; ctx.fillRect(38, 20, 2, 3);
       }
     }
+
+  };
+
+  // ── 紙娃娃：64×80 一格，面向右，分層畫 ───────────────────────────────────
+  // 圖層順序：影子 → 披風 → 腿/靴 → 後手 → 身體/鎧甲 → 頭/頭髮/頭盔 → 前手 → 武器
+  A.drawHumanoid = function (ctx, look, ox = 0, oy = 0, s = 1) {
+    ctx.save();
+    ctx.translate(ox, oy); ctx.scale(s, s);
+    const cls = G.CLASSES[look.cls] || G.CLASSES.villager;
+
+    // 影子
+    ctx.fillStyle = 'rgba(0,0,0,.25)';
+    ctx.beginPath(); ctx.ellipse(32, 76, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+    // 披風（職業色）
+    if (cls.cape) {
+      ctx.fillStyle = shade(cls.cape, -20);
+      ctx.beginPath(); ctx.moveTo(25, 31); ctx.lineTo(15, 66); ctx.lineTo(36, 64); ctx.lineTo(38, 31); ctx.closePath(); ctx.fill();
+    }
+
+    // 腿
+    ctx.fillStyle = '#4b3a2a';
+    ctx.fillRect(26, 56, 6, 14); ctx.fillRect(34, 56, 6, 14);
+    // 靴子
+    const bc = look.boots ? look.boots.color : '#4a3424';
+    ctx.fillStyle = shade(bc, -15);
+    rr(ctx, 25, 66, 8, 8, 2); ctx.fill();
+    rr(ctx, 33, 66, 10, 8, 2); ctx.fill();
+    if (look.boots && look.boots.v === 1) { ctx.fillStyle = shade(bc, 40); ctx.fillRect(25, 65, 8, 2); ctx.fillRect(33, 65, 10, 2); }
+
+    // 後手
+    ctx.fillStyle = look.armor ? shade(look.armor.color, -30) : '#7a6040';
+    rr(ctx, 21, 34, 6, 17, 3); ctx.fill();
+    const wp = look.weapon || { type: 'pitchfork', color: GEAR_COLORS[0] };
+    ctx.lineCap = 'round';
+
+    A.drawTorsoGear(ctx, look);
+    A.drawHeadGear(ctx, look);
 
     // 前手
     ctx.fillStyle = look.armor ? shade(look.armor.color, -10) : '#8b6f47';

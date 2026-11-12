@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>骨架動畫預覽</title>
+<style>
+  body { margin: 0; padding: 16px; background: #1b1530; color: #eee; font: 14px/1.5 -apple-system, "PingFang TC", sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: #aaa; font-size: 13px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .cell { background: linear-gradient(#5a6fa8, #8aa0d8 70%, #4a3d6a 70%); border-radius: 10px; padding: 6px; text-align: center; }
+  .cell small { display: block; font-size: 12px; color: #fff; }
+  canvas { display: block; width: 192px; height: 176px; image-rendering: auto; }
+  .looks { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .looks button { background: #2d2550; color: #eee; border: 1px solid #554a8a; border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+  .looks button.on { background: #2ea043; border-color: #56d364; }
+  label { font-size: 13px; color: #ccc; }
+</style>
+</head>
+<body>
+<h1>骨架動畫原型：血騎士</h1>
+<p>直接用遊戲的 js/data.js、js/art.js、js/rig.js 畫，跟戰鬥裡看到的一樣（戰鬥裡是縮小顯示）。攻擊、被打每 1.5 秒重播一次。</p>
+<div class="looks" id="looks"></div>
+<label><input type="checkbox" id="slow"> 慢動作（×4）</label>
+<div class="row" id="row" style="margin-top:10px"></div>
+
+<script src="../js/data.js"></script>
+<script src="../js/art.js"></script>
+<script src="../js/rig.js"></script>
+<script>
+  // 幾組不同裝備，確認紙娃娃換裝照樣顯示（顏色 = 稀有度）
+  const C = G.ART.GEAR_COLORS;
+  const LOOKS = {
+    '初始（布衣）': { cls: 'bloodknight', skin: '#f1c9a0', hair: '#5a3a22', armor: { v: 0, color: '#c0392b' }, weapon: { type: 'dualsword', color: C[0] } },
+    '鐵盔＋鎖甲（藍）': { cls: 'bloodknight', skin: '#e0b895', hair: '#222831', helmet: { v: 1, color: C[2] }, armor: { v: 1, color: C[2] }, boots: { v: 0, color: C[2] }, weapon: { type: 'dualsword', color: C[2] } },
+    '板甲（紫）＋金靴': { cls: 'bloodknight', skin: '#f3d2b3', hair: '#d9a066', helmet: { v: 1, color: C[3] }, armor: { v: 2, color: C[3] }, boots: { v: 1, color: C[4] }, accessory: { color: C[4] }, weapon: { type: 'dualsword', color: C[4] } },
+    '天櫻（粉）': { cls: 'bloodknight', skin: '#f6dcc4', hair: '#f5e6a8', helmet: { v: 0, color: C[5] }, armor: { v: 2, color: C[5] }, boots: { v: 1, color: C[5] }, accessory: { color: C[5] }, weapon: { type: 'dualsword', color: C[5] } },
+  };
+  let cur = Object.keys(LOOKS)[0], cache = {};
+  const ANIMS = [['idle', '待機'], ['walk', '走路'], ['attack', '攻擊'], ['hit', '被打'], ['dead', '倒下']];
+  const row = document.getElementById('row'), cvs = {};
+  ANIMS.forEach(([a, name]) => {
+    const d = document.createElement('div'); d.className = 'cell';
+    const c = document.createElement('canvas'); c.width = G.RIG.FW * G.RIG.SCALE; c.height = G.RIG.FH * G.RIG.SCALE;
+    d.appendChild(c); const s = document.createElement('small'); s.textContent = name; d.appendChild(s);
+    row.appendChild(d); cvs[a] = c;
+  });
+  const lk = document.getElementById('looks');
+  Object.keys(LOOKS).forEach(k => {
+    const b = document.createElement('button'); b.textContent = k; b.onclick = () => { cur = k; [...lk.children].forEach(x => x.classList.toggle('on', x === b)); };
+    if (k === cur) b.classList.add('on'); lk.appendChild(b);
+  });
+  // 每個動作的每一格先畫好快取（跟遊戲一樣是 sprite sheet 的格子）
+  function frameOf(anim, k) {
+    const key = cur + anim + k;
+    if (!cache[key]) { const A = G.RIG.ANIMS[anim]; cache[key] = G.RIG.frame(LOOKS[cur], anim, A.loop ? k / A.n : (A.n === 1 ? 1 : k / (A.n - 1))); }
+    return cache[key];
+  }
+  const t0 = performance.now();
+  function loop(now) {
+    const sp = document.getElementById('slow').checked ? 0.25 : 1, t = (now - t0) / 1000 * sp;
+    ANIMS.forEach(([a]) => {
+      const A = G.RIG.ANIMS[a], one = !A.loop && a !== 'dead';
+      const tt = one ? (t % 1.5) : t;   // 一次性動作：每 1.5 秒重播
+      const k = one && tt >= A.dur ? 0 : G.RIG.frameAt(a, tt);
+      const c = cvs[a], x = c.getContext('2d');
+      x.clearRect(0, 0, c.width, c.height);
+      x.drawImage(one && tt >= A.dur ? frameOf('idle', 0) : frameOf(a, k), 0, 0);
+    });
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+</script>
+</body>
+</html>

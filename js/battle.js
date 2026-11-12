@@ -140,6 +140,45 @@
       this.tex(key, 64, 80, ctx => G.ART.drawHumanoid(ctx, look));
       return key;
     }
+    // 骨架動畫（G.RIG）：整張 sprite sheet 當一個貼圖，每格登記成 frame「動作+編號」
+    rigTex(prefix, look) {
+      const key = prefix + '_rig_' + (++this.texVer), sh = G.RIG.sheet(look);
+      if (this.textures.exists(key)) this.textures.remove(key);
+      const tx = this.textures.addCanvas(key, sh.canvas);
+      Object.entries(sh.frames).forEach(([anim, xs]) => xs.forEach((x, k) => tx.add(anim + k, 0, x, 0, sh.fw, sh.fh)));
+      return key;
+    }
+    // 換外觀：新外觀有骨架動畫就用 sprite sheet，沒有就用舊的一張圖
+    setUnitLook(u, prefix, look, baseScale) {
+      const old = u.img.texture.key;
+      if (G.RIG.enabled(look)) {
+        u.img.setTexture(this.rigTex(prefix, look), 'idle0').setScale(baseScale / G.RIG.SCALE).setOrigin(0.5, G.RIG.ORIGIN_Y);
+        u.rig = { anim: 'idle', t: 0, one: null };
+      } else {
+        u.img.setTexture(this.humanTex(prefix, look)).setScale(baseScale).setOrigin(0.5, 0.95);
+        u.rig = null;
+      }
+      if (old !== u.img.texture.key && this.textures.exists(old) && old !== '__DEFAULT') this.textures.remove(old);
+    }
+    // 骨架動畫：播一次性動作（攻擊、被打）；攻擊中不會被「被打」打斷
+    rigPlay(u, anim) {
+      if (!u.rig || !u.alive) return;
+      if (anim === 'hit' && u.rig.one === 'attack') return;
+      u.rig.one = anim; u.rig.t = 0;
+    }
+    // 每幀更新骨架動畫的格子：倒下 → dead；一次性動作播完 → 走路／待機
+    rigTick(dt, walking) {
+      this.units.forEach(u => {
+        if (!u.rig) return;
+        const r = u.rig;
+        r.t += dt;
+        if (r.one && r.t >= G.RIG.ANIMS[r.one].dur) { r.one = null; r.t = 0; }   // 一次性動作播完
+        const anim = !u.alive ? 'dead' : r.one || (walking ? 'walk' : 'idle');
+        r.anim = anim;
+        const name = anim + G.RIG.frameAt(anim, r.t);
+        if (u.img.frame.name !== name) u.img.setFrame(name);
+      });
+    }
 
     monsterTex(shape, color) {
       const key = 'mon_' + shape + color;
@@ -174,10 +213,13 @@
     memberUnit(who) {
       const isHero = who === 'hero';
       const look = isHero ? G.ART.lookFromHero() : who === G.MERC ? G.S.merc.snap.look : G.ART.lookFromPartner(who);
+      const prefix = isHero ? 'hero' : 'p_' + who.replace('@', ''), baseScale = isHero ? 1.1 : 1.0;
       const u = this.makeUnit({
         side: 'party', kind: isHero ? 'hero' : 'partner', key: who, partnerId: isHero ? null : who,
-        st: G.charStats(who), texture: this.humanTex(isHero ? 'hero' : 'p_' + who.replace('@', ''), look), x: 0, scale: isHero ? 1.1 : 1.0,
+        st: G.charStats(who), texture: this.humanTex(prefix, look), x: 0, scale: baseScale,
       });
+      u.baseScale = baseScale;
+      if (G.RIG.enabled(look)) this.setUnitLook(u, prefix, look, baseScale);   // 骨架動畫（原型：血騎士）
       this.applyBuild(u, who);
       u.frenzy = this.frenzyMem[who] || 0;
       return u;
@@ -223,9 +265,7 @@
         this.applyBuild(u, u.key);
         u.skills.forEach(s => { const o = old.find(x => x.def.id === s.def.id); if (o) s.cd = o.cd; });   // 冷卻不重置
         if (look && u.kind === 'hero') {
-          const oldKey = u.img.texture.key;
-          u.img.setTexture(this.humanTex('hero', G.ART.lookFromHero()));
-          this.textures.remove(oldKey);
+          this.setUnitLook(u, 'hero', G.ART.lookFromHero(), u.baseScale || 1.1);
           this.needRebuild = true;   // 職業改變時前後排可能要重排
         }
       });
@@ -768,7 +808,12 @@
       if (!this.doomBlasting && u.doomStacks) u.doomStacks.forEach(s => { s.acc += amount; });   // 死亡詛咒：每層都記錄受到的傷害（引爆本身不算）
       this.floatText(u.img.x + G.rand(-10, 10), this.barY(u) - 12, (crit ? G.t('battle.crit') + ' ' : '') + (amount >= 10000 ? '**' : amount >= 1000 ? '*' : '') + G.fmt(amount), color, crit ? 18 : quiet ? 12 : 14);
       // 受擊閃一下：先停掉上一次的閃爍再從 1 開始，不然連續被打會停在半透明
-      if (!quiet && u.alive) {
+      if (u.rig && u.alive && !quiet) {   // 骨架動畫：後仰＋閃白（不用半透明閃爍）
+        this.rigPlay(u, 'hit');
+        u.img.setTintFill(0xffffff);
+        if (u.flashEv) u.flashEv.remove();
+        u.flashEv = this.time.delayedCall(70, () => { u.flashEv = null; if (u.alive) u.img.clearTint(); });
+      } else if (!quiet && u.alive) {
         if (u.flashTw) u.flashTw.stop();
         u.img.setAlpha(1);
         u.flashTw = this.tweens.add({ targets: u.img, alpha: 0.4, duration: 60, yoyo: true, onComplete: () => { u.flashTw = null; if (u.alive) u.img.setAlpha(1); } });
@@ -830,6 +875,7 @@
     }
 
     lunge(u) {
+      if (u.rig) this.rigPlay(u, 'attack');   // 骨架動畫：揮劍
       const dir = this.party(u) ? 1 : -1;
       this.tweens.add({ targets: u.img, x: u.homeX + 16 * dir, duration: 90, yoyo: true, ease: 'Quad.out' });
     }
@@ -1166,7 +1212,8 @@
           return;
         }
         // 主角或夥伴倒下：變灰，波次結束時復活。全隊（不算召喚動物）都倒下才算戰敗
-        u.img.setAlpha(0.3).setTint(0x777777);
+        if (u.rig) { if (u.flashEv) { u.flashEv.remove(); u.flashEv = null; } u.img.setAlpha(0.7).setTint(0x8a8a8a); }   // 骨架動畫：倒下姿勢看得清楚一點
+        else u.img.setAlpha(0.3).setTint(0x777777);
         if (this.mode !== 'dead' && !this.units.some(x => x.alive && x.kind !== 'summon')) this.defeat();
       }
     }
@@ -1318,11 +1365,12 @@
         if (this.islandsLayer) this.islandsLayer.tilePositionX += speed * 0.1 * dt;
         // 走路上下晃
         const bob = Math.abs(Math.sin(this.time.now / 140)) * 3;
-        this.units.forEach(u => { if (u.alive) u.img.y = GROUND - bob; });
+        this.units.forEach(u => { if (u.alive) u.img.y = u.rig ? GROUND : GROUND - bob; });   // 骨架動畫自己有走路起伏
       } else {
         this.cloudFar.tilePositionX += 6 * dt;
         this.units.forEach(u => { u.img.y = GROUND; });
       }
+      this.rigTick(dt, walking);
 
       if (this.mode === 'walk') {
         this.walkT -= dt;
