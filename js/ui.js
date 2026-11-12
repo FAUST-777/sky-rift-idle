@@ -37,6 +37,7 @@
       $('floorKills').classList.add('boss');
     }
     renderBuffs(sc);
+    renderEnemyTip(sc);
     renderLive(sc);
     if (sc && sc.reviveAt) {
       const left = Math.max(0, Math.ceil((sc.reviveAt - Date.now()) / 1000));
@@ -62,6 +63,33 @@
     lastBuffSig = sig;
     $('buffBar').innerHTML = list.map(b =>
       `<button class="buff ${b.id}" data-act="buff" data-id="${b.id}" title="${esc(t(`buff.${b.id}.name`))}">${b.icon}<b>${esc(b.val)}</b></button>`).join('');
+  }
+
+  // ── 點敵人 → 一次列出牠身上全部減益（第 172 輪）；hud 每 0.4 秒更新秒數 ──────
+  const pctv = v => Math.round(v * 100);
+  function edbDesc(d) {
+    if (d.id === 'bleed' || d.id === 'poison') return t('edb.' + d.id, { v: G.fmt(Math.round(d.v)) });
+    if (d.id === 'critDown') return t('edb.critDown', { v: +d.v.toFixed(1) });
+    if (d.id === 'doom') return t('edb.doom', { n: Math.max(1, d.n) });
+    if (d.id === 'stun') return t('edb.stun', { v: pctv(G.STUN.taken) });
+    return t('edb.' + d.id, { v: pctv(d.v) });
+  }
+  UI.tipEnemy = null;
+  UI.enemyTip = function (u) {
+    UI.tipEnemy = u && u !== UI.tipEnemy ? u : null;   // 再點同一隻 = 關掉
+    renderEnemyTip(G.battleScene());
+  };
+  function renderEnemyTip(sc) {
+    const box = $('enemyTip'); if (!box) return;
+    const u = UI.tipEnemy;
+    if (!u || !sc || !u.alive || !sc.enemies.includes(u)) { UI.tipEnemy = null; box.hidden = true; return; }
+    const list = sc.debuffsOf(u);
+    const name = t('monster.' + u.monsterId) + (u.boss ? ` <span class="etip-boss">${t('etip.boss')}</span>` : '');
+    const rows = list.length ? list.map(d => `<div class="etip-row"><span class="etip-ic">${G.FX_ICON[d.id]}</span>
+        <span class="etip-tx">${edbDesc(d)}</span><b class="etip-t">${d.t < 3 ? d.t.toFixed(1) : Math.ceil(d.t)}s</b></div>`).join('')
+      : `<div class="muted" style="font-size:12px">${t('etip.none')}</div>`;
+    box.innerHTML = `<div class="etip-hd">${name}<span class="etip-hp">❤️ ${G.fmt(Math.max(0, Math.round(u.hp)))} / ${G.fmt(u.st.maxHp)}</span></div>${rows}`;
+    box.hidden = false;
   }
 
   // ── 冒險頁「即時數值」：每 0.4 秒跟著 hud 更新，切換看哪個角色（UI.liveWho）──
@@ -1314,6 +1342,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       if (b) switchTab(b.dataset.tab);
     });
     document.addEventListener('click', e => {
+      if (UI.tipEnemy && !e.target.closest('#battle')) UI.enemyTip(null);
       const el = e.target.closest('[data-act]');
       if (!el || el.tagName === 'SELECT' || el.tagName === 'INPUT') return;
       act(el);

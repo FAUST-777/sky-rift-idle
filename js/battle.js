@@ -66,6 +66,12 @@
       // 飛空艇放右上（左上角留給 buff 圖示）
       this.shipImg = this.add.image(405, 58, '__DEFAULT').setScale(0.25);
       this.shipImg.setInteractive({ useHandCursor: true }).on('pointerdown', () => G.UI && G.UI.shipTip && G.UI.shipTip());   // 點飛空艇 → 提示可爬層數
+      // 第 172 輪：點敵人 → 列出牠身上全部的減益（G.UI.enemyTip）；點到其他地方就關掉
+      this.input.on('pointerdown', (p, over) => {
+        if (over && over.includes(this.shipImg)) return;
+        const e = this.enemyAt(p.worldX, p.worldY);
+        if (G.UI && G.UI.enemyTip) G.UI.enemyTip(e);
+      });
       this.cloudFar = this.add.tileSprite(0, 20, W, 128, 'clouds').setOrigin(0);
       this.cloudNear = this.add.tileSprite(0, 120, W, 128, 'clouds2').setOrigin(0).setAlpha(0.7);
       this.ground = this.add.tileSprite(0, GROUND - 6, W, H - GROUND + 6, '__DEFAULT').setOrigin(0);
@@ -1342,7 +1348,22 @@
     }
 
     // ── 文字特效 ─────────────────────────────────────────────────────────
-    barY(u) { return u.img.y - u.img.displayHeight * 0.95 - 8; }   // 血條的 y（浮動文字從這上面開始，不擋血條）
+    barY(u) { return u.img.y - u.img.displayHeight * 0.95 - 8; }
+    // 座標底下的敵人（從血條上方到腳下減益文字；左右放寬一點，手機比較好點）
+    enemyAt(x, y) {
+      let best = null, bd = Infinity;
+      this.enemies.forEach(u => {
+        if (!u.alive || !u.img.visible) return;
+        const half = Math.max(24, u.img.displayWidth * 0.5), top = this.barY(u) - 10, bottom = GROUND + 30;
+        const d = Math.abs(x - u.img.x);
+        if (d <= half && y >= top && y <= bottom && d < bd) { best = u; bd = d; }
+      });
+      return best;
+    }
+    // 提示卡用：這隻敵人身上的減益（id、數值、剩餘秒數、死亡詛咒層數）
+    debuffsOf(u) {
+      return DEBUFF_IDS.filter(id => this.fxv(u, id)).map(id => ({ id, v: u.fx[id].v, t: u.fx[id].t, n: id === 'doom' && u.doomStacks ? u.doomStacks.length : 0 }));
+    }   // 血條的 y（浮動文字從這上面開始，不擋血條）
     floatText(x, y, text, color, size = 14, dur = 700) {
       const t = this.add.text(x, y, text, {
         fontFamily: '"Noto Sans TC", "Microsoft JhengHei", sans-serif', fontSize: size + 'px', fontStyle: 'bold',
