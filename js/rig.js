@@ -90,196 +90,227 @@
   };
 
   // ── 畫一個姿勢（標準 64×80 座標，外層已經做好平移／縮放）───────────────────
+  //   美術風格（第 161 輪）：日系線上 RPG 的像素小人感覺——約 3.3 頭身、
+  //   分層尖刺的蓬鬆頭髮（暗面＋亮面＋髮絲線）、黑點眼睛、衣服鎧甲有明暗兩階、整體偏暖的柔和色調
   const pt = (o, a, L) => [o[0] + Math.sin(a) * L, o[1] + Math.cos(a) * L];
   const rot = (o, a, x, y) => [o[0] + x * Math.cos(a) - y * Math.sin(a), o[1] + x * Math.sin(a) + y * Math.cos(a)];
   function limb(ctx, a, b, w, color) {
     ctx.lineCap = 'round'; ctx.strokeStyle = color; ctx.lineWidth = w;
     ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
   }
+  // 兩階明暗的手腳：先畫暗色整條，再往右上偏一點畫亮色（光從前上方來）
+  function limb2(ctx, a, b, w, c) {
+    limb(ctx, a, b, w, shade(c, -40));
+    limb(ctx, [a[0] + 0.5, a[1] - 0.45], [b[0] + 0.5, b[1] - 0.45], w - 1.9, c);
+  }
+  const mix = (a, b, k) => {
+    const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+    const ch = s => Math.round(((x >> s) & 255) * (1 - k) + ((y >> s) & 255) * k);
+    return '#' + ((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, '0');
+  };
+  const mute = c => mix(c, '#7a6452', 0.22);   // 裝備顏色往暖灰靠一點，比較柔和
+  const poly = (ctx, pts) => {
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath();
+  };
+  // 兩階明暗的色塊：整塊先塗暗色，再把同一塊往右上偏移、塗亮色（剪在原形狀裡）→ 左下留一圈暗面
+  function cel(ctx, path, base, dark, ox = 1.1, oy = -1.1) {
+    ctx.fillStyle = dark; path(); ctx.fill();
+    ctx.save(); path(); ctx.clip(); ctx.translate(ox, oy); ctx.fillStyle = base; path(); ctx.fill(); ctx.restore();
+  }
+  const strokes = (ctx, color, w, lines) => {
+    ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    lines.forEach(l => { ctx.beginPath(); ctx.moveTo(l[0][0], l[0][1]); for (let i = 1; i < l.length; i++) ctx.lineTo(l[i][0], l[i][1]); ctx.stroke(); });
+  };
 
-  // ── Q 版美術（第 160 輪：參考日系線上 RPG 的 Q 版比例；動作不變）─────────────
-  //   大頭（約全身 1/3）、大眼睛、蓬鬆分層的頭髮、短身體、短手短腳、圓頭靴
-  //   比例常數：腿兩段各 LEG、手兩段各 ARM、軀幹 TORSO、頭半徑 HEAD_R
-  const LEG = 6.6, ARM = 6.2, TORSO = 15.5, HEAD_R = 13.5;
-  R.CHIBI = { LEG, ARM, TORSO, HEAD_R };
+  // ── 頭（頭中心 = (0,0)，面向右的 3/4 側臉）─────────────────────────────
+  const HAIR_BACK = [[7, -8], [4, -11.5], [-1, -13], [-6, -12], [-10, -9.5], [-15, -9.5], [-11.8, -5.8], [-16, -3.2],
+    [-11.8, -0.6], [-15, 3.8], [-10.2, 3], [-12, 8.5], [-6.8, 4.6], [-5.6, 10], [-3, 3], [-1, -2], [3, -5]];
+  const HAIR_TOP = [[10.6, -3], [10.2, -8], [6.2, -12.2], [0, -13.8], [-6.2, -12.8], [-10.8, -8.4], [-11.4, -2.4],
+    [-9.4, 4], [-6.4, 7.4], [-4.6, 2.4], [-3, -1.2], [0, -4.2], [4, -5.6], [8, -5.2]];
+  const HAIR_BANGS = [[-1.2, -4.2], [0.8, -8.4], [5, -9.6], [9.4, -9], [12, -6.4], [12.6, -2.2], [10.6, -3.9],
+    [11, 0.4], [8.6, -3.5], [7.5, -1.6], [5.8, -4.3], [3.6, -1.4], [2.8, -4.6], [0.6, 4.6]];
+  const HAIR_TUFTS = [[[-3.5, -12.8], [-7.5, -16.2], [-0.5, -13.6]], [[1, -13.6], [3.2, -17.2], [5.6, -12]]];
 
-  // 頭：3/4 側臉朝右；畫在以頭中心為 (0,0) 的座標
-  function chibiHead(ctx, look, cls) {
-    const r = HEAD_R, hair = look.hair || '#5a3a22', hm = look.helmet;
-    const hairDark = shade(hair, -38), hairLight = shade(hair, 45);
-    const covered = hm && (hm.v === 1 || hm.v === 2);       // 鐵盔、兜帽：頭頂頭髮被蓋住
-    // 後髮（頭後面一大團，尾端分岔）
-    if (!(hm && hm.v === 2)) {
-      ctx.fillStyle = hairDark;
-      ctx.beginPath();
-      ctx.moveTo(-4, -r + 1);
-      ctx.quadraticCurveTo(-r - 6, -r + 2, -r - 3, 4);
-      ctx.lineTo(-r - 6, 12); ctx.lineTo(-r + 1, 9); ctx.lineTo(-r - 1, 15); ctx.lineTo(-r + 5, 10);
-      ctx.quadraticCurveTo(-3, 6, -4, -r + 1);
-      ctx.fill();
+  function drawHead(ctx, look) {
+    const hair = look.hair || '#5a3a22', skin = look.skin || '#f1c9a0', hm = look.helmet;
+    const hD = shade(hair, -42), hL = shade(hair, 48), hDD = shade(hair, -70);
+    const skD = shade(skin, -32);
+    const hv = hm ? hm.v : -1;
+    const hc = hm ? mute(hm.color) : null;
+
+    // 兜帽：後半先畫在臉後面
+    if (hv === 2) {
+      cel(ctx, () => poly(ctx, [[-4, -14], [5, -14.5], [12, -9], [12.5, -2], [8, -6.5], [1, -6], [-3, -1], [-4, 9], [-2, 14], [-14, 15], [-14.5, 2], [-12, -10]]), hc, shade(hc, -38));
+    } else {
+      // 1. 後髮：腦後一束束往後下翹的尖髮（最暗）
+      ctx.fillStyle = hD; poly(ctx, HAIR_BACK); ctx.fill();
+      strokes(ctx, hDD, 0.8, [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
     }
-    // 臉
-    const g = ctx.createRadialGradient(3, -2, 2, 0, 0, r + 1);
-    g.addColorStop(0, shade(look.skin, 12)); g.addColorStop(1, shade(look.skin, -14));
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.ellipse(0.5, 0.5, r, r - 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    // 下巴往右前收一點（3/4 側臉）
-    ctx.beginPath(); ctx.moveTo(-2, 8); ctx.quadraticCurveTo(8, 15, 12, 6); ctx.lineTo(10, 2); ctx.closePath(); ctx.fill();
-    // 耳朵（在臉的後半）
-    ctx.fillStyle = shade(look.skin, -10);
-    ctx.beginPath(); ctx.ellipse(-4.5, 2.5, 2.4, 3.2, 0.2, 0, Math.PI * 2); ctx.fill();
-    // 眼睛：近的大、遠的窄；白眼、虹膜（職業色）、瞳孔、兩個高光、上睫毛
-    const iris = shade(cls.color || '#3a5a9a', -10);
-    const eye = (x, w, h) => {
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(x, 2, w, h, 0, 0, Math.PI * 2); ctx.fill();
-      const ig = ctx.createLinearGradient(0, 2 - h, 0, 2 + h);
-      ig.addColorStop(0, shade(iris, -45)); ig.addColorStop(1, shade(iris, 35));
-      ctx.fillStyle = ig; ctx.beginPath(); ctx.ellipse(x + w * 0.25, 2.4, w * 0.72, h * 0.85, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#1a1020'; ctx.beginPath(); ctx.ellipse(x + w * 0.3, 2.6, w * 0.32, h * 0.42, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x + w * 0.05, 0.6, Math.max(0.8, w * 0.32), 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + w * 0.6, 4, Math.max(0.5, w * 0.16), 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#2a1820'; ctx.lineWidth = 1.3; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(x - w - 0.4, 2 - h * 0.55); ctx.quadraticCurveTo(x, 2 - h - 1.4, x + w + 0.8, 2 - h * 0.7); ctx.stroke();
-    };
-    eye(5.2, 2.7, 3.6);    // 近眼
-    eye(11, 1.6, 3.3);     // 遠眼（被透視壓窄）
-    // 眉毛、嘴、腮紅
-    ctx.strokeStyle = hairDark; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(3, -3.4); ctx.lineTo(7.6, -4); ctx.moveTo(10, -4); ctx.lineTo(12.2, -3.5); ctx.stroke();
-    ctx.strokeStyle = '#8a3a3a'; ctx.lineWidth = 0.9;
-    ctx.beginPath(); ctx.moveTo(8, 9.2); ctx.quadraticCurveTo(9.5, 10, 10.6, 9); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,120,130,.35)';
-    ctx.beginPath(); ctx.ellipse(3.5, 7.2, 2.6, 1.3, 0, 0, Math.PI * 2); ctx.fill();
-    // 前髮：頭頂一大片＋垂到額前的尖瀏海＋臉側一撮（帽子蓋住就只畫露出來的瀏海）
-    if (!covered) {
-      const hg = ctx.createLinearGradient(0, -r - 4, 0, 2);
-      hg.addColorStop(0, hairLight); hg.addColorStop(0.45, hair); hg.addColorStop(1, hairDark);
-      ctx.fillStyle = hg;
-      ctx.beginPath();
-      ctx.moveTo(-r - 1, 3);
-      ctx.quadraticCurveTo(-r - 2, -r - 3, 2, -r - 3);       // 後腦到頭頂
-      ctx.quadraticCurveTo(r + 3, -r - 1, r + 2, -3);         // 頭頂到前額
-      ctx.lineTo(r - 1, -1.5); ctx.lineTo(10.5, -5.2);         // 瀏海尖 1
-      ctx.lineTo(8.5, 0.5); ctx.lineTo(6.2, -5.4);             // 瀏海尖 2
-      ctx.lineTo(3.4, 1.5); ctx.lineTo(1.2, -5);               // 瀏海尖 3
-      ctx.lineTo(-1.8, 1); ctx.lineTo(-3.5, -3);
-      ctx.lineTo(-6.5, 8); ctx.lineTo(-8, 1);                  // 臉側那撮
-      ctx.closePath(); ctx.fill();
-      // 頭頂翹毛
-      ctx.beginPath(); ctx.moveTo(-1, -r - 2); ctx.quadraticCurveTo(-3, -r - 9, 3, -r - 8); ctx.quadraticCurveTo(0, -r - 5, 2, -r - 2); ctx.fill();
-      // 光澤帶
-      ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.arc(1, -2, r - 2, Math.PI * 1.18, Math.PI * 1.55); ctx.stroke();
-    } else if (hm.v === 1) {   // 戴鐵盔：盔沿下露出一點瀏海
-      ctx.fillStyle = hair;
-      ctx.beginPath(); ctx.moveTo(1, -5); ctx.lineTo(3.5, 0); ctx.lineTo(5.5, -5); ctx.lineTo(8.5, 0.5); ctx.lineTo(10.5, -5); ctx.closePath(); ctx.fill();
+    // 2. 臉（耳朵、下巴往右前收）
+    cel(ctx, () => {
+      ctx.beginPath(); ctx.ellipse(0.4, 0.2, 9.6, 9.8, 0, 0, Math.PI * 2);
+      ctx.moveTo(10, 3.6); ctx.lineTo(8.2, 9); ctx.lineTo(4, 10.6); ctx.lineTo(-3.5, 7); ctx.closePath();   // 跟橢圓同方向，不然重疊處會變破洞
+    }, skin, skD, 1.2, -0.6);
+    // 3. 頭頂的頭髮（包住頭頂跟後腦，留出臉）
+    if (hv !== 1 && hv !== 2) {
+      cel(ctx, () => poly(ctx, HAIR_TOP), hair, hD, 1.3, -1.3);
+      // 髮絲分層線
+      strokes(ctx, hD, 0.75, [[[-2, -11.5], [-7.5, -5], [-8, 1]], [[2.5, -12], [-2.5, -6.5], [-4.5, -0.5]], [[6, -11], [3, -7]]]);
     }
-    // 頭盔
-    if (hm) {
-      const hc = hm.color, hl = shade(hc, 45), hd = shade(hc, -40);
-      if (hm.v === 0) {            // 皮帽：圓頂軟帽＋帽緣
-        const cg = ctx.createLinearGradient(0, -r - 6, 0, -4); cg.addColorStop(0, hl); cg.addColorStop(1, hc);
-        ctx.fillStyle = cg; ctx.beginPath(); ctx.ellipse(0, -r + 3, r + 1, 9, 0, Math.PI, 0); ctx.fill();
-        ctx.fillStyle = hd; ctx.beginPath(); ctx.ellipse(1.5, -r + 3.5, r + 4, 2.6, 0.06, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = shade(hc, 70); ctx.fillRect(-6, -r - 3, 3, 2);
-      } else if (hm.v === 1) {     // 鐵盔：包住頭頂和後腦、鼻樑護片、鉚釘
-        const cg = ctx.createLinearGradient(-r, -r, r, 0); cg.addColorStop(0, hd); cg.addColorStop(0.5, hl); cg.addColorStop(1, hc);
-        ctx.fillStyle = cg;
-        ctx.beginPath(); ctx.moveTo(-r - 2, 9); ctx.quadraticCurveTo(-r - 3, -r - 3, 1, -r - 3); ctx.quadraticCurveTo(r + 3, -r - 2, r + 2, -4);
-        ctx.lineTo(-3, -4); ctx.lineTo(-5, 9); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = hd; ctx.fillRect(-r - 1, -5.5, 2 * r + 3, 2.4);
-        ctx.fillStyle = hl; ctx.fillRect(7.4, -5, 2.4, 7.5);
-        ctx.fillStyle = shade(hc, 80); [[-8, -4.3], [-2, -4.3], [4, -4.3]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 0.9, 0, Math.PI * 2); ctx.fill(); });
-        ctx.fillStyle = hl; ctx.beginPath(); ctx.moveTo(-2, -r - 3); ctx.lineTo(1, -r - 9); ctx.lineTo(4, -r - 3); ctx.fill();   // 頂飾
-      } else if (hm.v === 2) {     // 兜帽：包住頭和後頸，臉露出來
-        ctx.fillStyle = hc;
-        ctx.beginPath(); ctx.moveTo(-r - 3, 14); ctx.quadraticCurveTo(-r - 5, -r - 4, 2, -r - 3); ctx.quadraticCurveTo(r + 4, -r - 1, r + 2, -2);
-        ctx.quadraticCurveTo(r - 3, -6, 4, -5.5); ctx.quadraticCurveTo(-3, -3, -3, 12); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = hd; ctx.beginPath(); ctx.moveTo(-3, 12); ctx.quadraticCurveTo(-3, -3, 4, -5.5); ctx.lineTo(4, -3.5); ctx.quadraticCurveTo(-1, -1.5, -1, 12); ctx.closePath(); ctx.fill();
-      } else {                     // 其他職業頭飾：沿用舊畫法放大（之後再逐一改 Q 版）
-        ctx.save(); ctx.scale(1.3, 1.3); ctx.translate(-33, -21);
-        G.ART.drawHelmetOnly && G.ART.drawHelmetOnly(ctx, look);
-        ctx.restore();
+    // 4. 耳朵
+    if (hv !== 2) {
+      ctx.fillStyle = skD; ctx.beginPath(); ctx.ellipse(-2.9, 2.4, 1.9, 2.6, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(-2.5, 2.2, 1.2, 1.9, 0.15, 0, Math.PI * 2); ctx.fill();
+    }
+    // 5. 眼睛：黑點（近眼大一點、遠眼窄一點）＋淡淡腮紅
+    ctx.fillStyle = '#1c1418';
+    ctx.beginPath(); ctx.ellipse(4.8, 1.8, 1.15, 1.75, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(9, 1.6, 0.8, 1.55, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(235,110,100,.22)';
+    ctx.beginPath(); ctx.ellipse(4.2, 5.4, 2, 1, 0, 0, Math.PI * 2); ctx.fill();
+    // 6. 瀏海＋翹毛＋亮面
+    if (hv === 1) {                       // 鐵盔：盔沿下只露幾撮瀏海
+      cel(ctx, () => poly(ctx, [[2, -5], [3.4, -1.6], [5.2, -4.8], [7.2, -2], [8.6, -5]]), hair, hD, 0.6, -0.6);
+    } else {
+      cel(ctx, () => poly(ctx, HAIR_BANGS), hair, hD, 1, -1);
+      strokes(ctx, hD, 0.7, [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
+      if (hv !== 2) {
+        HAIR_TUFTS.forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
+        // 亮面：頭頂一圈光澤塊＋瀏海上的小亮條
+        ctx.fillStyle = hL;
+        poly(ctx, [[-7, -9.6], [-3, -12], [-2.2, -11.2], [-6.2, -8.8]]); ctx.fill();
+        poly(ctx, [[0.5, -12.2], [5, -11.2], [4.5, -10.3], [0.6, -11.2]]); ctx.fill();
+        poly(ctx, [[7.5, -8.4], [10.4, -7.2], [10.1, -6.4], [7.6, -7.5]]); ctx.fill();
       }
+      ctx.fillStyle = hL;
+      poly(ctx, [[2.6, -8], [4.4, -8.4], [4, -7.6], [2.8, -7.3]]); ctx.fill();
+    }
+    // 7. 頭盔
+    if (hv === 0) {                       // 皮帽：圓頂軟帽＋帽緣，下面露出瀏海和後髮
+      cel(ctx, () => { ctx.beginPath(); ctx.ellipse(0.5, -7.2, 11, 7.6, 0, Math.PI, 0); ctx.closePath(); }, hc, shade(hc, -38));
+      cel(ctx, () => poly(ctx, [[-12, -8], [11.5, -8.6], [13.5, -6.2], [-11.5, -5.4]]), shade(hc, -18), shade(hc, -55), 0.5, -0.6);
+      ctx.fillStyle = shade(hc, 45); poly(ctx, [[-4, -13.4], [2, -14.6], [2.5, -13.6], [-3.6, -12.4]]); ctx.fill();
+    } else if (hv === 1) {                // 鐵盔：包住頭頂和後腦，鼻樑護片、頂飾、鉚釘
+      cel(ctx, () => poly(ctx, [[-12.2, 7], [-12.6, -5], [-10, -11], [-3, -14.6], [4, -14.4], [9.8, -10.6], [11.6, -5], [11.4, -3.6],
+        [-1.5, -4.4], [-4.5, 0], [-5.2, 7]]), hc, shade(hc, -40), 1.3, -1.3);
+      ctx.fillStyle = shade(hc, -30); poly(ctx, [[-12.4, -6], [11.6, -5.4], [11.4, -3.6], [-12.2, -4]]); ctx.fill();
+      cel(ctx, () => poly(ctx, [[8.6, -4.4], [11.4, -4.2], [11, 3.2], [9.4, 3.2]]), shade(hc, 25), shade(hc, -20), 0.5, 0);
+      ctx.fillStyle = shade(hc, 55); poly(ctx, [[-6, -11.6], [0, -13.8], [0.6, -12.8], [-5.4, -10.6]]); ctx.fill();
+      ctx.fillStyle = shade(hc, 70); [[-8, -5], [-3, -4.8], [2, -4.6], [7, -4.4]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 0.7, 0, Math.PI * 2); ctx.fill(); });
+      cel(ctx, () => poly(ctx, [[-4, -14.2], [-1, -19], [3.5, -18.4], [1.5, -14.4]]), shade(hc, 20), shade(hc, -30), 0.5, -0.5);
+    } else if (hv === 2) {                // 兜帽：前緣包住額頭跟臉側
+      cel(ctx, () => poly(ctx, [[-4, -14], [5, -14.5], [12, -9], [12.8, -2.5], [11, -4.6], [6, -7.6], [0, -6.6], [-2.4, -2], [-2.6, 8], [-5, 12], [-6, -1]]),
+        shade(hc, 12), shade(hc, -30), 0.9, -0.9);
+      strokes(ctx, shade(hc, -50), 0.7, [[[-6, -10], [-9, 2]], [[0, -12], [-3, -6]]]);
     }
   }
 
-  // 軀幹：圓滾滾的短上衣（布衣／鎖甲／板甲），畫在以髖部為 (0,0)、往上 TORSO 的座標
-  function chibiTorso(ctx, look, cls) {
-    const ar = look.armor, c = ar ? ar.color : '#8b6f47';
-    const H = TORSO, top = -H - 1;
-    const g = ctx.createLinearGradient(-8, 0, 9, 0);
-    g.addColorStop(0, shade(c, -30)); g.addColorStop(0.55, c); g.addColorStop(1, shade(c, 22));
-    ctx.fillStyle = g;
-    // 上窄下寬的短上衣，下擺微微外翻
-    ctx.beginPath();
-    ctx.moveTo(-6, top); ctx.quadraticCurveTo(0, top - 1.5, 7, top);
-    ctx.quadraticCurveTo(10, -5, 10.5, 1.5); ctx.quadraticCurveTo(1, 4, -9.5, 1.5);
-    ctx.quadraticCurveTo(-9, -5, -6, top); ctx.closePath(); ctx.fill();
-    if (!ar || ar.v === 0) {       // 布衣：領口、腰帶、扣環
-      ctx.fillStyle = shade(c, 40); ctx.beginPath(); ctx.moveTo(-3, top); ctx.lineTo(2.5, top + 4.5); ctx.lineTo(6, top); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = shade(c, -55); ctx.fillRect(-9, -4, 19.5, 2.6);
-      ctx.fillStyle = '#e0b84a'; ctx.fillRect(1.2, -4.4, 3.2, 3.4);
-    } else if (ar.v === 1) {       // 鎖甲：鎖鏈點點＋腰帶
-      ctx.fillStyle = shade(c, 45);
-      for (let y = top + 3; y < -2; y += 2.4) for (let x = -7 + ((y | 0) % 2); x < 9; x += 2.4) ctx.fillRect(x, y, 1.1, 1.1);
-      ctx.fillStyle = shade(c, -55); ctx.fillRect(-9, -4, 19.5, 2.4);
-    } else {                       // 板甲：胸甲反光、中線、下擺甲片
-      ctx.fillStyle = shade(c, 30);
-      ctx.beginPath(); ctx.moveTo(-5, top + 1.5); ctx.quadraticCurveTo(3, top - 0.5, 8.5, top + 2); ctx.quadraticCurveTo(9, top + 9, 2, top + 10.5); ctx.quadraticCurveTo(-5, top + 9, -5, top + 1.5); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(5, top + 4, 2, 1.1, -0.4, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = shade(c, -45); ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(2, top + 1); ctx.lineTo(2, top + 10); ctx.stroke();
-      ctx.fillStyle = shade(c, -20); for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.rect(-9 + i * 5, -2.5, 4.5, 4); ctx.fill(); }
+  // ── 軀幹（髖部 = (0,0)，往上約 24；跟著身體前傾旋轉）──────────────────────
+  const STEEL = '#9097a0';
+  function drawTorso(ctx, look, cls) {
+    const ar = look.armor, v = ar ? ar.v : 0;
+    const tc = ar ? mute(ar.color) : '#8b6f47', tD = shade(tc, -40);
+    const skin = look.skin || '#f1c9a0';
+    // 脖子
+    ctx.fillStyle = shade(skin, -30); ctx.fillRect(-2.4, -28.5, 5, 6);
+    // 下擺（皮帶以下，蓋住大腿上半）
+    const skirt = () => poly(ctx, [[-8.6, -4.5], [9.4, -4.5], [11.2, 5], [4.6, 6.6], [2.2, 3.2], [-0.4, 6.6], [-10.2, 5.2]]);
+    if (v === 1) cel(ctx, skirt, STEEL, shade(STEEL, -40));
+    else if (v === 2) cel(ctx, skirt, shade(tc, -10), shade(tc, -50));
+    else cel(ctx, skirt, shade(tc, -16), shade(tc, -52));
+    // 上衣／胸甲
+    const body = () => { ctx.beginPath(); ctx.moveTo(-7.6, -23.4); ctx.quadraticCurveTo(1, -26, 9.6, -22.8);
+      ctx.lineTo(10.2, -14.5); ctx.lineTo(8.6, -5.5); ctx.lineTo(-7.6, -5.5); ctx.lineTo(-9.2, -14.5); ctx.closePath(); };
+    if (v === 0) {                         // 布衣：V 領、綁帶、衣褶
+      cel(ctx, body, tc, tD, 1.4, -1);
+      ctx.fillStyle = '#e9dcc0'; poly(ctx, [[-1.6, -24.6], [3.2, -18], [7.4, -24.2]]); ctx.fill();
+      ctx.fillStyle = shade(tc, 30); poly(ctx, [[-2.6, -24.6], [3.2, -16.6], [3.2, -18], [-1.6, -24.6]]); ctx.fill();
+      strokes(ctx, tD, 0.8, [[[-4.5, -19], [-5.2, -8]], [[6.8, -14], [7.4, -8]]]);
+      strokes(ctx, shade(tc, 45), 0.6, [[[2.4, -16], [4, -15]], [[2.4, -13.5], [4, -12.5]], [[2.4, -11], [4, -10]]]);
+    } else if (v === 1) {                  // 鎖甲＋前面一片罩袍
+      cel(ctx, body, STEEL, shade(STEEL, -42), 1.4, -1);
+      ctx.strokeStyle = shade(STEEL, -30); ctx.lineWidth = 0.55;
+      for (let y = -22; y < -6; y += 2.2) for (let x = -7 + ((y * 10 | 0) % 2 ? 1.1 : 0); x < 9; x += 2.2) { ctx.beginPath(); ctx.arc(x, y, 0.9, 0, Math.PI); ctx.stroke(); }
+      cel(ctx, () => poly(ctx, [[-1.5, -24.6], [7.6, -24], [8.4, -5.5], [-2, -5.5]]), tc, tD, 1.1, -0.8);
+      ctx.fillStyle = shade(tc, 55); ctx.fillRect(2.4, -20.5, 1.6, 8); ctx.fillRect(0, -18, 6.4, 1.6);
+      cel(ctx, () => poly(ctx, [[-0.4, -4.5], [7.8, -4.5], [8.4, 6], [0.4, 6]]), tc, tD, 0.8, -0.6);
+    } else {                               // 板甲：胸甲反光、下緣甲片、腿前甲片
+      cel(ctx, body, tc, tD, 1.6, -1.2);
+      ctx.fillStyle = shade(tc, 50); poly(ctx, [[3.8, -23.6], [6.8, -23.4], [7.6, -12], [5, -10.5]]); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(5.8, -20, 1, 1.8, 0.2, 0, Math.PI * 2); ctx.fill();
+      strokes(ctx, tD, 0.8, [[[-8, -11], [-2, -9.6], [9.6, -11.4]]]);
+      [[-8.2, 9.2, -1.5], [-9, 10.6, 2]].forEach(([x0, x1, y]) => cel(ctx, () => poly(ctx, [[x0, y - 3], [x1, y - 3], [x1 + 0.6, y + 1], [x0 - 0.6, y + 1]]), shade(tc, -6), shade(tc, -48), 0.5, -0.5));
     }
-    if (look.accessory) {          // 飾品：胸前寶石＋小鍊子
-      ctx.strokeStyle = '#e0b84a'; ctx.lineWidth = 0.7; ctx.beginPath(); ctx.moveTo(-2, top + 1); ctx.quadraticCurveTo(2.5, top + 6, 7, top + 1); ctx.stroke();
-      ctx.fillStyle = look.accessory.color; ctx.beginPath(); ctx.moveTo(2.5, top + 4.5); ctx.lineTo(4.3, top + 6.5); ctx.lineTo(2.5, top + 8.8); ctx.lineTo(0.7, top + 6.5); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(1.9, top + 5.4, 0.9, 0.9);
+    // 皮帶＋扣環
+    cel(ctx, () => poly(ctx, [[-8, -7], [9, -7], [9.2, -4], [-8.2, -4]]), '#5a3a26', '#2e1c14', 0.4, -0.6);
+    cel(ctx, () => poly(ctx, [[4, -7.6], [7.6, -7.6], [7.6, -3.4], [4, -3.4]]), '#e0b850', '#9a7228', 0.5, -0.5);
+    // 飾品：胸前墜子
+    if (look.accessory) {
+      strokes(ctx, '#d8b04a', 0.6, [[[-1.6, -24.4], [2.6, -19.6], [7, -24]]]);
+      const ac = look.accessory.color;
+      cel(ctx, () => poly(ctx, [[2.6, -20.4], [4.4, -18.4], [2.6, -16.2], [0.8, -18.4]]), ac, shade(ac, -50), 0.5, -0.5);
+      ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(2.2, -19.4, 0.8, 0.8);
     }
+  }
+
+  // 肩甲（鎖甲小、板甲大兩層）
+  function pauldron(ctx, look, sh, lean, back) {
+    const ar = look.armor; if (!ar || ar.v === 0) return;
+    let c = ar.v === 1 ? STEEL : mute(ar.color);
+    if (back) c = shade(c, -30);
+    const big = ar.v === 2;
+    ctx.save(); ctx.translate(sh[0], sh[1]); ctx.rotate(lean);
+    cel(ctx, () => { ctx.beginPath(); ctx.ellipse(0.6, big ? 0.6 : 0.4, big ? 5.6 : 4, big ? 4.6 : 3.4, 0, Math.PI * 1.05, Math.PI * 1.95 + 0.0001); ctx.lineTo(big ? 5.6 : 4, big ? 3.4 : 2.4); ctx.lineTo(big ? -4.6 : -3.4, big ? 3.4 : 2.4); ctx.closePath(); }, c, shade(c, -45), 0.8, -0.8);
+    if (big) {
+      cel(ctx, () => poly(ctx, [[-4.4, 3], [5.8, 3], [5.2, 5.6], [-3.8, 5.6]]), shade(c, -8), shade(c, -50), 0.5, -0.5);
+      ctx.fillStyle = shade(c, 50); poly(ctx, [[-1, -3.4], [3, -3.6], [3.2, -2.7], [-0.8, -2.5]]); ctx.fill();
+    }
+    ctx.restore();
   }
 
   R.drawPose = function (ctx, look, p) {
     const cls = G.CLASSES[look.cls] || G.CLASSES.villager;
-    const hip = [32 + p.dx, 61 + p.dy];   // 腳底（鞋底）約在 y 76，跟影子對齊
-    const neck = rot(hip, p.lean, 0, -TORSO);
-    const headC = rot(neck, p.lean + p.head, 1.5, -HEAD_R + 1);
-    const armC = look.armor ? look.armor.color : '#8b6f47';
-    const bootC = look.boots ? look.boots.color : '#4a3424';
+    const hip = [32 + p.dx, 55 + p.dy];
+    const neck = rot(hip, p.lean, 0, -24);
+    const headC = rot(neck, p.lean + p.head, 1, -10);
+    const ar = look.armor, av = ar ? ar.v : 0;
+    const tc = ar ? mute(ar.color) : '#8b6f47';
+    const sleeve = av === 1 ? STEEL : av === 2 ? '#5a5560' : tc;   // 上臂：布衣同色、鎖甲鋼色、板甲深色內襯
+    const fore = av === 2 ? tc : sleeve;                           // 前臂：板甲換成護臂
+    const pants = '#4e3d30';
+    const bootC = look.boots ? mute(look.boots.color) : '#5e4230';
     const wp = look.weapon || { type: 'dualsword', color: G.ART.GEAR_COLORS[0] };
-    const plate = look.armor && look.armor.v === 2;
 
-    // 腿：短短的大腿＋小腿＋圓頭靴（後腿比較暗）
+    // 腿：褲子大腿 → 長靴（小腿）→ 腳掌；後腿整條暗一階
     const leg = (hx, T, K, back) => {
-      const h0 = rot(hip, p.lean * 0.3, hx, 0);
-      const knee = pt(h0, T, LEG), ankle = pt(knee, T - K, LEG);
-      const dk = back ? -28 : 0;
-      limb(ctx, h0, knee, 5.6, shade('#4b3a2a', dk));
-      limb(ctx, knee, ankle, 5, shade('#4b3a2a', dk - 6));
-      const bc = shade(bootC, dk - 8);
-      const bg = ctx.createLinearGradient(0, ankle[1] - 4, 0, ankle[1] + 3);
-      bg.addColorStop(0, shade(bc, 25)); bg.addColorStop(1, shade(bc, -20));
-      ctx.fillStyle = bg;
-      ctx.beginPath(); ctx.moveTo(ankle[0] - 3.2, ankle[1] - 4.5); ctx.lineTo(ankle[0] + 2.5, ankle[1] - 4.5);
-      ctx.quadraticCurveTo(ankle[0] + 8, ankle[1] - 1.5, ankle[0] + 7.2, ankle[1] + 2.6); ctx.lineTo(ankle[0] - 3.4, ankle[1] + 2.6); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = shade(bc, -40); ctx.fillRect(ankle[0] - 3.4, ankle[1] + 1.6, 10.6, 1.2);           // 鞋底
-      if (look.boots && look.boots.v === 1) { ctx.fillStyle = shade(bootC, 45 + dk); ctx.fillRect(ankle[0] - 3.6, ankle[1] - 5.6, 6.6, 2); }   // 靴口翻邊
+      const dk = back ? -30 : 0;
+      const h0 = rot(hip, p.lean * 0.3, hx, 1);
+      const knee = pt(h0, T, 8.5), ankle = pt(knee, T - K, 8.5);
+      limb2(ctx, h0, knee, 6.2, shade(pants, dk));
+      const bc = shade(bootC, dk);
+      const kb = [knee[0] + (ankle[0] - knee[0]) * 0.18, knee[1] + (ankle[1] - knee[1]) * 0.18];
+      limb2(ctx, kb, ankle, 6, bc);
+      // 靴筒翻邊
+      const cuffC = look.boots && look.boots.v === 1 ? shade(bc, 45) : shade(bc, 22);
+      limb(ctx, [kb[0] - Math.cos(T - K) * 3.2, kb[1] + Math.sin(T - K) * 3.2], [kb[0] + Math.cos(T - K) * 3.2, kb[1] - Math.sin(T - K) * 3.2], 2.2, cuffC);
+      // 腳掌（往前）＋鞋底
+      cel(ctx, () => poly(ctx, [[ankle[0] - 3.2, ankle[1] - 3], [ankle[0] + 2.6, ankle[1] - 3], [ankle[0] + 6.8, ankle[1] - 0.4], [ankle[0] + 7.2, ankle[1] + 2.4], [ankle[0] - 3.4, ankle[1] + 2.4]]), bc, shade(bc, -40), 0.8, -0.8);
+      ctx.fillStyle = shade(bc, -60); ctx.fillRect(ankle[0] - 3.4, ankle[1] + 1.4, 10.6, 1.1);
+      if (look.boots && look.boots.v === 1) {   // 金屬靴：膝蓋護片
+        cel(ctx, () => { ctx.beginPath(); ctx.arc(knee[0], knee[1], 3.1, 0, Math.PI * 2); }, shade(bc, 18), shade(bc, -35), 0.6, -0.6);
+      }
     };
-    // 手：短手、圓圓的拳頭；板甲多一個圓肩甲
+    // 手：袖子 → 前臂 → 手套；回傳手的位置
     const arm = (sh, S, E, back) => {
-      const elbow = pt(sh, S, ARM), hand = pt(elbow, S + E, ARM);
-      const c = back ? shade(armC, -32) : shade(armC, -6);
-      limb(ctx, sh, elbow, 5.4, c);
-      limb(ctx, elbow, hand, 4.8, shade(c, -8));
-      ctx.fillStyle = back ? shade(look.skin, -25) : look.skin;
-      ctx.beginPath(); ctx.arc(hand[0], hand[1], 2.7, 0, Math.PI * 2); ctx.fill();
+      const dk = back ? -30 : 0;
+      const elbow = pt(sh, S, 8), hand = pt(elbow, S + E, 8);
+      limb2(ctx, sh, elbow, 6.2, shade(sleeve, dk));
+      limb2(ctx, elbow, hand, 5.6, shade(fore, dk));
+      const gl = shade('#6e4c34', dk);
+      cel(ctx, () => { ctx.beginPath(); ctx.arc(hand[0], hand[1], 2.9, 0, Math.PI * 2); }, gl, shade(gl, -40), 0.6, -0.6);
       return hand;
-    };
-    const pauldron = (sh, back) => {
-      if (!plate) return;
-      const c = back ? shade(armC, -25) : shade(armC, 18);
-      const g = ctx.createRadialGradient(sh[0] - 1, sh[1] - 2, 0.5, sh[0], sh[1], 5);
-      g.addColorStop(0, shade(c, 40)); g.addColorStop(1, c);
-      ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(sh[0], sh[1] + 0.5, 4.6, 4, 0, 0, Math.PI * 2); ctx.fill();
     };
     const sword = (hand, a, L, back) => {
       const tip = pt(hand, a, L);
@@ -287,47 +318,49 @@
       return tip;
     };
 
-    // 1. 披風（掛在肩後，比較短，下襬分岔）
+    // 1. 披風（掛在脖子，往後飄；有兩條布褶）
     if (cls.cape) {
-      const top = rot(neck, p.lean, -4, 1.5), sway = p.cape;
-      const L = 21, bl = [top[0] - 10 - sway * 12, top[1] + L - sway * 5], br = [top[0] + 3 - sway * 7, top[1] + L + 1 - sway * 3];
-      const g = ctx.createLinearGradient(top[0], top[1], top[0], top[1] + L);
-      g.addColorStop(0, shade(cls.cape, 5)); g.addColorStop(1, shade(cls.cape, -45));
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.moveTo(top[0] - 2, top[1]); ctx.quadraticCurveTo(bl[0] + 2, top[1] + 10, bl[0], bl[1]);
-      ctx.lineTo((bl[0] + br[0]) / 2, (bl[1] + br[1]) / 2 - 3); ctx.lineTo(br[0], br[1]);
-      ctx.quadraticCurveTo(top[0] + 7, top[1] + 10, top[0] + 6, top[1]); ctx.closePath(); ctx.fill();
+      const top = rot(neck, p.lean, -5, 1), sway = p.cape;
+      const bl = [top[0] - 12 - sway * 14, top[1] + 33 - sway * 6], br = [top[0] + 4 - sway * 8, top[1] + 34 - sway * 3];
+      const capeC = mute(cls.cape);
+      const path = () => { ctx.beginPath(); ctx.moveTo(top[0] - 2, top[1]); ctx.quadraticCurveTo(bl[0] + 2, top[1] + 16, bl[0], bl[1]);
+        ctx.lineTo((bl[0] * 2 + br[0]) / 3, (bl[1] * 2 + br[1]) / 3 - 2.5); ctx.lineTo((bl[0] + br[0] * 2) / 3, (bl[1] + br[1] * 2) / 3 + 0.5);
+        ctx.lineTo(br[0], br[1]); ctx.quadraticCurveTo(top[0] + 8, top[1] + 16, top[0] + 7, top[1]); ctx.closePath(); };
+      cel(ctx, path, shade(capeC, -6), shade(capeC, -45), 2.2, -0.6);
+      const m = (k, s) => [top[0] + (bl[0] + (br[0] - bl[0]) * s - top[0]) * k, top[1] + (bl[1] + (br[1] - bl[1]) * s - top[1]) * k];
+      strokes(ctx, shade(capeC, -55), 0.9, [[m(0.25, 0.3), m(0.95, 0.3)], [m(0.35, 0.65), m(0.92, 0.65)]]);
     }
-    // 2. 後腳、後手＋後劍
-    leg(-3, p.bT, p.bK, true);
-    const bSh = rot(neck, p.lean, -4.5, 2.5);
+    // 2. 後腳、後手＋後肩甲＋後劍
+    leg(-3.5, p.bT, p.bK, true);
+    const bSh = rot(neck, p.lean, -6, 4);
     const bHand = arm(bSh, p.bS, p.bE, true);
-    pauldron(bSh, true);
-    if (wp.type === 'dualsword') sword(bHand, p.bW, 20, true);
+    pauldron(ctx, look, bSh, p.lean, true);
+    if (wp.type === 'dualsword') sword(bHand, p.bW, 22, true);
     // 3. 前腳
-    leg(3, p.fT, p.fK, false);
-    // 4. 軀幹（跟著髖部旋轉）
+    leg(3.5, p.fT, p.fK, false);
+    // 4. 軀幹＋鎧甲（跟著髖部旋轉）
     ctx.save(); ctx.translate(hip[0], hip[1]); ctx.rotate(p.lean);
-    chibiTorso(ctx, look, cls);
+    drawTorso(ctx, look, cls);
     ctx.restore();
-    // 5. 頭（大頭，跟著軀幹＋頭部傾斜）
+    // 5. 頭＋頭髮＋頭盔
     ctx.save(); ctx.translate(headC[0], headC[1]); ctx.rotate(p.lean + p.head);
-    chibiHead(ctx, look, cls);
+    ctx.translate(0, -0.6); ctx.scale(1.1, 1.1);   // 頭稍微大一點（比例接近 3.3 頭身）
+    drawHead(ctx, look);
     ctx.restore();
-    // 6. 前手＋肩甲＋前劍（揮砍時畫殘影弧線）
-    const fSh = rot(neck, p.lean, 5.5, 2.5);
+    // 6. 前手＋前肩甲＋前劍（揮砍時畫殘影弧線）
+    const fSh = rot(neck, p.lean, 7, 4);
     const fHand = arm(fSh, p.fS, p.fE, false);
-    pauldron(fSh, false);
+    pauldron(ctx, look, fSh, p.lean, false);
     if (wp.type === 'dualsword') {
       if (p.slash > 0.05) {
         ctx.save(); ctx.globalAlpha = 0.55 * p.slash;
-        const g = ctx.createRadialGradient(fSh[0], fSh[1], 6, fSh[0], fSh[1], 28);
+        const g = ctx.createRadialGradient(fSh[0], fSh[1], 6, fSh[0], fSh[1], 30);
         g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.7, 'rgba(255,240,240,.9)'); g.addColorStop(1, shade(cls.color, 40));
         ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(fSh[0], fSh[1], 28, -Math.PI * 0.62, Math.PI * 0.18); ctx.arc(fSh[0], fSh[1], 16, Math.PI * 0.18, -Math.PI * 0.62, true); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.arc(fSh[0], fSh[1], 30, -Math.PI * 0.62, Math.PI * 0.18); ctx.arc(fSh[0], fSh[1], 18, Math.PI * 0.18, -Math.PI * 0.62, true); ctx.closePath(); ctx.fill();
         ctx.restore();
       }
-      sword(fHand, p.fW, 24, false);
+      sword(fHand, p.fW, 26, false);
     }
   };
 
