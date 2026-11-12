@@ -11,8 +11,17 @@
   const R = G.RIG = {};
   const shade = (c, a) => G.ART.shade(c, a);
 
-  R.CLASSES = ['bloodknight'];                 // 原型：先只有血騎士換新畫法
-  R.enabled = look => !!look && R.CLASSES.includes(look.cls);
+  // 第 163 輪起：全部職業（含冒險者）都用骨架畫法
+  R.enabled = look => !!look;
+  // 攻擊動作類型：dual 雙劍、melee 近戰單手、ranged 遠程（手往前推出）、cast 遠程長柄、gun 雙槍（雙手往前）
+  R.style = function (look) {
+    const w = look.weapon ? look.weapon.type : '';
+    if (w === 'dualsword') return 'dual';
+    if (w === 'pistol') return 'gun';
+    const C = G.CLASSES[look.cls];
+    if (!C || !C.ranged) return 'melee';
+    return ['brush', 'scythe', 'axe'].includes(w) ? 'cast' : 'ranged';   // cast：長柄武器往前上方舉（不會超出格子）
+  };
 
   // 一格的大小（單位）：比舊的 64×80 左右各多 16、上方多 8，揮劍時劍不會被切掉
   R.PAD_X = 16; R.PAD_TOP = 8;
@@ -51,7 +60,7 @@
   const STAND = { dx: 0, dy: 0, lean: 0.06, head: 0, bT: -0.18, bK: 0.12, fT: 0.22, fK: 0.1,
     bS: 0.5, bE: -0.75, fS: 0.55, fE: -1.05, bW: 1.85, fW: 2.55, cape: 0, slash: 0 };
 
-  R.pose = function (anim, t) {
+  R.pose = function (anim, t, style) {
     const p = Object.assign({}, STAND);
     const TAU = Math.PI * 2;
     if (anim === 'idle') {             // 待機：呼吸起伏、手微微晃、披風飄
@@ -68,6 +77,16 @@
       p.fS = 0.45 - 0.3 * s; p.bS = 0.45 + 0.3 * s;
       p.fW = 2.45 - 0.15 * s; p.bW = 1.8 + 0.15 * s;
       p.cape = 0.22 + 0.06 * Math.abs(s);
+    } else if (anim === 'attack' && (style === 'ranged' || style === 'gun' || style === 'cast')) {   // 遠程：手縮回 → 往前推出（施法／開槍）→ 停一下 → 收回
+      const g = style === 'gun', up = style === 'cast' ? 0.8 : 0;   // up：長柄武器往上抬的角度
+      Object.assign(p, keyed([
+        [0.0,  { dx: 0, lean: 0.06, head: 0, fS: 0.55, fE: -1.05, fW: 2.55, bS: 0.5, bE: -0.75, bW: 1.85 }],
+        [0.3,  { dx: -1.5, lean: -0.06, head: -0.05, fS: 0.15, fE: -1.7, fW: 2.9 + up * 0.2, bS: g ? 0.2 : 0.5, bE: g ? -1.5 : -0.75, bW: g ? 2.6 : 1.85 }],
+        [0.5,  { dx: 2, lean: 0.14, head: 0.06, fS: 1.5, fE: -0.05, fW: 1.6 + up, bS: g ? 1.35 : 0.3, bE: g ? -0.05 : -0.9, bW: g ? 1.65 : 1.85 }],
+        [0.75, { dx: 1.5, lean: 0.12, head: 0.05, fS: 1.45, fE: -0.1, fW: 1.65 + up, bS: g ? 1.3 : 0.3, bE: g ? -0.1 : -0.9, bW: g ? 1.7 : 1.85 }],
+        [1.0,  { dx: 0, lean: 0.06, head: 0, fS: 0.55, fE: -1.05, fW: 2.55, bS: 0.5, bE: -0.75, bW: 1.85 }],
+      ], t));
+      p.cape = 0.1 + Math.max(0, p.dx) * 0.03;
     } else if (anim === 'attack') {    // 攻擊：前劍舉到後上方 → 往前下砍（殘影）→ 後劍補一刀 → 收回
       Object.assign(p, keyed([
         [0.0,  { dx: 0, lean: 0.06, fS: 0.55, fE: -1.05, fW: 2.55, bS: 0.5, bE: -0.75, bW: 1.85, fT: 0.22, bT: -0.18, slash: 0, head: 0 }],
@@ -132,6 +151,14 @@
   const HAIR_BANGS = [[-1.2, -4.2], [0.8, -8.4], [5, -9.6], [9.4, -9], [12, -6.4], [12.6, -2.2], [10.6, -3.9],
     [11, 0.4], [8.6, -3.5], [7.5, -1.6], [5.8, -4.3], [3.6, -1.4], [2.8, -4.6], [0.6, 4.6]];
   const HAIR_TUFTS = [[[-3.5, -12.8], [-7.5, -16.2], [-0.5, -13.6]], [[1, -13.6], [3.2, -17.2], [5.6, -12]]];
+  // 女生：長髮垂到背上（髮尾分岔）、側分瀏海、臉旁一長撮、一根呆毛
+  const F_BACK = [[7, -8], [4, -11.8], [-1, -13.4], [-6.5, -12.5], [-11, -9], [-13.2, -3], [-13.8, 4], [-13.2, 11],
+    [-14.8, 18.5], [-10.6, 15.8], [-9.2, 20.8], [-6.2, 16.4], [-3.4, 19.2], [-3, 10], [-2.5, 4], [-1, -2], [3, -5]];
+  const F_TOP = [[10.6, -3], [10.4, -8], [6.4, -12.4], [0, -14], [-6.4, -13], [-11, -8.6], [-12, -2], [-11.2, 5],
+    [-8, 8.5], [-4.6, 3], [-3, -1.2], [0, -4.2], [4, -5.6], [8, -5.2]];
+  const F_BANGS = [[-1.2, -4.2], [1, -8.6], [5.5, -10], [10, -8.8], [12.2, -5.6], [12.4, -1.4], [10.6, -3.2], [9.8, -0.4],
+    [8, -4], [5.6, -2.2], [4.4, -5], [2.6, -3.2], [2, -5.2], [0.6, 5], [1.8, 10.8], [-1.2, 9.4]];
+  const F_TUFTS = [[[0, -13.6], [2.4, -17.8], [3.6, -13.2]]];
 
   //   頭盔／頭飾先不畫（第 162 輪：之後另外設計紙娃娃），一律露出完整髮型
   function drawHead(ctx, look) {
@@ -139,16 +166,18 @@
     const hD = shade(hair, -42), hL = shade(hair, 48), hDD = shade(hair, -70);
     const skD = shade(skin, -32);
 
-    // 1. 後髮：腦後一束束往後下翹的尖髮（最暗）
-    ctx.fillStyle = hD; poly(ctx, HAIR_BACK); ctx.fill();
-    strokes(ctx, hDD, 0.8, [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
+    const fem = look.gender === 'f';
+    // 1. 後髮：男生是腦後往後下翹的尖髮束；女生是垂到背上的長髮（最暗）
+    ctx.fillStyle = hD; poly(ctx, fem ? F_BACK : HAIR_BACK); ctx.fill();
+    strokes(ctx, hDD, 0.8, fem ? [[[-9, -6], [-11.6, 6], [-12.2, 15]], [[-6, -4], [-7.6, 8], [-7, 17]]]
+      : [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
     // 2. 臉（下巴往右前收）
     cel(ctx, () => {
       ctx.beginPath(); ctx.ellipse(0.4, 0.2, 9.6, 9.8, 0, 0, Math.PI * 2);
       ctx.moveTo(10, 3.6); ctx.lineTo(8.2, 9); ctx.lineTo(4, 10.6); ctx.lineTo(-3.5, 7); ctx.closePath();   // 跟橢圓同方向，不然重疊處會變破洞
     }, skin, skD, 1.2, -0.6);
     // 3. 頭頂的頭髮（包住頭頂跟後腦，留出臉）＋髮絲分層線
-    cel(ctx, () => poly(ctx, HAIR_TOP), hair, hD, 1.3, -1.3);
+    cel(ctx, () => poly(ctx, fem ? F_TOP : HAIR_TOP), hair, hD, 1.3, -1.3);
     strokes(ctx, hD, 0.75, [[[-2, -11.5], [-7.5, -5], [-8, 1]], [[2.5, -12], [-2.5, -6.5], [-4.5, -0.5]], [[6, -11], [3, -7]]]);
     // 4. 耳朵
     ctx.fillStyle = skD; ctx.beginPath(); ctx.ellipse(-2.9, 2.4, 1.9, 2.6, 0.15, 0, Math.PI * 2); ctx.fill();
@@ -157,12 +186,14 @@
     ctx.fillStyle = '#1c1418';
     ctx.fillRect(3.8, 0.4, 2.2, 2.8);
     ctx.fillRect(8.4, 0.3, 1.5, 2.6);
+    if (fem) { ctx.fillRect(3.1, -0.1, 1.3, 0.9); ctx.fillRect(8.1, -0.2, 0.9, 0.8); }   // 女生：眼角一點睫毛
     ctx.fillStyle = 'rgba(235,110,100,.22)';
     ctx.beginPath(); ctx.ellipse(4.2, 5.4, 2, 1, 0, 0, Math.PI * 2); ctx.fill();
     // 6. 瀏海＋翹毛＋亮面
-    cel(ctx, () => poly(ctx, HAIR_BANGS), hair, hD, 1, -1);
-    strokes(ctx, hD, 0.7, [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
-    HAIR_TUFTS.forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
+    cel(ctx, () => poly(ctx, fem ? F_BANGS : HAIR_BANGS), hair, hD, 1, -1);
+    strokes(ctx, hD, 0.7, fem ? [[[5.5, -9], [5.4, -3]], [[9.5, -8.4], [9.6, -2]], [[1.8, -7], [1.2, 8]]]
+      : [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
+    (fem ? F_TUFTS : HAIR_TUFTS).forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
     ctx.fillStyle = hL;
     poly(ctx, [[-7, -9.6], [-3, -12], [-2.2, -11.2], [-6.2, -8.8]]); ctx.fill();
     poly(ctx, [[0.5, -12.2], [5, -11.2], [4.5, -10.3], [0.6, -11.2]]); ctx.fill();
@@ -179,13 +210,18 @@
     // 脖子
     ctx.fillStyle = shade(skin, -30); ctx.fillRect(-2.4, -28.5, 5, 6);
     // 下擺（皮帶以下，蓋住大腿上半）
-    const skirt = () => poly(ctx, [[-8.6, -4.5], [9.4, -4.5], [11.2, 5], [4.6, 6.6], [2.2, 3.2], [-0.4, 6.6], [-10.2, 5.2]]);
+    const fem = look.gender === 'f';
+    const skirt = () => poly(ctx, fem ? [[-8.6, -4.5], [9.4, -4.5], [12.6, 8.2], [5, 9.6], [2.2, 6.2], [-0.6, 9.6], [-11.6, 8.2]]
+      : [[-8.6, -4.5], [9.4, -4.5], [11.2, 5], [4.6, 6.6], [2.2, 3.2], [-0.4, 6.6], [-10.2, 5.2]]);
     if (v === 1) cel(ctx, skirt, STEEL, shade(STEEL, -40));
     else if (v === 2) cel(ctx, skirt, shade(tc, -10), shade(tc, -50));
     else cel(ctx, skirt, shade(tc, -16), shade(tc, -52));
     // 上衣／胸甲
-    const body = () => { ctx.beginPath(); ctx.moveTo(-7.6, -23.4); ctx.quadraticCurveTo(1, -26, 9.6, -22.8);
-      ctx.lineTo(10.2, -14.5); ctx.lineTo(8.6, -5.5); ctx.lineTo(-7.6, -5.5); ctx.lineTo(-9.2, -14.5); ctx.closePath(); };
+    const body = fem
+      ? () => { ctx.beginPath(); ctx.moveTo(-7, -23.4); ctx.quadraticCurveTo(1, -25.8, 9, -22.8);
+          ctx.lineTo(9.8, -15.5); ctx.lineTo(7.8, -9); ctx.lineTo(8.8, -5.5); ctx.lineTo(-7.8, -5.5); ctx.lineTo(-7.4, -9); ctx.lineTo(-8.6, -15.5); ctx.closePath(); }
+      : () => { ctx.beginPath(); ctx.moveTo(-7.6, -23.4); ctx.quadraticCurveTo(1, -26, 9.6, -22.8);
+          ctx.lineTo(10.2, -14.5); ctx.lineTo(8.6, -5.5); ctx.lineTo(-7.6, -5.5); ctx.lineTo(-9.2, -14.5); ctx.closePath(); };
     if (v === 0) {                         // 布衣：V 領、綁帶、衣褶
       cel(ctx, body, tc, tD, 1.4, -1);
       ctx.fillStyle = '#e9dcc0'; poly(ctx, [[-1.6, -24.6], [3.2, -18], [7.4, -24.2]]); ctx.fill();
@@ -233,6 +269,98 @@
     ctx.restore();
   }
 
+
+  // ── 武器（每個職業固定一種）：hand = 手的位置、a = 武器角度（0 往下、π 往上）、back = 後手 ──
+  //   along()：把座標轉成「+y 沿著武器往前端、-x 是武器朝前／朝下的那一側」
+  function along(ctx, hand, a, fn) { ctx.save(); ctx.translate(hand[0], hand[1]); ctx.rotate(-a); fn(); ctx.restore(); }
+  function drawWeapon(ctx, wp, hand, a, back, p, hip) {
+    const t = wp.type, wc = back ? shade(wp.color, -25) : wp.color;
+    const wood = '#6b4a2a';
+    if (back) {                              // 後手只有雙劍、雙槍會拿東西
+      if (t === 'dualsword') { const tip = pt(hand, a, 22); G.ART.blade(ctx, wc, hand[0], hand[1], tip[0], tip[1], 2.5); }
+      else if (t === 'pistol') along(ctx, hand, a, () => gun(ctx, wc));
+      return;
+    }
+    if (t === 'dualsword') { const tip = pt(hand, a, 26); G.ART.blade(ctx, wc, hand[0], hand[1], tip[0], tip[1], 3); }
+    else if (t === 'longsword') {            // 貓鎧者：長劍
+      const tip = pt(hand, a, 31); G.ART.blade(ctx, wc, hand[0], hand[1], tip[0], tip[1], 3.8);
+      along(ctx, hand, a, () => { ctx.fillStyle = wc; ctx.beginPath(); ctx.arc(0, -5, 1.8, 0, Math.PI * 2); ctx.fill(); });
+    } else if (t === 'pistol') along(ctx, hand, a, () => gun(ctx, wc));
+    else along(ctx, hand, a, () => {
+      if (t === 'axe') {                     // 德魯伊：斧頭＋藤蔓
+        limb(ctx, [0, -5], [0, 24], 2.6, wood);
+        cel(ctx, () => poly(ctx, [[-1, 15], [-8, 12], [-11, 18], [-8, 25], [-1, 22]]), shade(wc, 40), shade(wc, -10), -0.6, 0.6);
+        strokes(ctx, '#4f8a4a', 1.2, [[[0.8, 2], [-1.4, 6], [1.2, 10], [-1.2, 14]]]);
+      } else if (t === 'scythe') {           // 死靈術師：鐮刀（刀刃顏色 = 稀有度）
+        limb(ctx, [0, -10], [0, 30], 2.6, '#3a2f2a');
+        cel(ctx, () => { ctx.beginPath(); ctx.moveTo(0, 29.5); ctx.quadraticCurveTo(14, 34, 21, 21); ctx.quadraticCurveTo(12, 27.5, 0, 25.5); ctx.closePath(); },
+          shade(wc, 60), shade(wc, 10), 0.5, 0.6);
+        ctx.fillStyle = '#9dff9d'; ctx.shadowColor = '#7dff9a'; ctx.shadowBlur = 5;
+        ctx.beginPath(); ctx.arc(0, 30, 1.8, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+      } else if (t === 'brush') {            // 暗黑畫家：大畫筆
+        limb(ctx, [0, -4], [0, 22], 2.6, wood);
+        ctx.fillStyle = shade(wc, 20); ctx.fillRect(-2.2, 21.5, 4.4, 3.2);
+        cel(ctx, () => { ctx.beginPath(); ctx.moveTo(-2.6, 24.5); ctx.quadraticCurveTo(0, 35, 2.6, 24.5); ctx.closePath(); }, '#8a4fd0', '#4a2480', -0.5, 0.5);
+      } else if (t === 'tower') {            // 城牆者：大塔盾（擋在身前）
+        ctx.rotate(a + p.lean * 0.5);        // 盾牌大致保持直立
+        cel(ctx, () => { G.ART.rr(ctx, -4, -16, 15, 30, 3); }, shade(mute(wc), 10), shade(mute(wc), -40), 1, -1);
+        ctx.fillStyle = shade(mute(wc), 55); ctx.fillRect(2, -12, 3, 22); ctx.fillRect(-1.5, -4, 10, 3);
+      } else if (t === 'openbook') {         // 學者：打開的書
+        ctx.rotate(a + p.lean * 0.5 - 0.15);
+        ctx.fillStyle = shade(wc, -25); poly(ctx, [[-5, -6], [3, -3.5], [11, -6], [11, 4], [3, 6.5], [-5, 4]]); ctx.fill();
+        ctx.fillStyle = '#f3ead2';
+        poly(ctx, [[-4, -7], [3, -4.5], [3, 5], [-4, 3]]); ctx.fill();
+        poly(ctx, [[10, -7], [3, -4.5], [3, 5], [10, 3]]); ctx.fill();
+        strokes(ctx, '#9a8c70', 0.6, [0, 1, 2].flatMap(i => [[[-2.6, -4 + i * 2.3], [1.6, -2.4 + i * 2.3]], [[4.4, -2.4 + i * 2.3], [8.6, -4 + i * 2.3]]]));
+      } else if (t === 'spyglass') {         // 飛船船長：黃銅望遠鏡（環 = 稀有度）
+        cel(ctx, () => G.ART.rr(ctx, -2.4, -2, 4.8, 13, 1.5), '#c8963b', '#7a5420', 0.5, 0.5);
+        cel(ctx, () => G.ART.rr(ctx, -3.1, 10, 6.2, 7, 1.5), '#e0b04a', '#8a6024', 0.5, 0.5);
+        ctx.fillStyle = wc; ctx.fillRect(-2.4, 3, 4.8, 1.6); ctx.fillRect(-3.1, 12, 6.2, 1.6);
+        ctx.fillStyle = '#9fd8ff'; ctx.fillRect(-2.4, 16.4, 4.8, 1);
+      } else if (t === 'briefcase') {        // 對沖基金經理人：公事包（往下垂）
+        ctx.rotate(a);                       // 不跟著手轉，永遠往下掛
+        strokes(ctx, '#2a1d14', 1.2, [[[-2.5, 3], [-2.5, 0], [2.5, 0], [2.5, 3]]]);
+        cel(ctx, () => G.ART.rr(ctx, -8, 3, 16, 11, 1.6), '#6a442a', '#3a2416', 0.8, -0.8);
+        ctx.fillStyle = '#3e2716'; ctx.fillRect(-8, 7.5, 16, 1.2);
+        ctx.fillStyle = wc; ctx.fillRect(-1.5, 6.5, 3, 3.4);
+      } else if (t === 'dumbbell') {         // 健身者：啞鈴（跟手臂垂直）
+        limb(ctx, [-5.5, 0.5], [5.5, 0.5], 1.8, '#666');
+        cel(ctx, () => { ctx.beginPath(); ctx.rect(-8, -3.2, 3.4, 7.4); ctx.rect(4.6, -3.2, 3.4, 7.4); }, shade(wc, -20), shade(wc, -60), 0.5, -0.5);
+      } else if (t === 'claw') {             // 美甲師：三爪拳刃，爪尖是亮粉色指甲
+        cel(ctx, () => G.ART.rr(ctx, -3.4, -1.5, 6.8, 6.5, 1.5), shade(wc, 20), shade(wc, -30), 0.5, 0.5);
+        [-2.4, 0, 2.4].forEach(x => {
+          strokes(ctx, '#d8dde6', 1.5, [[[x, 4.5], [x * 1.3 - 0.8, 10], [x * 1.5 - 2.4, 14]]]);
+          ctx.fillStyle = '#ff5fae'; ctx.beginPath(); ctx.arc(x * 1.5 - 2.4, 14, 1.3, 0, Math.PI * 2); ctx.fill();
+        });
+      } else if (t === 'leash') {            // 遛狗者：牽繩（狗另外畫）
+        ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.arc(0, 0, 1.2, 0, Math.PI * 2); ctx.fill();
+      } else {                               // 冒險者：草叉
+        limb(ctx, [0, -6], [0, 25], 2.4, '#8a6a3a');
+        strokes(ctx, '#a0a4aa', 1.3, [[[-4, 25], [4, 25]], [[-4, 25], [-4, 32]], [[0, 25], [0, 33]], [[4, 25], [4, 32]]]);
+      }
+    });
+    if (t === 'leash') drawDog(ctx, hand, p, hip);
+  }
+  // 雙槍的一把：槍管沿著武器方向，握把往下
+  function gun(ctx, wc) {
+    cel(ctx, () => poly(ctx, [[0.8, -1.5], [-5, -3.2], [-5.6, -0.4], [-1.2, 2.2]]), '#6a4426', '#3a2414', -0.4, 0.4);
+    cel(ctx, () => { ctx.beginPath(); ctx.rect(-1.5, -1, 3, 12); }, shade(wc, 25), shade(wc, -25), 0.5, 0.5);
+    ctx.fillStyle = '#2a2a30'; ctx.fillRect(-1.5, 10, 3, 1.2);
+  }
+  // 遛狗者的狗：站在主人前面，牽繩從手拉到項圈
+  function drawDog(ctx, hand, p, hip) {
+    const x = hip[0] + 18 - p.dx * 0.3, y = 70.5 + Math.abs(p.dy) * 0.4, dc = '#b9874f', dD = shade(dc, -40);
+    strokes(ctx, '#c0392b', 1.1, [[hand, [(hand[0] + x + 6) / 2, Math.max(hand[1], y - 6) + 4], [x + 6, y - 6]]]);
+    ctx.fillStyle = dD; ctx.fillRect(x - 3.5, y - 2, 2.4, 6); ctx.fillRect(x + 4, y - 2, 2.4, 6);   // 後面兩隻腳
+    strokes(ctx, dc, 1.8, [[[x - 5, y - 4], [x - 8, y - 9]]]);                                 // 尾巴
+    cel(ctx, () => G.ART.rr(ctx, -6 + x, y - 8, 13, 7, 3), dc, dD, 0.8, -0.8);                // 身體
+    ctx.fillStyle = dc; ctx.fillRect(x - 2, y - 2, 2.4, 6); ctx.fillRect(x + 5, y - 2, 2.4, 6);
+    cel(ctx, () => { ctx.beginPath(); ctx.ellipse(x + 9, y - 9, 4.4, 4, 0, 0, Math.PI * 2); ctx.rect(x + 10, y - 9, 4.4, 3.2); }, dc, dD, 0.6, -0.6);
+    ctx.fillStyle = dD; ctx.beginPath(); ctx.ellipse(x + 6.4, y - 9.6, 1.7, 3.3, 0.4, 0, Math.PI * 2); ctx.fill();   // 耳朵
+    ctx.fillStyle = '#1c1418'; ctx.fillRect(x + 10, y - 11, 1.4, 1.6); ctx.fillRect(x + 13.6, y - 9, 1.4, 1.3);   // 眼睛、鼻子
+    ctx.fillStyle = '#c0392b'; ctx.fillRect(x + 5.6, y - 8, 1.8, 4);                           // 項圈
+  }
+
   R.drawPose = function (ctx, look, p) {
     const cls = G.CLASSES[look.cls] || G.CLASSES.villager;
     const hip = [32 + p.dx, 55 + p.dy];
@@ -275,11 +403,6 @@
       cel(ctx, () => { ctx.beginPath(); ctx.arc(hand[0], hand[1], 2.9, 0, Math.PI * 2); }, gl, shade(gl, -40), 0.6, -0.6);
       return hand;
     };
-    const sword = (hand, a, L, back) => {
-      const tip = pt(hand, a, L);
-      G.ART.blade(ctx, back ? shade(wp.color, -25) : wp.color, hand[0], hand[1], tip[0], tip[1], back ? 2.5 : 3);
-      return tip;
-    };
 
     // 1. 披風（掛在脖子，往後飄；有兩條布褶）
     if (cls.cape) {
@@ -298,7 +421,7 @@
     const bSh = rot(neck, p.lean, -6, 4);
     const bHand = arm(bSh, p.bS, p.bE, true);
     pauldron(ctx, look, bSh, p.lean, true);
-    if (wp.type === 'dualsword') sword(bHand, p.bW, 22, true);
+    drawWeapon(ctx, wp, bHand, p.bW, true, p, hip);
     // 3. 前腳
     leg(3.5, p.fT, p.fK, false);
     // 4. 軀幹＋鎧甲（跟著髖部旋轉）
@@ -314,7 +437,8 @@
     const fSh = rot(neck, p.lean, 7, 4);
     const fHand = arm(fSh, p.fS, p.fE, false);
     pauldron(ctx, look, fSh, p.lean, false);
-    if (wp.type === 'dualsword') {
+    const style = R.style(look);
+    if (style === 'dual' || style === 'melee') {
       if (p.slash > 0.05) {
         ctx.save(); ctx.globalAlpha = 0.55 * p.slash;
         const g = ctx.createRadialGradient(fSh[0], fSh[1], 6, fSh[0], fSh[1], 30);
@@ -323,30 +447,43 @@
         ctx.beginPath(); ctx.arc(fSh[0], fSh[1], 30, -Math.PI * 0.62, Math.PI * 0.18); ctx.arc(fSh[0], fSh[1], 18, Math.PI * 0.18, -Math.PI * 0.62, true); ctx.closePath(); ctx.fill();
         ctx.restore();
       }
-      sword(fHand, p.fW, 26, false);
     }
+    drawWeapon(ctx, wp, fHand, p.fW, false, p, hip);
   };
 
   // ── 一格：加影子、畫姿勢、自動描邊 ──────────────────────────────────────
   // 回傳畫好的 canvas（FW×FH 單位 × SCALE）
-  R.frame = function (look, anim, t) {
-    const S = R.SCALE, W = R.FW * S, H = R.FH * S;
+  R.frame = function (look, anim, t, scale) {
+    const S = scale || R.SCALE, W = R.FW * S, H = R.FH * S;
+    const style = R.style(look);
     const fig = G.ART.canvas(W, H), f = fig.getContext('2d');
     f.save(); f.scale(S, S); f.translate(R.PAD_X, R.PAD_TOP);
-    R.drawPose(f, look, R.pose(anim, t));
+    R.drawPose(f, look, R.pose(anim, t, style));
     f.restore();
     // 描邊：把人物剪影往 8 個方向偏移、塗深色，墊在下面
     const sil = G.ART.canvas(W, H), s = sil.getContext('2d');
     s.drawImage(fig, 0, 0); s.globalCompositeOperation = 'source-in'; s.fillStyle = '#1a1020'; s.fillRect(0, 0, W, H);
     const out = G.ART.canvas(W, H), o = out.getContext('2d');
     // 影子（不描邊）
-    const p = R.pose(anim, t);
+    const p = R.pose(anim, t, style);
     o.fillStyle = 'rgba(0,0,0,.25)';
     o.beginPath(); o.ellipse((32 + R.PAD_X + p.dx * 0.5) * S, (76 + R.PAD_TOP) * S, (anim === 'dead' ? 20 : 16) * S, 4 * S, 0, 0, Math.PI * 2); o.fill();
     const d = 1.1 * S / 2 + 0.5;
     [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([x, y]) => o.drawImage(sil, x * d, y * d));
     o.drawImage(fig, 0, 0);
     return out;
+  };
+
+  // 選單裡的紙娃娃：高解析度的待機第一格（同樣外觀只畫一次）
+  const dollCache = new Map();
+  R.DOLL_SCALE = 6;
+  R.doll = function (look) {
+    const key = JSON.stringify(look);
+    if (!dollCache.has(key)) {
+      if (dollCache.size > 40) dollCache.delete(dollCache.keys().next().value);
+      dollCache.set(key, R.frame(look, 'idle', 0, R.DOLL_SCALE));
+    }
+    return dollCache.get(key);
   };
 
   // 整張 sprite sheet：所有動作的格子排一排；frames = { anim: [格子 x 位置…] }

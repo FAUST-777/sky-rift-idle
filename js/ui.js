@@ -224,7 +224,10 @@
       <div class="card">
         ${whoBarHtml(false)}
         <div class="doll-wrap">
-          <canvas class="doll" id="dollSlot"></canvas>
+          <div class="doll-col">
+            <canvas class="doll" id="dollSlot"></canvas>
+            ${isHero ? `<div class="gender-pick" title="${t('hero.gender')}">${['m', 'f'].map(g => `<button class="btn small ${(h.gender || 'm') === g ? 'primary' : ''}" data-act="gender" data-g="${g}">${t('hero.gender.' + g)}</button>`).join('')}</div>` : ''}
+          </div>
           <div class="grow">
             ${isHero ? '' : `<div style="font-weight:700;margin-bottom:2px">${esc(whoName(who))}</div>`}
             <div style="font-size:18px;font-weight:700">Lv ${lv} <span style="color:${G.CLASSES[cls].color}">${G.clsName(cls)}</span></div>
@@ -1046,6 +1049,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'sell': G.sell(+d.id); UI.close(); break;
       case 'autoequip': G.autoEquip(d.scope === 'one' ? UI.who : null); break;
       case 'clspick': UI.clsPick = d.cls; UI.render(); break;
+      case 'gender': if (G.S.hero.gender !== d.g) { G.S.hero.gender = d.g; G.save && G.save(); G.emit('look'); } break;
       case 'sellbelow':
         // 紫色是好東西：要在 3 秒內按第二次才賣，避免手滑
         if (+d.v >= 3 && UI.sellArmed !== el) {

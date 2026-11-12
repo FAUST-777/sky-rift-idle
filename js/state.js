@@ -61,7 +61,7 @@
   }
 
   function newState() {
-    const hero = { level: 1, xp: 0, cls: 'villager', hair: '#5a3a22', skin: '#f1c9a0' };
+    const hero = { level: 1, xp: 0, cls: 'villager', hair: '#5a3a22', skin: '#f1c9a0', gender: 'm' };   // gender：m 男 / f 女（舊存檔沒有 = 男）
     resetSkills(hero);
     return {
       v: 1, skillVer: 2,

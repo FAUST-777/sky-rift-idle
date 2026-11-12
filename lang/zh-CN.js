@@ -28,6 +28,7 @@ G.I18N['zh-CN'] = {
   'hero.classChangeNote': '更换职业需要 {cost} 金币，技能点会全部返还。',
   'hero.bag': '背包', 'hero.sellBelow.0': '卖掉白色', 'hero.sellBelow.1': '卖掉绿色以下', 'hero.sellBelow.2': '卖掉蓝色以下', 'hero.sellBelow.3': '卖掉紫色以下', 'hero.sellConfirm': '再按一次确认卖出',
   'hero.bagEmpty': '打怪会掉装备，掉到的会出现在这里。',
+  'hero.gender': '性别', 'hero.gender.m': '♂ 男', 'hero.gender.f': '♀ 女',
   'hero.who.hero': '主角', 'hero.partnerNote': '伙伴的职业与升级在「伙伴」分页。', 'hero.notRecruited': '还没有伙伴，往上爬就会遇到。',
   'hero.expand': '扩充 +{n} 格', 'hero.bagMax': '已达上限', 'item.equipTo': '给 {name} 装备',
   'hero.autoEquipHint': '主角先挑，剩下的依序分给出战中、休息中的伙伴',

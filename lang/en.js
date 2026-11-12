@@ -28,6 +28,7 @@ G.I18N['en'] = {
   'hero.classChangeNote': 'Changing class costs {cost} gold. All skill points are refunded.',
   'hero.bag': 'Inventory', 'hero.sellBelow.0': 'Sell white', 'hero.sellBelow.1': 'Sell green & below', 'hero.sellBelow.2': 'Sell blue & below', 'hero.sellBelow.3': 'Sell purple & below', 'hero.sellConfirm': 'Tap again to confirm',
   'hero.bagEmpty': 'Monsters drop gear. Anything you find shows up here.',
+  'hero.gender': 'Gender', 'hero.gender.m': '♂ Male', 'hero.gender.f': '♀ Female',
   'hero.who.hero': 'You', 'hero.partnerNote': 'Change companion classes and levels in the Party tab.', 'hero.notRecruited': 'No companions yet. You will meet them as you climb.',
   'hero.expand': 'Expand +{n}', 'hero.bagMax': 'Maxed', 'item.equipTo': 'Equip on {name}',
   'hero.autoEquipHint': 'You pick first, then deployed companions, then resting ones',

@@ -121,6 +121,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ── 角色 / 紙娃娃 ───────────────────────────────── */
 .doll-wrap { display: flex; gap: 12px; align-items: center; }
+.doll-col { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.gender-pick { display: flex; gap: 6px; }
+.gender-pick .btn { flex: 1; }
 .doll { width: 128px; height: 160px; flex: none; background: radial-gradient(circle at 50% 70%, #3c3366, #221c3a); border-radius: 12px; border: 1px solid var(--line); }
 .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
 .slot { aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--line); background: #1a1530; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; position: relative; padding: 0; }

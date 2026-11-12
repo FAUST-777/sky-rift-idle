@@ -82,13 +82,13 @@
 
   A.lookFromHero = function () {
     const S = G.S;
-    return classLook(Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls }, gearLook(S.equipped)), 0);
+    return classLook(Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls, gender: S.hero.gender || 'm' }, gearLook(S.equipped)), 0);
   };
   // 夥伴：穿上的裝備優先，沒穿的部位用職業預設裝扮
   A.lookFromPartner = function (id) {
     const def = G.PARTNERS.find(p => p.id === id), p = G.S.partners[id];
     const tier = Math.min(4, Math.floor(p.level / 8));
-    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
+    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls, gender: def.gender || 'm' }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
     return classLook(look, tier);
   };
 
@@ -190,6 +190,14 @@
   // ── 紙娃娃：64×80 一格，面向右，分層畫 ───────────────────────────────────
   // 圖層順序：影子 → 披風 → 腿/靴 → 後手 → 身體/鎧甲 → 頭/頭髮/頭盔 → 前手 → 武器
   A.drawHumanoid = function (ctx, look, ox = 0, oy = 0, s = 1) {
+    // 第 163 輪起：人物一律用骨架畫法的待機圖（js/rig.js）；下面舊畫法保留當備用
+    if (G.RIG && G.RIG.enabled(look)) {
+      const R = G.RIG;
+      ctx.save(); ctx.translate(ox, oy); ctx.scale(s, s);
+      ctx.drawImage(R.doll(look), -R.PAD_X, -R.PAD_TOP, R.FW, R.FH);
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.translate(ox, oy); ctx.scale(s, s);
     const cls = G.CLASSES[look.cls] || G.CLASSES.villager;
