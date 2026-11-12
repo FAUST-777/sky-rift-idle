@@ -1065,6 +1065,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         } else if (code === '878787') {   // 6 種船艙寵物各一隻，機制隨機
           G.HOME_PETS.forEach(k => S.hpets.push({ uid: S.uid++, kind: k.id, perk: G.pick(G.PET_PERKS).id }));
           G.save(); G.emit('home'); UI.toast(t('toast.secretPets', { n: G.HOME_PETS.length }));
+        } else if (code === '1025') {   // 10 個頭飾：5 種各 2 個（第 166 輪）
+          G.HEADWEAR.forEach(k => { S.headwear[k] = (S.headwear[k] || 0) + 2; });
+          G.save(); G.emit('headwear'); UI.toast(t('toast.secretHw', { n: G.HEADWEAR.length * 2 }));
         } else if (code === '7777777') { S.gold += 25000000; S.crystal += 9999; G.save(); UI.toast(t('toast.secretOk')); }
         else UI.toast(t('toast.secretBad'));
         if (inp) inp.value = '';
