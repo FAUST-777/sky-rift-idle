@@ -238,10 +238,17 @@
       cel(ctx, () => { ctx.beginPath(); ctx.moveTo(-2, -14.6); ctx.quadraticCurveTo(-9, -21, -18, -14); ctx.quadraticCurveTo(-16, -9, -13.4, -6);
         ctx.quadraticCurveTo(-12.6, -12, -2.4, -12.4); ctx.closePath(); }, '#c0392b', '#6e1a1a', 0.8, -0.8);
     } else if (hw === 'shades') {         // 墨鏡：黑鏡片＋鏡架＋一道反光
-      strokes(ctx, '#151018', 0.8, [[[2.6, 0.4], [-2.2, 1.6]]]);
-      ctx.fillStyle = '#151018'; G.ART.rr(ctx, 2.4, -0.9, 5, 3.6, 1); ctx.fill(); G.ART.rr(ctx, 7.8, -0.9, 2.9, 3.4, 0.8); ctx.fill();
-      ctx.fillRect(7, -0.2, 1, 0.9);
-      ctx.fillStyle = 'rgba(255,255,255,.75)'; poly(ctx, [[3.4, 1.8], [5.2, -0.4], [6, -0.4], [4.2, 1.8]]); ctx.fill();
+      // 第 171 輪：鏡片放大，蓋住大半張臉
+      strokes(ctx, '#151018', 1.2, [[[0.8, -0.6], [-2.6, 1.4]]]);                    // 鏡腳到耳朵
+      ctx.fillStyle = '#151018';
+      G.ART.rr(ctx, 0.2, -3.6, 8.4, 8.4, 2.4); ctx.fill();                              // 近鏡片
+      G.ART.rr(ctx, 8.4, -3.4, 4.2, 8, 1.6); ctx.fill();                            // 遠鏡片（側面看比較窄）
+      ctx.fillRect(7.8, -2.4, 1.4, 1.4);                                               // 鼻樑
+      ctx.fillStyle = '#2c2436'; G.ART.rr(ctx, 1, -2.8, 6.8, 1.6, 0.7); ctx.fill();   // 上緣一點反光層次
+      ctx.fillStyle = 'rgba(255,255,255,.8)';
+      poly(ctx, [[1.8, 3.6], [5, -1.6], [6.4, -1.6], [3.2, 3.6]]); ctx.fill();
+      poly(ctx, [[5, 4], [6.9, 1], [7.5, 1], [5.6, 4]]); ctx.fill();
+      poly(ctx, [[9.4, 3.2], [11, 0], [11.6, 0], [10, 3.2]]); ctx.fill();
     } else if (hw === 'dino') {           // 暴龍頭：布偶頭套，臉從嘴巴露出來
       const g = '#5f9e4a', gD = '#2f5a24', gL = '#8cc26a';
       // 下顎（在下巴下面，牙齒往上）
@@ -256,6 +263,56 @@
       ctx.fillStyle = '#1c1418'; ctx.fillRect(6.2, -13.4, 2.2, 2.4); ctx.fillRect(17, -9.6, 1, 1);   // 眼睛、鼻孔
       ctx.fillStyle = '#fff'; ctx.fillRect(6.6, -13, 0.8, 0.8);
       strokes(ctx, gD, 0.9, [[[4.6, -15], [9, -15.4]]]);                              // 眉骨
+    } else if (hw === 'bunny') {          // 兔子耳朵：白色長耳、內側粉紅，往後斜
+      [[-5.6, -12.4, -0.32, -26], [1.8, -13.6, 0.12, 0]].forEach(([x, y, rot, dk]) => {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+        cel(ctx, () => { ctx.beginPath(); ctx.ellipse(0, -8, 3.1, 9.4, 0, 0, Math.PI * 2); }, shade('#fbf7f2', dk), shade('#b9b0aa', dk), 0.8, -0.8);
+        ctx.fillStyle = shade('#f4a9bb', dk); ctx.beginPath(); ctx.ellipse(0.4, -7.4, 1.5, 7, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      });
+    } else if (hw === 'halo') {           // 天使光環：浮在頭上的金色光圈
+      ctx.save(); ctx.translate(0, -19.5); ctx.rotate(-0.08);
+      ctx.strokeStyle = 'rgba(255,236,140,.35)'; ctx.lineWidth = 3.6; ctx.beginPath(); ctx.ellipse(0, 0, 8.6, 2.6, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = '#c99a1e'; ctx.lineWidth = 1.9; ctx.beginPath(); ctx.ellipse(0, 0.25, 8.2, 2.3, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = '#ffe36a'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.ellipse(0, -0.1, 8.2, 2.3, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#fffbe0'; ctx.beginPath(); ctx.ellipse(3.4, -2, 1.6, 0.5, -0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (hw === 'ox') {             // 牛角：米白色、往兩側伸出再往上彎，角尖深色
+      const horn = (pts, dk) => {
+        cel(ctx, () => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); ctx.quadraticCurveTo(pts[1][0], pts[1][1], pts[2][0], pts[2][1]);
+          ctx.quadraticCurveTo(pts[3][0], pts[3][1], pts[4][0], pts[4][1]); ctx.closePath(); }, shade('#efe4c6', dk), shade('#a8946a', dk), 0.7, -0.7);
+        ctx.fillStyle = shade('#5a4632', dk); ctx.beginPath(); ctx.moveTo(pts[2][0], pts[2][1]);
+        const k = 0.72, mx = (a, b) => a + (b - a) * k;
+        ctx.lineTo(mx(pts[0][0], pts[2][0]) + 1.2, mx(pts[0][1], pts[2][1]) - 0.6); ctx.lineTo(mx(pts[4][0], pts[2][0]) - 0.4, mx(pts[4][1], pts[2][1]) + 0.8); ctx.closePath(); ctx.fill();
+      };
+      horn([[-6.4, -9.4], [-15.6, -10.6], [-15.2, -20.4], [-12.6, -12.4], [-3.6, -12.4]], -26);   // 遠側
+      horn([[2.6, -13.2], [13.6, -13.6], [14.6, -23.4], [15.6, -10.2], [6.8, -10.6]], 0);       // 近側
+    } else if (hw === 'ram') {            // 羊角：從頭頂往後捲到耳朵旁的螺旋角，有環紋
+      const cx = -4.2, cy = -1.6, pts = [];
+      for (let i = 0; i <= 40; i++) { const k = i / 40, a = -1.2 - k * 5.6, r = 9.6 - k * 6.6; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3.6 - k * 2]); }
+      const run = (col, extra) => { ctx.strokeStyle = col; ctx.lineCap = 'round';
+        for (let i = 1; i < pts.length; i++) { ctx.lineWidth = pts[i][2] + extra; ctx.beginPath(); ctx.moveTo(pts[i - 1][0], pts[i - 1][1]); ctx.lineTo(pts[i][0], pts[i][1]); ctx.stroke(); } };
+      run('#6b5638', 1.3); run('#c9b28a', 0);
+      ctx.strokeStyle = '#8a7350'; ctx.lineWidth = 0.5;                                // 環紋
+      for (let i = 3; i < pts.length - 2; i += 3) { const [x, y, w] = pts[i], [x2, y2] = pts[i + 1], dx = x2 - x, dy = y2 - y, l = Math.hypot(dx, dy) || 1;
+        ctx.beginPath(); ctx.moveTo(x - dy / l * w / 2, y + dx / l * w / 2); ctx.lineTo(x + dy / l * w / 2, y - dx / l * w / 2); ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(255,245,220,.6)'; ctx.lineWidth = 0.8; ctx.beginPath();
+      for (let i = 2; i < 16; i++) { const [x, y] = pts[i]; i === 2 ? ctx.moveTo(x + 0.6, y - 0.6) : ctx.lineTo(x + 0.6, y - 0.6); } ctx.stroke();
+    } else if (hw === 'cone') {           // 三角錐：橘色交通錐戴在頭上，白色反光條
+      ctx.save(); ctx.translate(0.5, -12.4); ctx.rotate(0.1);
+      cel(ctx, () => G.ART.rr(ctx, -9, -1.4, 18, 3.4, 1), '#e8611a', '#8f3a10', 0.6, -0.6);   // 底座
+      cel(ctx, () => poly(ctx, [[-6.6, -0.6], [-1, -17], [1, -17], [6.6, -0.6]]), '#ff8a2a', '#b84e14', 1, -1);
+      ctx.save(); poly(ctx, [[-6.6, -0.6], [-1, -17], [1, -17], [6.6, -0.6]]); ctx.clip();
+      ctx.fillStyle = '#f6f6f6'; ctx.fillRect(-8, -6.6, 16, 2.6); ctx.fillRect(-8, -12.4, 16, 2.2);
+      ctx.fillStyle = 'rgba(255,255,255,.45)'; poly(ctx, [[1.6, -1], [0.6, -16], [1.2, -16], [3, -1]]); ctx.fill();
+      ctx.restore(); ctx.restore();
+    } else if (hw === 'fox') {            // 狐狸耳朵：大三角耳、橘色、內側白毛、耳尖深色
+      [[[-9.8, -8.6], [-13.4, -23.4], [-2.6, -13.6], -26], [[-0.4, -13.8], [3.6, -25.2], [7.6, -10.8], 0]].forEach(([a, tip, b, dk]) => {
+        cel(ctx, () => poly(ctx, [a, tip, b]), shade('#e8792b', dk), shade('#9a4512', dk), 0.8, -0.8);
+        const m = (k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k], lt = (p, k) => [p[0] + (tip[0] - p[0]) * k, p[1] + (tip[1] - p[1]) * k];
+        ctx.fillStyle = shade('#fff4e4', dk); poly(ctx, [m(0.22), lt(m(0.5), 0.72), m(0.78)]); ctx.fill();
+        ctx.fillStyle = shade('#3a2418', dk); poly(ctx, [lt(a, 0.7), tip, lt(b, 0.7)]); ctx.fill();
+      });
     }
   }
   // 頭飾小圖示（選單用）：一顆戴著頭飾的頭，回傳 dataURL（每種只畫一次）
@@ -263,7 +320,8 @@
   R.hwIcon = function (kind) {
     if (hwIconCache[kind]) return hwIconCache[kind];
     const S = 3, c = G.ART.canvas(48 * S, 48 * S), x = c.getContext('2d');
-    x.scale(S, S); x.translate(22, 27);
+    x.scale(S, S);
+    if (['bunny', 'cone', 'fox', 'ox', 'halo'].includes(kind)) { x.translate(23, 33); x.scale(0.8, 0.8); } else x.translate(22, 27);
     const look = { hair: '#5a3a22', skin: '#f1c9a0', gender: 'm', hw: kind };
     drawHead(x, look);
     // 描邊
