@@ -680,7 +680,7 @@ G.HOME_PETS = [
   { id: 'jellySail', move: 'float', w: 20, speed: 2, fw: 230, fh: 219 },
   { id: 'jellyShroom', move: 'float', w: 22, speed: 2, fw: 220, fh: 178 },
   { id: 'jellyMountain', move: 'float', w: 22, speed: 2, fw: 220, fh: 211 },
-  { id: 'unicorn',   move: 'walk',  w: 30, speed: 7, fw: 230, fh: 168 },   // 第 154 輪：天馬獨角獸
+  { id: 'unicorn',   move: 'walk',  w: 30, speed: 7, fw: 225, fh: 180 },   // 第 154 輪：天馬獨角獸（第 158 輪換成白身紫鬃版）
 ];
 // 寵物特殊機制（跟品種分開隨機）。同一種機制放兩隻只有先放的那隻有效
 G.PET_PERKS = [
