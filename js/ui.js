@@ -673,7 +673,7 @@
     const S = G.S, petCap = G.petCap(), bg = G.homeBg();
     const slots = bg.slots.map(([x, y, w, h], i) => {
       const key = 's' + i, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
-      return `<button class="hslot ${f ? 'has' : ''} ${UI.placing && !id ? 'placing' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="hslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? furnIcon(f) : ''}</button>`;
+      return `<button class="hslot ${f ? 'has' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="hslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? furnIcon(f) : ''}</button>`;
     }).join('');
     const pets = S.hpetEq.map(u => G.hpet(u)).filter(Boolean).map(p => {
       const k = G.hpetKind(p.kind);
@@ -683,9 +683,10 @@
     const bgs = G.HOME_BGS.map((b, i) => i < G.homeBgCount()
       ? `<button class="chip ${G.homeBg() === b ? 'on' : ''}" data-act="homebg" data-v="${i}">${t(`homeBg.${b.id}`)}</button>`
       : `<span class="chip locked">🔒 ${t(`homeBg.${b.id}`)}</span>`).join('');
+    // 家具倉庫：點任一件就進入擺設模式（先選好這件，再點要擺的格子）
     const stock = Object.entries(S.furniture).filter(([, n]) => n > 0).map(([id, n]) => {
       const f = G.FURNITURE.find(z => z.id === id);
-      return `<button class="chip ${UI.placing === id ? 'on' : ''}" data-act="pick" data-id="${id}">${furnIcon(f, 'sm')} ${t(`furniture.${id}`)} ×${n}</button>`;
+      return `<button class="chip" data-act="placeopen" data-id="${id}">${furnIcon(f, 'sm')} ${t(`furniture.${id}`)} ×${n}</button>`;
     }).join('');
     const shop = G.FURNITURE.map(f => `<button data-act="buy" data-id="${f.id}"><b>${furnIcon(f, 'shop')}</b>${t(`furniture.${f.id}`)}<br>
       <small class="muted">${f.cur === 'gold' ? G.fmt(f.price) + '💰' : f.price + '💎'}・${t('home.comfortPlus', { n: f.comfort })}</small></button>`).join('');
@@ -694,12 +695,12 @@
       <div class="card">
         <h3>${t('home.title')} <small>${t('home.comfort', { c: G.comfort() })}</small></h3>
         <div class="home-scene" id="homeScene"><img src="${bg.img}" alt="">${slots}${pets}</div>
-        <p class="muted" style="font-size:12px;margin:8px 0 6px">${UI.placing ? t('home.placingHint') : t('home.hint')}</p>
+        <p class="muted" style="font-size:12px;margin:8px 0 6px">${t('home.hint')}</p>
         <div class="chips">${bgs}</div>
         <p class="muted" style="font-size:11px;margin:6px 0 0">${t('home.bgHint')}</p>
       </div>
       ${renderHomePets()}
-      <div class="card"><h3>${t('home.storage')}</h3><div class="chips">${stock || `<span class="muted">${t('home.storageEmpty')}</span>`}</div></div>
+      <div class="card"><h3>${t('home.storage')} <small>${t('home.storageHint')}</small></h3><div class="chips">${stock || `<span class="muted">${t('home.storageEmpty')}</span>`}</div></div>
       <div class="card"><h3>${t('home.shop')}</h3><div class="shop">${shop}</div></div>
       ${renderNets()}
       <div class="card">
@@ -708,6 +709,35 @@
       </div>
       ${renderDex()}`;
   }
+
+  // ── 擺設模式（第 156 輪）：船艙背景＋8 格，沒有寵物；點空格 → 選家具、點有家具的格 → 收回倉庫
+  //   UI.placeKey = 正在選家具的格子；UI.placeItem = 從家具倉庫點進來、要擺的家具（點空格直接擺上）
+  function placeModal() {
+    const S = G.S, bg = G.homeBg();
+    const slots = bg.slots.map(([x, y, w, h], i) => {
+      const key = 's' + i, id = S.home[key], f = id && G.FURNITURE.find(z => z.id === id);
+      return `<button class="hslot ${f ? 'has' : 'placing'} ${UI.placeKey === key ? 'picked' : ''}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" data-act="pslot" data-k="${key}" title="${f ? t(`furniture.${id}`) : ''}">${f ? furnIcon(f) + '<i class="slot-x">✕</i>' : '<i class="slot-plus">＋</i>'}</button>`;
+    }).join('');
+    const stock = Object.entries(S.furniture).filter(([, n]) => n > 0);
+    const item = UI.placeItem && G.FURNITURE.find(z => z.id === UI.placeItem);
+    let picker = '';
+    if (UI.placeKey) {   // 點了空格：拉開選單問要擺哪個
+      picker = `<div class="place-pick"><div class="slot-label">${t('home.placePick')}</div>
+        ${stock.length ? `<div class="chips">${stock.map(([id, n]) => { const f = G.FURNITURE.find(z => z.id === id); return `<button class="chip" data-act="placeput" data-id="${id}">${furnIcon(f, 'sm')} ${t(`furniture.${id}`)} ×${n}</button>`; }).join('')}</div>`
+          : `<p class="muted" style="font-size:12px;margin:4px 0 0">${t('home.placeEmpty')}</p>`}
+        <button class="btn small" data-act="placecancel" style="margin-top:6px">${t('common.cancel')}</button></div>`;
+    } else if (item) {   // 從家具倉庫點進來：提示點格子擺這件
+      picker = `<p class="place-item">${furnIcon(item, 'sm')} ${t('home.placeItem', { name: t(`furniture.${item.id}`), n: S.furniture[item.id] || 0 })}</p>`;
+    }
+    UI.modal(`<h2>${t('home.placeTitle')} <small class="muted" style="font-weight:400;font-size:12px">${t('home.comfort', { c: G.comfort() })}</small></h2>
+      <div class="home-scene place-scene" id="placeScene"><img src="${bg.img}" alt="">${slots}</div>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">${t('home.placeHint')}</p>${picker}
+      <div class="modal-actions"><button class="btn" data-act="close">${t('common.close')}</button></div>`);
+  }
+  UI.openPlace = function (key, itemId) {
+    UI.modalKind = 'homeplace'; UI.placeKey = key || null; UI.placeItem = itemId || null;
+    placeModal();
+  };
 
   // 船艙寵物清單：放在船艙的（生效）＋倉庫
   function renderHomePets() {
@@ -1056,7 +1086,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'shipeq': G.equipShipPart(d.slot, +d.i); break;
       case 'shiplook': G.setShipLook(d.slot, +d.i); break;
       case 'buy': G.buyFurniture(d.id); break;
-      case 'pick': UI.placing = UI.placing === d.id ? null : d.id; UI.refresh(); break;
+      case 'placeopen': UI.openPlace(null, d.id); break;   // 家具倉庫點家具 → 擺設模式（選好這件）
+      case 'pslot': {   // 擺設模式裡點格子：有家具 → 收回倉庫；空格 → 有選好的家具就直接擺，否則拉選單
+        if (S.home[d.k]) { G.removeFurniture(d.k); UI.toast(t('toast.furnitureBack')); UI.placeKey = null; }
+        else if (UI.placeItem && S.furniture[UI.placeItem]) { G.placeFurniture(d.k, UI.placeItem); if (!S.furniture[UI.placeItem]) UI.placeItem = null; UI.placeKey = null; }
+        else { UI.placeItem = null; UI.placeKey = d.k; }
+        placeModal();
+        break;
+      }
+      case 'placeput': if (UI.placeKey) { G.placeFurniture(UI.placeKey, d.id); UI.placeKey = null; } placeModal(); break;
+      case 'placecancel': UI.placeKey = null; placeModal(); break;
       case 'homebg': G.setHomeBg(+d.v); break;
       case 'hpeteq': G.equipPet(+d.id); break;
       case 'hpetun': G.unequipPet(+d.id); break;
@@ -1079,11 +1118,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         break;
       }
       case 'hpetrel2': UI.close(); G.releasePet(+d.id); break;
-      case 'hslot':
-        if (S.home[d.k]) G.removeFurniture(d.k);
-        else if (UI.placing) { G.placeFurniture(d.k, UI.placing); if (!S.furniture[UI.placing]) UI.placing = null; UI.refresh(); }
-        else UI.toast(t('home.pickFirst'));
-        break;
+      case 'hslot': UI.openPlace(S.home[d.k] ? null : d.k); break;   // 船艙點格子 → 擺設模式（空格直接拉開選單）
       case 'netbuy': G.buyNet(+d.i); break;
       case 'neteq': G.equipNet(+d.i); break;
       case 'dexclaim': if (!d.id || G.dexClaimable(d.id)) G.dexClaim(d.id || null); break;
@@ -1092,7 +1127,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
   function switchTab(tab) {
     UI.tab = tab;
-    UI.placing = null;
     document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
     $('panel').scrollTop = 0;
     UI.render();
@@ -1118,6 +1152,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     if (UI.showPrologue) UI.showPrologue();
     else if (UI.modalKind === 'settings') settingsModal();
     else if (UI.modalKind === 'credits') creditsModal();
+    else if (UI.modalKind === 'homeplace') placeModal();
   }
 
   UI.init = function () {

@@ -273,14 +273,13 @@
         this.partyAlive().forEach(p => { this.addFx(p, 'tariff', G.HF_TARIFF.v, G.HF_TARIFF.t); this.glow(p, '#ffd76a'); });
         this.floatText(target.img.x, this.barY(target) - 52, G.t('battle.tariff'), '#ffd76a', 13, 1000);
       }
-      const base = target.st.maxHp;
-      this.partyAlive().forEach(o => {
-        const op = o.special.options;
-        if (!op || o.kind === 'summon') return;
-        const amt = Math.round(base * op.v);
-        if (amt > (o.shield || 0)) { o.shield = amt; o.shieldBase = amt; }
-        o.shieldT = Math.max(o.shieldT || 0, G.HF_OPTIONS_T);
-      });
+      // 期權交易（第 156 輪：改成被打的人自己獲得護盾）：隊上有人裝就生效，多人裝取最高等級；護盾 = 被打者最大生命 × 90%→300%
+      const ov = Math.max(0, ...this.partyAlive().filter(p => p.kind !== 'summon').map(p => (p.special.options || {}).v || 0));
+      if (ov && target.alive) {
+        const amt = Math.round(target.st.maxHp * ov);
+        if (amt > (target.shield || 0)) { target.shield = amt; target.shieldBase = amt; }
+        target.shieldT = Math.max(target.shieldT || 0, G.HF_OPTIONS_T);
+      }
     }
     // 內線交易：每 G.INSIDER.every 秒扣目前生命 99%、生成護盾（開打第一下就有）
     insiderTick(dt) {

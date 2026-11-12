@@ -201,9 +201,9 @@ G.I18N['en'] = {
   'skill.hf_bull.name': 'Bull Market',
   'skill.hf_bull.desc': 'Your max HP +{v}%, party gold gain +{party_goldPct}%',
   'skill.hf_options.name': 'Options Trading',
-  'skill.hf_options.desc': 'When anyone in the party is attacked, you gain a shield equal to {v}% of their max HP (5s, keeps the larger). Party DEF +{party_defPct}%. Being attacked also triggers Trump Tariff: party damage taken -15% for 4s (12s cooldown)',
+  'skill.hf_options.desc': 'When anyone in the party is attacked, the one hit gains a shield equal to {v}% of their max HP (5s, keeps the larger). Party DEF +{party_defPct}%. Being attacked also triggers Trump Tariff: party damage taken -15% for 4s (12s cooldown)',
   'skill.hf_insider.name': 'Insider Trading',
-  'skill.hf_insider.desc': 'DEF set to 0, cannot evade, healing received -33%. Every 5s: lose 99% of your current HP and gain a shield of {shield}% of your max HP (lasts {dur}s). Base ATK ×{v}, damage +{dmg}%, always crit, crit damage +{critDmg}%, +{per}% damage per debuff on the enemy; attack speed +{spdPct}%, skill damage +{skillDmg}%',
+  'skill.hf_insider.desc': 'DEF set to 0, cannot evade, healing received -33%. Every 5s: lose 99% of your current HP and gain a shield of {shield}% of your max HP (lasts {dur}s). Damage +{v}%, always crit, crit damage +{critDmg}%, +{per}% damage per debuff on the enemy; attack speed +{spdPct}%, skill damage +{skillDmg}%',
   'skill.hf_wolf.name': 'The Wolf of Wall Street',
   'skill.hf_wolf.desc': 'Made so much money you just bought another airship! Airship damage ×2 (cannon and captain ship skills), cannon interval halved; ship skill damage +{v}% more',
   'buff.qe.name': 'Quantitative Easing',
@@ -464,13 +464,12 @@ G.I18N['en'] = {
 
   // ── Home ──
   'home.title': 'Airship Cabin', 'home.comfort': 'Comfort {c} (offline earnings +{c}%)',
-  'home.placingHint': '👉 Tap a frame to place it; tap placed furniture to store it.',
-  'home.hint': 'Pick furniture from Storage, then tap a translucent frame to place it. Tap placed furniture to take it back.', 'home.hullHint': 'Upgrade the Hull for more space.',
-  'home.storage': 'Storage', 'home.storageEmpty': 'Empty. Buy some furniture in the shop below.', 'home.shop': 'Furniture Shop',
+  'home.hint': 'Tap a slot in the cabin, or a piece in the Furniture Storage, to enter placement mode.', 'home.hullHint': 'Upgrade the Hull for more space.',
+  'home.storageHint': 'tap a piece → placement mode', 'home.placeTitle': 'Placement Mode', 'home.placeHint': 'Tap a ＋ slot to place furniture; tap placed furniture (✕) to return it to storage.', 'home.placePick': 'Which piece goes in this slot?', 'home.placeEmpty': 'Furniture Storage is empty. Buy something in the shop first.', 'home.placeItem': 'Holding {name} ({n} left) — tap a ＋ slot to place it', 'toast.furnitureBack': 'Returned to Furniture Storage', 'home.storage': 'Furniture Storage', 'home.storageEmpty': 'Empty. Buy furniture in the shop below', 'home.shop': 'Furniture Shop',
   'home.collect': 'Collectible', 'home.comfortPlus': 'Comfort +{n}',
   'home.pets': 'Captured Monsters', 'home.petsInfo': '{n}/{cap} · Each gives a small bonus',
   
-  'home.noPets': 'No monsters captured yet', 'home.pickFirst': 'Pick furniture from Storage first',
+  'home.noPets': 'No monsters captured yet',
   'furniture.typewriter': 'Mech Typewriter', 'furniture.octopus': 'Pink Octopus Plush', 'furniture.cake': 'Rainbow Birthday Cake', 'furniture.coffeeTech': 'Tech Coffee Set', 'furniture.paradise': 'Bird of Paradise', 'furniture.plantGreen': 'Chomper Plant', 'furniture.bonsai': 'Lucky Cat Bonsai', 'furniture.blackCat': 'Sleeping Black Cat', 'furniture.laptop': 'Trading Laptop', 'furniture.chips': 'Casino Chips', 'furniture.hula': 'Hula Dancers', 'furniture.moneyStack': 'Cash & Coin Stand', 'furniture.steamChest': 'Steam Treasure Chest', 'furniture.goldPistol': 'Golden Pistol', 'furniture.trophy': 'Golden Trophy', 'furniture.plantBlue': 'Porcelain Chomper', 'furniture.spiritLantern': 'Spirit Lantern', 'furniture.techOrb': 'Energy Core', 'furniture.holoGlobe': 'Starlight Globe', 'furniture.garuda': 'Garuda Carving', 'furniture.dancerStatue': 'Dancer Statue', 'furniture.skullCrown': 'Skull King Crown', 'furniture.dragonJade': 'Jade Dragon Statue', 'furniture.dragonLava': 'Lava Dragon Statue', 'furniture.unicornStatue': 'Pegasus Statue',
   'furniture.plant': 'Potted Plant', 'furniture.barrel': 'Barrel', 'furniture.lamp': 'Lantern', 'furniture.chair': 'Wooden Chair', 'furniture.bed': 'Hammock',
   'furniture.rug': 'Woven Rug', 'furniture.shelf': 'Bookshelf', 'furniture.globe': 'Sky Orrery', 'furniture.compass': 'Ancient Compass',

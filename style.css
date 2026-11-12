@@ -55,8 +55,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* 戰鬥區折疊：只收外框高度，#battle 本身尺寸不變（Phaser 才不會被縮成 0） */
 #battleBox { position: relative; overflow: hidden; aspect-ratio: 480 / 300; transition: aspect-ratio .25s, height .25s; }
 #battleWrap.collapsed #battleBox { height: 0; aspect-ratio: auto; }
-#collapseBtn { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; width: 30px; height: 26px; padding: 0; font-size: 12px; color: var(--muted); flex: none; }
-#battleWrap.collapsed #collapseBtn { color: var(--gold); border-color: var(--gold); }
+/* 手機版折疊戰鬥畫面按鈕（第 156 輪：綠色、加寬） */
+#collapseBtn { background: #2ea043; border: 1px solid #56d364; border-radius: 8px; width: 68px; height: 28px; padding: 0; font-size: 13px; font-weight: 700; color: #fff; flex: none; box-shadow: 0 0 0 1px rgba(86,211,100,.25); }
+#battleWrap.collapsed #collapseBtn { background: #3fb950; border-color: #7ee787; }
 
 /* Buff 圖示列（戰鬥畫面左上角） */
 #buffBar { position: absolute; top: 6px; left: 6px; display: flex; flex-wrap: wrap; gap: 4px; max-width: 70%; z-index: 4; }
@@ -218,9 +219,10 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { background: var(--card2); border: 1px solid var(--line); border-radius: 18px; padding: 5px 10px; font-size: 13px; }
 .chip.on { border-color: var(--gold); background: #4a3d1a; }
-.shop { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.shop button { text-align: left; background: #1f1936; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
-.shop button b { font-size: 20px; margin-right: 4px; }
+.shop { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }   /* 第 156 輪：三排 */
+.shop button { text-align: center; background: #1f1936; border: 1px solid var(--line); border-radius: 10px; padding: 6px 3px; font-size: 12px; line-height: 1.3; }
+.shop button b { display: block; font-size: 20px; margin: 0; }
+.shop button small { font-size: 10px; }
 .pets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .pet { position: relative; display: flex; flex-direction: column; align-items: center; background: #1a1530; border-radius: 10px; padding: 4px; }
 .pet-x { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 90, 90, .85); color: #fff; font-size: 11px; line-height: 20px; cursor: pointer; }
@@ -295,6 +297,15 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 .furn-img.sm { display: inline-block; width: 22px; height: 22px; vertical-align: middle; }
 .furn-img.shop { width: 44px; height: 44px; margin: 0 auto 2px; }
 .hslot.placing { border-color: var(--gold); background: rgba(255,215,106,.22); }
+/* 擺設模式（第 156 輪） */
+.place-scene { margin-top: 4px; }
+.place-scene .hslot { cursor: pointer; }
+.place-scene .hslot.picked { box-shadow: 0 0 0 3px var(--gold); }
+.slot-plus { font-style: normal; color: var(--gold); font-size: 18px; font-weight: 700; }
+.slot-x { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,90,90,.92); color: #fff; font-style: normal; font-size: 11px; line-height: 18px; text-align: center; }
+.place-pick { margin-top: 8px; padding: 8px; border-radius: 10px; background: rgba(255,215,106,.08); border: 1px solid rgba(255,215,106,.35); }
+.place-item { margin: 6px 0 0; font-size: 13px; color: var(--gold); }
+.modal-card .home-scene { aspect-ratio: 1437 / 1094; }
 .hpet { position: absolute; transform: translate(-50%, -100%); pointer-events: none; }
 .hpet-spr { display: block; width: 100%; background-size: 300% 100%; background-repeat: no-repeat; animation: hpetWalk .5s step-end infinite; }
 .hpet.float .hpet-spr { animation-duration: .9s; }

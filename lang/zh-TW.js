@@ -201,9 +201,9 @@ G.I18N['zh-TW'] = {
   'skill.hf_bull.name': '牛市',
   'skill.hf_bull.desc': '自己最大生命 +{v}%，全隊金幣獲得 +{party_goldPct}%',
   'skill.hf_options.name': '期權交易',
-  'skill.hf_options.desc': '隊伍有人被攻擊時，自己獲得護盾：被打的人最大生命 × {v}%（5 秒，取較大的）。全隊防禦 +{party_defPct}%。隊伍有人被攻擊時觸發「川普關稅」：全隊受到傷害 -15%，持續 4 秒（間隔 12 秒）',
+  'skill.hf_options.desc': '隊伍有人被攻擊時，被打的人獲得護盾：自己最大生命 × {v}%（5 秒，取較大的）。全隊防禦 +{party_defPct}%。隊伍有人被攻擊時觸發「川普關稅」：全隊受到傷害 -15%，持續 4 秒（間隔 12 秒）',
   'skill.hf_insider.name': '內線交易',
-  'skill.hf_insider.desc': '防禦歸零、無法閃避、受到的回復 -33%；每 5 秒發動一次：扣掉目前生命的 99%，並生成最大生命 {shield}% 的護盾（持續 {dur} 秒）。基礎攻擊 ×{v}、傷害 +{dmg}%、必定暴擊、暴擊傷害 +{critDmg}%，敵人身上每個減益再 +{per}% 傷害；攻速 +{spdPct}%、技能傷害 +{skillDmg}%',
+  'skill.hf_insider.desc': '防禦歸零、無法閃避、受到的回復 -33%；每 5 秒發動一次：扣掉目前生命的 99%，並生成最大生命 {shield}% 的護盾（持續 {dur} 秒）。傷害 +{v}%、必定暴擊、暴擊傷害 +{critDmg}%，敵人身上每個減益再 +{per}% 傷害；攻速 +{spdPct}%、技能傷害 +{skillDmg}%',
   'skill.hf_wolf.name': '華爾街之狼',
   'skill.hf_wolf.desc': '賺太多錢直接再買一艘飛船啦！飛空艇造成的傷害 ×2（含船砲與船長的飛船技能），船砲間隔減半；飛船技能傷害再 +{v}%',
   'buff.qe.name': '量化寬鬆',
@@ -464,13 +464,12 @@ G.I18N['zh-TW'] = {
 
   // ── 家園 ──
   'home.title': '飛空艇船艙', 'home.comfort': '舒適度 {c}（離線收益 +{c}%）',
-  'home.placingHint': '👉 點半透明框擺放，點已擺的家具收回倉庫。',
-  'home.hint': '先在「倉庫」選一件家具，再點半透明框擺放；點已擺放的家具可收回。', 'home.hullHint': '升級「船身」可以擴大空間。',
-  'home.storage': '倉庫', 'home.storageEmpty': '空的，去下面商店買家具吧', 'home.shop': '家具商店',
+  'home.hint': '點船艙裡的擺設格，或點「家具倉庫」裡的家具，進入擺設模式。', 'home.hullHint': '升級「船身」可以擴大空間。',
+  'home.storageHint': '點家具 → 擺設模式', 'home.placeTitle': '擺設模式', 'home.placeHint': '點 ＋ 的空格擺家具；點已擺放的家具（✕）會收回家具倉庫。', 'home.placePick': '要在這格擺哪個家具？', 'home.placeEmpty': '家具倉庫是空的，先去家具商店買家具。', 'home.placeItem': '選好「{name}」（還有 {n} 件），點一個 ＋ 空格擺上去', 'toast.furnitureBack': '已收回家具倉庫', 'home.storage': '家具倉庫', 'home.storageEmpty': '空的，去下面家具商店買家具吧', 'home.shop': '家具商店',
   'home.collect': '收藏', 'home.comfortPlus': '舒適 +{n}',
   'home.pets': '捕獲的怪物', 'home.petsInfo': '{n}/{cap}・每隻帶一個小增益',
   
-  'home.noPets': '還沒有捕獲任何怪物', 'home.pickFirst': '先在「倉庫」選一件家具',
+  'home.noPets': '還沒有捕獲任何怪物',
   'furniture.typewriter': '機械打字機', 'furniture.octopus': '粉紅章魚抱枕', 'furniture.cake': '彩虹生日蛋糕', 'furniture.coffeeTech': '科技咖啡組', 'furniture.paradise': '天堂鳥盆栽', 'furniture.plantGreen': '食人花盆栽', 'furniture.bonsai': '招財貓盆景', 'furniture.blackCat': '酣睡黑貓', 'furniture.laptop': '看盤筆電', 'furniture.chips': '賭場籌碼', 'furniture.hula': '草裙舞娃娃', 'furniture.moneyStack': '鈔票金幣台', 'furniture.steamChest': '蒸汽寶箱', 'furniture.goldPistol': '黃金沙漠之鷹', 'furniture.trophy': '金像獎盃', 'furniture.plantBlue': '青花食人花', 'furniture.spiritLantern': '鎮魂宮燈', 'furniture.techOrb': '能量核心儀', 'furniture.holoGlobe': '星輝地球儀', 'furniture.garuda': '迦樓羅木雕', 'furniture.dancerStatue': '舞神石像', 'furniture.skullCrown': '骷髏王冠', 'furniture.dragonJade': '翠鱗龍像', 'furniture.dragonLava': '熔岩龍像', 'furniture.unicornStatue': '天馬獨角獸像',
   'furniture.plant': '盆栽', 'furniture.barrel': '酒桶', 'furniture.lamp': '風燈', 'furniture.chair': '木椅', 'furniture.bed': '吊床',
   'furniture.rug': '織毯', 'furniture.shelf': '書櫃', 'furniture.globe': '天空儀', 'furniture.compass': '古代羅盤',
