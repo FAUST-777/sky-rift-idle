@@ -671,6 +671,9 @@ G.HOME_PETS = [
   { id: 'blackdog',  move: 'walk',  w: 25, speed: 8, fw: 210, fh: 147 },
   { id: 'collie',    move: 'walk',  w: 25, speed: 8, fw: 212, fh: 127 },
   { id: 'jack',      move: 'walk',  w: 22, speed: 9, fw: 224, fh: 142 },
+  { id: 'catOrange', move: 'walk',  w: 22, speed: 6, fw: 216, fh: 138 },   // 貓：橘貓、三花貓、賓士貓
+  { id: 'catCalico', move: 'walk',  w: 22, speed: 6, fw: 217, fh: 165 },
+  { id: 'catTuxedo', move: 'walk',  w: 22, speed: 6, fw: 219, fh: 116 },
   { id: 'komodo',    move: 'walk',  w: 32, speed: 3, fw: 228, fh: 59 },
   { id: 'robot',     move: 'walk',  w: 18, speed: 4, fw: 191, fh: 90 },
   { id: 'jellyMoon', move: 'float', w: 20, speed: 2, fw: 207, fh: 138 },
