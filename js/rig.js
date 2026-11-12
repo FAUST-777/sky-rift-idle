@@ -133,78 +133,41 @@
     [11, 0.4], [8.6, -3.5], [7.5, -1.6], [5.8, -4.3], [3.6, -1.4], [2.8, -4.6], [0.6, 4.6]];
   const HAIR_TUFTS = [[[-3.5, -12.8], [-7.5, -16.2], [-0.5, -13.6]], [[1, -13.6], [3.2, -17.2], [5.6, -12]]];
 
+  //   頭盔／頭飾先不畫（第 162 輪：之後另外設計紙娃娃），一律露出完整髮型
   function drawHead(ctx, look) {
-    const hair = look.hair || '#5a3a22', skin = look.skin || '#f1c9a0', hm = look.helmet;
+    const hair = look.hair || '#5a3a22', skin = look.skin || '#f1c9a0';
     const hD = shade(hair, -42), hL = shade(hair, 48), hDD = shade(hair, -70);
     const skD = shade(skin, -32);
-    const hv = hm ? hm.v : -1;
-    const hc = hm ? mute(hm.color) : null;
 
-    // 兜帽：後半先畫在臉後面
-    if (hv === 2) {
-      cel(ctx, () => poly(ctx, [[-4, -14], [5, -14.5], [12, -9], [12.5, -2], [8, -6.5], [1, -6], [-3, -1], [-4, 9], [-2, 14], [-14, 15], [-14.5, 2], [-12, -10]]), hc, shade(hc, -38));
-    } else {
-      // 1. 後髮：腦後一束束往後下翹的尖髮（最暗）
-      ctx.fillStyle = hD; poly(ctx, HAIR_BACK); ctx.fill();
-      strokes(ctx, hDD, 0.8, [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
-    }
-    // 2. 臉（耳朵、下巴往右前收）
+    // 1. 後髮：腦後一束束往後下翹的尖髮（最暗）
+    ctx.fillStyle = hD; poly(ctx, HAIR_BACK); ctx.fill();
+    strokes(ctx, hDD, 0.8, [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
+    // 2. 臉（下巴往右前收）
     cel(ctx, () => {
       ctx.beginPath(); ctx.ellipse(0.4, 0.2, 9.6, 9.8, 0, 0, Math.PI * 2);
       ctx.moveTo(10, 3.6); ctx.lineTo(8.2, 9); ctx.lineTo(4, 10.6); ctx.lineTo(-3.5, 7); ctx.closePath();   // 跟橢圓同方向，不然重疊處會變破洞
     }, skin, skD, 1.2, -0.6);
-    // 3. 頭頂的頭髮（包住頭頂跟後腦，留出臉）
-    if (hv !== 1 && hv !== 2) {
-      cel(ctx, () => poly(ctx, HAIR_TOP), hair, hD, 1.3, -1.3);
-      // 髮絲分層線
-      strokes(ctx, hD, 0.75, [[[-2, -11.5], [-7.5, -5], [-8, 1]], [[2.5, -12], [-2.5, -6.5], [-4.5, -0.5]], [[6, -11], [3, -7]]]);
-    }
+    // 3. 頭頂的頭髮（包住頭頂跟後腦，留出臉）＋髮絲分層線
+    cel(ctx, () => poly(ctx, HAIR_TOP), hair, hD, 1.3, -1.3);
+    strokes(ctx, hD, 0.75, [[[-2, -11.5], [-7.5, -5], [-8, 1]], [[2.5, -12], [-2.5, -6.5], [-4.5, -0.5]], [[6, -11], [3, -7]]]);
     // 4. 耳朵
-    if (hv !== 2) {
-      ctx.fillStyle = skD; ctx.beginPath(); ctx.ellipse(-2.9, 2.4, 1.9, 2.6, 0.15, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(-2.5, 2.2, 1.2, 1.9, 0.15, 0, Math.PI * 2); ctx.fill();
-    }
-    // 5. 眼睛：黑點（近眼大一點、遠眼窄一點）＋淡淡腮紅
+    ctx.fillStyle = skD; ctx.beginPath(); ctx.ellipse(-2.9, 2.4, 1.9, 2.6, 0.15, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(-2.5, 2.2, 1.2, 1.9, 0.15, 0, Math.PI * 2); ctx.fill();
+    // 5. 眼睛：方形黑點（近眼寬一點、遠眼窄一點）＋淡淡腮紅
     ctx.fillStyle = '#1c1418';
-    ctx.beginPath(); ctx.ellipse(4.8, 1.8, 1.15, 1.75, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(9, 1.6, 0.8, 1.55, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(3.8, 0.4, 2.2, 2.8);
+    ctx.fillRect(8.4, 0.3, 1.5, 2.6);
     ctx.fillStyle = 'rgba(235,110,100,.22)';
     ctx.beginPath(); ctx.ellipse(4.2, 5.4, 2, 1, 0, 0, Math.PI * 2); ctx.fill();
     // 6. 瀏海＋翹毛＋亮面
-    if (hv === 1) {                       // 鐵盔：盔沿下只露幾撮瀏海
-      cel(ctx, () => poly(ctx, [[2, -5], [3.4, -1.6], [5.2, -4.8], [7.2, -2], [8.6, -5]]), hair, hD, 0.6, -0.6);
-    } else {
-      cel(ctx, () => poly(ctx, HAIR_BANGS), hair, hD, 1, -1);
-      strokes(ctx, hD, 0.7, [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
-      if (hv !== 2) {
-        HAIR_TUFTS.forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
-        // 亮面：頭頂一圈光澤塊＋瀏海上的小亮條
-        ctx.fillStyle = hL;
-        poly(ctx, [[-7, -9.6], [-3, -12], [-2.2, -11.2], [-6.2, -8.8]]); ctx.fill();
-        poly(ctx, [[0.5, -12.2], [5, -11.2], [4.5, -10.3], [0.6, -11.2]]); ctx.fill();
-        poly(ctx, [[7.5, -8.4], [10.4, -7.2], [10.1, -6.4], [7.6, -7.5]]); ctx.fill();
-      }
-      ctx.fillStyle = hL;
-      poly(ctx, [[2.6, -8], [4.4, -8.4], [4, -7.6], [2.8, -7.3]]); ctx.fill();
-    }
-    // 7. 頭盔
-    if (hv === 0) {                       // 皮帽：圓頂軟帽＋帽緣，下面露出瀏海和後髮
-      cel(ctx, () => { ctx.beginPath(); ctx.ellipse(0.5, -7.2, 11, 7.6, 0, Math.PI, 0); ctx.closePath(); }, hc, shade(hc, -38));
-      cel(ctx, () => poly(ctx, [[-12, -8], [11.5, -8.6], [13.5, -6.2], [-11.5, -5.4]]), shade(hc, -18), shade(hc, -55), 0.5, -0.6);
-      ctx.fillStyle = shade(hc, 45); poly(ctx, [[-4, -13.4], [2, -14.6], [2.5, -13.6], [-3.6, -12.4]]); ctx.fill();
-    } else if (hv === 1) {                // 鐵盔：包住頭頂和後腦，鼻樑護片、頂飾、鉚釘
-      cel(ctx, () => poly(ctx, [[-12.2, 7], [-12.6, -5], [-10, -11], [-3, -14.6], [4, -14.4], [9.8, -10.6], [11.6, -5], [11.4, -3.6],
-        [-1.5, -4.4], [-4.5, 0], [-5.2, 7]]), hc, shade(hc, -40), 1.3, -1.3);
-      ctx.fillStyle = shade(hc, -30); poly(ctx, [[-12.4, -6], [11.6, -5.4], [11.4, -3.6], [-12.2, -4]]); ctx.fill();
-      cel(ctx, () => poly(ctx, [[8.6, -4.4], [11.4, -4.2], [11, 3.2], [9.4, 3.2]]), shade(hc, 25), shade(hc, -20), 0.5, 0);
-      ctx.fillStyle = shade(hc, 55); poly(ctx, [[-6, -11.6], [0, -13.8], [0.6, -12.8], [-5.4, -10.6]]); ctx.fill();
-      ctx.fillStyle = shade(hc, 70); [[-8, -5], [-3, -4.8], [2, -4.6], [7, -4.4]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 0.7, 0, Math.PI * 2); ctx.fill(); });
-      cel(ctx, () => poly(ctx, [[-4, -14.2], [-1, -19], [3.5, -18.4], [1.5, -14.4]]), shade(hc, 20), shade(hc, -30), 0.5, -0.5);
-    } else if (hv === 2) {                // 兜帽：前緣包住額頭跟臉側
-      cel(ctx, () => poly(ctx, [[-4, -14], [5, -14.5], [12, -9], [12.8, -2.5], [11, -4.6], [6, -7.6], [0, -6.6], [-2.4, -2], [-2.6, 8], [-5, 12], [-6, -1]]),
-        shade(hc, 12), shade(hc, -30), 0.9, -0.9);
-      strokes(ctx, shade(hc, -50), 0.7, [[[-6, -10], [-9, 2]], [[0, -12], [-3, -6]]]);
-    }
+    cel(ctx, () => poly(ctx, HAIR_BANGS), hair, hD, 1, -1);
+    strokes(ctx, hD, 0.7, [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
+    HAIR_TUFTS.forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
+    ctx.fillStyle = hL;
+    poly(ctx, [[-7, -9.6], [-3, -12], [-2.2, -11.2], [-6.2, -8.8]]); ctx.fill();
+    poly(ctx, [[0.5, -12.2], [5, -11.2], [4.5, -10.3], [0.6, -11.2]]); ctx.fill();
+    poly(ctx, [[7.5, -8.4], [10.4, -7.2], [10.1, -6.4], [7.6, -7.5]]); ctx.fill();
+    poly(ctx, [[2.6, -8], [4.4, -8.4], [4, -7.6], [2.8, -7.3]]); ctx.fill();
   }
 
   // ── 軀幹（髖部 = (0,0)，往上約 24；跟著身體前傾旋轉）──────────────────────
@@ -344,7 +307,7 @@
     ctx.restore();
     // 5. 頭＋頭髮＋頭盔
     ctx.save(); ctx.translate(headC[0], headC[1]); ctx.rotate(p.lean + p.head);
-    ctx.translate(0, -0.6); ctx.scale(1.1, 1.1);   // 頭稍微大一點（比例接近 3.3 頭身）
+    ctx.translate(0, 0.4); ctx.scale(0.94, 0.94);   // 頭比原本小一點（第 162 輪）
     drawHead(ctx, look);
     ctx.restore();
     // 6. 前手＋前肩甲＋前劍（揮砍時畫殘影弧線）
