@@ -159,7 +159,12 @@
         <h3>${t('adv.log')}</h3>
         <ul class="log">${S.log.map(l => `<li style="color:${l.color || 'inherit'}">${esc(G.logText(l))}</li>`).join('') || `<li class="muted">${t('adv.logEmpty')}</li>`}</ul>
       </div>
-      ${renderFriends()}`;
+      ${renderFriends()}
+      ${G.DONATE_URL ? `<div class="card donate-card">
+        <h3>🥛 ${t('donate.title')}</h3>
+        <p style="font-size:13px;margin:0 0 10px">${t('donate.text')}</p>
+        <a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
+      </div>` : ''}`;
   }
 
   // ── 分頁：角色（紙娃娃 + 裝備 + 轉職）──────────────────────────────────

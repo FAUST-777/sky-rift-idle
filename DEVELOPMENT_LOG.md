@@ -2991,3 +2991,11 @@
 - 三語新增 `settings.support`、`settings.supportNote`、`settings.donate`；英文說明的撇號用 ’ 避免字串斷掉。
 
 **驗證**：puppeteer 開設定，按鈕連結正確、target=_blank；三語檔載入無 page error。
+
+## 第 168 輪（2026-11-12）：冒險分頁最下方加斗內區（先不上線）
+
+**需求**：「幫我在冒險頁面 最下方 好友下方 新增一個斗內區域 寫 請作者喝一杯養樂多 繼續支持創作開發」
+
+**做法**：冒險分頁好友卡下面新增「🥛 支持作者」卡片：置中文字「請作者喝一杯養樂多，繼續支持創作開發！」＋藍色「💖 用 PayPal 斗內」按鈕（新分頁開 `G.DONATE_URL`）。跟設定裡的斗內區共用同一個網址，`G.DONATE_URL` 清空兩處都會隱藏。三語新增 `donate.title`、`donate.text`。
+
+**驗證**：puppeteer 載入，冒險分頁最後一張卡就是斗內卡（前一張是好友），連結正確，無 page error。

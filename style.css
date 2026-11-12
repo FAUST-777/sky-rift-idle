@@ -96,6 +96,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn:active { transform: scale(.96); }
 .btn.primary { background: linear-gradient(#ff9a4d, #e5702a); border-color: #ffb27a; color: #fff; font-weight: 700; }
 .btn.good { background: #2f6b45; border-color: #4f9a68; }
+.donate-card { text-align: center; }
 .btn.donate { display: inline-block; text-decoration: none; background: #0070ba; border-color: #3b9be0; color: #fff; }
 .btn.danger { background: #6b2f3a; border-color: #9a4f5a; }
 .btn.small { padding: 5px 9px; font-size: 12px; border-radius: 8px; }

@@ -576,6 +576,8 @@ G.I18N['zh-TW'] = {
   'settings.support': '支持作者',
   'settings.supportNote': '喜歡這款遊戲的話，可以請作者喝杯咖啡 ☕ 斗內不會影響遊戲內容，純粹是支持繼續開發！',
   'settings.donate': '用 PayPal 斗內',
+  'donate.title': '支持作者',
+  'donate.text': '請作者喝一杯養樂多，繼續支持創作開發！',
   'toast.secretOk': '神秘力量降臨！獲得 25M 金幣＋9999 雲晶',
   'toast.secretPink': '🌸 獲得 {n} 件第 {f} 層天櫻裝備！',
   'toast.secretPets': '🐾 獲得 {n} 隻船艙寵物！',

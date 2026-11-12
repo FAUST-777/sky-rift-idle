@@ -576,6 +576,8 @@ G.I18N['en'] = {
   'settings.support': 'Support the Dev',
   'settings.supportNote': 'If you enjoy the game, you can buy the developer a coffee ☕ Donations don’t change anything in-game — they just help development continue!',
   'settings.donate': 'Donate via PayPal',
+  'donate.title': 'Support the Dev',
+  'donate.text': 'Buy the developer a Yakult and keep the creation going!',
   'toast.secretOk': 'Mysterious power! +25M gold and +9999 crystals',
   'toast.secretPink': '🌸 Got {n} floor-{f} Sakura items!',
   'toast.secretPets': '🐾 Got {n} cabin pets!',
