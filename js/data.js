@@ -585,6 +585,9 @@ G.PARTNERS = [
   { id: 'kael', floor: 10, gender: 'm', hair: '#222831', skin: '#e0b895', perk: { stat: 'atkPct',   v: 0.06 } },
   { id: 'mira', floor: 14, gender: 'f', hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15, extra: 'defDownStack' } },   // extra：破防持續時間可累加
 ];
+// 頭飾（純外觀，打怪隨機掉落；名稱：hw.<id>.name）——第 165 輪
+G.HEADWEAR = ['cat', 'horns', 'knight', 'shades', 'dino'];
+G.HEADWEAR_DROP = { normal: 0.01, boss: 0.08 };   // 每隻怪的掉落機率
 G.partnerRecruitCost = p => 80 * p.floor;
 G.partnerLevelCost = lv => Math.round(25 * Math.pow(1.3, lv - 1) * (G.petPerk && G.petPerk('plevel') ? 0.85 : 1));   // 寵物「夥伴升級 -15%」   // 原本 50 起跳，-50%
 

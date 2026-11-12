@@ -171,10 +171,13 @@
     const skD = shade(skin, -32);
 
     const fem = look.gender === 'f', bob = fem && look.hairStyle === 'short';
+    const hw = look.hw;
+    // 暴龍頭整個包住後腦；騎士頭盔只露出女生的長髮／短髮
+    const backHair = hw !== 'dino' && !(hw === 'knight' && !fem);
     // 1. 後髮：男生是腦後往後下翹的尖髮束；女生是垂到背上的長髮（最暗）
-    ctx.fillStyle = hD; poly(ctx, bob ? FS_BACK : fem ? F_BACK : HAIR_BACK); ctx.fill();
+    if (backHair) { ctx.fillStyle = hD; poly(ctx, bob ? FS_BACK : fem ? F_BACK : HAIR_BACK); ctx.fill();
     strokes(ctx, hDD, 0.8, bob ? [[[-9, -6], [-11, 4], [-11.6, 8.6]], [[-6, -4], [-7, 5], [-6.4, 9.2]]] : fem ? [[[-9, -6], [-11.6, 6], [-12.2, 15]], [[-6, -4], [-7.6, 8], [-7, 17]]]
-      : [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]);
+      : [[[-8, -7], [-12, -4.6]], [[-7.5, -2.5], [-12, 1.5]], [[-6.5, 2], [-9.5, 6.5]]]); }
     // 2. 臉（下巴往右前收）
     cel(ctx, () => {
       ctx.beginPath(); ctx.ellipse(0.4, 0.2, 9.6, 9.8, 0, 0, Math.PI * 2);
@@ -197,13 +200,79 @@
     cel(ctx, () => poly(ctx, bob ? FS_BANGS : fem ? F_BANGS : HAIR_BANGS), hair, hD, 1, -1);
     strokes(ctx, hD, 0.7, fem ? [[[5.5, -9], [5.4, -3]], [[9.5, -8.4], [9.6, -2]], [[1.8, -7], [1.2, bob ? 5.5 : 8]]]
       : [[[5, -8.6], [5.6, -4.6]], [[9, -8.2], [8.8, -4]], [[1.8, -7], [1.6, 1]]]);
-    (fem ? F_TUFTS : HAIR_TUFTS).forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
+    if (hw !== 'knight' && hw !== 'dino') (fem ? F_TUFTS : HAIR_TUFTS).forEach(t => cel(ctx, () => poly(ctx, t), hair, hD, 0.7, -0.7));
     ctx.fillStyle = hL;
     poly(ctx, [[-7, -9.6], [-3, -12], [-2.2, -11.2], [-6.2, -8.8]]); ctx.fill();
     poly(ctx, [[0.5, -12.2], [5, -11.2], [4.5, -10.3], [0.6, -11.2]]); ctx.fill();
     poly(ctx, [[7.5, -8.4], [10.4, -7.2], [10.1, -6.4], [7.6, -7.5]]); ctx.fill();
     poly(ctx, [[2.6, -8], [4.4, -8.4], [4, -7.6], [2.8, -7.3]]); ctx.fill();
+    // 7. 頭飾
+    if (hw) drawHeadwear(ctx, hw, look);
   }
+
+  // ── 頭飾（第 165 輪）：畫在頭的座標裡（頭中心 (0,0)、面向右），跟著頭轉 ─────────
+  function drawHeadwear(ctx, hw, look) {
+    const hair = look.hair || '#5a3a22';
+    if (hw === 'cat') {                   // 貓耳：跟頭髮同色，內側粉紅
+      const c = shade(hair, 6), cD = shade(hair, -40);
+      [[[-9.6, -9.4], [-11.6, -19.8], [-2.8, -13.4], -26], [[0, -13.8], [3, -20.8], [6.8, -11.4], 0]].forEach(([a, tip, b, dk]) => {
+        cel(ctx, () => poly(ctx, [a, tip, b]), shade(c, dk), shade(cD, dk), 0.8, -0.8);
+        const m = (k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+        ctx.fillStyle = shade('#f2a0b4', dk); poly(ctx, [m(0.28), [tip[0] * 0.75 + (a[0] + b[0]) / 8, tip[1] * 0.75 + (a[1] + b[1]) / 8], m(0.72)]); ctx.fill();
+      });
+    } else if (hw === 'horns') {          // 惡魔角：暗紅、往上翹的彎角
+      const horn = (bx0, bx1, by0, by1, cx, cy, tx, ty, dk) => cel(ctx, () => {
+        ctx.beginPath(); ctx.moveTo(bx0, by0); ctx.quadraticCurveTo(cx - 2, cy + 1, tx, ty); ctx.quadraticCurveTo(cx + 1.5, cy + 3, bx1, by1); ctx.closePath();
+      }, shade('#9a2a36', dk), shade('#4a1018', dk), 0.7, -0.7);
+      horn(-7.8, -3.2, -11.2, -13.4, -10, -17, -13.4, -21, -24);
+      horn(1.6, 6.2, -13.6, -11.6, 6, -18.5, 3.6, -23, 0);
+      ctx.fillStyle = 'rgba(255,210,210,.55)'; poly(ctx, [[3, -16.5], [4.4, -19.6], [4.9, -19.2], [3.8, -16.2]]); ctx.fill();
+    } else if (hw === 'knight') {         // 騎士頭盔：全罩盔、眼縫、呼吸孔、紅羽飾
+      const st = '#a9b0ba', stD = '#5d6470';
+      cel(ctx, () => { ctx.beginPath(); ctx.moveTo(-11.8, 6); ctx.lineTo(-12.4, -5); ctx.quadraticCurveTo(-10, -14.6, -1, -15); ctx.quadraticCurveTo(10, -14.6, 11.8, -4);
+        ctx.lineTo(11.6, 7); ctx.lineTo(7, 11); ctx.lineTo(-2, 11.2); ctx.lineTo(-6, 9); ctx.closePath(); }, st, stD, 1.4, -1.2);
+      ctx.fillStyle = '#1c1418'; ctx.fillRect(2.4, -0.6, 9.4, 2);                  // 眼縫
+      ctx.fillStyle = shade(stD, -20); [[7.6, 4.4], [9.4, 4.4], [7.6, 6.4], [9.4, 6.4]].forEach(([x, y]) => ctx.fillRect(x, y, 1, 1));
+      strokes(ctx, stD, 0.8, [[[1.5, -14.2], [1.8, 10.6]]]);                       // 中線
+      ctx.fillStyle = '#e4e8ee'; poly(ctx, [[-7, -11], [-2, -13.8], [-1.2, -12.9], [-6.2, -10.2]]); ctx.fill();
+      cel(ctx, () => { ctx.beginPath(); ctx.moveTo(-2, -14.6); ctx.quadraticCurveTo(-9, -21, -18, -14); ctx.quadraticCurveTo(-16, -9, -13.4, -6);
+        ctx.quadraticCurveTo(-12.6, -12, -2.4, -12.4); ctx.closePath(); }, '#c0392b', '#6e1a1a', 0.8, -0.8);
+    } else if (hw === 'shades') {         // 墨鏡：黑鏡片＋鏡架＋一道反光
+      strokes(ctx, '#151018', 0.8, [[[2.6, 0.4], [-2.2, 1.6]]]);
+      ctx.fillStyle = '#151018'; G.ART.rr(ctx, 2.4, -0.9, 5, 3.6, 1); ctx.fill(); G.ART.rr(ctx, 7.8, -0.9, 2.9, 3.4, 0.8); ctx.fill();
+      ctx.fillRect(7, -0.2, 1, 0.9);
+      ctx.fillStyle = 'rgba(255,255,255,.75)'; poly(ctx, [[3.4, 1.8], [5.2, -0.4], [6, -0.4], [4.2, 1.8]]); ctx.fill();
+    } else if (hw === 'dino') {           // 暴龍頭：布偶頭套，臉從嘴巴露出來
+      const g = '#5f9e4a', gD = '#2f5a24', gL = '#8cc26a';
+      // 下顎（在下巴下面，牙齒往上）
+      cel(ctx, () => poly(ctx, [[-3.6, 9], [5, 11.4], [16.8, 7.8], [18, 10.6], [6.4, 14.6], [-3, 13]]), g, gD, 0.8, -0.8);
+      ctx.fillStyle = '#fff'; [9, 12, 15].forEach(x => { poly(ctx, [[x - 1.2, 9.6 - (x - 9) * 0.28], [x, 7.4 - (x - 9) * 0.28], [x + 1.2, 9.4 - (x - 9) * 0.28]]); ctx.fill(); });
+      // 頭套＋上顎
+      cel(ctx, () => { ctx.beginPath(); ctx.moveTo(-12.6, 11); ctx.lineTo(-13.6, -4); ctx.quadraticCurveTo(-12, -16, -3, -17.6); ctx.quadraticCurveTo(8, -18.6, 15.4, -12.6);
+        ctx.quadraticCurveTo(19.6, -10.6, 19.2, -6.4); ctx.lineTo(18.4, -4.6); ctx.lineTo(6, -5.2); ctx.lineTo(0, -5.8); ctx.lineTo(-3.2, -1); ctx.lineTo(-4.6, 9.6); ctx.closePath(); }, g, gD, 1.4, -1.2);
+      ctx.fillStyle = '#fff'; [7.5, 10.5, 13.5, 16.5].forEach(x => { poly(ctx, [[x - 1.2, -5], [x, -2.4], [x + 1.2, -5]]); ctx.fill(); });
+      ctx.fillStyle = gL; [[-11, -12.6], [-13.4, -6], [-13.4, 1]].forEach(([x, y]) => { poly(ctx, [[x + 1, y - 1.6], [x - 2.6, y + 0.6], [x + 0.8, y + 2.6]]); ctx.fill(); });   // 背上的刺
+      ctx.fillStyle = gL; poly(ctx, [[-4, -14.6], [4, -15.6], [4.4, -14.6], [-3.6, -13.6]]); ctx.fill();
+      ctx.fillStyle = '#1c1418'; ctx.fillRect(6.2, -13.4, 2.2, 2.4); ctx.fillRect(17, -9.6, 1, 1);   // 眼睛、鼻孔
+      ctx.fillStyle = '#fff'; ctx.fillRect(6.6, -13, 0.8, 0.8);
+      strokes(ctx, gD, 0.9, [[[4.6, -15], [9, -15.4]]]);                              // 眉骨
+    }
+  }
+  // 頭飾小圖示（選單用）：一顆戴著頭飾的頭，回傳 dataURL（每種只畫一次）
+  const hwIconCache = {};
+  R.hwIcon = function (kind) {
+    if (hwIconCache[kind]) return hwIconCache[kind];
+    const S = 3, c = G.ART.canvas(48 * S, 48 * S), x = c.getContext('2d');
+    x.scale(S, S); x.translate(22, 27);
+    const look = { hair: '#5a3a22', skin: '#f1c9a0', gender: 'm', hw: kind };
+    drawHead(x, look);
+    // 描邊
+    const o = G.ART.canvas(c.width, c.height), oc = o.getContext('2d'), sil = G.ART.canvas(c.width, c.height), sc = sil.getContext('2d');
+    sc.drawImage(c, 0, 0); sc.globalCompositeOperation = 'source-in'; sc.fillStyle = '#1a1020'; sc.fillRect(0, 0, c.width, c.height);
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([dx, dy]) => oc.drawImage(sil, dx * 2.5, dy * 2.5));
+    oc.drawImage(c, 0, 0);
+    return (hwIconCache[kind] = o.toDataURL());
+  };
 
   // ── 軀幹（髖部 = (0,0)，往上約 24；跟著身體前傾旋轉）──────────────────────
   const STEEL = '#9097a0';

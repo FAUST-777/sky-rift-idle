@@ -158,7 +158,8 @@
       <div class="card">
         <h3>${t('adv.log')}</h3>
         <ul class="log">${S.log.map(l => `<li style="color:${l.color || 'inherit'}">${esc(G.logText(l))}</li>`).join('') || `<li class="muted">${t('adv.logEmpty')}</li>`}</ul>
-      </div>`;
+      </div>
+      ${renderFriends()}`;
   }
 
   // ── 分頁：角色（紙娃娃 + 裝備 + 轉職）──────────────────────────────────
@@ -399,7 +400,7 @@
       const st = G.partnerStats(p.id), inParty = S.party.includes(p.id), sp = G.spOf(p.id);
       const nSk = own.active.filter(Boolean).length + own.passive.filter(Boolean).length;
       return `<div class="card partner">
-        <canvas data-doll="${p.id}" width="64" height="80"></canvas>
+        <div class="doll-col"><canvas data-doll="${p.id}" width="64" height="80"></canvas>${hwSlotHtml(p.id)}</div>
         <div class="grow">
           <div class="row between"><b>${G.partnerName(p.id)} <span class="muted">Lv ${own.level}</span>${perkTag(p)}</b>
             <button class="btn small ${inParty ? 'on' : ''}" data-act="party" data-id="${p.id}">${inParty ? t('partners.inParty') : t('partners.resting')}</button></div>
@@ -414,9 +415,64 @@
           </div>
         </div></div>`;
     }).join('');
-    return `${renderFriends()}${renderMerc()}
+    return `${heroCardHtml()}${renderMerc()}
       <div class="card"><h3>${t('partners.title')} <small>${t('partners.deployed', { n: S.party.length, max: G.CONFIG.maxParty })}</small></h3>
-      <p class="muted" style="margin:0;font-size:12px">${t('partners.help')}</p></div>${renderSynergy()}${cards}`;
+      <p class="muted" style="margin:0;font-size:12px">${t('partners.help')}</p></div>${renderSynergy()}${cards}${renderHeadwear()}`;
+  }
+
+  // ── 頭飾（純外觀，第 165 輪）────────────────────────────────────────────
+  const hwImg = (kind, cls = 'hw-ico') => `<img class="${cls}" src="${G.RIG.hwIcon(kind)}" alt="">`;
+  // 人物卡上的頭飾格：點了選要戴哪個
+  function hwSlotHtml(who) {
+    const k = G.hwOf(who);
+    return `<button class="hw-slot ${k ? '' : 'empty'}" data-act="hwslot" data-who="${who}">${k ? hwImg(k) : '🎀'}<small>${k ? t(`hw.${k}.name`) : t('hw.slot')}</small></button>`;
+  }
+  // 主角卡（夥伴分頁最上面一格）
+  function heroCardHtml() {
+    const h = G.S.hero, st = G.heroStats();
+    return `<div class="card partner hero-card">
+      <div class="doll-col"><canvas data-doll="hero" width="64" height="80"></canvas>${hwSlotHtml('hero')}</div>
+      <div class="grow">
+        <div class="row between"><b>${esc(G.S.account && G.S.account.name || t('hero.who.hero'))} <span class="muted">Lv ${h.level}</span></b><span class="wtag">${t('hero.who.hero')}</span></div>
+        <div class="tags" style="margin:4px 0">${classTags(h.cls)}</div>
+        <div class="muted" style="font-size:12px;margin:4px 0">${t('partners.stats', { hp: G.fmt(st.maxHp), atk: st.atk, def: st.def })}</div>
+      </div></div>`;
+  }
+  // 最下面的飾品區：擁有的頭飾，點了問要給誰戴
+  function renderHeadwear() {
+    const S = G.S, owned = G.HEADWEAR.filter(k => S.headwear[k] > 0);
+    const items = owned.map(k => {
+      const used = G.hwUsedBy(k);
+      return `<button class="hw-item" data-act="hwitem" data-kind="${k}">${hwImg(k)}<b>${t(`hw.${k}.name`)}</b>
+        <small class="muted">${t('hw.count', { n: S.headwear[k], w: used.length })}</small></button>`;
+    }).join('');
+    return `<div class="card"><h3>🎀 ${t('hw.title')}</h3>
+      <p class="muted" style="margin:0 0 8px;font-size:12px">${t('hw.help')}</p>
+      ${items ? `<div class="hw-grid">${items}</div>` : `<p class="muted" style="margin:0">${t('hw.empty')}</p>`}</div>`;
+  }
+  // 點人物卡的頭飾格：選要戴哪一個
+  function hwPickModal(who) {
+    const S = G.S, cur = G.hwOf(who), owned = G.HEADWEAR.filter(k => S.headwear[k] > 0);
+    const list = owned.map(k => {
+      const others = G.hwUsedBy(k).filter(w => w !== who), free = S.headwear[k] - others.length;
+      const note = cur === k ? t('hw.wearing') : free > 0 ? '' : t('hw.take', { name: esc(G.whoName(others[0])) });
+      return `<button class="hw-row ${cur === k ? 'on' : ''}" data-act="hwset" data-who="${who}" data-kind="${k}">${hwImg(k)}<b>${t(`hw.${k}.name`)}</b><small class="muted">${note}</small></button>`;
+    }).join('');
+    UI.modal(`<h2>${t('hw.pickTitle', { name: esc(G.whoName(who)) })}</h2>
+      ${list ? `<div class="hw-list">${list}</div>` : `<p class="muted">${t('hw.empty')}</p>`}
+      <div class="modal-actions">${cur ? `<button class="btn" data-act="hwset" data-who="${who}" data-kind="">${t('hw.remove')}</button>` : ''}<button class="btn primary" data-act="close">${t('common.close')}</button></div>`);
+  }
+  // 點飾品區的頭飾：選要給誰戴
+  function hwWhoModal(kind) {
+    const rows = G.hwWearers().map(w => {
+      const cur = G.hwOf(w);
+      return `<button class="hw-row ${cur === kind ? 'on' : ''}" data-act="hwset" data-who="${w}" data-kind="${cur === kind ? '' : kind}">
+        <b>${esc(G.whoName(w))}</b><small class="muted">${cur === kind ? t('hw.wearing') + '・' + t('hw.remove') : cur ? t('hw.now', { name: t(`hw.${cur}.name`) }) : t('hw.none')}</small></button>`;
+    }).join('');
+    UI.modal(`<h2>${hwImg(kind, 'hw-ico big')} ${t('hw.whoTitle', { name: t(`hw.${kind}.name`) })}</h2>
+      <p class="muted" style="font-size:12px;margin:0 0 8px">${t('hw.count', { n: G.S.headwear[kind] || 0, w: G.hwUsedBy(kind).length })}</p>
+      <div class="hw-list">${rows}</div>
+      <div class="modal-actions"><button class="btn primary" data-act="close">${t('common.close')}</button></div>`);
   }
 
   // ── 團隊特效：目前組合＋生效效果；全部特效表收在折疊區（展開狀態記在 UI，重繪不會自己收起）──
@@ -555,7 +611,7 @@
     const el = $('friendInput');
     const ok = await G.importCode(el ? el.value : '');
     if (ok) UI.friendDraft = '';
-    UI.refresh(['partners']);
+    UI.refresh(['adventure']);
   }
 
   // ── 開場：輸入冒險者名稱 → 取得遊戲 ID（在本機產生，不需要網路）──────────
@@ -594,6 +650,7 @@
     $('panel').querySelectorAll('canvas[data-doll]').forEach(c => {
       const id = c.dataset.doll;
       if (id === G.MERC) { c.width = 128; c.height = 160; if (G.S.merc) G.ART.drawHumanoid(c.getContext('2d'), G.S.merc.snap.look, 0, 0, 2); return; }
+      if (id === 'hero') { c.width = 128; c.height = 160; G.ART.drawHumanoid(c.getContext('2d'), G.ART.lookFromHero(), 0, 0, 2); return; }
       const own = G.S.partners[id], def = G.PARTNERS.find(p => p.id === id);
       const look = own ? G.ART.lookFromPartner(id) : { skin: def.skin, hair: def.hair, cls: 'villager' };
       c.width = 128; c.height = 160;
@@ -925,7 +982,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   // ── 繪製目前分頁 ─────────────────────────────────────────────────────────
   const RENDER = { adventure: renderAdventure, hero: renderHero, skills: renderSkills, partners: renderPartners, ship: renderShip, home: renderHome };
   UI.render = function () {
+    const ae = document.activeElement, keepId = ae && ae.id && $('panel').contains(ae) && /^(INPUT|TEXTAREA)$/.test(ae.tagName) ? ae.id : null;
+    const sel = keepId ? [ae.selectionStart, ae.selectionEnd] : null;
     $('panel').innerHTML = RENDER[UI.tab]();
+    if (keepId) { const el = $(keepId); if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(sel[0], sel[1]); } catch {} } }
     if (UI.tab === 'hero') mount('#dollSlot', dollCanvas(UI.who === 'hero' ? G.ART.lookFromHero() : G.ART.lookFromPartner(UI.who), 128, 160, 1.8));
     if (UI.tab === 'partners') mountPartnerDolls();
     if (UI.tab === 'home') mountPets();
@@ -1082,6 +1142,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         break;
       case 'recruit': G.recruit(d.id); break;
       case 'party': G.toggleParty(d.id); break;
+      case 'hwslot': hwPickModal(d.who); break;
+      case 'hwitem': hwWhoModal(d.kind); break;
+      case 'hwset': {
+        const taken = G.setHeadwear(d.who, d.kind || null);
+        if (taken) UI.toast(t('hw.taken', { name: G.whoName(taken) }));
+        UI.close(); break;
+      }
       case 'plevel': G.partnerLevelUp(d.id); break;
       case 'skreset': UI.modal(`<h2>${t('skills.reset')}</h2><p>${t('skills.resetBody', { who: esc(whoName(d.id)) })}</p>
         <div class="modal-actions"><button class="btn" data-act="close">${t('common.cancel')}</button><button class="btn good" data-act="skreset2" data-id="${d.id}">${t('skills.resetConfirm')}</button></div>`); break;
@@ -1185,13 +1252,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     G.on('floorChange', () => UI.refresh(['adventure']));
     G.on('floor', () => UI.refresh(['adventure']));
     G.on('inventory', () => UI.refresh(['hero', 'adventure']));
-    G.on('look', () => UI.refresh(['hero', 'adventure']));
+    G.on('look', () => UI.refresh(['hero', 'adventure', 'partners']));
+    G.on('headwear', () => UI.refresh(['partners']));
     G.on('levelup', () => UI.refresh(['hero', 'skills', 'adventure']));
     G.on('skills', () => UI.refresh(['skills', 'hero', 'adventure']));
     G.on('stats', () => UI.refresh(['hero', 'adventure']));
     G.on('party', () => UI.refresh(['partners', 'hero', 'adventure']));
-    G.on('friends', () => UI.refresh(['partners']));
-    G.on('account', () => UI.refresh(['partners']));
+    G.on('friends', () => UI.refresh(['adventure']));
+    G.on('account', () => UI.refresh(['adventure', 'partners']));
     // 名稱輸入框：即時字數；按 Enter 送出
     document.addEventListener('input', e => {
       if (e.target.id === 'nameInput') UI.nameCount && UI.nameCount();

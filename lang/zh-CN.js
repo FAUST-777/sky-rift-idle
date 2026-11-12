@@ -29,6 +29,7 @@ G.I18N['zh-CN'] = {
   'hero.bag': '背包', 'hero.sellBelow.0': '卖掉白色', 'hero.sellBelow.1': '卖掉绿色以下', 'hero.sellBelow.2': '卖掉蓝色以下', 'hero.sellBelow.3': '卖掉紫色以下', 'hero.sellConfirm': '再按一次确认卖出',
   'hero.bagEmpty': '打怪会掉装备，掉到的会出现在这里。',
   'hero.gender': '性别', 'hero.gender.m': '♂ 男', 'hero.gender.f': '♀ 女',
+  'hw.cat.name': '猫耳', 'hw.horns.name': '恶魔角', 'hw.knight.name': '骑士头盔', 'hw.shades.name': '墨镜', 'hw.dino.name': '暴龙头', 'hw.slot': '头饰', 'hw.title': '饰品', 'hw.help': '打怪物有几率掉落头饰（纯外观，不影响能力）。点一下选要给谁戴；人物卡上的头饰格也可以直接换。', 'hw.empty': '还没有头饰，打怪物有几率掉落。', 'hw.pickTitle': '{name} 要戴哪个头饰？', 'hw.whoTitle': '{name} 要给谁戴？', 'hw.remove': '卸下', 'hw.none': '没戴头饰', 'hw.now': '戴着{name}', 'hw.count': '拥有 {n}・戴着 {w}', 'hw.wearing': '戴着中', 'hw.take': '从 {name} 身上拿过来', 'hw.taken': '已从 {name} 身上拿下来', 'log.headwear': '🎀 掉落头饰「{name}」',
   'hero.who.hero': '主角', 'hero.partnerNote': '伙伴的职业与升级在「伙伴」分页。', 'hero.notRecruited': '还没有伙伴，往上爬就会遇到。',
   'hero.expand': '扩充 +{n} 格', 'hero.bagMax': '已达上限', 'item.equipTo': '给 {name} 装备',
   'hero.autoEquipHint': '主角先挑，剩下的依序分给出战中、休息中的伙伴',

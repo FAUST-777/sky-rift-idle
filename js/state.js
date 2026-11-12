@@ -80,6 +80,7 @@
       morale: 0,             // 士氣層數（貓鎧者每攻擊一次 +1 層，每層 +1% 全隊最終防禦；有人裝「士氣」被動才累積/生效）
       partners: {},          // id -> { level, cls, equipped, skills, active, passive }
       party: [],             // 出戰中的夥伴 id
+      headwear: {},          // 頭飾：id -> 擁有幾個（誰戴著記在角色的 hw）
       ship: newShip(),
       introVer: 0,           // 看過的開場對話版本（G.INTRO_VER 改版時會再看一次）
       furniture: {},         // id -> 持有數量（未擺放）
@@ -206,6 +207,31 @@
   // 雇用的好友主角用特殊 id G.MERC，資料是好友上傳的快照
   G.charOf = who => (who === 'hero' || !who ? G.S.hero : who === G.MERC ? G.S.merc.snap.char : G.S.partners[who]);
   G.partyMembers = () => ['hero', ...G.S.party.filter(id => (id === G.MERC ? !!G.S.merc : !!G.S.partners[id]))];
+  // ── 頭飾（純外觀）：擁有數量在 S.headwear，誰戴著記在 hero.hw / partners[id].hw ──
+  G.hwWearers = () => ['hero', ...Object.keys(G.S.partners)];
+  G.hwOf = who => (G.charOf(who) || {}).hw || null;
+  G.hwUsedBy = kind => G.hwWearers().filter(w => G.hwOf(w) === kind);
+  // 戴上（kind = null 卸下）；數量不夠時從別人身上拿過來，回傳被拿走的人
+  G.setHeadwear = function (who, kind) {
+    const ch = G.charOf(who); if (!ch) return null;
+    let taken = null;
+    if (kind) {
+      const own = G.S.headwear[kind] || 0; if (!own) return null;
+      const others = G.hwUsedBy(kind).filter(w => w !== who);
+      if (others.length >= own) { taken = others[0]; G.charOf(taken).hw = null; }
+    }
+    ch.hw = kind || null;
+    G.emit('look'); G.emit('headwear');
+    return taken;
+  };
+  G.rollHeadwear = function (boss) {
+    if (Math.random() >= (boss ? G.HEADWEAR_DROP.boss : G.HEADWEAR_DROP.normal)) return null;
+    const kind = G.pick(G.HEADWEAR);
+    G.S.headwear[kind] = (G.S.headwear[kind] || 0) + 1;
+    G.addLog('log.headwear', { name: { k: `hw.${kind}.name` } }, '#ff9ee8');
+    G.emit('headwear');
+    return kind;
+  };
   G.whoName = who => (who === 'hero' || !who ? G.t('hero.who.hero') : who === G.MERC ? (G.S.merc ? G.S.merc.name : '?') : G.partnerName(who));
   G.skillDef = (cls, id) => (G.SKILLS[cls] || []).find(s => s.id === id);
   G.spentPoints = who => Object.values(G.charOf(who).skills).reduce((a, b) => a + b, 0);

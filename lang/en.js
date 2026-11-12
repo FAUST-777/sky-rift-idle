@@ -29,6 +29,7 @@ G.I18N['en'] = {
   'hero.bag': 'Inventory', 'hero.sellBelow.0': 'Sell white', 'hero.sellBelow.1': 'Sell green & below', 'hero.sellBelow.2': 'Sell blue & below', 'hero.sellBelow.3': 'Sell purple & below', 'hero.sellConfirm': 'Tap again to confirm',
   'hero.bagEmpty': 'Monsters drop gear. Anything you find shows up here.',
   'hero.gender': 'Gender', 'hero.gender.m': '♂ Male', 'hero.gender.f': '♀ Female',
+  'hw.cat.name': 'Cat Ears', 'hw.horns.name': 'Devil Horns', 'hw.knight.name': 'Knight Helm', 'hw.shades.name': 'Sunglasses', 'hw.dino.name': 'T-Rex Hood', 'hw.slot': 'Headwear', 'hw.title': 'Accessories', 'hw.help': 'Monsters sometimes drop headwear (cosmetic only, no stats). Tap one to choose who wears it, or tap the headwear slot on a character card.', 'hw.empty': 'No headwear yet. Monsters sometimes drop it.', 'hw.pickTitle': 'Headwear for {name}', 'hw.whoTitle': 'Who wears the {name}?', 'hw.remove': 'Take off', 'hw.none': 'No headwear', 'hw.now': 'Wearing {name}', 'hw.count': 'Owned {n} · Worn {w}', 'hw.wearing': 'Wearing', 'hw.take': 'Take from {name}', 'hw.taken': 'Taken off {name}', 'log.headwear': '🎀 Dropped headwear: {name}',
   'hero.who.hero': 'You', 'hero.partnerNote': 'Change companion classes and levels in the Party tab.', 'hero.notRecruited': 'No companions yet. You will meet them as you climb.',
   'hero.expand': 'Expand +{n}', 'hero.bagMax': 'Maxed', 'item.equipTo': 'Equip on {name}',
   'hero.autoEquipHint': 'You pick first, then deployed companions, then resting ones',

@@ -190,6 +190,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .partner { display: flex; gap: 10px; }
 .partner canvas { width: 64px; height: 80px; flex: none; background: #1a1530; border-radius: 10px; }
 .partner.locked { opacity: .55; }
+.partner .doll-col { gap: 6px; }
+.hw-slot { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px; background: #1a1530; border: 1px solid var(--line); border-radius: 8px; color: inherit; font: inherit; cursor: pointer; }
+.hw-slot.empty { border-style: dashed; opacity: .8; font-size: 18px; }
+.hw-slot small { font-size: 10px; line-height: 1.2; }
+.hw-ico { width: 32px; height: 32px; image-rendering: auto; }
+.hw-ico.big { width: 40px; height: 40px; vertical-align: middle; }
+.hw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.hw-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: #1a1530; border: 1px solid var(--line); border-radius: 10px; color: inherit; font: inherit; cursor: pointer; }
+.hw-item .hw-ico { width: 48px; height: 48px; }
+.hw-item small { font-size: 10px; }
+.hw-list { display: flex; flex-direction: column; gap: 6px; }
+.hw-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #1a1530; border: 1px solid var(--line); border-radius: 10px; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.hw-row small { margin-left: auto; font-size: 11px; }
+.hw-row.on { border-color: #56d364; }
 select { font: inherit; background: var(--card2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 5px 6px; }
 
 /* ── 飛行船 ───────────────────────────────────────── */

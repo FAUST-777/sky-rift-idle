@@ -1245,6 +1245,8 @@
       }
       // 船艙寵物：隨機掉落（越高層越容易，層主更高）
       if ((u.boss && G.bossPetGift()) || G.rollPet(f, u.boss)) this.floatText(u.img.x, u.img.y - 70, '🐾', '#ff9ee8', 22, 1200);   // 層主送寵物（少於 6 隻時）優先，沒送到才走一般掉落
+      // 頭飾：隨機掉落（純外觀）
+      if (G.rollHeadwear(u.boss)) this.floatText(u.img.x, u.img.y - 90, '🎀', '#ff9ee8', 22, 1200);
       if (!u.boss) S.kills++;
       else this.bossCleared();
     }

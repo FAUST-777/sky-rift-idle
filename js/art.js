@@ -87,13 +87,13 @@
 
   A.lookFromHero = function () {
     const S = G.S;
-    return classLook(Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls, gender: S.hero.gender || 'm' }, gearLook(S.equipped)), 0);
+    return classLook(Object.assign({ skin: S.hero.skin, hair: S.hero.hair, cls: S.hero.cls, gender: S.hero.gender || 'm', hw: S.hero.hw || null }, gearLook(S.equipped)), 0);
   };
   // 夥伴：穿上的裝備優先，沒穿的部位用職業預設裝扮
   A.lookFromPartner = function (id) {
     const def = G.PARTNERS.find(p => p.id === id), p = G.S.partners[id];
     const tier = Math.min(4, Math.floor(p.level / 8));
-    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls, gender: def.gender || 'm', hairStyle: def.hairStyle }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
+    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls, gender: def.gender || 'm', hairStyle: def.hairStyle, hw: p.hw || null }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
     return classLook(look, tier);
   };
 
