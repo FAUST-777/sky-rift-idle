@@ -750,3 +750,6 @@ G.PET_BONUSES = [
 // INTRO_VER 改版時 +1，看過舊版開場的玩家會再看一次新的
 G.PROLOGUE_PAGES = 3;
 G.INTRO_VER = 2;
+
+// 斗內連結（只在網頁版顯示；之後包 Steam／手機 App 時把它設成空字串就會隱藏，平台規定不能放外部付款）
+G.DONATE_URL = 'https://www.paypal.com/paypalme/doge9687';

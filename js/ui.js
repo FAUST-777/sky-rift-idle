@@ -948,6 +948,11 @@
         <div class="muted" style="font-size:12px;margin:0 0 6px">${t('settings.autosell')}</div>
         <div class="row wrap" style="gap:10px 16px">${[0, 1, 2, 3].map(r => `<label class="switch"><input type="checkbox" data-act="autosell" data-v="${r}" ${S.autoSell[r] ? 'checked' : ''}><i></i><span style="color:${G.RARITY[r].color}">${t('rarity.' + r)}</span></label>`).join('')}</div>
       </div>
+      ${G.DONATE_URL ? `<div class="set-group">
+        <div class="set-label">☕ ${t('settings.support')}</div>
+        <p class="muted" style="font-size:12px;margin:0 0 8px">${t('settings.supportNote')}</p>
+        <a class="btn small donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
+      </div>` : ''}
       <div class="set-group">
         <div class="set-label">💾 ${t('settings.data')}</div>
         <p class="muted" style="font-size:12px;margin:0 0 8px">${t('settings.saveNote')}</p>
