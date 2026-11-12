@@ -40,6 +40,11 @@
     ctx.fillStyle = shade(color, 30); ctx.fillRect(x, y - 2, 13, 3.5);
   }
 
+  // 盔甲顯示顏色（第 164 輪）：不照稀有度，用裝備編號挑一個柔和的顏色（同一件永遠同色，舊存檔也適用）
+  const ARMOR_TINTS = ['#9a3b35', '#3f628f', '#4f7f4a', '#77579a', '#a8803a', '#5c6b7c', '#8f5a38', '#2f6f6c',
+    '#a0506e', '#6f6b38', '#4c4f78', '#b8693c', '#7a3f5a', '#55755f', '#8a8478', '#3d5a4a'];
+  const mixHash = n => { let h = Math.imul(n ^ (n >>> 16), 0x45d9f3b); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); return (h ^ (h >>> 16)) >>> 0; };
+  A.armorTint = it => it.uid == null ? GEAR_COLORS[it.rarity] : ARMOR_TINTS[mixHash(it.uid) % ARMOR_TINTS.length];
   // 稀有度對應的裝備顏色（紙娃娃用）
   const GEAR_COLORS = A.GEAR_COLORS = ['#8d8478', '#4f9d57', '#3f7fd0', '#8a4fd0', '#e0a030', '#f06ccb'];   // 最後一個 = 天櫻粉紅
 
@@ -49,7 +54,7 @@
     return {
       weapon: e.weapon ? { type: e.weapon.look, color: GEAR_COLORS[e.weapon.rarity] } : fb.weapon || null,
       helmet: e.helmet ? { v: e.helmet.look, color: GEAR_COLORS[e.helmet.rarity] } : fb.helmet || null,
-      armor:  e.armor  ? { v: e.armor.look,  color: GEAR_COLORS[e.armor.rarity] } : fb.armor || null,
+      armor:  e.armor  ? { v: e.armor.look,  color: A.armorTint(e.armor) } : fb.armor || null,
       boots:  e.boots  ? { v: e.boots.look,  color: GEAR_COLORS[e.boots.rarity] } : fb.boots || null,
       accessory: e.accessory ? { color: GEAR_COLORS[e.accessory.rarity] } : null,
     };
@@ -88,7 +93,7 @@
   A.lookFromPartner = function (id) {
     const def = G.PARTNERS.find(p => p.id === id), p = G.S.partners[id];
     const tier = Math.min(4, Math.floor(p.level / 8));
-    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls, gender: def.gender || 'm' }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
+    const look = Object.assign({ skin: def.skin, hair: def.hair, cls: p.cls, gender: def.gender || 'm', hairStyle: def.hairStyle }, gearLook(p.equipped || {}, { boots: { v: 0, color: '#5b4632' } }));
     return classLook(look, tier);
   };
 

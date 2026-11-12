@@ -579,9 +579,9 @@ G.HERO_BASE  = { hp: 100, atk: 10, def: 3, spd: 1.0, crit: 5, critDmg: 1.5 };
 // perk = 專屬 buff（永久、不能升級；出戰時給全隊，文字：perk.<stat>）；extra = 額外特殊效果（文字：perk.<extra>）
 //   cdr 技能冷卻縮短、procRate 觸發率（暴擊、流血、中毒、緩速等機率 ×(1+v)）
 G.PARTNERS = [
-  { id: 'ella', floor: 2,  gender: 'f', hair: '#d9a066', skin: '#f3d2b3', perk: { stat: 'cdr',      v: 0.10 } },
-  { id: 'bram', floor: 4,  gender: 'm', hair: '#3b2a1e', skin: '#d9a47a', perk: { stat: 'defPct',   v: 0.06 } },
-  { id: 'lina', floor: 7,  gender: 'f', hair: '#f5e6a8', skin: '#f6dcc4', perk: { stat: 'hpPct',    v: 0.08 } },
+  { id: 'ella', floor: 2,  gender: 'f', hairStyle: 'short', hair: '#d9a066', skin: '#f3d2b3', perk: { stat: 'cdr',      v: 0.10 } },
+  { id: 'bram', floor: 4,  gender: 'f', hair: '#3b2a1e', skin: '#d9a47a', perk: { stat: 'defPct',   v: 0.06 } },
+  { id: 'lina', floor: 7,  gender: 'm', hair: '#f5e6a8', skin: '#f6dcc4', perk: { stat: 'hpPct',    v: 0.08 } },
   { id: 'kael', floor: 10, gender: 'm', hair: '#222831', skin: '#e0b895', perk: { stat: 'atkPct',   v: 0.06 } },
   { id: 'mira', floor: 14, gender: 'f', hair: '#9c7be0', skin: '#f1d1c0', perk: { stat: 'procRate', v: 0.15, extra: 'defDownStack' } },   // extra：破防持續時間可累加
 ];
