@@ -48,6 +48,7 @@
 
   // 每 10 秒自動存檔（分頁在背景時不存，才不會蓋掉離開時間）
   setInterval(() => { if (!document.hidden) G.save(); }, 10000);
+  if (G.BGM) G.BGM.init();   // 背景音樂（玩家第一次點擊後才會出聲）
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) G.save();
     else {

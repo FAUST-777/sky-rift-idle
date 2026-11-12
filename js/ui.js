@@ -599,6 +599,50 @@
     G.ART.drawHumanoid(doll.getContext('2d'), p.look, (256 - 64 * 3.6) / 2, (320 - 80 * 3.6) / 2, 3.6);
   }
 
+  // ── 存檔匯出／匯入（第 170 輪）：換裝置時把進度帶過去 ──────────────────
+  async function saveDownload() {
+    const code = await G.exportSave();
+    const d = new Date(), pad = n => String(n).padStart(2, '0');
+    const name = `skyrift_save_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.txt`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([code], { type: 'text/plain' })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    UI.toast(t('save.downloaded'));
+  }
+  async function saveCopy() {
+    const code = await G.exportSave();
+    try { await navigator.clipboard.writeText(code); UI.toast(t('save.copied')); }
+    catch {
+      UI.modal(`<h2>📋 ${t('save.copy')}</h2><p class="muted" style="font-size:12px">${t('save.copyManual')}</p>
+        <textarea class="text-input" style="width:100%;height:140px;font-size:11px" readonly onclick="this.select()">${code}</textarea>
+        <div class="modal-actions"><button class="btn" data-act="settings">◀ ${t('settings.title')}</button><button class="btn primary" data-act="close">${t('common.close')}</button></div>`);
+    }
+  }
+  function saveImportModal() {
+    UI.pendingSave = null;
+    UI.modal(`<h2>📥 ${t('save.import')}</h2>
+      <p class="muted" style="font-size:12px">${t('save.importHelp')}</p>
+      <label class="btn small primary" style="display:inline-block;margin-bottom:10px">📂 ${t('save.pick')}
+        <input type="file" data-act="savefile" accept=".txt,text/plain" style="display:none"></label>
+      <textarea id="saveCode" class="text-input" style="width:100%;height:110px;font-size:11px" placeholder="${esc(t('save.pastePh'))}" spellcheck="false" autocomplete="off"></textarea>
+      <div class="modal-actions"><button class="btn" data-act="settings">◀ ${t('settings.title')}</button><button class="btn good" data-act="savepaste">${t('save.read')}</button></div>`);
+  }
+  async function saveCheck(code) {
+    const s = await G.parseSave(code);
+    if (!s) { UI.toast(t('save.bad')); return; }
+    UI.pendingSave = s; UI.modalKind = 'saveok';
+    const acc = s.account || {};
+    UI.modal(`<h2>${t('save.confirmTitle')}</h2>
+      <div class="card" style="margin:8px 0;font-size:13px;line-height:1.8">
+        <div>🧭 <b>${esc(acc.name || '—')}</b>　<span class="muted">ID</span> ${esc(acc.id || '—')}</div>
+        <div>Lv <b>${s.hero.level || 1}</b>・${t('save.maxFloor', { n: s.maxFloor || s.floor || 1 })}・💰 ${G.fmt(s.gold || 0)}</div>
+        ${s.lastSeen ? `<div class="muted" style="font-size:12px">${t('save.savedAt', { t: new Date(s.lastSeen).toLocaleString() })}</div>` : ''}
+      </div>
+      <p style="font-size:13px;color:#ff9b9b">${t('save.confirmBody')}</p>
+      <div class="modal-actions"><button class="btn" data-act="saveimp">${t('common.cancel')}</button><button class="btn danger" data-act="saveok">${t('save.confirm')}</button></div>`);
+  }
+
   // 複製我的好友代碼；瀏覽器不給複製時，跳出視窗讓玩家自己全選複製
   async function exportCode() {
     const code = await G.exportCode();
@@ -949,6 +993,15 @@
         <div class="chips">${G.LANGS.map(l => `<button class="chip ${G.settings.lang === l.id ? 'on' : ''}" data-act="lang" data-v="${l.id}">${l.name}</button>`).join('')}</div>
       </div>
       <div class="set-group">
+        <div class="set-label">🎵 ${t('settings.music')}</div>
+        <div class="row" style="gap:12px;align-items:center">
+          <label class="switch"><input type="checkbox" data-act="bgmon" ${G.settings.bgmOn !== false ? 'checked' : ''}><i></i><span>${t('settings.musicOn')}</span></label>
+          <span class="muted" style="font-size:12px">🔊</span>
+          <input id="bgmVol" type="range" min="0" max="100" step="1" value="${G.settings.bgmVol == null ? 50 : G.settings.bgmVol}" style="flex:1;min-width:0" ${G.settings.bgmOn === false ? 'disabled' : ''}>
+          <b id="bgmVolN" style="font-size:12px;width:2.5em;text-align:right">${G.settings.bgmVol == null ? 50 : G.settings.bgmVol}</b>
+        </div>
+      </div>
+      <div class="set-group">
         <div class="set-label">🎮 ${t('settings.game')}</div>
         <div class="muted" style="font-size:12px;margin:0 0 6px">${t('settings.autosell')}</div>
         <div class="row wrap" style="gap:10px 16px">${[0, 1, 2, 3].map(r => `<label class="switch"><input type="checkbox" data-act="autosell" data-v="${r}" ${S.autoSell[r] ? 'checked' : ''}><i></i><span style="color:${G.RARITY[r].color}">${t('rarity.' + r)}</span></label>`).join('')}</div>
@@ -961,6 +1014,11 @@
       <div class="set-group">
         <div class="set-label">💾 ${t('settings.data')}</div>
         <p class="muted" style="font-size:12px;margin:0 0 8px">${t('settings.saveNote')}</p>
+        <div class="row wrap" style="margin-bottom:8px">
+          <button class="btn small primary" data-act="savedl">⬇ ${t('save.download')}</button>
+          <button class="btn small" data-act="savecopy">📋 ${t('save.copy')}</button>
+          <button class="btn small good" data-act="saveimp">📥 ${t('save.import')}</button>
+        </div>
         <div class="row wrap">
           <button class="btn small danger" data-act="reset">${t('settings.reset')}</button>
           <button class="btn small" data-act="credits">${t('settings.credits')}</button>
@@ -1102,6 +1160,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       case 'reset': UI.modalKind = 'reset'; UI.modal(`<h2>${t('reset.title')}</h2><p>${t('reset.body')}</p>
         <div class="modal-actions"><button class="btn" data-act="settings">${t('common.cancel')}</button><button class="btn danger" data-act="reset2">${t('reset.confirm')}</button></div>`); break;
       case 'reset2': G.resetSave(); break;
+      case 'bgmon':
+        G.settings.bgmOn = el.checked; G.saveSettings(); if (G.BGM) G.BGM.update();
+        if ($('bgmVol')) $('bgmVol').disabled = !el.checked;
+        break;
+      case 'savedl': saveDownload(); break;
+      case 'savecopy': saveCopy(); break;
+      case 'saveimp': UI.modalKind = 'saveimp'; saveImportModal(); break;
+      case 'savefile': { const f = el.files && el.files[0]; if (f) f.text().then(saveCheck); break; }
+      case 'savepaste': saveCheck(($('saveCode') || {}).value); break;
+      case 'saveok': if (UI.pendingSave) G.importSave(UI.pendingSave); break;
       case 'credits': UI.modalKind = 'credits'; creditsModal(); break;
       case 'revivePay': G.battleScene().revivePaid(); break;
       case 'item':
@@ -1275,6 +1343,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     G.on('account', () => UI.refresh(['adventure', 'partners']));
     // 名稱輸入框：即時字數；按 Enter 送出
     document.addEventListener('input', e => {
+      if (e.target.id === 'bgmVol') {   // 音量滑桿：拖曳中就即時套用
+        G.settings.bgmVol = +e.target.value; G.saveSettings(); if (G.BGM) G.BGM.update();
+        if ($('bgmVolN')) $('bgmVolN').textContent = e.target.value;
+      }
       if (e.target.id === 'nameInput') UI.nameCount && UI.nameCount();
       if (e.target.id === 'friendInput') UI.friendDraft = e.target.value;
     });

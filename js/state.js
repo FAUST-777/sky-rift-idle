@@ -187,6 +187,37 @@
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(G.S)); } catch {}
   };
 
+  // 存檔匯出／匯入（第 170 輪）：換裝置用。代碼＝前綴＋（gzip）base64(JSON)
+  const SAVE_PREFIX = 'SKYRIFT-SAVE1:', SAVE_PREFIX_Z = 'SKYRIFT-SAVE1Z:';
+  const toB64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+  const fromB64 = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+  const pipe = async (u8, stream) => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer());
+  G.exportSave = async function () {
+    G.save();
+    const u8 = new TextEncoder().encode(JSON.stringify(G.S));
+    if (window.CompressionStream) { try { return SAVE_PREFIX_Z + toB64(await pipe(u8, new CompressionStream('gzip'))); } catch {} }
+    return SAVE_PREFIX + toB64(u8);
+  };
+  // 解析代碼 → 存檔物件；格式不對回傳 null
+  G.parseSave = async function (code) {
+    try {
+      code = String(code || '').replace(/\s+/g, '');
+      let u8;
+      if (code.startsWith(SAVE_PREFIX_Z)) u8 = await pipe(fromB64(code.slice(SAVE_PREFIX_Z.length)), new DecompressionStream('gzip'));
+      else if (code.startsWith(SAVE_PREFIX)) u8 = fromB64(code.slice(SAVE_PREFIX.length));
+      else return null;
+      const s = JSON.parse(new TextDecoder().decode(u8));
+      return s && s.v === 1 && s.hero ? s : null;
+    } catch { return null; }
+  };
+  // 用匯入的存檔取代目前進度並重新載入（跟重置一樣先停掉自動存檔，免得被舊進度蓋回去）
+  G.importSave = function (s) {
+    resetting = true;
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch { resetting = false; return false; }
+    location.reload();
+    return true;
+  };
+
   // 全部重置：遊戲存檔＋設定（語言、戰鬥畫面收合）都清掉
   G.resetSave = function () {
     resetting = true;
