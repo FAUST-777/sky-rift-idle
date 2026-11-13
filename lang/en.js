@@ -576,6 +576,7 @@ G.I18N['en'] = {
   'settings.support': 'Support the Dev',
   'settings.supportNote': 'If you enjoy the game, you can buy the developer a coffee ☕ Donations don’t change anything in-game — they just help development continue!',
   'settings.donate': 'Donate via PayPal',
+  'settings.ecpay': 'Donate via ECPay (Taiwan)',
   'etip.none': 'No debuffs right now',
   'etip.boss': 'Boss',
   'edb.stun': 'Stun: can’t attack or dodge, +{v}% damage taken',

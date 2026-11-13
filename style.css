@@ -389,3 +389,4 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 /* 第 173 輪：點玩家名稱開斗內視窗 */
 #hudName { cursor: pointer; }
 #hudName:hover { text-decoration: underline; }
+.btn.donate.ecpay { background: #00a651; border-color: #3fcf85; margin-left: 6px; }

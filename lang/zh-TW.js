@@ -576,6 +576,7 @@ G.I18N['zh-TW'] = {
   'settings.support': '支持作者',
   'settings.supportNote': '喜歡這款遊戲的話，可以請作者喝杯咖啡 ☕ 斗內不會影響遊戲內容，純粹是支持繼續開發！',
   'settings.donate': '用 PayPal 斗內',
+  'settings.ecpay': '用綠界斗內（台灣）',
   'etip.none': '目前沒有負面效果',
   'etip.boss': '層主',
   'edb.stun': '暈眩：不能攻擊／閃避，受傷 +{v}%',

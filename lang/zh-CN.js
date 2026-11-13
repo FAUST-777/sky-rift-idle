@@ -576,6 +576,7 @@ G.I18N['zh-CN'] = {
   'settings.support': '支持作者',
   'settings.supportNote': '喜欢这款游戏的话，可以请作者喝杯咖啡 ☕ 打赏不会影响游戏内容，纯粹是支持继续开发！',
   'settings.donate': '用 PayPal 打赏',
+  'settings.ecpay': '用绿界打赏（台湾）',
   'etip.none': '目前没有负面效果',
   'etip.boss': '层主',
   'edb.stun': '眩晕：不能攻击／闪避，受伤 +{v}%',

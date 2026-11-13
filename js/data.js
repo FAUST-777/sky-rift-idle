@@ -753,3 +753,4 @@ G.INTRO_VER = 2;
 
 // 斗內連結（只在網頁版顯示；之後包 Steam／手機 App 時把它設成空字串就會隱藏，平台規定不能放外部付款）
 G.DONATE_URL = 'https://www.paypal.com/paypalme/doge9687';
+G.ECPAY_URL = 'https://p.ecpay.com.tw/350A072'; // 綠界斗內（台灣信用卡／超商／ATM）
