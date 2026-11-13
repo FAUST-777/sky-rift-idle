@@ -1125,6 +1125,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
 
   UI.modal = function (html) { $('modalCard').innerHTML = html; $('modal').hidden = false; };
+  // 第 173 輪：點左上玩家名稱 → 斗內作者視窗
+  document.addEventListener('click', e => {
+    if (!G.DONATE_URL || !e.target.closest('#hudName')) return;
+    UI.modal(`<h3>🥛 ${t('donate.title')}</h3><p style="font-size:14px">${t('donate.text')}</p>
+      <div class="modal-actions"><a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a><button class="btn" data-act="close">${t('common.close')}</button></div>`);
+  });
   UI.close = function () { $('modal').hidden = true; UI.modalKind = null; };
   let toastT;
   UI.toast = function (text) {

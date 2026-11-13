@@ -385,3 +385,7 @@ select { font: inherit; background: var(--card2); color: var(--text); border: 1p
 #splash.out { opacity: 0; pointer-events: none; }
 @keyframes splashDark { to { background: #000; } }
 @keyframes splashLogo { to { opacity: 1; } }
+
+/* 第 173 輪：點玩家名稱開斗內視窗 */
+#hudName { cursor: pointer; }
+#hudName:hover { text-decoration: underline; }
