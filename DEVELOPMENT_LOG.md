@@ -3075,8 +3075,3 @@
 **做法**：點左上 `#hudName` → 斗內視窗（沿用 donate.title／donate.text／settings.donate，三語已有，不用新增 key）；名稱加手指游標、hover 底線。`G.DONATE_URL` 清空就不跳。
 
 **驗證**：puppeteer 點名稱 → 視窗出現 PayPal 連結；無 page error。
-
-## 第 174 輪：斗內加上綠界按鈕（2026-11-14，分支 claude/ecpay-donate）
-**需求**：「三個遊戲的斗內連結除了 PayPal 再加上綠界按鈕，連結是 https://p.ecpay.com.tw/350A072」
-**做法**：data.js 加 `ECPAY_URL`；所有 PayPal 斗內按鈕旁加綠色「綠界斗內」按鈕（設定頁＋點玩家名稱的斗內視窗）。
-**驗證**：puppeteer 點玩家名稱開斗內視窗，PayPal 與綠界兩個連結都在，無 page error。
