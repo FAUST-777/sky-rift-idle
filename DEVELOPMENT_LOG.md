@@ -3075,3 +3075,8 @@
 **做法**：點左上 `#hudName` → 斗內視窗（沿用 donate.title／donate.text／settings.donate，三語已有，不用新增 key）；名稱加手指游標、hover 底線。`G.DONATE_URL` 清空就不跳。
 
 **驗證**：puppeteer 點名稱 → 視窗出現 PayPal 連結；無 page error。
+
+## 第 174 輪：加上 Vercel Web Analytics（2026-11-15，分支 claude/analytics）
+**需求**：「Vercel Web Analytics 可以，四款遊戲都幫我加上」
+**做法**：index.html `<head>` 加 Vercel Web Analytics；只在 `*.vercel.app` 才載入 `/_vercel/insights/script.js`，本機開檔案不會有 404／console error。Vercel 後台該專案要按 Analytics → Enable 才會開始收資料。
+**驗證**：puppeteer 本機載入：`window.va` 存在、未載入 insights 腳本，無 page error／console error。

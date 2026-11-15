@@ -8,6 +8,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>天空裂洞物語</title>
 <link rel="stylesheet" href="style.css">
+  <!-- Vercel Web Analytics（後台要開 Analytics）；只在線上 vercel.app 載入，本機開檔案不會跳錯 -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    if (/\.vercel\.app$/.test(location.hostname)) { const s = document.createElement('script'); s.defer = true; s.src = '/_vercel/insights/script.js'; document.head.appendChild(s); }
+  </script>
 </head>
 <body>
 <!-- 開場動畫：全白 → 慢慢變黑 → 白色 LOGO → 進入遊戲（每次載入都跑，點一下可跳過） -->
