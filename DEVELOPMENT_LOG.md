@@ -3080,3 +3080,8 @@
 **需求**：「Vercel Web Analytics 可以，四款遊戲都幫我加上」
 **做法**：index.html `<head>` 加 Vercel Web Analytics；只在 `*.vercel.app` 才載入 `/_vercel/insights/script.js`，本機開檔案不會有 404／console error。Vercel 後台該專案要按 Analytics → Enable 才會開始收資料。
 **驗證**：puppeteer 本機載入：`window.va` 存在、未載入 insights 腳本，無 page error／console error。
+
+## 第 175 輪：斗內區加「作者其他遊戲」（2026-11-15，分支 claude/other-games）
+**需求**：「幫我四個遊戲的點選 名稱 跟設定裡面 的抖內區域 都新增「作者其他遊戲」然後放上對應的遊戲vercel連結」
+**做法**：點玩家名稱（或店名）跳出的斗內視窗、設定裡的支持作者區，都加上「🎮 作者其他遊戲」，列出另外三款的正式網址（另開分頁）：天空裂洞 sky-rift-idle.vercel.app、貓狗店 meowoof-shop-claude.vercel.app、殭屍之王 zombie-king.vercel.app、馬爾地夫 maldives-before-i-die.vercel.app。
+**驗證**：puppeteer：設定與點名稱的視窗都出現另外三款的連結、網址正確；無 page error。
