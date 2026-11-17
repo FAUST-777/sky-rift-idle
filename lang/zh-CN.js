@@ -580,6 +580,7 @@ G.I18N['zh-CN'] = {
   'other.cat': '喵汪星人吸猫撸狗店',
   'other.zom': '僵尸之王',
   'other.mal': '死前去一趟马尔地夫',
+  'other.star': '星际货运',
   'etip.none': '目前没有负面效果',
   'etip.boss': '层主',
   'edb.stun': '眩晕：不能攻击／闪避，受伤 +{v}%',

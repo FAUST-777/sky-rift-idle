@@ -34,6 +34,8 @@
       // 內嵌的美術（base64，file:// 也能用）
       const data = window.ASSET_DATA || {};
       Object.entries(data).forEach(([key, url]) => this.load.image(key, url));
+      // 第 176 輪：怪物三格動畫圖
+      G.MONSTER_TIERS.flat().forEach(m => { if (m.spr) [1, 2, 3].forEach(n => { const k = `mspr_${m.spr}_${n}`; if (!this.textures.exists(k)) this.load.image(k, G.sprUrl(m.spr, n)); }); });
     }
 
     create() {
@@ -591,11 +593,16 @@
       this.enemies = [];
       for (let i = 0; i < count; i++) {
         const m = boss ? pool[(f - 1) % pool.length] : G.pick(pool);
+        const spr = m.spr && this.textures.exists(`mspr_${m.spr}_1`) ? m.spr : null;   // 有動畫圖就用動畫圖
         const u = this.makeUnit({
           side: 'enemy', kind: 'monster', boss, monsterId: m.id, shape: m.shape, color: m.color,
-          st: Object.assign(G.monsterStats(f, boss), { dmgType: 'physical' }), texture: this.monsterTex(m.shape, m.color),
+          st: Object.assign(G.monsterStats(f, boss), { dmgType: 'physical' }), texture: spr ? `mspr_${spr}_1` : this.monsterTex(m.shape, m.color),
           x: ENEMY_X[boss ? 1 : i], scale: boss ? 1.75 : 1.1, originY: 0.94,
         });
+        if (spr) {   // 動畫圖：等比例縮到跟原本造型差不多大、面向左
+          u.spr = spr; u.sprT = Math.random();
+          u.img.setScale((boss ? 1.75 : 1.1) * 62 / Math.max(u.img.width, u.img.height)).setFlipX(G.SPR_FACE[spr] === 1);
+        }
         u.img.x = W + 40 + i * 50;
         this.tweens.add({ targets: u.img, x: u.homeX, duration: 700, ease: 'Quad.out' });
         this.enemies.push(u);
@@ -1394,6 +1401,7 @@
         this.units.forEach(u => { u.img.y = GROUND; });
       }
       this.rigTick(dt, walking);
+      this.enemies.forEach(u => { if (!u.spr || !u.alive) return; u.sprT += dt; const k = `mspr_${u.spr}_${Math.floor(u.sprT * 6) % 3 + 1}`; if (u.img.texture.key !== k) u.img.setTexture(k); });   // 怪物三格動畫
 
       if (this.mode === 'walk') {
         this.walkT -= dt;

@@ -192,7 +192,7 @@
         <h3>🥛 ${t('donate.title')}</h3>
         <p style="font-size:13px;margin:0 0 10px">${t('donate.text')}</p>
         <a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
-        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a></div></div>`}
+        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
       </div>` : ''}`;
   }
 
@@ -992,18 +992,26 @@
       <div class="dex-grid">${cells}</div></div>`;
   }
 
+  // 第 176 輪：寵物欄／圖鑑也用動畫圖的第一格（圖還沒載好就先畫程式造型，載好再補畫）
+  const monImg = {};
+  function drawMon(c, id, shape, color, dark) {
+    const ctx = c.getContext('2d'), m = G.MONSTER_TIERS.flat().find(x => x.id === id);
+    const plain = () => { ctx.clearRect(0, 0, c.width, c.height); ctx.filter = dark ? 'brightness(0) opacity(.5)' : 'none'; G.ART.drawMonster(ctx, shape, color, 0, 0, 1.5); ctx.filter = 'none'; };
+    if (!m || !m.spr) { plain(); return; }
+    let im = monImg[m.spr]; if (!im) { im = monImg[m.spr] = new Image(); im.src = G.sprUrl(m.spr, 1); }
+    const draw = () => { ctx.clearRect(0, 0, c.width, c.height); ctx.filter = dark ? 'brightness(0) opacity(.5)' : 'none'; const sc = 88 / Math.max(im.naturalWidth, im.naturalHeight), w = im.naturalWidth * sc, h = im.naturalHeight * sc; ctx.save(); ctx.translate(48, 48); if (G.SPR_FACE[m.spr] === 1) ctx.scale(-1, 1); ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore(); ctx.filter = 'none'; };
+    if (im.complete && im.naturalWidth) draw(); else { plain(); im.addEventListener('load', draw, { once: true }); }
+  }
   function mountPets() {
     $('panel').querySelectorAll('canvas[data-pet]').forEach(c => {
       const p = G.S.pets[+c.dataset.pet];
       c.width = 96; c.height = 96;
-      G.ART.drawMonster(c.getContext('2d'), p.shape, p.color, 0, 0, 1.5);
+      drawMon(c, p.id, p.shape, p.color);
     });
     $('panel').querySelectorAll('canvas[data-dex]').forEach(c => {
       const m = G.MONSTER_TIERS.flat().find(x => x.id === c.dataset.dex), e = G.S.dex[m.id];
       c.width = 96; c.height = 96;
-      const ctx = c.getContext('2d');
-      if (!e || !e.seen) ctx.filter = 'brightness(0) opacity(.5)';   // 還沒發現：剪影
-      G.ART.drawMonster(ctx, m.shape, m.color, 0, 0, 1.5);
+      drawMon(c, m.id, m.shape, m.color, !e || !e.seen);   // 還沒發現：剪影
     });
   }
 
@@ -1039,7 +1047,7 @@
         <div class="set-label">☕ ${t('settings.support')}</div>
         <p class="muted" style="font-size:12px;margin:0 0 8px">${t('settings.supportNote')}</p>
         <a class="btn small donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
-        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a></div></div>`}
+        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
       </div>` : ''}
       <div class="set-group">
         <div class="set-label">💾 ${t('settings.data')}</div>
@@ -1131,7 +1139,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   document.addEventListener('click', e => {
     if (!G.DONATE_URL || !e.target.closest('#hudName')) return;
     UI.modal(`<h3>🥛 ${t('donate.title')}</h3><p style="font-size:14px">${t('donate.text')}</p>
-      <div class="modal-actions"><a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a><button class="btn" data-act="close">${t('common.close')}</button></div>${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a></div></div>`}`);
+      <div class="modal-actions"><a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a><button class="btn" data-act="close">${t('common.close')}</button></div>${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}`);
   });
   UI.close = function () { $('modal').hidden = true; UI.modalKind = null; };
   let toastT;

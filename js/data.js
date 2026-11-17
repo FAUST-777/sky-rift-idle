@@ -536,17 +536,20 @@ G.FX_ICON = {
 // ── 怪物（名稱：monster.<id>）──────────────────────────────────────────────
 // 每 5 層換一組怪；shape 決定程式畫的造型
 G.MONSTER_TIERS = [
-  [{ id: 'cloudSlime', shape: 'slime', color: '#7ec8e3' }, { id: 'windBat', shape: 'bat', color: '#8a7fb5' }, { id: 'rubbleGolem', shape: 'golem', color: '#9a8f80' }],
-  [{ id: 'thunderBird', shape: 'bird', color: '#f2d24b' }, { id: 'skyJelly', shape: 'jelly', color: '#e58fd6' }, { id: 'ironCrow', shape: 'bird', color: '#5b5f6b' }],
-  [{ id: 'gargoyle', shape: 'bat', color: '#6b7d8c' }, { id: 'cloudGiant', shape: 'golem', color: '#d8e4f0' }, { id: 'riftSlime', shape: 'slime', color: '#b04be0' }],
-  [{ id: 'voidJelly', shape: 'jelly', color: '#5b3daf' }, { id: 'starGolem', shape: 'golem', color: '#2f3b66' }, { id: 'skyWarden', shape: 'bird', color: '#ffd27a' }],
+  [{ id: 'cloudSlime', spr: 'b_mutant', shape: 'slime', color: '#7ec8e3' }, { id: 'windBat', spr: 'a_dragon', shape: 'bat', color: '#8a7fb5' }, { id: 'rubbleGolem', spr: 'b_judge', shape: 'golem', color: '#9a8f80' }],
+  [{ id: 'thunderBird', spr: 'b_smuggler', shape: 'bird', color: '#f2d24b' }, { id: 'skyJelly', spr: 'a_jelly', shape: 'jelly', color: '#e58fd6' }, { id: 'ironCrow', spr: 'e_blockade', shape: 'bird', color: '#5b5f6b' }],
+  [{ id: 'gargoyle', spr: 'b_mantis', shape: 'bat', color: '#6b7d8c' }, { id: 'cloudGiant', spr: 'b_chickmech', shape: 'golem', color: '#d8e4f0' }, { id: 'riftSlime', spr: 'b_worm', shape: 'slime', color: '#b04be0' }],
+  [{ id: 'voidJelly', spr: 'b_squid2', shape: 'jelly', color: '#5b3daf' }, { id: 'starGolem', spr: 'b_robooct', shape: 'golem', color: '#2f3b66' }, { id: 'skyWarden', spr: 'b_nautilus', shape: 'bird', color: '#ffd27a' }],
   // 第 21 層起：裂洞上方的「天空之海」，海洋生物（每 5 層 2 種）
-  [{ id: 'bubbleCrab', shape: 'crab', color: '#e8604c' }, { id: 'skyStarfish', shape: 'starfish', color: '#ffb347' }],
-  [{ id: 'pearlClam', shape: 'clam', color: '#e9d6c2' }, { id: 'cloudPuffer', shape: 'puffer', color: '#9fd3ef' }],
-  [{ id: 'inkOctopus', shape: 'octopus', color: '#b05a9e' }, { id: 'thunderUrchin', shape: 'urchin', color: '#5a4a8a' }],
-  [{ id: 'tideSeahorse', shape: 'seahorse', color: '#4fc3a1' }, { id: 'isleTurtle', shape: 'turtle', color: '#6b9a5a' }],
-  [{ id: 'stormEel', shape: 'eel', color: '#3a7bd5' }, { id: 'skyWhale', shape: 'whale', color: '#5b7fb5' }],
+  [{ id: 'bubbleCrab', spr: 'a_crab', shape: 'crab', color: '#e8604c' }, { id: 'skyStarfish', spr: 'a_nautilus', shape: 'starfish', color: '#ffb347' }],
+  [{ id: 'pearlClam', spr: 'a_clam', shape: 'clam', color: '#e9d6c2' }, { id: 'cloudPuffer', spr: 'a_eye', shape: 'puffer', color: '#9fd3ef' }],
+  [{ id: 'inkOctopus', spr: 'a_squid', shape: 'octopus', color: '#b05a9e' }, { id: 'thunderUrchin', spr: 'b_lavacrab', shape: 'urchin', color: '#5a4a8a' }],
+  [{ id: 'tideSeahorse', spr: 'a_hydra', shape: 'seahorse', color: '#4fc3a1' }, { id: 'isleTurtle', spr: 'b_isopod', shape: 'turtle', color: '#6b9a5a' }],
+  [{ id: 'stormEel', spr: 'b_leviathan', shape: 'eel', color: '#3a7bd5' }, { id: 'skyWhale', spr: 'b_angler', shape: 'whale', color: '#5b7fb5' }],
 ];
+// 第 176 輪：怪物外觀換成三格動畫圖（assets/monsters/{spr}_1~3.webp，跟「星際貨運」共用素材）；SPR_FACE＝圖上面向（1 右、-1 左、0 正面），戰鬥中怪物要面向左
+G.SPR_FACE = { a_nautilus: -1, a_squid: -1, a_hydra: -1, a_clam: 0, a_crab: 0, a_eye: 1, a_dragon: 1, a_jelly: 0, b_robooct: 0, b_mutant: -1, b_smuggler: 1, b_worm: -1, b_chickmech: -1, b_judge: -1, b_nautilus: 1, b_angler: 1, b_leviathan: -1, b_isopod: -1, b_squid2: -1, b_lavacrab: 0, b_mantis: -1, e_blockade: 1 };
+G.sprUrl = (k, n) => `assets/monsters/${k}_${n || 1}.webp`;
 G.monsterTier = f => G.MONSTER_TIERS[Math.min(G.MONSTER_TIERS.length - 1, Math.floor((f - 1) / 5))];
 G.monsterStats = (f, boss) => {
   const m = boss ? { hp: 7, atk: 1.8, def: 1.5 } : { hp: 1, atk: 1, def: 1 };

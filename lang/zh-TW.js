@@ -580,6 +580,7 @@ G.I18N['zh-TW'] = {
   'other.cat': '喵汪星人吸貓擼狗店',
   'other.zom': '殭屍之王',
   'other.mal': '死前去一趟馬爾地夫',
+  'other.star': '星際貨運',
   'etip.none': '目前沒有負面效果',
   'etip.boss': '層主',
   'edb.stun': '暈眩：不能攻擊／閃避，受傷 +{v}%',

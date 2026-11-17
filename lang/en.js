@@ -580,6 +580,7 @@ G.I18N['en'] = {
   'other.cat': 'Meow-Woof Cat & Dog Shop',
   'other.zom': 'Zombie King',
   'other.mal': 'Maldives Before I Die',
+  'other.star': 'Star Freight',
   'etip.none': 'No debuffs right now',
   'etip.boss': 'Boss',
   'edb.stun': 'Stun: can’t attack or dodge, +{v}% damage taken',
