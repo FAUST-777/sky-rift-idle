@@ -430,7 +430,7 @@
       this.syncDoom(u);
     }
     doomBlast(u, s) {
-      const dmg = Math.round(s.acc * s.v);
+      const dmg = Math.round(s.acc * s.v * (this.aura.wolfDoom || 1));   // 華爾街之狼 2 人以上：引爆傷害最終 ×3
       if (!u.alive || dmg <= 0) return;
       this.doomBlasting = true;
       this.floatText(u.img.x, this.barY(u) - 26, G.t('battle.doomBlast'), '#e8e4d8', 13, 700);
@@ -1114,6 +1114,7 @@
         spd: S.spd, crit: 5, critDmg: 1.5, ranged: false, range: 'one', dmgType: 'dark', missile: S.missile,
       };
       const lr = this.legionRank(); if (lr) st.maxHp = Math.round(st.maxHp * (1 + G.UNDEAD_LEGION.hp(lr)));   // 亡靈軍團：召喚物生命
+      if (kind === 'golem') st.maxHp = Math.max(1, Math.round(st.maxHp * G.GOLEM_HP_FINAL));   // 第 177 輪：石魔人削弱，生命最後 ×33%
       const unit = this.makeUnit({ side: 'party', kind: 'summon', minion: kind, st, x: 224, texture: 'summon_' + kind, originY: 0.94, scale: 0.85 });
       unit.img.setAlpha(0);
       this.tweens.add({ targets: unit.img, alpha: 1, duration: 300 });

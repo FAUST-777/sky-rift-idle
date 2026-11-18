@@ -327,6 +327,8 @@
     const add = (k, v) => { if (v) aura[k] = (aura[k] || 0) + v; };
     // AURA_MAX 的欄位多人裝也不疊加（取最大）
     G.partyMembers().forEach(w => Object.entries(G.passivesOf(w).party).forEach(([k, v]) => { if (AURA_MAX.includes(k)) aura[k] = Math.max(aura[k] || 0, v); else add(k, v); }));
+    // 第 177 輪：華爾街之狼 2 人以上 → 第二艘船上限無效，改成死亡詛咒引爆傷害最終 ×3
+    if (G.partyMembers().filter(w => G.passivesOf(w).party.wolfSkill).length >= 2) aura.wolfDoom = G.WOLF_DOOM_X;
     Object.entries(G.shipBonus()).forEach(([k, v]) => add(k, v));
     G.S.pets.forEach(p => p.bonus && add(p.bonus.stat, p.bonus.v));   // 捕獲的怪物：各自一個小增益
     G.S.party.forEach(id => { const p = G.PARTNERS.find(x => x.id === id); if (p && p.perk && G.S.partners[id]) { add(p.perk.stat, p.perk.v); if (p.perk.extra) aura[p.perk.extra] = 1; } });   // 出戰夥伴的專屬 buff（extra 是開關）

@@ -500,6 +500,7 @@ G.INSIDER = { every: 5, hpCut: 0.99, healCut: 0.33, shield: lin(3, 1.1925), dur:
 G.GRUDGE = { regen: 0.01, bleedT: 3, vsFear: 0.5, vsDecayCritDmg: 0.5 };   // vsFear：普攻打恐懼敵人傷害；vsDecayCritDmg：打衰老詛咒敵人暴擊傷害
 G.BONE_STORM = { def: 0.2, blind: 0.2, poison: lin(1, 0.25), t: 6 };
 G.DOOM_MAX_STACKS = 1;   // 死亡詛咒同時幾層（第 110 輪改 1：不疊層，身上有詛咒時不會再上）
+G.WOLF_DOOM_X = 3;      // 第 177 輪：隊伍有 2 位以上華爾街之狼 → 死亡詛咒引爆傷害最終 ×3
 G.DOOM_MULT = 1;         // 死亡詛咒引爆倍率（第 110 輪：110%→200% 改固定 100%）
 G.UNDEAD_LEGION = { hp: lin(0.1, 0.1), evade: lin(0.1, 0.0125), fearChance: 0.1, decayDmg: 0.5 };
 G.DEATH_PACT = {
@@ -519,7 +520,8 @@ G.SUMMON_SKILLS = {
   golem:    { id: 'sm_taunt',  cd: 9, cd0: 0.5, v: () => 0.05, fx: v => ({ target: 'none', taunt: { v, t: 10 } }) },
   skeleton: { id: 'sm_arrows', cd: 8, cd0: 1.5, v: () => 2,   fx: v => ({ target: 'all', mult: v, self: [{ id: 'spdUp', v: 1, t: 5 }] }) },
 };
-G.GOLEM_EVADE_CAP = 0.2;   // 石魔人閃避上限（一般角色是 G.CONFIG.evadeCap 90%）
+G.GOLEM_EVADE_CAP = 0.05;  // 石魔人閃避上限（第 177 輪：20%→5%；一般角色是 G.CONFIG.evadeCap 90%）
+G.GOLEM_HP_FINAL = 0.33;   // 第 177 輪：石魔人最大生命最後再乘 33%
 G.GOLEM_HEAL_CUT = 0.99;   // 石魔人受到的所有回復 -99%（回血、治療、吸血）
 // 死靈術師的召喚物：站在隊伍正前方，普攻隨機打一隻敵人；場上最多一隻
 G.SUMMONS = {
