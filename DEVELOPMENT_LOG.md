@@ -3128,3 +3128,11 @@
 **驗證**：puppeteer：死靈生命 1000、召喚強度 1.6×1.3 → 石魔人生命 6240×0.33＝2059、閃避上限 0.05；wolfDoom＝3 時引爆 10 點累積傷害 → 造成 30；無 page error。
 
 **上版**：dev 合併到 main。
+
+## 第 178 輪：作者其他遊戲的貓狗遊戲改連「貓狗2」新網址（2026-11-20）
+
+**需求**：貓狗遊戲拆成貓狗1（舊網址 meowoof-shop-claude.vercel.app，平台專用版、不放其他遊戲）與貓狗2（新網址），其他遊戲的「作者其他遊戲」改連貓狗2，全部上版。
+
+**做法**：js/ui.js 的貓狗連結 https://meowoof-shop-claude.vercel.app → https://meowoof-shop-2.vercel.app。
+
+**驗證**：node --check 通過；新網址回 200。**上版**：dev 合併到 main。

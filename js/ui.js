@@ -192,7 +192,7 @@
         <h3>🥛 ${t('donate.title')}</h3>
         <p style="font-size:13px;margin:0 0 10px">${t('donate.text')}</p>
         <a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
-        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
+        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-2.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
       </div>` : ''}`;
   }
 
@@ -1047,7 +1047,7 @@
         <div class="set-label">☕ ${t('settings.support')}</div>
         <p class="muted" style="font-size:12px;margin:0 0 8px">${t('settings.supportNote')}</p>
         <a class="btn small donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a>
-        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
+        ${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-2.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}
       </div>` : ''}
       <div class="set-group">
         <div class="set-label">💾 ${t('settings.data')}</div>
@@ -1139,7 +1139,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   document.addEventListener('click', e => {
     if (!G.DONATE_URL || !e.target.closest('#hudName')) return;
     UI.modal(`<h3>🥛 ${t('donate.title')}</h3><p style="font-size:14px">${t('donate.text')}</p>
-      <div class="modal-actions"><a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a><button class="btn" data-act="close">${t('common.close')}</button></div>${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-claude.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}`);
+      <div class="modal-actions"><a class="btn donate" href="${G.DONATE_URL}" target="_blank" rel="noopener noreferrer">💖 ${t('settings.donate')}</a><button class="btn" data-act="close">${t('common.close')}</button></div>${`<div class="ogames"><div class="oglabel">🎮 ${t('other.title')}</div><div class="oglist"><a class="oglink" href="https://meowoof-shop-2.vercel.app" target="_blank" rel="noopener noreferrer">🐱 ${t('other.cat')}</a><a class="oglink" href="https://zombie-king.vercel.app" target="_blank" rel="noopener noreferrer">🧟 ${t('other.zom')}</a><a class="oglink" href="https://maldives-before-i-die.vercel.app" target="_blank" rel="noopener noreferrer">🏝️ ${t('other.mal')}</a><a class="oglink" href="https://star-freight-game.vercel.app" target="_blank" rel="noopener noreferrer">🚀 ${t('other.star')}</a></div></div>`}`);
   });
   UI.close = function () { $('modal').hidden = true; UI.modalKind = null; };
   let toastT;
